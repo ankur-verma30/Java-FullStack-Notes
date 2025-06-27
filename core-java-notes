@@ -1,0 +1,400 @@
+What is a class?
+-> A class in Java is a blueprint or template for creating objects.
+-> It defines the data (fields/attributes) and the behavior (methods/functions) that the objects created from the class will have.
+-> Class helps us to create objects in Java.
+
+Class Naming Convention
+#######################
+-> In Java, we use the class keyword to create a class, and the class keyword should be in lowercase. The class name should start with an uppercase letter only.
+-> If more than one word is used, then we should use camel casing.
+
+Note: class name cannot start with a number but can begin with $ or underscore(_), but it is not recommended.
+
+Example :
+class A {}
+-> We define the boundary of a class using curly brackets.
+  
+Example :
+-> Will execute without any error
+public class Bank_Account_Number {}  // Snake Casing-->Should not use for Java
+
+Note:
+1. Do not use specials characters like #,@ % & etc while creating class.
+2. $Class name will execute. But never create a class with a special character $.
+
+new keyword:
+##############
+The new keyword in Java is used to create objects (instances) of a class. 
+-> Using the new keyword, we send a request to the class to create an object
+-> Once the object is created new keyword will get the object's address and store that in a reference variable.
+
+Syntax to create an object:
+-------------------------
+ClassName variableName = new ClassName();
+
+Note:
+Two types of camel casing:
+a. Upper Case Camel Casing: Used for naming class, interface, abstract class, etc
+b. Lower Case Camel Casing: Used for creating methods, variables, etc
+_______________________________________________________________________ 
+
+Non-static Variable/ Instance Variable /Object Variables
+#########################################################
+It is a variable declared inside a class, but outside any method, and without the static keyword.
+📌 It belongs to:
+An instance of the class (not the class itself)
+Every object has its copy
+
+1. We should create non non-static variable inside a class outside a method without using the static keyword.
+2. Without creating an object, we cannot access non non-static variable.
+
+Example :
+public class A {
+	int x = 10;
+	int y = 20;
+  int z;
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(a1.x); // Output :10
+		System.out.println(a1.y); // Output :20
+
+    A a2 = new A();
+		System.out.println(a2.x); // Output :10
+    System.out.println(a2.z); // Output :0 //default value of int is 0
+	}
+}
+3. Every time we create an object non-static variable copy is loaded into that object.
+4. A copy of the variable in this object is different. That is, if you change the value of a variable in one object, those changes cannot be seen in another object.
+5. It is mandatory to initialize a non-static variable. Depending on the data type, automatically default value will be automatically stored in it.
+
+Static variables:
+#################
+->A static variable is a class-level variable, meaning:
+->It belongs to the class, not the object.
+->It is shared among all instances of the class.
+->Only one copy exists in memory, regardless of how many objects are created.
+
+1. We should create static variables inside a class but outside a method with the static keyword
+2. To access a static variable, we will use below options:
+a. ClassName.variableName
+b. variableName (Constraints)
+c. objectAddress.variableName (Wrong Approach, but will work)
+
+Example:
+---------------
+public class A {
+	static int x=10 ;
+	public static void main(String[] args) {
+		System.out.println(A.x);// Output :10
+		System.out.println(x);// Output :10
+    
+		//Wrong
+		A a1 = new A();
+		System.out.println(a1.x);//A.x, but will give the Output:10
+    A.x = 30;
+		System.out.println(A.x); //Ouput :30 
+  }
+}
+
+Types of variables in Java
+############################
+
+1. Local Variable
+######################
+a. Local variables should be created inside methods
+b. We should use local variables within the created method only
+c. Without initialization, if you are using a local variable, you will get an error.
+  
+Example 1:
+---------
+public class A {
+	static int y=10;
+	public static void main(String[] args) {
+		int x = 100;
+		System.out.println(x);
+    System.out.println(A.y);// Output :10
+	  A a1 = new A();
+		a1.test();
+    System.out.println(y);//Error
+	}
+	public void test() {
+    int z=100;
+		System.out.println(x);//Error because it is not present in this method
+    System.out.println(z); //Correct
+    System.out.println(A.y);
+	}
+}
+
+2. Static variable
+3. Non-static variable/instance variable
+
+4. Reference Variable
+#####################
+A reference variable in Java is a variable that stores the memory address (reference) of an object, not the actual object itself.
+a. Can hold either an Object address or a null value
+b. The datatype of the reference variable is the class 
+
+Example :
+----------
+In the below example, "a1" is created inside main, and hence it is a local variable. We cannot access that outside the main method
+
+Note: If we do not initialize a static reference variable, then by default null value will be stored in it.
+  
+public class A {
+	static A a4;  //null
+	public static void main(String[] args) {
+		A a1 = null;
+		A a2 = new A();
+    A a3;
+    System.out.println(a3);// Error because "a3" is local variable and not initialized   
+	}
+  public void test() {
+		System.out.println(a1);//Error
+	}
+}
+
+🧱 Stack Memory – LIFO (Last In First Out)
+###########################################
+Stores:
+Method calls,
+local variables,
+and reference variables (not actual objects).
+
+->Memory is automatically managed (pushed and popped as methods are called or returned).
+->Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
+->Faster but limited in size.
+
+🧠 Example:
+When a method is called, its variables go on the stack. When it returns, they’re removed.
+
+🗃️ Heap Memory
+################
+Used to store objects and instance variables.
+Every time you do new ClassName(), it creates an object in the heap.
+Objects stay in memory until they're no longer referenced.
+
+📍 Note: All reference variables (in the stack) point to objects in the heap.
+
+🗑️ Garbage Collector (GC)
+##########################
+Java’s automatic memory management tool.
+Runs in the background and:
+1. Detects objects in the heap no longer referenced
+2. Removes them to free memory
+3. Helps prevent memory leaks and overflow
+
+📌 You don’t have to manually delete objects — GC handles it.
+
+methods in java
+###############
+1. void keyword: A void method cannot return any value
+
+Example :
+----------
+public class C {
+	public static void main(String[] args) {
+		C c1 = new C();
+		int x = c1.test1(); //Error
+    int y= c1.test2();
+		System.out.println(y);// Output :100
+	}
+	public void test1() {
+		return 100;//Error
+  }
+public int test2() {
+		return 100;
+  }
+}
+
+return without value vs return value in Java
+#############################################
+The difference between return and return value lies in what you're returning and why.
+
+return without value keyword:
+-----------------------------
+-> A method has to be void
+-> It is optional
+-> It will return control to the method calling statement
+
+Note: If we write code after the return keyword, then that code will 100% not run. This error is called an unreachable code error
+
+Example:
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+	  c1.test();
+	}
+	
+	public void test() {
+		System.out.println(100);
+		return;
+		System.out.println(200);
+	}
+}
+Output: unreachable code error
+
+returning "value"
+-----------------
+-> The method has to be non-void
+-> It is mandatory to use a return "value" statement inside a non-void method
+-> It will return control and value to the method calling statement
+
+public class C {
+	public static void main(String[] args) {
+  }
+	public int test() {}// Error
+  public int test() {
+		return 100; 
+		System.out.println(300);// Unreachable code error
+	}
+}
+
+Method Arguments
+##################
+-> Using method arguments, we supply values to the method when we call it
+-> The method argument is a local variable
+-> Arguments inside the method values that you supply to the method should match
+
+Example:
+-------
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+    C c2 = new C();
+	  c1.test1(100);
+    c2.test2(100,"mike");
+	}
+	
+	public void test1(int x) {
+		System.out.println(x);
+	}
+  public void test2(int x,String y) {
+		System.out.println(x);
+	}
+}
+
+Note: When the method argument type is Object, then we can supply any kind of value to it
+
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+	  c1.test('a');
+	}
+	
+	public void test(Object x) {
+		System.out.println(x);
+	}
+}
+
+Using Varargs (Variable Arguments)
+##################################
+Example 2:
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+	  c1.test("mike",100,200,300,400);
+	}
+	
+	public void test(String y, int... x) { 
+		System.out.println(x[0]);// Output :100
+		System.out.println(x[1]);// Output :200
+		System.out.println(x[2]);// Output :300
+		System.out.println(x[3]);// Output :400
+		System.out.println(y);// Output :mike
+	}
+}
+
+Static Methods in Java
+######################
+A static method belongs to the class, not to instances (objects) of the class.
+This means you can call a static method without creating an object of that class.
+public class C {
+	public static void main(String[] args) {
+	    C.test1();// Output :599
+      int x =  C.test2();
+	    System.out.println(x);// Output :100  
+	}
+	public static void test1() {
+		System.out.println(599);
+	}
+  public static int test2() {
+		return 100;
+	}
+}  
+
+Java Data Types 
+################
+Java data types are divided into 2 main categories:
+
+🔹 1. Primitive Data Types (8 types)
+-------------------------------------
+Built-in, fixed-size types that store actual values directly.
+
+🔸 Integer Types (for whole numbers)
+--------------------------------------
+Type	       Size     	Default Value	      Range
+byte	       1 byte	      0	              -128 to 127
+short	       2 bytes	    0	              -32,768 to 32,767
+int	         4 bytes	    0	              -2,147,483,648 to 2,147,483,647
+long       	 8 bytes	    0	              -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+
+🔸 Floating Point Types (for decimals)
+----------------------------------------
+Type	    Size	      Default Value	        Range
+float	    4 bytes	      0.0f	              ±3.40282347E+38F (single-precision)
+double	  8 bytes	      0.0d	              ±1.79769313486231570E+308 (double-precision)
+
+Find the size of the datatype
+#########################
+Example:
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Size of int in bytes: " + Integer.BYTES);
+        System.out.println("Size of int in bits: " + Integer.SIZE);
+    }
+}
+
+🔸 Other Primitive Types
+-----------------------------
+Type	    Size	            Default Value	          Description
+boolean	  (JVM dependent)	  false                   Only true or false
+char	    2 bytes	          ' ' (blank)	            0 to 65,535 (Unicode characters)
+
+🔹 2. Non-Primitive / Reference Data Types
+---------------------------------------------
+Type	               Description	                        Default Value
+String	        A class (sequence of characters)	          null
+Arrays	        Object that holds multiple values	          null
+Custom Classes	User-defined types	                        null
+
+📌 Notes:
+String is not a primitive type, but a class in java.lang package.
+All reference types default to null.
+->Use long literals with L or l: long x = 123456789L;
+->Use float literals with F or f: float y = 3.14F;
+
+A new type was introduced in Java version 10
+---------------------------------------
+var type
+#########
+-> This was introduced in Java version 10
+-> It gives a dynamic datatype concept. Depending on the value stored inside the variable, the datatype is allocated to it internally.
+
+Example:
+public class C {
+	public static void main(String[] args) {
+		var x1 =100;
+		var x2 =100.3;
+		var x3 ="mike";
+		var x4 =new C();
+		System.out.println(x1);
+		System.out.println(x2);
+		System.out.println(x3);
+		System.out.println(x4);
+	}
+  public var test(var x3) {}//Error
+}
+-> var type can only be a local variable
+-> It cannot be a static / non-static variable
+-> It cannot be a method argument
+-> It cannot be a method return type
