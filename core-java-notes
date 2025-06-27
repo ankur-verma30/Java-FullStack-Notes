@@ -91,7 +91,7 @@ public class A {
 		//Wrong
 		A a1 = new A();
 		System.out.println(a1.x);//A.x, but will give the Output:10
-    A.x = 30;
+                A.x = 30;
 		System.out.println(A.x); //Ouput :30 
   }
 }
@@ -112,16 +112,16 @@ public class A {
 	public static void main(String[] args) {
 		int x = 100;
 		System.out.println(x);
-    System.out.println(A.y);// Output :10
-	  A a1 = new A();
-		a1.test();
-    System.out.println(y);//Error
+    		System.out.println(A.y);// Output :10
+		A a1 = new A();
+         	a1.test();
+    		System.out.println(y);//Error
 	}
 	public void test() {
-    int z=100;
-		System.out.println(x);//Error because it is not present in this method
-    System.out.println(z); //Correct
-    System.out.println(A.y);
+        int z=100;
+	System.out.println(x);//Error because it is not present in this method
+        System.out.println(z); //Correct
+        System.out.println(A.y);
 	}
 }
 
@@ -145,10 +145,10 @@ public class A {
 	public static void main(String[] args) {
 		A a1 = null;
 		A a2 = new A();
-    A a3;
-    System.out.println(a3);// Error because "a3" is local variable and not initialized   
+    		A a3;
+    		System.out.println(a3);// Error because "a3" is local variable and not initialized   
 	}
-  public void test() {
+  	public void test() {
 		System.out.println(a1);//Error
 	}
 }
@@ -195,15 +195,15 @@ public class C {
 	public static void main(String[] args) {
 		C c1 = new C();
 		int x = c1.test1(); //Error
-    int y= c1.test2();
+    		int y= c1.test2();
 		System.out.println(y);// Output :100
 	}
 	public void test1() {
 		return 100;//Error
-  }
-public int test2() {
+ 	 }
+	public int test2() {
 		return 100;
-  }
+  	}
 }
 
 return without value vs return value in Java
@@ -226,9 +226,9 @@ public class C {
 	}
 	
 	public void test() {
-		System.out.println(100);
-		return;
-		System.out.println(200);
+	      System.out.println(100);
+	      return;
+	      System.out.println(200);
 	}
 }
 Output: unreachable code error
@@ -240,10 +240,9 @@ returning "value"
 -> It will return control and value to the method calling statement
 
 public class C {
-	public static void main(String[] args) {
-  }
-	public int test() {}// Error
-  public int test() {
+	public static void main(String[] args) {}
+	public int test1() {}// Error
+  	public int test2() {
 		return 100; 
 		System.out.println(300);// Unreachable code error
 	}
@@ -259,17 +258,17 @@ Example:
 -------
 public class C {
 	public static void main(String[] args) {
-	  C c1 = new C();
-    C c2 = new C();
-	  c1.test1(100);
-    c2.test2(100,"mike");
+	 C c1 = new C();
+    	 C c2 = new C();
+	 c1.test1(100);
+    	 c2.test2(100,"mike");
 	}
 	
 	public void test1(int x) {
-		System.out.println(x);
+	  System.out.println(x);
 	}
   public void test2(int x,String y) {
-		System.out.println(x);
+	  System.out.println(x);
 	}
 }
 
@@ -280,9 +279,8 @@ public class C {
 	  C c1 = new C();
 	  c1.test('a');
 	}
-	
 	public void test(Object x) {
-		System.out.println(x);
+	   System.out.println(x);
 	}
 }
 
@@ -311,7 +309,7 @@ This means you can call a static method without creating an object of that class
 public class C {
 	public static void main(String[] args) {
 	    C.test1();// Output :599
-      int x =  C.test2();
+    	    int x =  C.test2();
 	    System.out.println(x);// Output :100  
 	}
 	public static void test1() {
@@ -333,10 +331,10 @@ Built-in, fixed-size types that store actual values directly.
 🔸 Integer Types (for whole numbers)
 --------------------------------------
 Type	       Size     	Default Value	      Range
-byte	       1 byte	      0	              -128 to 127
-short	       2 bytes	    0	              -32,768 to 32,767
-int	         4 bytes	    0	              -2,147,483,648 to 2,147,483,647
-long       	 8 bytes	    0	              -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+byte	       1 byte	            0	              -128 to 127
+short	       2 bytes	   	    0	              -32,768 to 32,767
+int	       4 bytes	            0	              -2,147,483,648 to 2,147,483,647
+long           8 bytes	            0	              -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
 
 🔸 Floating Point Types (for decimals)
 ----------------------------------------
@@ -357,15 +355,15 @@ public class Main {
 🔸 Other Primitive Types
 -----------------------------
 Type	    Size	            Default Value	          Description
-boolean	  (JVM dependent)	  false                   Only true or false
-char	    2 bytes	          ' ' (blank)	            0 to 65,535 (Unicode characters)
+boolean	    (JVM dependent)	    false                   Only true or false
+char	    2 bytes	            ' ' (blank)	            0 to 65,535 (Unicode characters)
 
 🔹 2. Non-Primitive / Reference Data Types
 ---------------------------------------------
 Type	               Description	                        Default Value
 String	        A class (sequence of characters)	          null
 Arrays	        Object that holds multiple values	          null
-Custom Classes	User-defined types	                        null
+Custom Classes	User-defined types	                          null
 
 📌 Notes:
 String is not a primitive type, but a class in java.lang package.
