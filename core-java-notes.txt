@@ -678,3 +678,490 @@ public class A {
 	}	
 }
 
+✅ Types of Constructor Chaining
+-> When we call one constructor from another constructor it will form chain like flow structure. This is called constructor chaining
+🔸 1. Within the Same Class → Use this()
+You can use this() to call another constructor in the same class.
+
+✅ Example:
+class Student {
+    String name;
+    int age;
+
+    Student() {
+        this("Unknown", 18);  // calls 2-arg constructor
+        System.out.println("Default constructor called");
+    }
+
+    Student(String name) {
+        this(name, 18);  // calls 2-arg constructor
+    }
+
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+        System.out.println("Parameterized constructor called");
+    }
+
+    void display() {
+        System.out.println("Name: " + name + ", Age: " + age);
+    }
+}
+▶️ Output:
+The parameterized constructor called  
+The default constructor is called  
+🔸 2. From Subclass to Superclass → Use super()
+You can call a constructor from the parent class using super().
+
+✅ Example:
+class Person {
+    Person() {
+        System.out.println("Person constructor");
+    }
+}
+
+class Student extends Person {
+    Student() {
+        super(); // calls Person constructor
+        System.out.println("Student constructor");
+    }
+}
+
+⚠️ Rules of Constructor Chaining
+Rule	Description
+✅ Only one constructor can be called using this() or super()	
+✅ Must be the first statement in the constructor	
+❌ Cannot mix this() and super() in the same constructor
+
+###############################
+Important Shortcuts in Eclipse
+################################
+1. Ctrl + Space:⚡ Content Assist — suggests code completions.
+2. Ctrl + 1: 💡 Quick fix — suggests solutions for errors or warnings.
+3. Ctrl + O: 🧭 Quick outline — shows methods/fields of the current class.
+4. F3: 🔄 Go to the declaration of a variable, method, or class.
+5. Ctrl + . : ➡️ Jump to the next error or warning in the file.
+
+📦 Packages in Java
+####################
+A package in Java is a namespace that organizes classes and interfaces into a structured folder system, making code modular, reusable, and easy to manage.
+
+c. Naming Convention for packages
+----------------------------------
+-> Package name cannot be ka eyword like - new, static, public, etc...
+-> Do not start the package name with capital letters
+-> Package name not to be given as java
+
+d. When you create a class inside a package, you have to define the package keyword in your program as shown below:
+Example:
+package p1;
+public class A {}
+
+e. Create 2 classes in the same package and perform inheritance. Import is not required.
+Example:
+package p1;
+public class A {}
+
+package p1;
+public class B extends A {}
+
+f. Create 2 classes in different packages and perform inheritance. "Import required".
+Example:
+package p1;
+public class A {}
+
+package p2;
+import p1.A;
+public class C extends A{}
+
+----------------------------------------------------------
+Example:
+package p1;
+public class A {}
+
+package p2;
+public class C {}
+
+package p1;
+import p2.C;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+		C c1 = new C();
+	}
+}
+---------------------------------------
+Example:
+package p1;
+public class A {}
+
+package p1;
+public class B {}
+
+package p2;
+import p1.*;
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();
+		B b1 = new B();
+	}
+}
+--------------------------------
+Example:
+package p1;
+public class A {}
+
+package p2;
+public class A {}
+
+package p3;
+public class B {
+	public static void main(String[] args) {
+		p1.A a1 = new p1.A();//---> p1
+		p2.A a2 = new p2.A();//---> p2
+	}
+}
+---------------------------------------
+#######################################
+Object Oriented Programming -  Pillars
+########################################
+
+a. inheritance
+b. polymorphism
+c. encapsulation
+d. abstraction
+
+a. inheritance
+######################
+Inheritance is one of the core pillars of Object-Oriented Programming (OOP).
+It allows a class (subclass) to inherit fields and methods from another class (superclass).
+
+✅ Why Use Inheritance?
+Code reusability
+Improves maintainability
+Supports method overriding & polymorphism
+
+Example :
+package app_java_1;
+public class Animal {
+	public void eat() {
+		System.out.println("Eating");
+	}
+	public void sleep() {
+		System.out.println("sleeping");
+	}
+}
+
+package app_java_1;
+public class Dog extends Animal{
+	//eat(),sleep()--->Animal
+}
+
+package app_java_1;
+public class Cow extends Animal{
+	//eat(),sleep()--->Animal
+}
+
+package app_java_1;
+public class Root {
+	public static void main(String[] args) {
+		Dog d = new Dog();
+		d.eat();
+		d.sleep();
+		System.out.println("_______");
+		Cow cow = new Cow();
+		cow.eat();
+		cow.sleep();
+	}
+}
+
+Example 3: Multilevel inheritance
+-----------------------------------
+
+package app_java_1;
+public class A {
+	public void test1() {
+		System.out.println(1);
+	}
+}
+package app_java_1;
+public class B extends A{
+	public void test2() {
+		System.out.println(2);
+	}
+}
+package app_java_1;
+public class C extends B{
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();//Output :1
+		c1.test2();//Output :2
+	}
+}
+
+------------------------------------------------------------------------------
+################################################################################################
+What is multiple inheritance?
+Answer: When a child class has more than one parent class, it is called multiple inheritance
+################################################################################################
+
+Note: Java classes do not support multiple inheritance because of the diamond problem.
+
+ Diamond Problem in Java (Multiple Inheritance Problem)
+---------------------------------------------------------
+The Diamond Problem occurs in multiple inheritance when a class inherits from two classes that have a common superclass, leading to ambiguity about which method to inherit.
+
+Suppose we inherit a method from A->B->D,  and the Same method is inherited from A->C->D, then confusion arises from which parent class method is inherited by the child class D. This is called as DIAMOND PROBLEM. Hence in java classes does not support multiple inheritance.
+
+Note: We can do mulitple inheritance on interface.
+
+Example: Multiple inheritance error
+------------------------------------------
+package app_java_1;
+public class A {}
+
+package app_java_1;
+public class B{}
+
+package app_java_1;
+public class C extends A, B{//Error
+	
+}
+
+###############################
+Access Specifiers in Java
+###############################
+
+| Access Context                | `public` |         `protected`          | `default` (no modifier)   | `private`  |
+| ------------------------------| :------: | :------------------------:   | :---------------------:   | :-------:  |
+| Same Class                    |     ✅   |              ✅             |            ✅            |     ✅     |
+| Same Package                  |     ✅   |              ✅             |            ✅            |     ❌     |
+| Subclass in Same Package      |     ✅   |              ✅             |            ✅            |     ❌     |
+| Non-Subclass in Same Package  |     ✅   |              ✅             |            ✅            |     ❌     |
+| Subclass in Other Package     |     ✅   | ✅ *(via inheritance only)* |            ❌            |     ❌     |
+| Non-Subclass in Other Package |     ✅   |              ❌             |            ❌            |     ❌     |
+
+a. private: When a variable/method is made private, then we can access that in the same class but not outside the class
+
+b. default: A variable/method with default access specifier can work only inside the same class or the same package, but cannot be accessed in a different package
+
+c. protected: We can access variables/methods in the same class/same package, and inside different packages only when inheritance is done
+
+d. public: When we make a variable/method public, then we can access that in the same class/the same package/different package
+
+########################################################
+Access Specifier on Constructors
+#######################################################
+
+Can we inherit the Constructor?
+Answer: We cannot inherit the constructor
+
+🔐 Private Constructor in Java
+A private constructor is a constructor that cannot be accessed outside its class.
+
+✅ Why Use a Private Constructor?
+❌ Prevent object creation	        for utility or helper classes
+✅ Implement Singleton Pattern		Ensure only one instance is created
+🔐 Hide object instantiation		Force object creation through factory methods
+-> If a constructor is made private, then its object cannot be created outside the class.
+
+Example :
+package p1;
+public class A {
+	private A() {}
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p1;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();//--->Error
+	}
+}
+package p2;
+import p1.A;
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();//-->Error
+	}
+}
+-> When a constructor is made private, then inheritance of that class is not allowed
+(Note: Constructs are not inherited)
+
+Example 2:
+----------
+package p1;
+public class A {
+	private A() {}	
+}
+
+package p1;
+public class B extends A{//-->Error	
+}
+
+package p2;
+import p1.A;
+public class C extends A{//-->Error	
+}
+
+
+🏗️ Default Constructor in Java
+################################
+A default constructor is a no-argument constructor that the Java compiler automatically provides if you do not define any constructors in your class.
+
+✅ Key Features:
+Feature					Description
+No parameters. 				Takes zero arguments
+Provided automatically			Only if no constructor is defined by the user
+Initializes variables,			sets fields to default values (e.g., 0, null)
+Used for object creation		Allows creation of objects without parameters
+-> If a constructor is made default, then its object can be created in the  same class/same package, but not outside the package.
+
+Example 1:
+----------
+package p1;
+public class A {
+	A() {}
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p1;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p2;
+import p1.A;
+public class C{
+	public static void main(String[] args) {
+		A a1 = new A();//-->Error
+	}
+}
+
+-> When a constructor is made default, then inheritance of that class is allowed only in the same package, but not outside the package
+
+Example 2:
+----------
+package p1;
+public class A {
+	A() {}
+}
+package p1;
+public class B extends A {}
+
+package p2;
+import p1.A;
+public class C extends A{//-->Error	
+}
+
+🔐 Protected Constructor in Java
+#################################
+A protected constructor means the constructor can only be accessed:
+
+✅ Within the same package
+✅ From subclasses (even in other packages)
+
+✅ Why Use a Protected Constructor?
+->To restrict object creation outside the package
+->To allow subclassing but prevent direct instantiation from unrelated classes
+->Often used in inheritance-based designs, frameworks, or abstract factories
+
+Example 1:
+---------
+package p1;
+public class A {
+	protected A() {}
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+
+package p1;
+public class B  {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+
+package p2;
+import p1.A;
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();//-->Error
+	}
+}
+-> When a constructor is made protected, then inheritance of that class is  allowed inthe  same package / outside the package (both)
+(Note: Constructors are not inherited)
+
+Example 2:
+----------
+package p1;
+public class A {
+	protected A() {}
+}
+
+package p1;
+public class B extends A {}
+
+package p2;
+import p1.A;
+public class C extends A {}
+
+e. public Constructor
+------------------------
+-> If a constructor is made public, then its object can be created in the same class/same package and outside the package also
+
+Example 1:
+---------
+package p1;
+public class A {
+	public A() {}
+	public static void main(String[] args) {
+		 A a1 = new A();
+	}
+}
+
+package p1;
+public class B  {
+	public static void main(String[] args) {
+		 A a1 = new A();
+	}
+}
+
+package p2;
+import p1.A;
+public class C  {
+	public static void main(String[] args) {
+		 A a1 = new A();
+	}
+}
+
+-> When a constructor is made public, then inheritance of that class is  allowed in the same package / outside the package (both)
+(Note: Constructors are not inherited)
+
+Example 2:
+----------
+package p1;
+public class A {
+	public A() {}
+}
+
+package p1;
+public class B extends A {}
+
+package p2;
+import p1.A;
+public class C extends A {}
+
+########################################
+Access Specifier on Class
+########################################
+-> A class can be only public / default
+-> A class cannot be private / protected
+
+
+
+
