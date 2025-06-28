@@ -396,3 +396,285 @@ public class C {
 -> It cannot be a static / non-static variable
 -> It cannot be a method argument
 -> It cannot be a method return type
+
+Constructors in Java
+Constructors are special methods used to initialize objects when they are created.
+
+🔹 Basic Rules:
+✅ Constructor name must match the class name
+❌ It is not void by default
+Constructors do not have a return type, not even void
+If you write void before a constructor, it becomes a method, not a constructor
+
+Example 1:
+----------
+public class C {
+	C(){
+		System.out.println(100);//will execute successfully Output :100
+		return 100;//Error
+	}
+	public static void main(String[] args) {
+		C c1 = new C();
+	}	
+}
+
+Note :
+-> Method name can be the same as the class name
+-> Variable name can be the same as the class name
+
+🔁 Constructor Overloading in Java
+####################################
+Constructor Overloading means having more than one constructor in the same class, but with different parameter lists.
+
+✅ Why Use Constructor Overloading?
+To create objects with different levels of information or default values, depending on what’s available.
+
+Example:
+--------
+public class A {
+	A(){//NoofArgs=0
+		System.out.println("A");
+	}
+	A(int x){//NoofArgs=1
+		System.out.println(x);
+	}
+	A(int x,int y){//NoofArgs=2
+		System.out.println(x);
+		System.out.println(y);
+	}
+	public static void main(String[] args) {
+		A a1 = new A();
+		A a2  = new A(100);
+		A a3 = new A(200,300);
+	}
+}
+
+🔷 this keyword in Java
+#############################
+The this keyword in Java is a reference variable that refers to the current object — the object whose method or constructor is being executed.
+
+✅ Uses of this Keyword
+1. Differentiate Between Instance and Local Variables
+------------------------------------------------------
+When local variable names are the same as instance variables, use this to refer to the instance variable.
+
+class Student {
+    String name;
+    Student(String name) {
+        this.name = name;  // 'this.name' is the instance variable, 'name' is the parameter
+    }
+}
+
+2. Call One Constructor from Another (Constructor Chaining)
+------------------------------------------------------------
+Use this() to call another constructor within the same class.
+
+class Student {
+    String name;
+    int age;
+
+    Student(String name) {
+        this(name, 18);  // calls the second constructor
+    }
+
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+3. Pass Current Object as Argument
+-----------------------------------
+class Student {
+    void display() {
+        Helper.printStudent(this);  // pass current object
+    }
+}
+class Helper {
+    static void printStudent(Student s) {
+        System.out.println("Student object: " + s);
+    }
+}
+
+4. Return Current Object
+---------------------------
+Useful in method chaining.
+
+class Person {
+    Person setName(String name) {
+        // set name
+        return this;  // return current object
+    }
+
+    Person setAge(int age) {
+        // set age
+        return this;
+    }
+}
+
+5. Access Instance Methods and Variables
+-----------------------------------------
+You can use this to call other instance methods or access fields within the class explicitly.
+
+void print() {
+    this.show();  // same as just calling show()
+}
+
+void show() {
+    System.out.println("Hello");
+}
+-> this keyword is a special reference variable that hold's object's address
+Example:
+----------
+public class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(a1);
+		a1.test();
+	}
+	public void test() {
+		System.out.println(this);
+	}
+}
+
+-> Using this keyword, we can access non-static members of the class
+Example:
+--------
+public class A {
+	int x = 10;
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(a1.x);
+		a1.test();
+	}
+	public void test() {
+		System.out.println(this.x);
+	}
+}
+
+-> We cannot use this keyword inside a "static method"
+public class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(this);//Error
+	}
+	public static void test() {
+		System.out.println(this);//Error
+	}
+}
+
+Example:
+-------
+public class A {
+	int x = 10;
+	int y = 10;
+	public static void main(String[] args) {
+		A a1 = new A();
+		a1.test();
+	}
+	public void test() {
+		System.out.println(this.x);
+		System.out.println(this.y);
+	}
+}
+
+-> this keyword hold's current object address that is executing
+
+Example:
+--------
+public class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+		a1.test();
+		A a2 = new A();
+		a2.test();
+		a1.test();
+		
+	}
+	public void test() {
+		System.out.println(this);
+	}
+}
+
+this()- This syntax is used to call the constructor
+--------------------------------------------
+-> Using this() keyword, we can call a constructor
+
+Example:
+-------
+public class A {
+	A(){
+		System.out.println("A");
+	}
+	A(int x){
+		this();
+	}
+	public static void main(String[] args) {
+	   A a1 = new A(100);
+	}	
+}
+
+-> While calling a constructor using this() keyword, ensure calling is done from another constructor
+Example:
+--------
+public class A {
+	A(){
+		System.out.println("A");
+	}
+	A(int x){
+		this();
+	}
+	public static void main(String[] args) {
+	   A a1 = new A(100);
+	}
+	public void test() {
+		this();//Error, we cannot call the constructor from a method
+	}	
+}
+
+Example:
+---------
+public class A {
+	A(int x){
+		System.out.println(x);
+	}
+	A(){
+		this(100);
+	}
+	public static void main(String[] args) {
+	   A a1 = new A();
+	}	
+}
+
+-> While calling a constructor using this() keyword, ensure it is alwaysthe  first statement inside another constructor
+
+Example:
+---------
+public class A {
+	A(int x){
+		System.out.println(x);
+	}
+	A(){
+		System.out.println(200);
+		this(100);//Error because it cannot be the second statement while calling the constructor	
+	}
+	public static void main(String[] args) {
+	   A a1 = new A();
+	}	
+}
+
+Example:
+---------
+public class A {
+	int x;//-->0
+	A(int x){////Step 4-->x=100
+		this.x=x;//Step 5
+		System.out.println(this.x);//Step 6===>100
+	}
+	A(){//Step 2
+		this(100);//Step 3
+	}
+	public static void main(String[] args) {
+	   A a1 = new A();//Step 1
+	}	
+}
+
