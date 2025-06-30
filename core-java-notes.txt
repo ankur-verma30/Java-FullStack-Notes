@@ -16,7 +16,7 @@ class A {}
   
 Example :
 -> Will execute without any error
-public class Bank_Account_Number {}  // Snake Casing-->Should not use for Java
+public class Bank_Account_Number {}// Snake Casing-->Should not use for Java
 
 Note:
 1. Do not use specials characters like #,@ % & etc while creating class.
@@ -45,7 +45,7 @@ It is a variable declared inside a class, but outside any method, and without th
 An instance of the class (not the class itself)
 Every object has its copy
 
-1. We should create non non-static variable inside a class outside a method without using the static keyword.
+1. We should create a non-static variable inside a class outside a method without using the static keyword.
 2. Without creating an object, we cannot access non non-static variable.
 
 Example :
@@ -65,7 +65,7 @@ public class A {
 }
 3. Every time we create an object non-static variable copy is loaded into that object.
 4. A copy of the variable in this object is different. That is, if you change the value of a variable in one object, those changes cannot be seen in another object.
-5. It is mandatory to initialize a non-static variable. Depending on the data type, automatically default value will be automatically stored in it.
+5. It is not mandatory to initialize a non-static variable. Depending on the data type, the default value will be automatically stored in it.
 
 Static variables:
 #################
@@ -75,7 +75,7 @@ Static variables:
 ->Only one copy exists in memory, regardless of how many objects are created.
 
 1. We should create static variables inside a class but outside a method with the static keyword
-2. To access a static variable, we will use below options:
+2. To access a static variable, we will use the following options:
 a. ClassName.variableName
 b. variableName (Constraints)
 c. objectAddress.variableName (Wrong Approach, but will work)
@@ -115,7 +115,7 @@ public class A {
     		System.out.println(A.y);// Output :10
 		A a1 = new A();
          	a1.test();
-    		System.out.println(y);//Error
+    		System.out.println(y);//Output: 10
 	}
 	public void test() {
         int z=100;
@@ -169,7 +169,7 @@ When a method is called, its variables go on the stack. When it returns, they’
 
 🗃️ Heap Memory
 ################
-Used to store objects and instance variables.
+Used to store objects/instance variables.
 Every time you do new ClassName(), it creates an object in the heap.
 Objects stay in memory until they're no longer referenced.
 
@@ -272,7 +272,7 @@ public class C {
 	}
 }
 
-Note: When the method argument type is Object, then we can supply any kind of value to it
+Note: When the method argument type is Object, then we can supply any kind of value to it.
 
 public class C {
 	public static void main(String[] args) {
@@ -292,8 +292,7 @@ public class C {
 	  C c1 = new C();
 	  c1.test("mike",100,200,300,400);
 	}
-	
-	public void test(String y, int... x) { 
+	public void test(String y,int... x) { 
 		System.out.println(x[0]);// Output :100
 		System.out.println(x[1]);// Output :200
 		System.out.println(x[2]);// Output :300
@@ -340,15 +339,15 @@ long           8 bytes	            0	              -9,223,372,036,854,775,808 to
 ----------------------------------------
 Type	    Size	      Default Value	        Range
 float	    4 bytes	      0.0f	              ±3.40282347E+38F (single-precision)
-double	  8 bytes	      0.0d	              ±1.79769313486231570E+308 (double-precision)
+double	    8 bytes	      0.0d	              ±1.79769313486231570E+308 (double-precision)
 
 Find the size of the datatype
 #########################
 Example:
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Size of int in bytes: " + Integer.BYTES);
-        System.out.println("Size of int in bits: " + Integer.SIZE);
+        System.out.println("Size of int in bytes: " + Integer.BYTES);//4
+        System.out.println("Size of int in bits: " + Integer.SIZE);//32
     }
 }
 
@@ -372,7 +371,7 @@ All reference types default to null.
 ->Use float literals with F or f: float y = 3.14F;
 
 A new type was introduced in Java version 10
----------------------------------------
+---------------------------------------------
 var type
 #########
 -> This was introduced in Java version 10
