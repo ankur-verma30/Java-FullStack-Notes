@@ -1156,11 +1156,380 @@ import p1.A;
 public class C extends A {}
 
 ########################################
-Access Specifier on Class
-########################################
--> A class can be only public / default
--> A class cannot be private / protected
+✅ Access Specifiers on Top-Level Classes:
+Access Specifier			Usage					Visibility
+public					public class ClassName {}		Visible to all classes everywhere (within the same package or other packages).
+Default (no modifier)			class ClassName {}			Visible to classes within the same package only.
 
+❌ Not allowed on top-level classes:
+private
+protected
 
+These are invalid for top-level classes and will cause a compile-time error if used.
+
+Example 1:
+package p1;
+class A {}
+
+package p1;
+public class B extends A{} //Because A is default and inherited in B
+
+package p2;
+import p1.A;//-->Error
+public class C extends A{//-->Error	
+}
+
+Example 2:
+package p1;
+class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p1;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p2;
+import p1.A;//--->Error because A is default and cannot be inherited in another package
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();//--->Error
+	}
+}
+
+What happens when a class is made public?
+Answer:
+->  Its object can be created in the same class/same package & inside a different package
+-> Inheritance is allowed in the same package & inside different packages
+
+Example :
+
+package p1;
+public class A {}
+
+package p1;
+public class B extends A{}
+
+package p2;
+import p1.A;
+public class C extends A{}
+
+Note:
+------------------------------------------------------------------
+a. Compile Time
+->This is the phase where source code is checked and translated into bytecode.
+->Java source files (.java) are compiled by the Java Compiler (javac).
+->The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
+
+Output: .class file containing bytecode.
+
+Command: javac MyProgram.java
+Result: Creates MyProgram.class file.
+
+b. Run Time
+->This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
+->The JVM loads the .class file and executes the bytecode.
+->Any exceptions or logical errors may occur during this phase.
+
+Command: java MyProgram
+Result: Runs the program using the bytecode inside MyProgram.class.
+
+-----------------------------------------------------------------------------------
+Two types of polymorphism
+
+a. Overriding (Run-time polymorphism):
+->Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
+->It is used to achieve Run-time Polymorphism.
+->The method signature (name + parameters) must be exactly same in both parent and child class.
+-> The decision of which method to call is made at run-time, not compile-time.
+
+🔸 Key Rules of Method Overriding:
+Rule							Description
+Same method signature					Method name, return type, and parameters must be the same.
+Access modifier						Child method must have the same or more accessible modifier (e.g., can’t override public with private).
+Inheritance						Only possible in an IS-A relationship (subclass-superclass).
+Can't override final, static, or private methods	These are either not inherited or cannot be changed.
+Return type						should be the same or covariant (child class return type).
+Use @Override						Optional, but recommended to catch errors at compile time.
+
+Example:
+package p1;
+public class GoldAccount {
+	public void onlineBanking() {
+		System.out.println("yes");
+	}
+	public void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+	public void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+	public static void main(String[] args) {
+		PlatinumAccount p = new PlatinumAccount();
+		p.onlineBanking();
+		p.rateOfInterestOutput: 6% PA
+		System.out.println("--------");
+		GoldAccount g = new GoldAccount();
+		g.onlineBanking();
+		g.rateOfInterest();//-->Output: nill
+	}
+}
+
+ What are Annotations?
+->Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
+->They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
+
+ Common Use: @Override
+--------------------------
+->@Override is used to indicate that a method is intended to override a method in the superclass.
+->It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
+
+package p1;
+	public class GoldAccount {	
+		public void rateOfInterest() {
+			System.out.println("nill");
+		}
+	}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+	@Override
+	public void rateOfInterests() {//-->Error because method name mismatch
+		System.out.println("6% PA");
+	}	
+}
+
+Question: Access Specifier should it be the same or can it be different during Overriding?
+Answer: During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
+
+Example 1:
+package p1;
+public class GoldAccount {
+	void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+//No Error Because the default scope is increased to public	
+	@Override
+	public void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+}
+-------------------------------------------------------------------
+Example 2:
+
+package p1;
+public class GoldAccount {
+	public void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+//Error: Because the public scope is reduced to the default
+	@Override
+	void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+}
+
+Order of Access Specifiers
+Private -> Default -> Proctected -> Public
+
+Example 3:
+-----------
+package p1;
+public class GoldAccount {
+	private void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+//Error: Because private methods, we cannot inherit
+//Without inheritance, overriding cannot be done
+	@Override
+	protected void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+}
+###############################
+Note: -> Static members cannot be inherited
+Example:
+You have:
+A parent class: GoldAccount (in package p1)
+A child class: PlatinumAccount extends GoldAccount
+
+// GoldAccount.java
+package p1;
+public class GoldAccount {
+    static int x = 100;
+    public static void rateOfInterest() {
+        System.out.println("nill");
+    }
+}
+
+// PlatinumAccount.java
+package p1;
+
+public class PlatinumAccount extends GoldAccount {
+    public static void main(String[] args) {
+        PlatinumAccount.rateOfInterest();      // Output:  nill
+        System.out.println(PlatinumAccount.x); // Outuput: 100
+    }
+}
+
+🔍 What Is This Program Teaching?
+✅ 1. Static Methods and Variables Are Not Polymorphic
+Even though PlatinumAccount inherits from GoldAccount, calling:
+PlatinumAccount.rateOfInterest();
+is resolved at compile-time based on the class name, not on the object type.
+
+Since PlatinumAccount does not override the method (it doesn’t define its own rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
+is effectively the same as: GoldAccount.rateOfInterest();
+
+The same logic applies to the static variable x:
+PlatinumAccount.x; // resolves to GoldAccount.x (100)
+🟨 Important Point:
+Static methods and variables are resolved based on class name, not overridden, and not polymorphic.
+
+################################################
+Can we override static methods?
+❌ No, we cannot override static methods in Java.
+🔹 Explanation:
+In Java, static methods belong to the class, not to instances (objects). Therefore, they are not subject to polymorphism and cannot be overridden like instance methods.
+
+When you define a static method in a subclass with the same signature as in the superclass, it's called: ✅ Method Hiding, not Overriding.
+
+Example:
+class A {
+    static void show() {
+        System.out.println("Static method from A");
+    }
+}
+
+class B extends A {
+    static void show() {
+        System.out.println("Static method from B");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        A obj = new B();
+        obj.show();  // Output: Static method from A
+    }
+}
+
+🔍 Why is the output a Static method from A?
+Because obj is of type A, and static methods are resolved at compile-time using reference type, not the actual object.
+
+So A.show() is called, not B.show().
+
+🛑 Using @Override on a static method:
+class C {
+    static void hello() {}
+}
+
+class D extends C {
+    @Override // ❌ Compile-time error!
+    static void hello() {}
+}
+
+Note: During overriding method return type should match
+
+✅ Overloading in Java (Compile-Time Polymorphism)
+🔹 What is Method Overloading?
+->Method Overloading means defining multiple methods with the same name in a class but with different parameter lists (type, number, or order of parameters).
+->It allows compile-time polymorphism, where the method to be called is determined at compile time based on the method signature.
+
+🔸 Characteristics of Overloading:
+Feature					Description
+Method name				Must be the same
+Parameter list				Must be different (type, number, or order)
+Return type				Can be same or different, but doesn't affect overloading
+Access modifier				Can be same or different
+Inheritance				Not required for overloading
+Polymorphism type			Compile-time polymorphism
+
+Example:
+package p1;
+
+public class EmailService {
+	public void sendEmail(String to, String subject, String message) {
+		System.out.println("Email sending....");
+	}
+	public void sendEmail(String to, String subject, String message, String filePath) {
+		System.out.println("Email sending with attachment.....");
+	}
+	public static void main(String[] args) {
+		EmailService service = new EmailService();
+		service.sendEmail("mike@gmail.com", "Welcome", "Some Message","G:\\image.png");
+	}
+}
+
+################################
+Final Keyword
+################################
+-> If you make a variable final, then we cannot change its value(Just like constant variables)
+-> If you make a static/non-static variable final, then initialization is mandatory
+-> If you make a method final, then overriding is not allowed
+-> If you make a class final, then inheritance is not allowed
+
+Example 1: 
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		final int x = 10;
+		x=20;//-->Cannot change the value of final variable
+
+		final int y;//->final mandatory to be initialized
+	        final static int z;//->final mandatory to be initialized
+	        //The above errors are called blank field errors
+		System.out.println(y);
+	}
+}
+
+Example 2:
+----------
+package p1;
+
+public class A {
+	final public void test() {
+		System.out.println(100);
+	}
+}
+package p1;
+
+public class B extends A{
+	@Override
+	public void test() {//--> Error because we cannot override final methods
+		System.out.println(100);
+	}
+}
+
+Example 3:
+----------
+package p1;
+
+final public class A {}
+package p1;
+
+public class B extends A{//---> Error because we cannot inherit final class	
+}
 
 
