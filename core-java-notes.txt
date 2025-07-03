@@ -1532,4 +1532,319 @@ package p1;
 public class B extends A{//---> Error because we cannot inherit final class	
 }
 
+#####################################
+interfaces in java - abstraction
+#######################################
+✅ Interfaces in Java – Abstraction
+Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
+
+🔹 Key Points:
+Complete Abstraction (Java 7)
+➤ In Java 7 and earlier, interfaces could only have abstract methods (no method bodies).
+➤ They define what should be done, not how.
+
+All Variables Are public static final
+➤ Any variable declared in an interface is implicitly:
+public static final (i.e., a constant).
+➤ No need to specify these modifiers—they are applied by default.
+
+Contract-Based Programming
+➤ An interface defines a contract. Any class that implements the interface must provide concrete implementations for all its methods.
+
+No Object Creation
+#############################
+Note: Drawback of inheritance
+#############################
+-> Inheritance results in tightly couple programming. Interfaces cannot be instantiated directly because they can contain incomplete methods (abstract methods).
+
+Loose Coupling
+➤ Interfaces help in decoupling code. The implementing class can change internally without affecting users of the interface.
+
+Improves Design and Flexibility
+➤ It forces implementing classes to use the same method signatures, promoting a standard structure and ensuring interoperability.
+
+Multiple Inheritance Support
+➤ Java does not support multiple inheritance with classes, but it does through interfaces. A class can implement multiple interfaces.
+
+Example 1:
+---------
+package p1;
+
+public interface A {
+	public void test1() {//-->Error because complete methods are not allowed in an interface	
+	public void test2(); //Correct version
+	}
+}
+
+Example 3:
+----------
+package p1;
+
+public interface NotificationService {
+	//What needs to be implemented
+	public void emailService();
+	public void whatsAppService();
+	public void smsService();
+}
+
+package p1;
+
+public class NotificationServiceImpl implements NotificationService {
+	//How it will be implemented
+	@Override
+	public void emailService() {
+		System.out.println("Email Sending");
+	}
+	@Override
+	public void whatsAppService() {
+		System.out.println("Whats app Sending");
+	}
+	@Override
+	public void smsService() {
+		System.out.println("SMS Sending");
+	}
+	public static void main(String[] args) {
+		NotificationServiceImpl impl = new NotificationServiceImpl();
+		impl.emailService();
+		impl.smsService();
+		impl.whatsAppService();
+	}
+}
+
+✅ Note: Drawback of Inheritance – Tightly Coupled Programming
+🔹 What is Tightly Coupled Programming?
+➤When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
+➤In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
+
+🔸 How Inheritance Causes Tight Coupling:
+➤Child class depends heavily on parent class:
+➤In inheritance, the child class inherits both behavior and structure from the parent.
+➤If the parent class changes, it can break or affect the behavior of all child classes.
+
+Strong binding:
+➤The child class is strongly bound to the specific parent class.
+➤You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
+
+Hard to maintain and extend:
+➤Over time, inherited code becomes fragile.
+➤Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
+
+Example:
+----------
+package p1;
+
+public interface Calculator {
+	public void add(int x, int y);
+	public void mul(int x, int y);
+}
+
+package p1;
+public class OrdinaryCalc implements Calculator{
+	@Override
+	public void add(int x, int y) {
+		System.out.println(x+y);
+	}
+	@Override
+	public void mul(int x, int y) {
+		System.out.println(x*y);
+	}
+}
+
+package p1;
+
+public class SciCalc implements Calculator{
+	@Override
+	public void add(int x, int y) {
+		System.out.println(x*x+y*y);
+	}
+	@Override
+	public void mul(int x, int y) {
+		int num1 = x*x;
+		int num2 = y*y;
+		System.out.println(num1*num2);
+	}
+}
+package p1;
+
+public class MainCalc {
+	public static void main(String[] args) {
+		OrdinaryCalc oc = new OrdinaryCalc();
+		oc.add(10, 20);
+		oc.mul(10, 20);
+		SciCalc sc = new SciCalc();
+		sc.add(10, 20);
+		sc.mul(10, 20);
+	}
+}
+
+✅ Advantages of Interfaces in Java
+1. Abstraction
+➤Interfaces facilitate complete abstraction.
+➤They allow you to hide implementation details and only expose what needs to be done, not how.
+
+Example: A Database interface may define connect(), disconnect(), but not how these are implemented.
+
+2. Contract Enforcement
+➤When a class implements an interface, it must implement all its methods.
+➤This imposes a strict contract on the class, ensuring consistency in structure and behavior across multiple classes.
+
+3. Good Design Practices
+➤Interfaces promote clear separation of responsibilities.
+➤They lead to clean, modular, and testable code.
+➤Developers can work independently on the interface and its implementations.
+
+4. Loose Coupling
+➤Classes that use interfaces depend only on method signatures, not on concrete implementations.
+➤This allows changes in implementations without affecting dependent classes.
+➤Enhances flexibility, extensibility, and maintainability of the system.
+
+5. Multiple Inheritance
+➤Java doesn’t support multiple inheritance with classes, but a class can implement multiple interfaces.
+➤This allows a class to inherit behavioral capabilities from multiple sources.
+
+6. Supports Plug-and-Play Architecture
+➤Interface-based design makes it easy to swap implementations (e.g., using different payment gateways, databases, or services) without changing the dependent code.
+
+7. Better Testability and Mocking
+➤Interfaces enable easier unit testing with mock implementations.
+➤You can test components in isolation by mocking interface behaviour.
+
+Note: ➤All Variables by default in an interface are final and static. Hence, initialization is mandatory.
+
+Example:  
+---------
+public interface A {
+	int MAX_VAL=100;
+	static final int MIN_VAL=0;
+}
+package p1;
+
+public class B {
+	public static void main(String[] args) {
+		System.out.println(A.MAX_VAL);//Output: 100
+		System.out.println(A.MIN_VAL);//Output: 0
+	}
+}
+
+Note:
+➤Class to Class Inheritance --> extends
+➤Interface to Interface Inheritance --> extends
+➤Interface to Class Inheritance --> implements
+
+Example :
+---------
+package p1;
+
+public interface A {
+	public void test1();
+}
+
+package p1;
+
+public interface B extends A{
+	public void test2();
+}
+
+public interface D{
+	public void test3();
+}
+
+package p1;
+
+public class C implements B, D { //If you do multiple inheritance on a class, then its parent should be interfaces only
+
+	@Override
+	public void test1() {
+		System.out.println("From test1");
+	}
+	@Override
+	public void test2() {
+		System.out.println("From test2");
+	}
+
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();
+		c1.test2();
+	}
+}
+
+Example 4:
+----------
+➤ In class can we perform extends and implements together
+➤But ensure the extension is used first and then implementes
+
+package p1;
+public interface A {
+	public void test2();
+}
+
+package p1;
+public class B {
+	public void test1() {
+		System.out.println("From test1");
+	}
+}
+
+package p1;
+public class C extends B  implements  A {
+	@Override
+	public void test2() {
+		System.out.println("From test2");		
+	}
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();
+		c1.test2();
+	}
+}
+
+Question: Can I develop an incomplete static method in an interface?
+Answer: We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface
+
+Example:
+package p1;
+public interface A {
+	public static void test2();//-------> Error
+}
+
+Java 8 Features
+###################
+1. default keyword:
+➤Using the default keyword, we can create complete methods inside an interface. This was introduced in Java version 8
+
+Example :
+package javaconcepts.p3;
+
+public interface A {
+	default public void test1() {
+		System.out.println("From test1");
+	}
+	public void test2();
+}
+package javaconcepts.p3;
+
+public class B implements A {
+
+	public static void main(String[] args) {
+		B b1 = new B();
+		b1.test1();
+		b1.test2();
+	}
+	@Override
+	public void test2() {
+		System.out.println("From Overrided test2");
+	}	
+	@Override
+	public void test1() { //we can override the method
+		System.out.println("From Overrided Test1");
+	}
+}
+Output
+From Overrided Test1
+From Overrided test2
+
+
+
+
 
