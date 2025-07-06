@@ -20,13 +20,13 @@ public class Bank_Account_Number {}// Snake Casing-->Should not use for Java
 
 Note:
 1. Do not use specials characters like #,@ % & etc while creating class.
-2. $Class name will execute. But never create a class with a special character $.
+2. $Class name will execute. However, never create a class with a special character ($).
 
 new keyword:
 ##############
 The new keyword in Java is used to create objects (instances) of a class. 
 -> Using the new keyword, we send a request to the class to create an object
--> Once the object is created new keyword will get the object's address and store that in a reference variable.
+Once the object is created, the new keyword will retrieve the object's address and store it in a reference variable.
 
 Syntax to create an object:
 -------------------------
@@ -44,23 +44,21 @@ It is a variable declared inside a class, but outside any method, and without th
 📌 It belongs to:
 An instance of the class (not the class itself)
 Every object has its copy
-
-1. We should create a non-static variable inside a class outside a method without using the static keyword.
-2. Without creating an object, we cannot access non non-static variable.
+Without creating an object, we cannot access non-static variables.
 
 Example :
 public class A {
 	int x = 10;
 	int y = 20;
-  int z;
+ 	int z;
 	public static void main(String[] args) {
 		A a1 = new A();
 		System.out.println(a1.x); // Output :10
 		System.out.println(a1.y); // Output :20
 
-    A a2 = new A();
+    		A a2 = new A();
 		System.out.println(a2.x); // Output :10
-    System.out.println(a2.z); // Output :0 //default value of int is 0
+    		System.out.println(a2.z); // Output :0 //default value of int is 0
 	}
 }
 3. Every time we create an object non-static variable copy is loaded into that object.
@@ -77,8 +75,74 @@ Static variables:
 1. We should create static variables inside a class but outside a method with the static keyword
 2. To access a static variable, we will use the following options:
 a. ClassName.variableName
-b. variableName (Constraints)
+
+Example
+public class Main {
+    static int x = 10;
+    public static void main(String[] args) {
+        System.out.println(Main.x);  // ✅ Recommended Output: 10
+    }
+}
+
+b. Accessing via variableName directly (With Constraints)
+Example
+class A {
+    static int x = 10;
+    void show() {
+        System.out.println(x); // ✅ Works inside the same class
+    }
+}
+✅ Explanation:
+➤You can directly use x without the class name only when:
+➤You're inside the same class where the static variable is declared.
+➤OR the static variable is imported statically (in some special cases).
+
+This is allowed because the compiler understands the scope.
+
+❗ Constraints:
+➤This only works within the same class unless,
+➤You use import static (less common).
+
+📌 Example Without import static:
+Example:
+
+public class MyClass {
+    public static int count = 42;
+}
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(MyClass.count); // 👈 Must use class name
+    }
+}
+
+📌 Example with import static:
+Example:
+
+import static java.lang.Math.*;
+
+public class Demo {
+    public static void main(String[] args) {
+        System.out.println(sqrt(16)); // instead of Math.sqrt(16)
+        System.out.println(PI);       // instead of Math.PI
+    }
+}
+
+Outside the class, you need to use either:
+➤ClassName.x (best), or
+➤object.x (works but discouraged).
+
 c. objectAddress.variableName (Wrong Approach, but will work)
+✅ Explanation:
+➤This works because the object refers to the class, and the static variable belongs to the class.
+➤When you do a1.x, Java still resolves it as A.x internally.
+➤But it's misleading because it looks like x is instance-specific when it's shared across all instances.
+
+🔁 Bonus Tip:
+You can even do:
+
+A a1 = null;
+System.out.println(a1.x); // Still works!
 
 Example:
 ---------------
@@ -131,8 +195,8 @@ public class A {
 4. Reference Variable
 #####################
 A reference variable in Java is a variable that stores the memory address (reference) of an object, not the actual object itself.
-a. Can hold either an Object address or a null value
-b. The datatype of the reference variable is the class 
+a. Can hold either an Object address or a null value.
+b. The datatype of the reference variable is the class. 
 
 Example :
 ----------
@@ -145,7 +209,7 @@ public class A {
 	public static void main(String[] args) {
 		A a1 = null;
 		A a2 = new A();
-    		A a3;
+    		A a3; // Reference Local Variable
     		System.out.println(a3);// Error because "a3" is local variable and not initialized   
 	}
   	public void test() {
@@ -156,22 +220,22 @@ public class A {
 🧱 Stack Memory – LIFO (Last In First Out)
 ###########################################
 Stores:
-Method calls,
-local variables,
-and reference variables (not actual objects).
+➤Method calls,
+➤local variables,
+➤reference variables (not actual objects).
 
-->Memory is automatically managed (pushed and popped as methods are called or returned).
-->Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
-->Faster but limited in size.
+➤Memory is automatically managed (pushed and popped as methods are called or returned).
+➤Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
+➤Faster but limited in size.
 
 🧠 Example:
 When a method is called, its variables go on the stack. When it returns, they’re removed.
 
 🗃️ Heap Memory
 ################
-Used to store objects/instance variables.
-Every time you do new ClassName(), it creates an object in the heap.
-Objects stay in memory until they're no longer referenced.
+➤Used to store objects/instance variables.
+➤Every time you do new ClassName(), it creates an object in the heap.
+➤Objects stay in memory until they're no longer referenced.
 
 📍 Note: All reference variables (in the stack) point to objects in the heap.
 
@@ -185,7 +249,7 @@ Runs in the background and:
 
 📌 You don’t have to manually delete objects — GC handles it.
 
-methods in java
+Methods in Java
 ###############
 1. void keyword: A void method cannot return any value
 
@@ -206,15 +270,15 @@ public class C {
   	}
 }
 
-return without value vs return value in Java
+Return without value vs Return value in Java
 #############################################
 The difference between return and return value lies in what you're returning and why.
 
 return without value keyword:
 -----------------------------
--> A method has to be void
--> It is optional
--> It will return control to the method calling statement
+➤A method has to be void
+➤It is optional
+➤It will return control to the method calling statement
 
 Note: If we write code after the return keyword, then that code will 100% not run. This error is called an unreachable code error
 
@@ -223,8 +287,7 @@ public class C {
 	public static void main(String[] args) {
 	  C c1 = new C();
 	  c1.test();
-	}
-	
+	}	
 	public void test() {
 	      System.out.println(100);
 	      return;
@@ -233,11 +296,11 @@ public class C {
 }
 Output: unreachable code error
 
-returning "value"
+Returning "value"
 -----------------
--> The method has to be non-void
--> It is mandatory to use a return "value" statement inside a non-void method
--> It will return control and value to the method calling statement
+➤The method has to be non-void.
+➤It is mandatory to use a return "value" statement inside a non-void method
+➤It will return control and value to the method calling statement
 
 public class C {
 	public static void main(String[] args) {}
@@ -250,12 +313,11 @@ public class C {
 
 Method Arguments
 ##################
--> Using method arguments, we supply values to the method when we call it
--> The method argument is a local variable
--> Arguments inside the method values that you supply to the method should match
+➤Using method arguments, we supply values to the method when we call it
+➤The method argument is a local variable
+➤Arguments inside the method values that you supply to the method should match
 
 Example:
--------
 public class C {
 	public static void main(String[] args) {
 	 C c1 = new C();
@@ -263,7 +325,6 @@ public class C {
 	 c1.test1(100);
     	 c2.test2(100,"mike");
 	}
-	
 	public void test1(int x) {
 	  System.out.println(x);
 	}
@@ -274,6 +335,7 @@ public class C {
 
 Note: When the method argument type is Object, then we can supply any kind of value to it.
 
+Example
 public class C {
 	public static void main(String[] args) {
 	  C c1 = new C();
@@ -286,17 +348,17 @@ public class C {
 
 Using Varargs (Variable Arguments)
 ##################################
-Example 2:
+
+Example:
 public class C {
 	public static void main(String[] args) {
 	  C c1 = new C();
-	  c1.test("mike",100,200,300,400);
+	  c1.test("mike",100,200,300);
 	}
 	public void test(String y,int... x) { 
 		System.out.println(x[0]);// Output :100
 		System.out.println(x[1]);// Output :200
 		System.out.println(x[2]);// Output :300
-		System.out.println(x[3]);// Output :400
 		System.out.println(y);// Output :mike
 	}
 }
@@ -346,7 +408,7 @@ Find the size of the datatype
 Example:
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Size of int in bytes: " + Integer.BYTES);//4
+        System.out.println("Size of int in bytes: " + Integer.BYTES);//4 INTEGER is a wrapper class of int (discussed later)
         System.out.println("Size of int in bits: " + Integer.SIZE);//32
     }
 }
@@ -361,21 +423,21 @@ char	    2 bytes	            ' ' (blank)	            0 to 65,535 (Unicode charac
 ---------------------------------------------
 Type	               Description	                        Default Value
 String	        A class (sequence of characters)	          null
-Arrays	        Object that holds multiple values	          null
+Array	        Object that holds multiple values	          null
 Custom Classes	User-defined types	                          null
 
 📌 Notes:
 String is not a primitive type, but a class in java.lang package.
 All reference types default to null.
-->Use long literals with L or l: long x = 123456789L;
-->Use float literals with F or f: float y = 3.14F;
+➤Use long literals with L or l: long x = 123456789L;
+➤Use float literals with F or f: float y = 3.14F;
 
 A new type was introduced in Java version 10
 ---------------------------------------------
 var type
 #########
--> This was introduced in Java version 10
--> It gives a dynamic datatype concept. Depending on the value stored inside the variable, the datatype is allocated to it internally.
+➤This was introduced in Java version 10
+➤It is a dynamic datatype concept. Depending on the value stored inside the variable, the datatype is allocated to it internally.
 
 Example:
 public class C {
@@ -391,17 +453,20 @@ public class C {
 	}
   public var test(var x3) {}//Error
 }
--> var type can only be a local variable
--> It cannot be a static / non-static variable
--> It cannot be a method argument
--> It cannot be a method return type
+
+Properties and Constraints on the var keyword
+--------------------------------------------
+➤The var type can only be a local variable
+➤It cannot be a static / non-static variable
+➤It cannot be a method argument
+➤It cannot be a method return type
 
 Constructors in Java
+####################
 Constructors are special methods used to initialize objects when they are created.
 
 🔹 Basic Rules:
-✅ Constructor name must match the class name
-❌ It is not void by default
+The constructor name must match the class name
 Constructors do not have a return type, not even void
 If you write void before a constructor, it becomes a method, not a constructor
 
@@ -418,8 +483,7 @@ public class C {
 }
 
 Note :
--> Method name can be the same as the class name
--> Variable name can be the same as the class name
+➤Method, Variable name can be the same as the class name
 
 🔁 Constructor Overloading in Java
 ####################################
@@ -448,15 +512,16 @@ public class A {
 	}
 }
 
-🔷 this keyword in Java
-#############################
-The this keyword in Java is a reference variable that refers to the current object — the object whose method or constructor is being executed.
+🔷 This keyword in Java
+##########################
+This keyword in Java is a reference variable that refers to the current object — the object whose method or constructor is being executed.
 
 ✅ Uses of this Keyword
 1. Differentiate Between Instance and Local Variables
 ------------------------------------------------------
 When local variable names are the same as instance variables, use this to refer to the instance variable.
 
+Example:
 class Student {
     String name;
     Student(String name) {
@@ -465,24 +530,24 @@ class Student {
 }
 
 2. Call One Constructor from Another (Constructor Chaining)
-------------------------------------------------------------
+-----------------------------------------------------------
 Use this() to call another constructor within the same class.
 
+Example:
 class Student {
     String name;
     int age;
-
     Student(String name) {
         this(name, 18);  // calls the second constructor
     }
-
     Student(String name, int age) {
         this.name = name;
         this.age = age;
     }
 }
-3. Pass Current Object as Argument
------------------------------------
+
+3. Pass the Current Object as an Argument
+-----------------------------------------
 class Student {
     void display() {
         Helper.printStudent(this);  // pass current object
@@ -499,14 +564,24 @@ class Helper {
 Useful in method chaining.
 
 class Person {
+    private String name;
+    private int age;
+
     Person setName(String name) {
-        // set name
-        return this;  // return current object
+        this.name = name; // Set name and return current object
+        return this;
     }
 
     Person setAge(int age) {
-        // set age
+        this.age = age; // Set age and return current object
         return this;
+    }
+
+    public static void main(String[] args) {
+        Person p1 = new Person();
+        
+        // Method chaining in action
+        p1.setName("Ankur").setAge(22).show();
     }
 }
 
@@ -521,7 +596,8 @@ void print() {
 void show() {
     System.out.println("Hello");
 }
--> this keyword is a special reference variable that hold's object's address
+➤This keyword is a special reference variable that hold's object's address
+
 Example:
 ----------
 public class A {
@@ -535,7 +611,8 @@ public class A {
 	}
 }
 
--> Using this keyword, we can access non-static members of the class
+➤Using this keyword, we can access non-static members of the class
+
 Example:
 --------
 public class A {
@@ -550,33 +627,20 @@ public class A {
 	}
 }
 
--> We cannot use this keyword inside a "static method"
+➤We cannot use this keyword inside a "static method"
 public class A {
+	int x=10;
 	public static void main(String[] args) {
 		A a1 = new A();
 		System.out.println(this);//Error
 	}
 	public static void test() {
 		System.out.println(this);//Error
+		System.out.println(this.x);// Output: 10
 	}
 }
 
-Example:
--------
-public class A {
-	int x = 10;
-	int y = 10;
-	public static void main(String[] args) {
-		A a1 = new A();
-		a1.test();
-	}
-	public void test() {
-		System.out.println(this.x);
-		System.out.println(this.y);
-	}
-}
-
--> this keyword hold's current object address that is executing
+➤This keyword hold's current object address that is executing
 
 Example:
 --------
@@ -586,8 +650,7 @@ public class A {
 		a1.test();
 		A a2 = new A();
 		a2.test();
-		a1.test();
-		
+		a1.test();	
 	}
 	public void test() {
 		System.out.println(this);
@@ -596,7 +659,7 @@ public class A {
 
 this()- This syntax is used to call the constructor
 --------------------------------------------
--> Using this() keyword, we can call a constructor
+➤Using this() keyword, we can call a constructor
 
 Example:
 -------
@@ -612,7 +675,7 @@ public class A {
 	}	
 }
 
--> While calling a constructor using this() keyword, ensure calling is done from another constructor
+➤While calling a constructor using this() keyword, ensure calling is done from another constructor
 Example:
 --------
 public class A {
@@ -644,7 +707,7 @@ public class A {
 	}	
 }
 
--> While calling a constructor using this() keyword, ensure it is alwaysthe  first statement inside another constructor
+➤While calling a constructor using this() keyword, ensure it is always the  first statement inside another constructor
 
 Example:
 ---------
@@ -678,8 +741,8 @@ public class A {
 }
 
 ✅ Types of Constructor Chaining
--> When we call one constructor from another constructor it will form chain like flow structure. This is called constructor chaining
-🔸 1. Within the Same Class → Use this()
+-> When we call one constructor from another constructor, it will form a chain-like flow structure. This is called constructor chaining
+🔸 1. Within the Same Class → Use this().
 You can use this() to call another constructor in the same class.
 
 ✅ Example:
