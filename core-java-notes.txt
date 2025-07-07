@@ -741,7 +741,7 @@ public class A {
 }
 
 ✅ Types of Constructor Chaining
--> When we call one constructor from another constructor, it will form a chain-like flow structure. This is called constructor chaining
+➤When we call one constructor from another constructor, it will form a chain-like flow structure. This is called constructor chaining.
 🔸 1. Within the Same Class → Use this().
 You can use this() to call another constructor in the same class.
 
@@ -749,7 +749,6 @@ You can use this() to call another constructor in the same class.
 class Student {
     String name;
     int age;
-
     Student() {
         this("Unknown", 18);  // calls 2-arg constructor
         System.out.println("Default constructor called");
@@ -771,7 +770,8 @@ class Student {
 }
 ▶️ Output:
 The parameterized constructor called  
-The default constructor is called  
+The default constructor is called 
+
 🔸 2. From Subclass to Superclass → Use super()
 You can call a constructor from the parent class using super().
 
@@ -790,7 +790,6 @@ class Student extends Person {
 }
 
 ⚠️ Rules of Constructor Chaining
-Rule	Description
 ✅ Only one constructor can be called using this() or super()	
 ✅ Must be the first statement in the constructor	
 ❌ Cannot mix this() and super() in the same constructor
@@ -810,16 +809,16 @@ A package in Java is a namespace that organizes classes and interfaces into a st
 
 c. Naming Convention for packages
 ----------------------------------
--> Package name cannot be ka eyword like - new, static, public, etc...
--> Do not start the package name with capital letters
--> Package name not to be given as java
+➤Package name cannot be a keyword like - new, static, public, etc...
+➤Do not start the package name with capital letters
+➤Package name not to be given as java
+➤When you create a class inside a package, you have to define the package keyword in your program as shown below:
 
-d. When you create a class inside a package, you have to define the package keyword in your program as shown below:
 Example:
 package p1;
 public class A {}
 
-e. Create 2 classes in the same package and perform inheritance. Import is not required.
+➤Create 2 classes in the same package and perform inheritance. Import is not required.
 Example:
 package p1;
 public class A {}
@@ -827,7 +826,7 @@ public class A {}
 package p1;
 public class B extends A {}
 
-f. Create 2 classes in different packages and perform inheritance. "Import required".
+➤Create 2 classes in different packages and perform inheritance. "Import required".
 Example:
 package p1;
 public class A {}
@@ -836,7 +835,6 @@ package p2;
 import p1.A;
 public class C extends A{}
 
-----------------------------------------------------------
 Example:
 package p1;
 public class A {}
@@ -852,7 +850,7 @@ public class B {
 		C c1 = new C();
 	}
 }
----------------------------------------
+
 Example:
 package p1;
 public class A {}
@@ -868,7 +866,7 @@ public class C {
 		B b1 = new B();
 	}
 }
---------------------------------
+
 Example:
 package p1;
 public class A {}
@@ -883,25 +881,23 @@ public class B {
 		p2.A a2 = new p2.A();//---> p2
 	}
 }
----------------------------------------
-#######################################
+
 Object Oriented Programming -  Pillars
 ########################################
-
 a. inheritance
 b. polymorphism
 c. encapsulation
 d. abstraction
 
 a. inheritance
-######################
+###############
 Inheritance is one of the core pillars of Object-Oriented Programming (OOP).
 It allows a class (subclass) to inherit fields and methods from another class (superclass).
 
 ✅ Why Use Inheritance?
-Code reusability
-Improves maintainability
-Supports method overriding & polymorphism
+➤Code reusability
+➤Improves maintainability
+➤Supports method overriding & polymorphism
 
 Example :
 package app_java_1;
@@ -937,9 +933,10 @@ public class Root {
 	}
 }
 
-Example 3: Multilevel inheritance
------------------------------------
+ Multilevel inheritance
+#########################
 
+Example:
 package app_java_1;
 public class A {
 	public void test1() {
@@ -961,11 +958,8 @@ public class C extends B{
 	}
 }
 
-------------------------------------------------------------------------------
-################################################################################################
 What is multiple inheritance?
 Answer: When a child class has more than one parent class, it is called multiple inheritance
-################################################################################################
 
 Note: Java classes do not support multiple inheritance because of the diamond problem.
 
@@ -973,12 +967,12 @@ Note: Java classes do not support multiple inheritance because of the diamond pr
 ---------------------------------------------------------
 The Diamond Problem occurs in multiple inheritance when a class inherits from two classes that have a common superclass, leading to ambiguity about which method to inherit.
 
-Suppose we inherit a method from A->B->D,  and the Same method is inherited from A->C->D, then confusion arises from which parent class method is inherited by the child class D. This is called as DIAMOND PROBLEM. Hence in java classes does not support multiple inheritance.
+Suppose we inherit a method from A->B->D,  and the Same method is inherited from A->C->D, then confusion arises from which parent class method is inherited by the child class D. This is called as DIAMOND PROBLEM. Hence, in Java, classes do not support multiple inheritance.
 
-Note: We can do mulitple inheritance on interface.
+Note: We can do multiple inheritance on an interface.
 
 Example: Multiple inheritance error
-------------------------------------------
+
 package app_java_1;
 public class A {}
 
@@ -986,11 +980,9 @@ package app_java_1;
 public class B{}
 
 package app_java_1;
-public class C extends A, B{//Error
-	
+public class C extends A, B{//Error	
 }
 
-###############################
 Access Specifiers in Java
 ###############################
 
@@ -1011,12 +1003,28 @@ c. protected: We can access variables/methods in the same class/same package, an
 
 d. public: When we make a variable/method public, then we can access that in the same class/the same package/different package
 
-########################################################
 Access Specifier on Constructors
 #######################################################
 
 Can we inherit the Constructor?
-Answer: We cannot inherit the constructor
+Answer: No, constructors cannot be inherited in Java.
+Even though a subclass gets access to all public and protected members of the superclass, constructors are not part of inheritance.
+
+🔍 Why Are Constructors Not Inherited?
+✅ 1. Constructors are not members
+Constructors are not inherited because they are not class members like methods or fields.
+
+✅ 2. Constructors are class-specific
+A constructor is tightly bound to its class name.
+
+✅ 3. Subclass should define how it initializes its members
+A subclass might have new fields or different logic to initialize.
+So it needs its constructor to control initialization.
+
+✅ 4. Java automatically provides a default constructor
+If you don't define any constructors, Java will insert a default no-arg constructor.
+But this doesn't mean the superclass constructor is inherited — it's just that Java calls the superclass constructor from the subclass constructor.
+They are special blocks used to initialize objects of a specific class.
 
 🔐 Private Constructor in Java
 A private constructor is a constructor that cannot be accessed outside its class.
@@ -1025,7 +1033,7 @@ A private constructor is a constructor that cannot be accessed outside its class
 ❌ Prevent object creation	        for utility or helper classes
 ✅ Implement Singleton Pattern		Ensure only one instance is created
 🔐 Hide object instantiation		Force object creation through factory methods
--> If a constructor is made private, then its object cannot be created outside the class.
+➤If a constructor is made private, then its object cannot be created outside the class.
 
 Example :
 package p1;
@@ -1048,8 +1056,8 @@ public class C {
 		A a1 = new A();//-->Error
 	}
 }
--> When a constructor is made private, then inheritance of that class is not allowed
-(Note: Constructs are not inherited)
+
+➤When a constructor is made private, then inheritance of that class is not allowed
 
 Example 2:
 ----------
@@ -1067,7 +1075,6 @@ import p1.A;
 public class C extends A{//-->Error	
 }
 
-
 🏗️ Default Constructor in Java
 ################################
 A default constructor is a no-argument constructor that the Java compiler automatically provides if you do not define any constructors in your class.
@@ -1078,10 +1085,10 @@ No parameters. 				Takes zero arguments
 Provided automatically			Only if no constructor is defined by the user
 Initializes variables,			sets fields to default values (e.g., 0, null)
 Used for object creation		Allows creation of objects without parameters
--> If a constructor is made default, then its object can be created in the  same class/same package, but not outside the package.
+➤If a constructor is made default, then its object can be created in the same class/same package, but not outside the package.
 
 Example 1:
-----------
+
 package p1;
 public class A {
 	A() {}
@@ -1103,10 +1110,8 @@ public class C{
 	}
 }
 
--> When a constructor is made default, then inheritance of that class is allowed only in the same package, but not outside the package
-
 Example 2:
-----------
+
 package p1;
 public class A {
 	A() {}
@@ -1122,17 +1127,16 @@ public class C extends A{//-->Error
 🔐 Protected Constructor in Java
 #################################
 A protected constructor means the constructor can only be accessed:
-
 ✅ Within the same package
 ✅ From subclasses (even in other packages)
 
 ✅ Why Use a Protected Constructor?
-->To restrict object creation outside the package
-->To allow subclassing but prevent direct instantiation from unrelated classes
-->Often used in inheritance-based designs, frameworks, or abstract factories
+➤To restrict object creation outside the package
+➤To allow subclassing but prevent direct instantiation from unrelated classes
+➤Often used in inheritance-based designs, frameworks, or abstract factories
 
 Example 1:
----------
+
 package p1;
 public class A {
 	protected A() {}
@@ -1155,11 +1159,10 @@ public class C {
 		A a1 = new A();//-->Error
 	}
 }
--> When a constructor is made protected, then inheritance of that class is  allowed inthe  same package / outside the package (both)
-(Note: Constructors are not inherited)
+➤When a constructor is made protected, then inheritance of that class is  allowed in the same package / outside the package (both).
 
 Example 2:
-----------
+
 package p1;
 public class A {
 	protected A() {}
@@ -1173,11 +1176,11 @@ import p1.A;
 public class C extends A {}
 
 e. public Constructor
-------------------------
--> If a constructor is made public, then its object can be created in the same class/same package and outside the package also
+
+➤If a constructor is made public, then its object can be created in the same class/same package, and outside the package also
 
 Example 1:
----------
+
 package p1;
 public class A {
 	public A() {}
@@ -1201,11 +1204,10 @@ public class C  {
 	}
 }
 
--> When a constructor is made public, then inheritance of that class is  allowed in the same package / outside the package (both)
-(Note: Constructors are not inherited)
+➤When a constructor is made public, then inheritance of that class is  allowed in the same package / outside the package (both)
 
 Example 2:
-----------
+
 package p1;
 public class A {
 	public A() {}
@@ -1218,7 +1220,7 @@ package p2;
 import p1.A;
 public class C extends A {}
 
-########################################
+
 ✅ Access Specifiers on Top-Level Classes:
 Access Specifier			Usage					Visibility
 public					public class ClassName {}		Visible to all classes everywhere (within the same package or other packages).
@@ -1227,6 +1229,19 @@ Default (no modifier)			class ClassName {}			Visible to classes within the same 
 ❌ Not allowed on top-level classes:
 private
 protected
+
+🔍 Reason: Java's Design Philosophy
+✅ 1. Top-level classes must be accessible to the JVM & compiler
+
+If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
+
+That breaks the point of having it at the top level — it becomes useless.
+
+✅ 2. Protected and private only make sense in class hierarchies
+
+Protected is meaningful only within inheritance (i.e., subclass access).
+Private is meaningful only within the enclosing class.
+For a top-level class, there is no enclosing class, so these modifiers make no logical sense.
 
 These are invalid for top-level classes and will cause a compile-time error if used.
 
@@ -1249,12 +1264,14 @@ class A {
 		A a1 = new A();
 	}
 }
+
 package p1;
 public class B {
 	public static void main(String[] args) {
 		A a1 = new A();
 	}
 }
+
 package p2;
 import p1.A;//--->Error because A is default and cannot be inherited in another package
 public class C {
@@ -1265,8 +1282,8 @@ public class C {
 
 What happens when a class is made public?
 Answer:
-->  Its object can be created in the same class/same package & inside a different package
--> Inheritance is allowed in the same package & inside different packages
+➤Its object can be created in the same class/same package & inside a different package
+➤Inheritance is allowed in the same package & inside different packages
 
 Example :
 
@@ -1281,11 +1298,40 @@ import p1.A;
 public class C extends A{}
 
 Note:
-------------------------------------------------------------------
 a. Compile Time
-->This is the phase where source code is checked and translated into bytecode.
-->Java source files (.java) are compiled by the Java Compiler (javac).
-->The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
+➤This is the phase where source code is checked and translated into bytecode.
+➤Java source files (.java) are compiled by the Java Compiler (javac).
+➤The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
+
+[Source Code (.java file)]
+             |
+             v
+[JDK - javac Compiler]
+   (Compiles to Bytecode)
+             |
+             v
+[.class File (Bytecode)]
+             |
+             v
+[JVM Class Loader]
+   (Loads class into memory)
+             |
+             v
+[Bytecode Verifier]
+   (Validates bytecode)
+             |
+             v
+[Execution by JVM]
+     /           \
+    v             v
+[Interpreter]   [JIT Compiler]
+ (line-by-line)   (compiles hot code to native)
+             |
+             v
+[Native Machine Code]
+             |
+             v
+[CPU Executes Code → Output]
 
 Output: .class file containing bytecode.
 
@@ -1293,27 +1339,47 @@ Command: javac MyProgram.java
 Result: Creates MyProgram.class file.
 
 b. Run Time
-->This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
-->The JVM loads the .class file and executes the bytecode.
-->Any exceptions or logical errors may occur during this phase.
+➤This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
+➤The JVM loads the .class file and executes the bytecode.
+➤Any exceptions or logical errors may occur during this phase.
 
 Command: java MyProgram
 Result: Runs the program using the bytecode inside MyProgram.class.
 
------------------------------------------------------------------------------------
-Two types of polymorphism
+✅ What Makes Java Platform Independent?
+Java is platform-independent because of its "Write Once, Run Anywhere" capability.
+This is mainly due to:
+🔑 1. Bytecode
+When you compile a Java program (.java file), the Java compiler (javac) doesn't generate platform-specific machine code.
+It generates bytecode (.class file) — an intermediate, platform-neutral code.
+
+// You write this
+HelloWorld.java
+↓
+// Compiled by javac to
+HelloWorld.class (bytecode)
+
+Bytecode is the key to platform independence — it's the same for all operating systems.
+
+🔑 2. Java Virtual Machine (JVM)
+JVM is platform-dependent (a different version exists for Windows, Linux, Mac, etc.).
+It executes the bytecode by converting it into native machine code at runtime.
+Since every OS has its own JVM, the same bytecode can run on any system with a compatible JVM.
+
+b. Polymorphism
+#################
+Two types of polymorphism:
 
 a. Overriding (Run-time polymorphism):
-->Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
-->It is used to achieve Run-time Polymorphism.
-->The method signature (name + parameters) must be exactly same in both parent and child class.
--> The decision of which method to call is made at run-time, not compile-time.
+➤Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
+➤It is used to achieve Run-time Polymorphism.
+➤The method signature (name + parameters) must be the same in both parent and child classes.
+➤The decision of which method to call is made at run-time, not compile-time.
 
 🔸 Key Rules of Method Overriding:
 Rule							Description
 Same method signature					Method name, return type, and parameters must be the same.
 Access modifier						Child method must have the same or more accessible modifier (e.g., can’t override public with private).
-Inheritance						Only possible in an IS-A relationship (subclass-superclass).
 Can't override final, static, or private methods	These are either not inherited or cannot be changed.
 Return type						should be the same or covariant (child class return type).
 Use @Override						Optional, but recommended to catch errors at compile time.
@@ -1337,7 +1403,7 @@ public class PlatinumAccount extends GoldAccount {
 	public static void main(String[] args) {
 		PlatinumAccount p = new PlatinumAccount();
 		p.onlineBanking();
-		p.rateOfInterestOutput: 6% PA
+		p.rateOfInterest()// Output: 6% PA
 		System.out.println("--------");
 		GoldAccount g = new GoldAccount();
 		g.onlineBanking();
@@ -1346,13 +1412,13 @@ public class PlatinumAccount extends GoldAccount {
 }
 
  What are Annotations?
-->Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
-->They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
+➤Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
+➤They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
 
  Common Use: @Override
 --------------------------
-->@Override is used to indicate that a method is intended to override a method in the superclass.
-->It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
+➤@Override is used to indicate that a method is intended to override a method in the superclass.
+➤It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
 
 package p1;
 	public class GoldAccount {	
@@ -1369,7 +1435,7 @@ public class PlatinumAccount extends GoldAccount {
 	}	
 }
 
-Question: Access Specifier should it be the same or can it be different during Overriding?
+Question: Access Specifier should be the same or can it be different during Overriding?
 Answer: During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
 
 Example 1:
@@ -1388,7 +1454,7 @@ public class PlatinumAccount extends GoldAccount {
 		System.out.println("6% PA");
 	}
 }
--------------------------------------------------------------------
+
 Example 2:
 
 package p1;
@@ -1411,7 +1477,7 @@ Order of Access Specifiers
 Private -> Default -> Proctected -> Public
 
 Example 3:
------------
+
 package p1;
 public class GoldAccount {
 	private void rateOfInterest() {
@@ -1428,8 +1494,65 @@ public class PlatinumAccount extends GoldAccount {
 		System.out.println("6% PA");
 	}
 }
-###############################
-Note: -> Static members cannot be inherited
+
+Note: Static members cannot be inherited
+❓ Are Static Members Inherited in Java?
+✅ Technically, static members are inherited — but they are not polymorphic, and they do not behave like instance members in inheritance.
+
+🔥 Common Misconception:
+People often say:
+❌ "Static members cannot be inherited."
+But that's not entirely accurate.
+
+✅ What Actually Happens:
+1. Static members belong to the class, not to objects.
+They are class-level members, not instance-level.
+
+So they are shared across the inheritance hierarchy.
+
+✅ Example:
+class A {
+    static int x = 10;
+    static void greet() {
+        System.out.println("Hello from A");
+    }
+}
+
+class B extends A {}
+Now in B, you can access x and greet():
+
+System.out.println(B.x);     // ✅ Allowed
+B.greet();                   // ✅ Allowed
+
+So yes — static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
+
+⚠️ Why Static Members Are Not "Truly" Inherited:
+✅ 1. They don’t participate in runtime polymorphism
+
+class A {
+    static void show() {
+        System.out.println("A");
+    }
+}
+
+class B extends A {
+    static void show() {
+        System.out.println("B");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A obj = new B();
+        obj.show(); // Output: A (not B)
+    }
+}
+
+Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
+
+✅ 2. They're not part of the instance — so “inheritance” isn’t meaningful
+Since they don’t get copied to each object or act differently per subclass instance, calling it "inheritance" is misleading.
+
 Example:
 You have:
 A parent class: GoldAccount (in package p1)
@@ -1465,6 +1588,7 @@ is effectively the same as: GoldAccount.rateOfInterest();
 
 The same logic applies to the static variable x:
 PlatinumAccount.x; // resolves to GoldAccount.x (100)
+
 🟨 Important Point:
 Static methods and variables are resolved based on class name, not overridden, and not polymorphic.
 
@@ -1515,8 +1639,17 @@ Note: During overriding method return type should match
 
 ✅ Overloading in Java (Compile-Time Polymorphism)
 🔹 What is Method Overloading?
-->Method Overloading means defining multiple methods with the same name in a class but with different parameter lists (type, number, or order of parameters).
-->It allows compile-time polymorphism, where the method to be called is determined at compile time based on the method signature.
+➤Method Overloading means defining multiple methods with the same name in a class but with different parameter lists (type, number, or order of parameters).
+➤It allows compile-time polymorphism, where the method to be called is determined at compile time based on the method signature.
+
+| Feature                     | Allowed in Overloading? | Explanation                             |
+| --------------------------- | ----------------------- | --------------------------------------- |
+| Change number of parameters | ✅ Yes                   | Different arity                         |
+| Change type of parameters   | ✅ Yes                   | Different signatures                    |
+| Change order of parameters  | ✅ Yes                   | Only if types are different             |
+| Change return type only     | ❌ No                    | Causes compile-time error               |
+| Change access modifier only | ❌ No                    | Doesn't affect method signature         |
+| Change method name          | ❌ No                    | It's not overloading, it's a new method |
 
 🔸 Characteristics of Overloading:
 Feature					Description
@@ -1543,13 +1676,28 @@ public class EmailService {
 	}
 }
 
-################################
 Final Keyword
 ################################
--> If you make a variable final, then we cannot change its value(Just like constant variables)
--> If you make a static/non-static variable final, then initialization is mandatory
--> If you make a method final, then overriding is not allowed
--> If you make a class final, then inheritance is not allowed
+➤If you make a variable final, then we cannot change its value(Just like constant variables)
+➤If you make a static/non-static variable final, then initialization is mandatory
+
+Example:  
+---------
+public interface A {
+	int MAX_VAL=100;
+	static final int MIN_VAL=0;
+}
+package p1;
+
+public class B {
+	public static void main(String[] args) {
+		System.out.println(A.MAX_VAL);//Output: 100
+		System.out.println(A.MIN_VAL);//Output: 0
+	}
+}
+
+➤If you make a method final, then overriding is not allowed
+➤If you make a class final, then inheritance is not allowed
 
 Example 1: 
 ----------
@@ -1559,7 +1707,6 @@ public class A {
 	public static void main(String[] args) {
 		final int x = 10;
 		x=20;//-->Cannot change the value of final variable
-
 		final int y;//->final mandatory to be initialized
 	        final static int z;//->final mandatory to be initialized
 	        //The above errors are called blank field errors
@@ -1595,10 +1742,8 @@ package p1;
 public class B extends A{//---> Error because we cannot inherit final class	
 }
 
-#####################################
-interfaces in java - abstraction
-#######################################
-✅ Interfaces in Java – Abstraction
+Interfaces in Java - Abstraction
+##################################
 Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
 
 🔹 Key Points:
@@ -1606,28 +1751,29 @@ Complete Abstraction (Java 7)
 ➤ In Java 7 and earlier, interfaces could only have abstract methods (no method bodies).
 ➤ They define what should be done, not how.
 
-All Variables Are public static final
-➤ Any variable declared in an interface is implicitly:
+All Variables are public static final.
+➤ Any variable declared in an interface is implicit:
 public static final (i.e., a constant).
 ➤ No need to specify these modifiers—they are applied by default.
+➤No Object creation
 
-Contract-Based Programming
-➤ An interface defines a contract. Any class that implements the interface must provide concrete implementations for all its methods.
+✅ Note: Drawback of Inheritance – Tightly Coupled Programming
+🔹 What is Tightly Coupled Programming?
+➤When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
+➤In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
 
-No Object Creation
-#############################
-Note: Drawback of inheritance
-#############################
--> Inheritance results in tightly couple programming. Interfaces cannot be instantiated directly because they can contain incomplete methods (abstract methods).
+🔸 How Inheritance Causes Tight Coupling:
+Child class depends heavily on the parent class:
+➤In inheritance, the child class inherits both behavior and structure from the parent.
+➤If the parent class changes, it can break or affect the behavior of all child classes.
 
-Loose Coupling
-➤ Interfaces help in decoupling code. The implementing class can change internally without affecting users of the interface.
+Strong binding:
+➤The child class is strongly bound to the specific parent class.
+➤You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
 
-Improves Design and Flexibility
-➤ It forces implementing classes to use the same method signatures, promoting a standard structure and ensuring interoperability.
-
-Multiple Inheritance Support
-➤ Java does not support multiple inheritance with classes, but it does through interfaces. A class can implement multiple interfaces.
+Hard to maintain and extend:
+➤Over time, inherited code becomes fragile.
+➤Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
 
 Example 1:
 ---------
@@ -1644,7 +1790,6 @@ Example 3:
 package p1;
 
 public interface NotificationService {
-	//What needs to be implemented
 	public void emailService();
 	public void whatsAppService();
 	public void smsService();
@@ -1653,7 +1798,6 @@ public interface NotificationService {
 package p1;
 
 public class NotificationServiceImpl implements NotificationService {
-	//How it will be implemented
 	@Override
 	public void emailService() {
 		System.out.println("Email Sending");
@@ -1673,24 +1817,6 @@ public class NotificationServiceImpl implements NotificationService {
 		impl.whatsAppService();
 	}
 }
-
-✅ Note: Drawback of Inheritance – Tightly Coupled Programming
-🔹 What is Tightly Coupled Programming?
-➤When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
-➤In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
-
-🔸 How Inheritance Causes Tight Coupling:
-➤Child class depends heavily on parent class:
-➤In inheritance, the child class inherits both behavior and structure from the parent.
-➤If the parent class changes, it can break or affect the behavior of all child classes.
-
-Strong binding:
-➤The child class is strongly bound to the specific parent class.
-➤You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
-
-Hard to maintain and extend:
-➤Over time, inherited code becomes fragile.
-➤Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
 
 Example:
 ----------
@@ -1768,27 +1894,6 @@ Example: A Database interface may define connect(), disconnect(), but not how th
 6. Supports Plug-and-Play Architecture
 ➤Interface-based design makes it easy to swap implementations (e.g., using different payment gateways, databases, or services) without changing the dependent code.
 
-7. Better Testability and Mocking
-➤Interfaces enable easier unit testing with mock implementations.
-➤You can test components in isolation by mocking interface behaviour.
-
-Note: ➤All Variables by default in an interface are final and static. Hence, initialization is mandatory.
-
-Example:  
----------
-public interface A {
-	int MAX_VAL=100;
-	static final int MIN_VAL=0;
-}
-package p1;
-
-public class B {
-	public static void main(String[] args) {
-		System.out.println(A.MAX_VAL);//Output: 100
-		System.out.println(A.MIN_VAL);//Output: 0
-	}
-}
-
 Note:
 ➤Class to Class Inheritance --> extends
 ➤Interface to Interface Inheritance --> extends
@@ -1834,8 +1939,8 @@ public class C implements B, D { //If you do multiple inheritance on a class, th
 
 Example 4:
 ----------
-➤ In class can we perform extends and implements together
-➤But ensure the extension is used first and then implementes
+➤ In class, can we perform extends and implements together
+➤But ensure the extends is used first and then implementes
 
 package p1;
 public interface A {
@@ -1850,7 +1955,7 @@ public class B {
 }
 
 package p1;
-public class C extends B  implements  A {
+public class C extends B implements A {
 	@Override
 	public void test2() {
 		System.out.println("From test2");		
@@ -1863,7 +1968,7 @@ public class C extends B  implements  A {
 }
 
 Question: Can I develop an incomplete static method in an interface?
-Answer: We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface
+Answer: We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
 
 Example:
 package p1;
@@ -1885,6 +1990,7 @@ public interface A {
 	}
 	public void test2();
 }
+
 package javaconcepts.p3;
 
 public class B implements A {
@@ -1906,6 +2012,41 @@ public class B implements A {
 Output
 From Overrided Test1
 From Overrided test2
+
+Before Java 8:
+➤Interfaces could only contain abstract methods (no body).
+➤If you added a new method to an interface, all implementing classes would break unless they implemented the new method.
+
+✅ Benefits of default Methods in Interfaces
+1. Backward Compatibility
+➤You can add new methods to interfaces without breaking existing implementations.
+➤Existing classes don’t need to override the new default method.
+
+interface A {
+    void m1();  // originally
+    default void m2() { // added later
+        System.out.println("Default m2");
+    }
+}
+
+➤Even if old classes only implement m1(), they won’t break because m2() has a default body.
+
+interface A {
+    default void greet() {
+        System.out.println("Hello from A");
+    }
+}
+interface B {
+    default void greet() {
+        System.out.println("Hello from B");
+    }
+}
+class C implements A, B {
+    public void greet() {
+        A.super.greet();  // resolve conflict
+    }
+}
+This allows controlled multiple behavior inheritance.
 
 ✅ 2. Functional Interface
 🔹 Definition:
@@ -2012,8 +2153,8 @@ public interface B extends A{
 }
 Output: Error because we are inheriting 1 method from a functional interface, and a functional interface has 1 method, which totals to 2 methods in an interface
 
-🔹 Definition:
-A Lambda Expression is a short block of code which:
+🔹Lambda Expression:
+A Lambda Expression is a short block of code that:
 ➤Takes in parameters
 ➤Executes a body
 ➤Can be used in place of anonymous classes
@@ -2041,8 +2182,6 @@ name -> System.out.println("Hello " + name)
 () -> System.out.println("No parameters")
 
 ✅ How Lambda Expressions Work in Java?
-🔹 Basic Concept
-At a high level, lambda expressions in Java work by:
 ➤ It creates an anonymous class behind the scenes. A class without any name is called Anonymous.
 ➤Then the lambda expression creates an object and loads the method by implementing it inside the object.
 ➤Then we use an object reference to call that implemented method
@@ -2050,6 +2189,7 @@ At a high level, lambda expressions in Java work by:
 
 🔸 ✅ Behind the Scenes:
 When you write a lambda expression like: () -> System.out.println("Hello");
+
 Java performs the following under the hood:
 ➤Infers the target type based on the context. → It must be a functional interface.
 ➤Converts the lambda into an instance of the functional interface using invokedynamic bytecode instruction (introduced in Java 7).
@@ -2196,7 +2336,6 @@ You can define:
 abstract class Demo {
     static int count = 0;
     int id;
-
     static void showCount() {
         System.out.println("Count = " + count);
     }
@@ -2271,10 +2410,19 @@ package p1;
 public abstract class C extends A,B{//Error
 }
 
-Difference between interface & abstract class
--------------------------------------------------
-a. Interface supports multiple inheritance, but abstract class does not support multiple inheritance
-b. All variables in an interface by default are final & static, whereas inside an abstract class, we can create static/non-static/final variables
+🧠 So, Why Use an Interface if an Abstract Class Can Have Abstract Methods?
+➤Java doesn't support multiple inheritance for classes; interfaces allow it.
+➤Interfaces are ideal for defining APIs and contracts, not implementations.
+➤Use abstract classes when you want to provide a common base with shared code.
+➤Use interfaces when you want to enforce a common behavior across unrelated classes.
+➤All variables in an interface by default are final & static, whereas inside an abstract class, we can create static/non-static/final variables
+
+✅ Real-World Analogy:
+| Concept        | Example                                                                     |
+| -------------- | --------------------------------------------------------------------------- |
+| Interface      | RemoteControl: defines buttons (on/off) — any brand can follow              |
+| Abstract class | SamsungRemote: provides partial button logic, common to all Samsung remotes |
+
 
 Example:
 -------
