@@ -2171,7 +2171,7 @@ Allows writing concise code by eliminating boilerplate like anonymous class synt
 Lambda expressions can only be used where a functional interface (i.e., one abstract method) is expected.
 
 ✅ Commonly Used in Stream API
-Lambdas are widely used in filtering, mapping, sorting, and reducing data in the Java Stream API.
+Lambdas  are widely used in filtering, mapping, sorting, and reducing data in the Java Stream API.
 
 🔹 Syntax of Lambda Expression:
 (parameters) -> { body }
@@ -2189,11 +2189,6 @@ name -> System.out.println("Hello " + name)
 
 🔸 ✅ Behind the Scenes:
 When you write a lambda expression like: () -> System.out.println("Hello");
-
-Java performs the following under the hood:
-➤Infers the target type based on the context. → It must be a functional interface.
-➤Converts the lambda into an instance of the functional interface using invokedynamic bytecode instruction (introduced in Java 7).
-➤Creates a synthetic method and links the lambda expression to it at runtime.
 
 🔹 Step-by-step Breakdown:
 ✅ Step 1: Functional Interface
@@ -2227,7 +2222,7 @@ System.out.println(add.operate(5, 3)); // 8
 Note: Functional Programming defines you to say "what you want, not how to do it step-by-step"
 
 Example 1:
-------------
+-----------
 package p1;
 @FunctionalInterface
 public interface A {
@@ -2239,7 +2234,7 @@ public class B{
 		A a1 = ()->{
 			System.out.println(100);
 		};
-		a1.test1();// Output: 100
+		a1.test1();//Output: 100
 	}
 }
 
@@ -2304,10 +2299,10 @@ b. Functional Programming
 
 5. Optional class - We have to learn the exception concept in Java first
 -----------------------------------------------------------------------
-Note: What are marker interfaces in Java?
--> Empty interfaces in Java are called marker interfaces
 
-Example: For the marker interface
+Marker interface 
+------------------
+An empty interface is called a marker interface
 package p1;
 public interface A {}
 
@@ -2486,7 +2481,7 @@ public class C extends B{
 }
 
 #############################################################################
-Note: In Java 8 we can develop complete static methods & main method in an interface
+Note: In Java 8, we can develop complete static methods & main method in an interface
 #################################################################################
 
 Example:
