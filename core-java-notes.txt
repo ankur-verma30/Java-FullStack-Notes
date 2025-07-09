@@ -1504,7 +1504,7 @@ People often say:
 ❌ "Static members cannot be inherited."
 But that's not entirely accurate.
 
-✅ What Actually Happens:
+✅ What Happens:
 1. Static members belong to the class, not to objects.
 They are class-level members, not instance-level.
 
@@ -1550,7 +1550,7 @@ public class Main {
 
 Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
 
-✅ 2. They're not part of the instance — so “inheritance” isn’t meaningful
+✅ 2. They're not part of the instance, so “inheritance” isn’t meaningful
 Since they don’t get copied to each object or act differently per subclass instance, calling it "inheritance" is misleading.
 
 Example:
@@ -1581,7 +1581,7 @@ public class PlatinumAccount extends GoldAccount {
 ✅ 1. Static Methods and Variables Are Not Polymorphic
 Even though PlatinumAccount inherits from GoldAccount, calling:
 PlatinumAccount.rateOfInterest();
-is resolved at compile-time based on the class name, not on the object type.
+is resolved at compile time based on the class name, not the object type.
 
 Since PlatinumAccount does not override the method (it doesn’t define its own rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
 is effectively the same as: GoldAccount.rateOfInterest();
@@ -1592,50 +1592,7 @@ PlatinumAccount.x; // resolves to GoldAccount.x (100)
 🟨 Important Point:
 Static methods and variables are resolved based on class name, not overridden, and not polymorphic.
 
-################################################
-Can we override static methods?
-❌ No, we cannot override static methods in Java.
-🔹 Explanation:
-In Java, static methods belong to the class, not to instances (objects). Therefore, they are not subject to polymorphism and cannot be overridden like instance methods.
-
-When you define a static method in a subclass with the same signature as in the superclass, it's called: ✅ Method Hiding, not Overriding.
-
-Example:
-class A {
-    static void show() {
-        System.out.println("Static method from A");
-    }
-}
-
-class B extends A {
-    static void show() {
-        System.out.println("Static method from B");
-    }
-}
-
-public class Test {
-    public static void main(String[] args) {
-        A obj = new B();
-        obj.show();  // Output: Static method from A
-    }
-}
-
-🔍 Why is the output a Static method from A?
-Because obj is of type A, and static methods are resolved at compile-time using reference type, not the actual object.
-
-So A.show() is called, not B.show().
-
-🛑 Using @Override on a static method:
-class C {
-    static void hello() {}
-}
-
-class D extends C {
-    @Override // ❌ Compile-time error!
-    static void hello() {}
-}
-
-Note: During overriding method return type should match
+Note: During overriding, the method return type should match
 
 ✅ Overloading in Java (Compile-Time Polymorphism)
 🔹 What is Method Overloading?
@@ -2608,7 +2565,7 @@ public class A {
 	public static void main(String[] args) {
 		try {
 			A a1 = null;
-			System.out.println(a1.x);//A.x  Output : 10
+			System.out.println(a1.x);//A.x  Output: 10
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
