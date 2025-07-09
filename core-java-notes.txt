@@ -2166,16 +2166,6 @@ Greet g = new Greet() {
 };
 But the lambda version is shorter, cleaner, and faster.
 
-🔹 Functional Interface Matching
-@FunctionalInterface
-interface MathOperation {
-    int operate(int a, int b);
-}
-
-MathOperation add = (a, b) -> a + b;
-System.out.println(add.operate(5, 3)); // 8
-➡ Java matches the lambda (a, b) -> a + b to the method operate(int,int).
-
 Note: Functional Programming defines you to say "what you want, not how to do it step-by-step"
 
 Example 1:
@@ -2216,37 +2206,6 @@ public class B{
 		a1.test2();// Output: test2
 	}
 }
-
-✅ How it works: Lambda Expression with Functional Interface
-In Java 8+, when you have a functional interface (i.e., an interface with only one abstract method), you can use a lambda expression to provide the implementation without creating a class that implements A.
-
-🔹 Behind the Scenes:
-This line:
-A a1 = () -> {
-    System.out.println("This is the test1 function");
-};
-...is a shortcut for writing:
-
-A a1 = new A() {
-    @Override
-    public void test1() {
-        System.out.println("This is the test1 function");
-    }
-};
-✅ So the lambda automatically becomes the implementation of test1() in the background.
-
-✅ Do We Need to Implement the Functional Interface Manually?
-➤No, you do not need to use implements InterfaceName at all, regardless of:
-➤Whether the functional interface is in the same package
-➤Or in a different package
-
-✅ What You DO Need:
-| Requirement                                                               | Mandatory?     | Explanation                               |
-| ------------------------------------------------------------------------- | -------------- | ----------------------------------------- |
-| Interface must be `@FunctionalInterface`                                  | ✅              | Must have exactly one abstract method     |
-| Interface must be **accessible** (i.e., `public` if from another package) | ✅              | You must import it properly               |
-| Same package                                                              | ❌ Not required | Lambda works across packages              |
-| Class must `implements A`                                                 | ❌ Not required | Lambda already handles the implementation |
 
 4. Stream API
 ---------------------
