@@ -2573,7 +2573,124 @@ public class A {
 	}
 }
 
-Note:
+Unary Operators in Java
+##############################
+
+1. Increment Operator
+   1.1 Post-Increment: Increment the value of the variable next time you see the same variable
+Example 1:
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int i=0;
+		int j = i++;
+		int k=10;
+		int l=k++ + k++ + k++;
+		System.out.println(i);//Output: 1
+		System.out.println(j);// Output: 0
+		System.out.println(k);//Output: 13
+		System.out.println(l);// Output: 33
+	} 
+}
+   1.2 Pre-Increment: Increment the value of the variable in the same step
+Example 1:
+-----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int i=10;		
+		int j = ++i;
+		int k=10;
+		int l=++k + ++k + ++k;
+		System.out.println(i);// Output: 11
+		System.out.println(j);// Output: 11
+		System.out.println(k);// Output: 13
+		System.out.println(l);// Output: 36
+	} 	
+}
+2. Decrement Operator
+   2.1 Post Decrement: Here we decrement the value of i by 1 when we next time see the same variable:
+
+Example:
+package p1;
+
+public class A {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = a-- + a--; 
+	int x = 10;
+        int y = x-- + x++ + x-- + x--; 
+        System.out.println(a); //Output: 8
+        System.out.println(b); //Output: 19
+        System.out.println(x); //Output: 8
+        System.out.println(y); //Output: 38
+    }
+}
+   2.2 Pre Decrement: Here we decrement the value of the variable in the same step by 1
+
+Example 1:
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int i=10;		
+		int j = --i + --i;
+		System.out.println(i);
+		System.out.println(j);
+	} 
+}
+
+✅ Type Casting of Data Types in Java
+In Java, type casting is used to convert a variable of one data type into another. This is commonly done between primitive types or object references (in case of inheritance).
+
+🔄 1. Type Casting Between Primitive Data Types
+There are two types:
+
+✅ a) Widening Casting (Implicit & Upcasting)
+➤Smaller type → Larger type
+➤Safe, automatic, without any loss of data
+
+byte → short → int → long → float → double
+
+🧪 Example:
+int a = 10;
+double b = a;  // int to double (widening)
+double x=10.3d;
+long y=x; // Smaller -> Larger, but there is a loss of data, so that it will give an error.
+
+✅ b) Narrowing Casting (Explicit & Downcasting)
+ ➤Larger type → Smaller type
+➤Risky, must be done manually using cast () 
+➤Loss of data can take place
+
+double → float → long → int → short → byte
+
+🧪 Example:
+double x = 10.99;
+long i=10;
+int y = (int) x;  //output: 10 double to int (narrowing)
+byte j=i; // ----------> Throws error
+
+🧪 Example:
+long i=100;
+byte j=(byte)(int)i; //multiple downcasting is possible
+
+🧪 Example:
+int i=100;
+long j=(long)i; // No error
+
+🔍 Why is float → long considered downcasting, even though size increases?
+Because type casting in Java is not only about memory size, but also about type compatibility and precision:
+
+❗ float → long is narrowing because:
+➤You are going from floating-point to integer, which involves:
+➤Loss of precision (decimal part is truncated)
+➤Potential data loss if the value is too large
+➤Even if you're increasing memory size, you're going from a more complex representation (float) to a simpler one (integer).
 
 Primitive    Wrapper Class
 byte		Byte
@@ -2832,77 +2949,6 @@ public class A {
 	public static void main(String[] args) {
 		int[] age = new int[40];
 		System.out.println(age.length);// Output :40
-	} 
-}
-
-Unary Operators in Java
-##############################
-
-1. Increment Operator
-   1.1 Post-Increment: Increment the value of the variable next time you see the same variable
-Example 1:
-----------
-package p1;
-
-public class A {
-	public static void main(String[] args) {
-		int i=0;
-		int j = i++;
-		int k=10;
-		int l=k++ + k++ + k++;
-		System.out.println(i);//Output: 1
-		System.out.println(j);// Output: 0
-		System.out.println(k);//Output: 13
-		System.out.println(l);// Output: 33
-	} 
-}
-   1.2 Pre-Increment: Increment the value of the variable in the same step
-Example 1:
------------
-package p1;
-
-public class A {
-	public static void main(String[] args) {
-		int i=10;		
-		int j = ++i;
-		int k=10;
-		int l=++k + ++k + ++k;
-		System.out.println(i);// Output: 11
-		System.out.println(j);// Output: 11
-		System.out.println(k);// Output: 13
-		System.out.println(l);// Output: 36
-	} 	
-}
-2. Decrement Operator
-   2.1 Post Decrement: Here we decrement the value of i by 1 when we next time see the same variable:
-
-Example:
-package p1;
-
-public class A {
-    public static void main(String[] args) {
-        int a = 10;
-        int b = a-- + a--; 
-	int x = 10;
-        int y = x-- + x++ + x-- + x--; 
-        System.out.println(a); //Output: 8
-        System.out.println(b); //Output: 19
-        System.out.println(x); //Output: 8
-        System.out.println(y); //Output: 38
-    }
-}
-   2.2 Pre Decrement: Here we decrement the value of the variable in the same step by 1
-
-Example 1:
-----------
-package p1;
-
-public class A {
-	public static void main(String[] args) {
-		int i=10;		
-		int j = --i + --i;
-		System.out.println(i);
-		System.out.println(j);
 	} 
 }
 
