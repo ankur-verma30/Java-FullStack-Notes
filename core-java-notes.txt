@@ -2619,7 +2619,7 @@ byte → short → int → long → float → double
 int a = 10;
 double b = a;  // int to double (widening)
 double x=10.3d;
-long y=x; // Smaller -> Larger, but there is a loss of data, so that it will give an error.
+long y=x; // Larger -> Smaller, there is a loss of data so it will give an error.
 
 ✅ b) Narrowing Casting (Explicit & Downcasting)
  ➤Larger type → Smaller type
