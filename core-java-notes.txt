@@ -3006,6 +3006,116 @@ sc.nextLine(); // ← eat the leftover newline
 System.out.print("Enter name: ");
 String name = sc.nextLine();
 
+🔷 IIB — Instance Initialization Block
+########################################
+It runs every time an object is created, before the constructor, and is used to initialize instance (non-static) data.
+You can think of an IIB as an anonymous constructor fragment that runs before the real constructor.
+
+package p1;
+
+public class iiBTutorial {
+	int i;
+	int j;
+	static int k;
+	static void test() {
+		System.out.println("Test method called");
+	}
+	{
+		i = 10;
+		j = 20;
+		System.out.println("Intance Initialization Block 1 called");
+		System.out.println("The value of i: " + i);
+		System.out.println("The value of j: " + j);
+		System.out.println("The value of k: " + k);
+		test();
+		// new iiBTutorial();-----------> recursive calling of IIB stack overflow, cannot create object inside IIB
+	}
+	{
+		System.out.println("Intance Initialization Block 2 called");
+	}
+
+	iiBTutorial() {
+		System.out.println("B constructor called");
+	}
+
+	public static void main(String[] args) {
+		iiBTutorial b1 = new iiBTutorial();
+		test();
+	}
+}
+
+
+When you create an object, Java executes:
+1. Instance variable initializations
+2. IIB block(s) (in the order they appear)
+3. Constructor
+
+➤Use Case: To initialize instance variables or logic common to all constructors.
+➤Runs whenever an object creation takes place.
+➤Every time a new object is created, IIB runs.
+
+✅ When to Use IIB?
+➤When all constructors need to run some common code.
+➤To reduce duplication across overloaded constructors.
+
+Note: A Static variable/method can be accessed inside the IIB
+
+🔷 SIB — Static Initialization Block
+#######################################
+It runs once when the class is loaded, before the main() method or any static method/variable is accessed.
+
+package p1;
+
+public class SIBTutorial {
+	static int i;
+	int j;
+	static {
+		System.out.println("Static Initialization Block-1 called");
+		System.out.println("The value of i "+i);
+		i=20;
+		j=10;//cannot do that
+		System.out.println("The value of i "+i);	
+	}
+	static {
+		System.out.println("Static Initialization Block-2 called");
+	}
+	public static void main(String[] args) {}
+}
+
+Order of Execution:
+➤Static variable initializations
+➤SIB block(s) (in the order they appear)
+➤Main method
+
+🔥 Use Case:
+➤Initialize static variables
+➤Load configuration, logging, or static resources
+➤Run a one-time setup for the class
+
+Example 2: We can create an object inside SIB through which IIB and the constructor can be called.
+package p1;
+public class A {
+	{
+		System.out.println("IIB");// Print 1
+	}
+	static {
+		new A();
+		System.out.println("SIB"); // Print 3
+	}
+	A(){
+		System.out.println("Constructor of A called");// Print 2
+	}
+	public static void main(String[] args) {
+		System.out.println("Entered Main");// Print 4
+	}
+}
+
+Output 
+IIB
+Constructor of A called
+SIB
+Entered Main
+
 Loops in Java
 ##############
 1. for loop
