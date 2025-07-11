@@ -2966,6 +2966,45 @@ public class A {
 		scan.close();
 	} 	
 }
+⚠️ Note:
+➤Always close the scanner with sc.close() to free system resources.
+➤Use nextLine() carefully after nextInt() or next() due to newline issues.
+
+⚠️ Issue: nextLine() after nextInt() or next() doesn't behave as expected.
+✅ Root Cause:
+➤Methods like nextInt(), nextDouble(), and next() do not consume the newline character (\n) at the end of user input.
+➤But nextLine() does consume the full line, including the newline.
+
+So, if you call nextLine() immediately after nextInt() or next(), it may read the leftover newline from the previous input, resulting in an empty string.
+
+🔍 Example:
+Scanner sc = new Scanner(System.in);
+
+System.out.print("Enter age: ");
+int age = sc.nextInt();  // user enters: 25 + [Enter]
+
+System.out.print("Enter name: ");
+String name = sc.nextLine();  // reads leftover '\n' from above
+
+System.out.println("Age: " + age);
+System.out.println("Name: " + name);
+
+🔴 Output:
+Enter age: 25
+Enter name:
+Age: 25
+Name:
+❗Oops! name is empty because nextLine() consumed the leftover newline from nextInt().
+
+✅ How to Fix It:
+Solution: Add a sc.nextLine() dummy call after nextInt() or next() to consume the leftover newline.
+
+System.out.print("Enter age: ");
+int age = sc.nextInt();
+sc.nextLine(); // ← eat the leftover newline
+
+System.out.print("Enter name: ");
+String name = sc.nextLine();
 
 Loops in Java
 ##############
@@ -3031,9 +3070,9 @@ public class A {
 Example 2:
 --------
 a. Enter the amount, and we should get a message, please collect cash
-b. Then prompt a message Do you want to continue(yes or no)
+b. Then prompt a message: Do you want to continue(yes or no)
 c. If yes, again enter the amount, and we should get a message, please collect cash
-d. If enter no program should stop
+d. If no program is entered, it should stop
 
 Code:
 import java.util.Scanner;
@@ -3056,7 +3095,7 @@ public class A {
 	}
 }
 
-3. do while loop -  Will run first time without condition check. For the second iteration condition will be evaluated
+3. do while loop -  Will run first time without condition check. For the second iteration, the condition will be evaluated
 
 Example 1:
 ---------
