@@ -3116,6 +3116,145 @@ Constructor of A called
 SIB
 Entered Main
 
+Super in Java
+###############
+The super keyword is a reference variable used within a subclass to refer to its immediate parent class (superclass) members, including variables, methods, and constructors.
+It helps achieve proper inheritance behavior and overriding control.
+
+✅ Uses of super in Java
+1️⃣ Access Parent Class Fields (Variables)
+When the subclass has a variable with the same name as the parent class, super helps distinguish the parent class version.
+It cannot access the private members of the super class.
+
+🎓 Real-World Analogy
+Imagine super as saying:
+"Hey, I want the version of this thing that came from my parent class."
+Just like a child might say:
+"I want to use my dad’s phone, not mine — because it's different."
+
+class A {
+    int num = 10;
+}
+class B extends A {
+    int num = 20;
+    void display() {
+        System.out.println("Child num: " + num);       // 20
+        System.out.println("Parent num: " + super.num); // 10
+    }
+}
+
+2️⃣ Call Parent Class Methods
+If the child class overrides a method, but you still want to call the parent version, use super.methodName().
+
+public class A {
+	 int x = 10;
+	 static int y=20;
+	  static void display() {
+		  System.out.println("This is a static display method");
+	  }
+	    void show() {
+	        System.out.println("In class A");
+	    }
+}
+
+public class B extends A {
+
+	public static void main(String[] args) {
+		B b1=new B();
+		b1.test();	
+	}
+	public void test() {
+		super.display();
+		System.out.println(super.x);
+		System.out.println(super.y);	
+	}
+}
+
+✅ What This Means:
+➤Super is meant to refer to instance (non-static) members of a superclass.
+➤Even though it is technically possible to write super.staticMethod() in Java, it is discouraged, and Java treats it the same as ParentClass.staticMethod() internally.
+➤So, it's not a compiler error, but a bad practice.
+
+✅ Best Practice:
+Always access static members using the class name, not super or this.
+// Good
+ParentClass.staticMethod();
+
+// Bad (misleading)
+super.staticMethod();
+
+3️⃣ Call Parent Class Constructor
+➤super() is used to call the constructor of the parent class from the child class constructor only.
+➤✅ This must be the first statement in the subclass constructor; Hence, super and this keyword cannot be used at the same time.
+➤If in the Child class constructor, this keyword is used, then in that constructor super keyword will not be automatically placed.
+class A {
+    A() {
+        System.out.println("Constructor of A");
+    }
+}
+class B extends A {
+    B() {
+        super();  // Must be first statement
+        System.out.println("Constructor of B");
+    }
+}
+📌 Output:
+Constructor of A
+Constructor of B
+
+Even though you didn’t write super() in class B, Java internally adds it:
+Even If we don't explicitly write the constructor, Java internally calls the constructor and add the super() keyword inside it(but only calls the default constructor of the parent class).
+B() {
+    super(); // inserted automatically by compiler
+    System.out.println("Constructor of B");
+}
+
+🎯 Why use it?
+➤To ensure proper construction of the inheritance chain
+➤To pass values to a parameterized parent constructor
+
+4️⃣ Use with Parameterized Constructors
+class A {
+    A(String msg) {
+        System.out.println("Message from A: " + msg);
+    }
+}
+class B extends A {
+    B() {
+        super("Hello"); // Pass value to superclass constructor
+        System.out.println("Constructor of B");
+    }
+}
+
+❌ super is not allowed in static methods
+The super keyword refers to the current object’s superclass, but static methods belong to the class, not to any object.
+
+🔍 Why This Causes an Error:
+➤Static methods do not have a this reference, because they can be called without creating an object.
+➤Since super is used to refer to the parent of this object, and this doesn't exist in a static context, super becomes invalid there.
+
+🧪 Example:
+class A {
+    int x = 10;
+    static void staticShow() {
+        System.out.println("Static method in A");
+    }
+}
+class B extends A {
+    static void staticTest() {
+        // System.out.println(super.x); ❌ Compile-time error
+        // super.staticShow();          ❌ Compile-time error
+    }
+}
+
+🚫 Both lines give:
+Cannot use 'super' in a static context
+
+✅ What You Can Do in Static Methods:
+If you need to access static members of the parent class in a static method:
+A.staticShow();  // ✅ Correct
+System.out.println(A.someStaticVariable);  // ✅ Correct
+
 Loops in Java
 ##############
 1. for loop
