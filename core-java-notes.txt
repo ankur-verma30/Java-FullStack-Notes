@@ -1,3 +1,15 @@
+🧠 What is OOP in Java?
+Object-Oriented Programming (OOP) is a programming paradigm that organizes code using objects, which are instances of classes.
+Java is a pure object-oriented language (except for primitive types) and is built entirely around the concept.
+Properties (State) – Data/attributes
+Methods (Behavior) – Functions/actions
+
+🎯 Key Goals of OOPs:
+➤Code reusability
+➤Modularity
+➤Data hiding and security
+➤Scalability and maintainability
+
 What is a class?
 -> A class in Java is a blueprint or template for creating objects.
 -> It defines the data (fields/attributes) and the behavior (methods/functions) that the objects created from the class will have.
@@ -8,7 +20,7 @@ Class Naming Convention
 -> In Java, we use the class keyword to create a class, and the class keyword should be in lowercase. The class name should start with an uppercase letter only.
 -> If more than one word is used, then we should use camel casing.
 
-Note: class name cannot start with a number but can begin with $ or underscore(_), but it is not recommended.
+Note: Class names cannot start with a number, but they can begin with $ or an underscore (_), although this is not recommended.
 
 Example :
 class A {}
@@ -21,6 +33,42 @@ public class Bank_Account_Number {}// Snake Casing-->Should not use for Java
 Note:
 1. Do not use specials characters like #,@ % & etc while creating class.
 2. $Class name will execute. However, never create a class with a special character ($).
+
+Breakdown of PSVM
+###################
+public static void main(String[] args)
+It’s the starting point of any Java program, and each keyword has a specific purpose. Here's the full form and meaning of each part:
+
+✅ Detailed Breakdown:
+
+1️⃣ public
+➤It's an access modifier.
+➤Makes the main method accessible by the JVM from outside the class.
+➤If you make it private, JVM won’t be able to access it, and the program won’t run.
+
+2️⃣ static
+➤Means it belongs to the class, not the object.
+➤JVM doesn’t create an object of the class to call main() — it just calls it via the class name directly.
+➤That’s why it must be static.
+
+3️⃣ void
+➤Specifies that the method does not return any value.
+➤You can’t return anything from main() in standard Java execution.
+
+4️⃣ main
+➤This is the method name.
+➤JVM looks specifically for a method with this name as the entry point to start program execution.
+
+5️⃣ String[] args
+Represents command-line arguments.
+It is an array of Strings, which means you can pass values when running the program:
+
+java MyProgram Hello World
+Then args[0] = "Hello", args[1] = "World"
+
+🔁 JVM Looks for This Exact Signature:
+public static void main(String[] args)
+⚠️ If the signature is different (e.g., not public, not static, or missing parameters), the program will compile but not run, and you’ll get a "Main method not found" error.
 
 new keyword:
 ##############
@@ -189,6 +237,26 @@ public class A {
 	}
 }
 
+✅ Interview question based on Local Variable
+
+public class Test {
+    public static void main(String[] args) {
+        int x = 100;
+        {
+            int x = 200;
+            System.out.println(x);
+        }
+    }
+}
+
+➤The code will give a compile-time error, but not because of creating a new scope — that is allowed in Java.
+The actual issue is:
+➤You are declaring two local variables with the same name, x, in overlapping scopes.
+➤Even though you're trying to redeclare int x = 200; in an inner block, Java does not allow hiding a local variable in an inner block with the same name.
+
+Also:
+Each method has its stack frame, and local variables are stored there, so naming conflicts like this are not allowed even in nested blocks.
+
 2. Static variable
 3. Non-static variable/instance variable
 
@@ -239,15 +307,28 @@ When a method is called, its variables go on the stack. When it returns, they’
 
 📍 Note: All reference variables (in the stack) point to objects in the heap.
 
-🗑️ Garbage Collector (GC)
-##########################
-Java’s automatic memory management tool.
-Runs in the background and:
-1. Detects objects in the heap no longer referenced
-2. Removes them to free memory
-3. Helps prevent memory leaks and overflow
+🧠 What is Garbage Collection in Java?
+Garbage Collection is a process by which the Java Virtual Machine (JVM) automatically removes unused objects (objects that are no longer reachable) from memory to free up space and avoid memory leaks.
 
-📌 You don’t have to manually delete objects — GC handles it.
+Java developers don’t manually free memory (unlike in C/C++). Instead, the Garbage Collector (GC) handles it.
+
+🧩 Key Goals of GC:
+➤Reclaim memory used by unreachable objects
+➤Prevent memory leaks
+➤Keep the heap memory clean and efficient
+
+🔄 When Does GC Run?
+➤GC runs automatically in the background.
+➤It is non-deterministic — you can't predict exactly when it will run.
+➤You can suggest GC using System.gc(), but the JVM may ignore it.
+➤Only Heap memory is subject to GC.
+
+🔍 Object Lifecycle in Java
+1. The object is created using new
+2. The reference variable holds the object
+3. Once the reference is lost or goes out of scope, the object becomes unreachable
+4. JVM marks it as garbage
+5. GC reclaims that memory
 
 Methods in Java
 ###############
