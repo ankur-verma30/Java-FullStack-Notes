@@ -1624,7 +1624,7 @@ class B extends A {
 
 public class Main {
     public static void main(String[] args) {
-        A obj = new B();
+        A obj = new B();// Upcasting 
         obj.show(); // Output: A (not B)
     }
 }
@@ -1635,11 +1635,9 @@ Even though obj is of type B, A.show() gets called because static methods are re
 Since they don’t get copied to each object or act differently per subclass instance, calling it "inheritance" is misleading.
 
 Example:
-You have:
 A parent class: GoldAccount (in package p1)
 A child class: PlatinumAccount extends GoldAccount
 
-// GoldAccount.java
 package p1;
 public class GoldAccount {
     static int x = 100;
@@ -1648,7 +1646,6 @@ public class GoldAccount {
     }
 }
 
-// PlatinumAccount.java
 package p1;
 
 public class PlatinumAccount extends GoldAccount {
@@ -1659,12 +1656,10 @@ public class PlatinumAccount extends GoldAccount {
 }
 
 🔍 What Is This Program Teaching?
-✅ 1. Static Methods and Variables Are Not Polymorphic
-Even though PlatinumAccount inherits from GoldAccount, calling:
-PlatinumAccount.rateOfInterest();
-is resolved at compile time based on the class name, not the object type.
+✅ 1. Static Methods and Variables Are Not Polymorphic. Even though PlatinumAccount inherits from GoldAccount, calling PlatinumAccount.rateOfInterest();
+It is resolved at compile time based on the class name, not the object type.
 
-Since PlatinumAccount does not override the method (it doesn’t define its own rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
+Since PlatinumAccount does not override the method (it doesn’t define its rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
 is effectively the same as: GoldAccount.rateOfInterest();
 
 The same logic applies to the static variable x:
@@ -1691,11 +1686,11 @@ Note: During overriding, the method return type should match
 
 🔸 Characteristics of Overloading:
 Feature					Description
-Method name				Must be the same
-Parameter list				Must be different (type, number, or order)
-Return type				Can be same or different, but doesn't affect overloading
-Access modifier				Can be same or different
-Inheritance				Not required for overloading
+Method name				must be the same
+Parameter list				must be different (type, number, or order)
+Return type				can be the same or different, but doesn't affect overloading
+Access modifier				can be the same or different
+Inheritance				is not required for overloading
 Polymorphism type			Compile-time polymorphism
 
 Example:
@@ -1716,8 +1711,8 @@ public class EmailService {
 
 Final Keyword
 ################################
-➤If you make a variable final, then we cannot change its value(Just like constant variables)
-➤If you make a static/non-static variable final, then initialization is mandatory
+➤If you make a variable final, then we cannot change its value(Just like constant variables).
+➤If you make a static/non-static variable final, then initialization is mandatory.
 
 Example:  
 ---------
@@ -1789,11 +1784,9 @@ Complete Abstraction (Java 7)
 ➤ In Java 7 and earlier, interfaces could only have abstract methods (no method bodies).
 ➤ They define what should be done, not how.
 
-All Variables are public static final.
-➤ Any variable declared in an interface is implicit:
-public static final (i.e., a constant).
+➤ All Variables are public static final.
 ➤ No need to specify these modifiers—they are applied by default.
-➤No Object creation
+➤ No Object creation
 
 ✅ Note: Drawback of Inheritance – Tightly Coupled Programming
 🔹 What is Tightly Coupled Programming?
@@ -1814,17 +1807,15 @@ Hard to maintain and extend:
 ➤Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
 
 Example 1:
----------
 package p1;
 
 public interface A {
-	public void test1() {//-->Error because complete methods are not allowed in an interface	
+	public void test1() {}//-->Error because complete methods are not allowed in an interface	
 	public void test2(); //Correct version
 	}
 }
 
-Example 3:
-----------
+Example 2:
 package p1;
 
 public interface NotificationService {
@@ -1857,7 +1848,6 @@ public class NotificationServiceImpl implements NotificationService {
 }
 
 Example:
-----------
 package p1;
 
 public interface Calculator {
