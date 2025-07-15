@@ -1099,8 +1099,8 @@ Constructors are not inherited because they are not class members like methods o
 A constructor is tightly bound to its class name.
 
 ✅ 3. Subclass should define how it initializes its members
-A subclass might have new fields or different logic to initialize.
-So it needs its constructor to control initialization.
+A subclass may have new fields or different logic for initialization.
+Therefore, it requires a constructor to control its initialization.
 
 ✅ 4. Java automatically provides a default constructor
 If you don't define any constructors, Java will insert a default no-arg constructor.
@@ -1628,8 +1628,17 @@ public class Main {
         obj.show(); // Output: A (not B)
     }
 }
+Is this overriding?
+❌ No. This is method hiding, not method overriding, because the methods are static
+➤Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
 
-Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
+Imagine static methods are like TV channels fixed on the remote brand, not on who's holding the remote.
+
+A obj = new B();
+➤Here, you're using a remote (reference) of brand A, so Java checks what methods belong to A, not B.
+➤Even though you created a B object, the method called depends on what reference type you're using.
+static = class-based decision (compile-time)
+non-static = object-based decision (run-time)
 
 ✅ 2. They're not part of the instance, so “inheritance” isn’t meaningful
 Since they don’t get copied to each object or act differently per subclass instance, calling it "inheritance" is misleading.
@@ -1729,8 +1738,19 @@ public class B {
 	}
 }
 
-➤If you make a method final, then overriding is not allowed
+➤If you make a method final, then overriding is not allowed but inheritance is allowed
+🔒 Why Use final on a Method?
+1. You want to prevent subclassing from changing the logic of a method.
+2. You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
+
 ➤If you make a class final, then inheritance is not allowed
+A final class:
+❌ Cannot be extended/inherited.
+✅ Can have regular (non-final) methods.
+✅ Can have final methods too.
+
+But since the class itself cannot be inherited:
+🔒 No methods inside it — final or not — can ever be overridden.
 
 Example 1: 
 ----------
@@ -1894,6 +1914,20 @@ public class MainCalc {
 	}
 }
 
+🧠 Interview Questions:
+Question 1. Could this have been done with an abstract class?
+✅ Yes — abstract classes allow incomplete methods and inheritance.
+But the real reason for using an interface here is that you're defining pure behavior (what calculators must do), not common implementation logic.
+So:
+Interface → for capabilities
+Abstract class → for partial implementation + common state
+
+Question 2. Biggest advantage of using an interface instead of an Abstract Class?
+✅ Loose coupling and flexibility.
+You said it well — interfaces let you add new types of calculators later without changing the existing hierarchy.
+Also:
+Java allows multiple interfaces, but only single inheritance with abstract classes.
+
 ✅ Advantages of Interfaces in Java
 1. Abstraction
 ➤Interfaces facilitate complete abstraction.
@@ -1995,6 +2029,45 @@ public class C extends B implements A {
 	}
 }
 
+✅Example:
+interface A {
+    default void show() {
+        System.out.println("A");
+    }
+}
+
+interface B {
+    default void show() {
+        System.out.println("B");
+    }
+}
+
+class C implements A, B {
+    // ??----------------->// It does not compile
+}
+🧠Interview Question on above example
+❓ Will this compile?
+❓ If not, what do you do in class C to fix it?
+❓ Why does Java force you to resolve this?
+
+🧠 Why ??
+✔️ Because both interfaces A and B define a default void show() method.
+✔️ When C implements both, Java doesn’t know which one to inherit → 🔺 Diamond Problem (method ambiguity).
+
+✅ Fix in Class C:
+class C implements A, B {
+    public void show() {
+        A.super.show();  // or B.super.show();
+    }
+}
+
+✔️ You resolve the conflict by explicitly choosing which interface’s show() to call.
+📌 Why Java Forces This?
+Because, unlike classes (which can’t be inherited from more than one), interfaces can be — so Java must protect against silent conflicts, especially now that interfaces can have default (concrete) methods since Java 8.
+
+Java’s philosophy:
+✳️ “Explicit is better than implicit in cases of ambiguity.”
+
 Question: Can I develop an incomplete static method in an interface?
 Answer: We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
 
@@ -2007,9 +2080,8 @@ public interface A {
 Java 8 Features
 ###################
 1. default keyword:
-➤Using the default keyword, we can create complete methods inside an interface. This was introduced in Java version 8
-
-Example :
+➤ We can create complete methods inside an interface. This was introduced in Java version 8.
+Example:
 package javaconcepts.p3;
 
 public interface A {
@@ -2215,28 +2287,33 @@ name -> System.out.println("Hello " + name)
 ➤Then we use an object reference to call that implemented method
 ➤Replacing instances of anonymous classes that implement functional interfaces with a concise, inline function-like syntax.
 
-🔸 ✅ Behind the Scenes:
-When you write a lambda expression like: () -> System.out.println("Hello");
-
-🔹 Step-by-step Breakdown:
-✅ Step 1: Functional Interface
+Example:
 @FunctionalInterface
-interface Greet {
-    void sayHello();
+interface MyOperation {
+    void perform(int x);
 }
 
-✅ Step 2: Lambda Expression
-Greet g = () -> System.out.println("Hello");
-g.sayHello();
+✅ Lambda Expression
+MyOperation op = () -> System.out.println("Hello");
+op.perform();
 
-➡ This is functionally equivalent to:
-Greet g = new Greet() {
-    public void sayHello() {
-        System.out.println("Hello");
+🧠Interview Question based on Lambda expression?
+Question 1. Why does this work without new?
+✔️ Yes — a lambda expression automatically creates an instance of the functional interface.
+🔧 But technically:
+It’s not creating an anonymous class; it creates a synthetic implementation of the interface using invokedynamic bytecode — more lightweight and efficient than anonymous inner classes.
+
+So:
+MyOperation op = (int x) -> { ... };
+
+is syntactic sugar for:
+MyOperation op = new MyOperation() {
+    public void perform(int x) {
+        // your lambda logic
     }
 };
-But the lambda version is shorter, cleaner, and faster.
 
+But the lambda version is shorter, cleaner, and faster.
 Note: Functional Programming defines you to say "what you want, not how to do it step-by-step"
 
 Example 1:
@@ -2602,6 +2679,64 @@ public class A {
 		System.out.println("Welcome");//Output: Welcome
 	}
 }
+
+
+Code Example:
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(test());
+    }
+
+    static int test() {
+        try {
+            return 1;
+        } catch (Exception e) {
+            return 2;
+        } finally {
+            return 3;
+        }
+    }
+}
+🧠Interview Question on Exception Handling
+1. What is the output?
+✅ Output is: 3
+
+2. Why does finally override the return in try?
+➤Because the finally block is always executed, and if it contains a return, it overrides any previous return values, even from try or catch.
+➤So even though try says return 1, and there's no exception, the finally block's return 3 overrides it.
+🧨 This is often called "return suppression".
+
+3. What if finally didn’t have a return?
+Then the return from try (or catch, if an exception occurs) would go through as normal.
+
+So if finally is:
+finally {
+    System.out.println("Cleaning up");
+}
+
+Then the output would be:
+Cleaning up ---> Output from finally  
+1 ----> returned output from try-catch block
+
+Code Example 2:
+public class Main {
+    public static void main(String[] args) {
+        try {
+            int a = 5 / 0;
+        } catch (ArithmeticException e) {
+            System.out.println("A");
+        } finally {
+            System.out.println("B");
+        }
+    }
+}
+And what if you remove the catch block — will it still print B? Why or why not?
+✅ Output:
+B  
+Exception in thread "main" java.lang.ArithmeticException: / by zero.
+
+✔️ Finally runs.
+Even when there's no catch, the finally block executes before the exception is thrown back to the JVM.
 
 Unary Operators in Java
 ##############################
