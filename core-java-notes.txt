@@ -677,7 +677,7 @@ void print() {
 void show() {
     System.out.println("Hello");
 }
-➤This keyword is a special reference variable that hold's object's address
+➤This keyword is a special reference variable that holds the current object's address.
 
 Example:
 ----------
@@ -716,8 +716,8 @@ public class A {
 		System.out.println(this);//Error
 	}
 	public static void test() {
-		System.out.println(this);//Error
-		System.out.println(this.x);// Output: 10
+		System.out.println(this);// Error
+		System.out.println(this.x);// Error 
 	}
 }
 
@@ -788,7 +788,7 @@ public class A {
 	}	
 }
 
-➤While calling a constructor using this() keyword, ensure it is always the  first statement inside another constructor
+➤While calling a constructor using this() keyword, ensure it is always the first statement inside another constructor
 
 Example:
 ---------
