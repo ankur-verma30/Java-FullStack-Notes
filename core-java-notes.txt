@@ -1314,17 +1314,14 @@ protected
 🔍 Reason: Java's Design Philosophy
 ✅ 1. Top-level classes must be accessible to the JVM & compiler
 
-If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
-
-That breaks the point of having it at the top level — it becomes useless.
+➤ If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
+➤ That breaks the point of having it at the top level — it becomes useless.
 
 ✅ 2. Protected and private only make sense in class hierarchies
 
-Protected is meaningful only within inheritance (i.e., subclass access).
-Private is meaningful only within the enclosing class.
-For a top-level class, there is no enclosing class, so these modifiers make no logical sense.
-
-These are invalid for top-level classes and will cause a compile-time error if used.
+➤ Protected is meaningful only within inheritance (i.e., subclass access).
+➤ Private is meaningful only within the enclosing class.
+➤ For a top-level class, there is no enclosing class, so these modifiers make no logical sense.
 
 Example 1:
 package p1;
@@ -1413,8 +1410,6 @@ a. Compile Time
              |
              v
 [CPU Executes Code → Output]
-
-Output: .class file containing bytecode.
 
 Command: javac MyProgram.java
 Result: Creates MyProgram.class file.
@@ -1588,24 +1583,8 @@ But that's not entirely accurate.
 ✅ What Happens:
 1. Static members belong to the class, not to objects.
 They are class-level members, not instance-level.
-
 So they are shared across the inheritance hierarchy.
-
-✅ Example:
-class A {
-    static int x = 10;
-    static void greet() {
-        System.out.println("Hello from A");
-    }
-}
-
-class B extends A {}
-Now in B, you can access x and greet():
-
-System.out.println(B.x);     // ✅ Allowed
-B.greet();                   // ✅ Allowed
-
-So yes — static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
+So yes, static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
 
 ⚠️ Why Static Members Are Not "Truly" Inherited:
 ✅ 1. They don’t participate in runtime polymorphism
@@ -1630,13 +1609,13 @@ public class Main {
 }
 Is this overriding?
 ❌ No. This is method hiding, not method overriding, because the methods are static
-➤Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
+➤ Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
 
 Imagine static methods are like TV channels fixed on the remote brand, not on who's holding the remote.
 
 A obj = new B();
-➤Here, you're using a remote (reference) of brand A, so Java checks what methods belong to A, not B.
-➤Even though you created a B object, the method called depends on what reference type you're using.
+➤ Here, you're using a remote (reference) of brand A, so Java checks what methods belong to A, not B.
+➤ Even though you created a B object, the method called depends on what reference type you're using.
 static = class-based decision (compile-time)
 non-static = object-based decision (run-time)
 
@@ -1673,11 +1652,6 @@ is effectively the same as: GoldAccount.rateOfInterest();
 
 The same logic applies to the static variable x:
 PlatinumAccount.x; // resolves to GoldAccount.x (100)
-
-🟨 Important Point:
-Static methods and variables are resolved based on class name, not overridden, and not polymorphic.
-
-Note: During overriding, the method return type should match
 
 ✅ Overloading in Java (Compile-Time Polymorphism)
 🔹 What is Method Overloading?
