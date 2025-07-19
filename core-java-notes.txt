@@ -414,7 +414,7 @@ public class C {
 	}
 }
 
-Note: When the method argument type is Object, then we can supply any kind of value to it.
+Note: When the method argument type is Object, then we can supply any value to it.
 
 Example
 public class C {
@@ -541,6 +541,100 @@ Properties and Constraints on the var keyword
 ➤It cannot be a static / non-static variable
 ➤It cannot be a method argument
 ➤It cannot be a method return type
+
+✅ Wrapper Classes
+###################
+➤ Java is object-oriented, but primitive types (int, float, char, etc.) are not objects.
+➤ To treat them as objects, Java provides Wrapper Classes in the java.lang package.
+➤ A wrapper class wraps (encloses) a primitive type inside an object.
+
+🔹 List of Primitive Types and Their Wrapper Classes:
+| Primitive Type | Wrapper Class |
+| -------------- | ------------- |
+| byte           | Byte          |
+| short          | Short         |
+| int            | Integer       |
+| long           | Long          |
+| float          | Float         |
+| double         | Double        |
+| char           | Character     |
+| boolean        | Boolean       |
+
+🔹 Why Do We Need Wrapper Classes?
+➤ To store primitives in collections like ArrayList, which accept only objects.
+➤ For object manipulation (e.g., in multithreading, generics, reflection).
+➤ Useful in parsing strings into numeric values.
+➤ Enable the use of utility methods like Integer.parseInt(), Double.compare(), etc.
+
+❓ Are wrapper classes immutable?
+✅ Yes, all wrapper classes are immutable.
+
+🔹 Key Concepts
+1. Boxing (Manual Conversion)
+Converting primitive → object
+int a = 10;
+Integer i = new Integer(a); // Boxing
+
+2. Unboxing (Manual Conversion)
+Converting object → primitive
+Integer i = new Integer(10);
+int a = i.intValue(); // Unboxing
+
+3. Autoboxing
+The compiler automatically converts a primitive → wrapper object
+int x = 5;
+Integer obj = x;  // Autoboxing
+
+4. Auto-unboxing
+The compiler automatically converts wrapper → primitive
+Integer y = 100;
+int value = y;  // Auto-unboxing
+
+🔹 Commonly Used Wrapper Class Methods
+Integer.parseInt(String) → Converts string to int
+Double.parseDouble(String) → Converts string to double
+Character.isDigit(char) → Checks if the char is a digit
+Boolean.valueOf(String) → Converts string to Boolean object
+
+✅ Code Examples
+public class WrapperExample1 {
+    public static void main(String[] args) {
+        int a = 100;
+        Integer obj = new Integer(a); // Boxing
+        int b = obj.intValue();       // Unboxing
+        System.out.println("Boxed: " + obj + ", Unboxed: " + b);
+	Integer num = 50;     // Autoboxing
+        int val = num + 20;   // Auto-unboxing
+        System.out.println("Value: " + val);
+    }
+}
+
+🔸 Conceptual Trick Questions
+
+❓ What will happen here?
+Integer a = 128;
+Integer b = 128;
+System.out.println(a == b); ❌ Output: false compare refrences
+System.out.println(a.equals(b)); // true ✅ compare actual values.
+
+➤ Because integers from -128 to 127 are cached in Java
+➤ For values beyond that, new objects are created
+
+🔸 Deep Understanding
+❓ Difference between parseInt() and valueOf()?
+ parseInt() returns a primitive int
+ valueOf() returns an Integer object
+
+❓ Can you override methods in wrapper classes?
+❌ No, they are final classes
+
+❓ What is the default value of Integer vs int?
+ int → 0, Integer → null
+
+✅ Real-Time Application Use Case
+➤ Storing grades (int) in a List<Integer>
+➤ Reading user input from a file: converting String to int using Integer.parseInt()
+➤ Config settings: Boolean.valueOf("true")
 
 Constructors in Java
 ####################
