@@ -1806,7 +1806,7 @@ public class B {
 	}
 }
 
-➤If you make a method final, then overriding is not allowed but inheritance is allowed
+➤If you make a method final, then overriding is not allowed, but inheritance is allowed
 🔒 Why Use final on a Method?
 1. You want to prevent subclassing from changing the logic of a method.
 2. You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
@@ -1862,6 +1862,28 @@ package p1;
 
 public class B extends A{//---> Error because we cannot inherit final class	
 }
+
+✅ What Happens When a Reference Variable is Marked final?
+final Student s = new Student();
+➤ You can't reassign s to point to another object.
+➤ But you can still modify the object that s refers to(if it is mutable). unless the class itself is immutable(like String).
+
+✅ Example:
+class Student {
+    int marks = 80;
+}
+
+public class Test {
+    public static void main(String[] args) {
+        final Student s = new Student();
+        s.marks = 90;         // ✅ Allowed
+        // s = new Student(); // ❌ Not allowed (Compile-time error)
+        System.out.println(s.marks); // 90
+    }
+}
+
+Why do you use the final for references?
+To prevent reassignment, ensure safe dependency injection, and to make code more thread-safe and readable. It’s also a key part of writing immutable classes and predictable lambdas.
 
 Interfaces in Java - Abstraction
 ##################################
@@ -2423,6 +2445,63 @@ public class B{
 	}
 }
 
+✅ Why were private methods added to interfaces in Java 9?
+🔐 Types of Private Interface Methods (Java 9)
+| Modifier         | Can Call From         | Description                         |
+| ---------------- | --------------------- | ----------------------------------- |
+| `private`        | Other default methods | Helps share common logic internally |
+| `private static` | Other static methods  | Helps static methods reuse logic    |
+
+🧪 Example: Private Methods in Interface
+interface MyInterface {
+
+    default void greet() {
+        log("Hello from default method");
+    }
+
+    static void staticGreet() {
+        logStatic("Hello from static method");
+    }
+
+    // ✅ Private instance method
+    private void log(String message) {
+        System.out.println("LOG: " + message);
+    }
+
+    // ✅ Private static method
+    private static void logStatic(String message) {
+        System.out.println("STATIC LOG: " + message);
+    }
+}
+
+Usage:
+public class Test implements MyInterface {
+    public static void main(String[] args) {
+        Test t = new Test();
+        t.greet();
+
+        MyInterface.staticGreet();
+    }
+}
+✅ Output:
+LOG: Hello from the default method
+STATIC LOG: Hello from static method
+
+🎯 Key Benefits
+➤ Code reusability: Avoids repeating logic in multiple default/static methods.
+➤ Encapsulation: Keeps helper methods hidden from implementing classes.
+➤ Cleaner design: Interfaces can now follow DRY (Don't Repeat Yourself) more cleanly.
+
+🧠 Interview Traps
+Q: Can private interface methods be accessed outside the interface?
+❌ No, only accessible within the interface for reuse by default/static methods.
+
+Q: Can we override private interface methods?
+❌ No, private methods cannot be inherited or overridden.
+
+Q: Are private methods mandatory in interfaces?
+❌ No, they are optional—use them to clean up repeated logic.
+
 4. Stream API
 ---------------------
 Note: to learn Stream API, complete the following first
@@ -2457,8 +2536,8 @@ abstract class Shape {
 
 2. ✅ Can Have Both Static and Non-Static Members
 You can define:
-➤Static variables and methods
-➤Non-static variables and methods
+➤ Static variables and methods
+➤ Non-static variables and methods
 
 abstract class Demo {
     static int count = 0;
