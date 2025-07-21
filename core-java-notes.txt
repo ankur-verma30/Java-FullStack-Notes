@@ -5126,4 +5126,144 @@ Is join() used for synchronization?
 Not directly. join() is for waiting, not for data safety.
 Use join() to make sure threads finish before the main thread proceeds.
 
-Java session no 47 to be continued...
+✅ wait(), notify(), notifyAll() in Java
+##########################################
+These are methods of the Object class, not the Thread class.
+
+Why? Because every object in Java has a monitor (lock), and these methods are used to control thread communication on an object's lock.
+
+| Method        | Purpose                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| `wait()`      | Causes the **current thread** to wait until another thread calls `notify()` or `notifyAll()` |
+| `notify()`    | Wakes up **one waiting thread** (chosen arbitrarily) on the object's monitor                 |
+| `notifyAll()` | Wakes up **all waiting threads** on the object's monitor                                     |
+
+🔹 Why Use wait() / notify()?
+Used when:
+Threads need to communicate or coordinate their execution
+For example, producer-consumer problems, or when a thread must pause until another completes
+
+🔹 ⚠️ Important Rules for Using wait() / notify()
+| Rule                                                                | Description                                          |
+| ------------------------------------------------------------------- | ---------------------------------------------------- |
+| Must be called inside `synchronized` block/method                   | Otherwise, you'll get `IllegalMonitorStateException` |
+| Must be called on the **object** whose monitor you're synchronizing |                                                      |
+| `wait()` releases the lock temporarily, `notify()` does not         |                                                      |
+🔹 🔍 Wrong Example (Race Condition)
+class A {
+    public static void main(String[] args) {
+        B b1 = new B();
+        b1.start();
+        System.out.println(b1.balance); // ❌ Likely prints 0 — race condition!
+    }
+}
+
+class B extends Thread {
+    int balance;
+    public void run() {
+        for (int i = 0; i <= 10000; i++) {
+            balance += i;
+        }
+    }
+}
+❌ Problem:
+main() prints balance before run() finishes.
+No synchronization or communication between threads.
+
+✅ Correct Way with wait() and notify()
+class A {
+    public static void main(String[] args) {
+        B b1 = new B();
+        b1.start();
+
+        synchronized (b1) {
+            try {
+                b1.wait();  // Main thread waits for notification from b1
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Final balance: " + b1.balance);  // ✅ Correct value
+    }
+}
+
+class B extends Thread {
+    int balance;
+
+    public void run() {
+        synchronized (this) {
+            for (int i = 0; i <= 10000; i++) {
+                balance += i;
+            }
+            this.notify(); // Wakes up the main thread waiting on this object
+        }
+    }
+}
+
+🔹 When to Use notifyAll() Instead of notify()?
+Use notifyAll() when:
+Multiple threads are waiting for different conditions
+You’re not sure which thread should continue — let the scheduler decide
+
+✅ wait() + notifyAll() Example:
+class Shared {
+    void printMessage() {
+        synchronized (this) {
+            System.out.println(Thread.currentThread().getName() + " is waiting...");
+            try {
+                wait(); // thread goes into waiting state
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(Thread.currentThread().getName() + " is resumed.");
+        }
+    }
+}
+
+class MyThread extends Thread {
+    Shared shared;
+
+    MyThread(Shared shared, String name) {
+        super(name);
+        this.shared = shared;
+    }
+
+    public void run() {
+        shared.printMessage();
+    }
+}
+
+public class NotifyAllSimple {
+    public static void main(String[] args) throws InterruptedException {
+        Shared shared = new Shared();
+
+        MyThread t1 = new MyThread(shared, "Thread-1");
+        MyThread t2 = new MyThread(shared, "Thread-2");
+
+        t1.start();
+        t2.start();
+
+        Thread.sleep(1000); // Allow both threads to call wait()
+
+        synchronized (shared) {
+            System.out.println("Main thread is calling notifyAll...");
+            shared.notifyAll(); // wake up both t1 and t2
+        }
+    }
+}
+
+🟢 Output:
+Thread-1 is waiting...
+Thread-2 is waiting...
+Main thread is calling notifyAll...
+Thread-2 is resumed.
+Thread-1 is resumed.
+
+Note: The order in which resumed threads are executed may change depending on the JVM.
+
+🟢 Thread Life Cycle
+######################
+
+
+
