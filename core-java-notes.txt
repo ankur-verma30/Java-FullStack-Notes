@@ -3397,7 +3397,6 @@ public class iiBTutorial {
 	}
 }
 
-
 When you create an object, Java executes:
 1. Instance variable initializations
 2. IIB block(s) (in the order they appear)
@@ -3418,7 +3417,6 @@ Note: A Static variable/method can be accessed inside the IIB
 It runs once when the class is loaded, before the main() method or any static method/variable is accessed.
 
 package p1;
-
 public class SIBTutorial {
 	static int i;
 	int j;
@@ -3652,7 +3650,6 @@ public class A {
 		}
 		scan.close();
 	} 
-	
 }
 
 2. while loop
@@ -4398,123 +4395,151 @@ public class A {
 	}
 }
 
-BufferedReader
-#######################
-1. This will improve file reading performance
-2. This should be used with the FileReader class. If we use only BufferedReader, then file reading cannot be done
-3. It has readLine() method. Using this method we can read the entire line from the file
+📘 BufferedReader in Java
+#############################
+➤ BufferedReader is used to read text from a character-input stream, buffering characters for efficient reading of characters, arrays, and lines.
+➤ It significantly improves performance over using FileReader alone.
+➤ Introduced in the java.io package.
 
-Example 1:
-----------
-package p1;
+1. Improved Performance
+Uses a buffer (default size: 8192 characters) to read chunks of data at once, reducing disk I/O.
+
+2. Works with FileReader
+BufferedReader wraps FileReader. On its own, it cannot read files because it doesn’t handle files directly.
+
+3. readLine() Method
+Allows reading one full line (till \n) at a time. Returns null when EOF (End Of File) is reached.
+
+4. Supports Other Input Types
+Can wrap any Reader (e.g., InputStreamReader, StringReader), not just FileReader
+
+📌 Commonly Used Constructors
+BufferedReader br = new BufferedReader(new FileReader("path"));
+BufferedReader br = new BufferedReader(new FileReader("path"), bufferSize); // optional buffer size
+
+➤ Example 1: Reading one character
+
 import java.io.BufferedReader;
 import java.io.FileReader;
-public class A {
-	public static void main(String[] args) {
-		try {
-			FileReader fr = new FileReader("G://april//t1.txt");
-			BufferedReader br = new BufferedReader(fr);
-			System.out.println((char)br.read());
-			br.close();
-			fr.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+
+FileReader fr = new FileReader("G://april//t1.txt");
+BufferedReader br = new BufferedReader(fr);
+System.out.println((char)br.read());  // Reads one character
+br.close();
+fr.close();
+
+➤ Example 2: Reading into a char array
+
+FileReader fr = new FileReader("G://f1//t1.txt");
+BufferedReader br = new BufferedReader(fr);
+char[] ch = new char[4];
+br.read(ch); // Reads 4 characters into the array
+for(char c: ch) {
+    System.out.print(c);
 }
+br.close();
+fr.close();
 
-Example 2:
-----------
-package p1;
-import java.io.BufferedReader;
-import java.io.FileReader;
-public class A {
-	public static void main(String[] args) {
-		try {
-			FileReader fr = new FileReader("G://f1//t1.txt");
-			BufferedReader br = new BufferedReader(fr);
-			char[] ch = new char[4];
-			br.read(ch);
-			for(char c: ch) {
-				System.out.print(c);
-			}
-			br.close();
-			fr.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+➤ Example 3: Reading multiple lines using readLine()
+
+FileReader fr = new FileReader("G://f1//t1.txt");
+BufferedReader br = new BufferedReader(fr);
+for(int i=0; i<3; i++) {
+    System.out.println(br.readLine()); // Reads one line at a time
 }
+br.close();
+fr.close();
 
-Example 3:
------------
-package p1;
-import java.io.BufferedReader;
-import java.io.FileReader;
-public class A {
-	public static void main(String[] args) {
-		try {
-			FileReader fr = new FileReader("G://f1//t1.txt");
-			BufferedReader br = new BufferedReader(fr);
-			for(int i=0;i<3;i++) {
-				System.out.println(br.readLine());
-			}
-			br.close();
-			fr.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}
+🔥 Internal Working
+➤ BufferedReader maintains an internal buffer (char[]).
+➤ When read() or readLine() is called and the buffer is empty, it:
+➤ Pulls a block of characters from the underlying Reader (FileReader)
+➤ Stores them in the buffer
+➤ Serves future reads from this buffer until it's empty again.
+➤ This reduces the number of physical reads from disk, improving performance.
 
-BufferedWriter
-#####################
-➤It improves file writing performance
-➤This should be used with the FileWriter class. If we use only BufferedWriter, then file writing cannot be done
-➤BufferedWriter class has newline() method
+🎯 Advantages
+➤ Reduces file reading time, especially for large files.
+➤ readLine() makes line-by-line processing much easier.
 
-Example 1:
-----------
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-public class A {
-	public static void main(String[] args) {
-		try {
-			FileWriter fw = new FileWriter("G://april//t1.txt",true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("mike");
-			bw.newLine();
-			bw.write(97);
-			char[] ch = {'b','c','d'};
-			bw.newLine();
-			bw.write(ch);
-			
-			bw.close();
-			fw.close();
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}
+📘 BufferedWriter in Java
+###########################
+➤ BufferedWriter is a part of the java.io package.
+➤ It is used to write text efficiently to character output streams by buffering characters.
+➤ Improves performance by minimizing disk interaction (reducing write operations).
 
-################################
-Serialization & Deserialization
-################################
+🔍 Core Features
+Buffers characters before writing to the destination (default size: 8192 characters).
+Can write:
+1. Strings (write(String str))
+2. Single characters (write(int c))
+3. Character arrays (write(char[] cbuf))
 
--> Serialization is a process of converting an object to byte code and storing that in a file system
--> Deserialization is a process of reading byte code from the file and forming an Object based on the byte code
--> To skip writing certain content to the object during serialization, we can use the  transient keyword
+Supports newLine() to write platform-dependent line separator (\n, \r\n, etc.)
+Must be used with a Writer (e.g., FileWriter, OutputStreamWriter) — cannot directly write to files.
+
+🧪 Code Example:
+FileWriter fw = new FileWriter("G://april//t1.txt", true); // true = append mode
+BufferedWriter bw = new BufferedWriter(fw);
+bw.write("mike");
+bw.newLine(); //append new line
+bw.write(97); // Writes the character with ASCII value 97 ('a')
+char[] ch = {'b','c','d'}; //// Writes a char array {'b', 'c', 'd'}
+bw.newLine();
+bw.write(ch);
+
+bw.close(); // Always close in reverse order of creation
+fw.close();
+
+Q. When is the data written to the file?
+✅ When the buffer is full, or flush() / close() is called.
+Prefer flush() if writing in real-time or inside loops.
+
+💾 Serialization & Deserialization in Java
+############################################
+
+Serialization is the process of converting a Java object into a byte stream.
+This byte stream can be:
+1. Written to a file
+2. Transmitted over a network
+3. Saved to a database
+
+Deserialization is the reverse process: Converting a byte stream back into a Java object.
+
+🔄 Real-World Use Cases
+1. Saving the state of an object to a file (e.g., session persistence)
+2. Sending objects over a network (e.g., in RMI, sockets)
+3. Caching objects in memory/disk
+4. Java Messaging Service (JMS)
+
+📘 Key Concepts
+| Concept             | Details                                                             |
+| ------------------- | ------------------------------------------------------------------- |
+| `Serializable`      | Marker interface (`java.io.Serializable`) that must be implemented  |
+| `transient` keyword | Used to skip fields from serialization                              |
+| `serialVersionUID`  | Version control for the class — helps avoid `InvalidClassException` |
 
 Example:
 --------
 package p1;
 import java.io.Serializable;
-public class A implements Serializable{
-	String name="mike";
-	transient String password = "testing";
+
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;  // Version control ID
+    String username = "mike";
+    transient String password = "secret123"; // Will not be serialized
 }
+
+
+➤ transient: tells JVM to skip this field during serialization
+➤ The password field will be null when deserialized
+
+🔐 transient Keyword – In Detail
+Prevents sensitive data (e.g., password, OTP) from being persisted
+Prevents circular references or unnecessarily heavy objects from being serialized
+
+Syntax:
+transient DataType fieldName;
 
 package p1;
 import java.io.FileOutputStream;
@@ -4525,8 +4550,7 @@ public class B {
 		try {
 			FileOutputStream fos = new FileOutputStream("G:\\april\\file.ser");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(a1);
-		
+			oos.writeObject(a1); // a1 is instance of A. The object a1 is converted to a byte stream and saved in a file.ser
 			oos.close();
 			fos.close();
 		} catch (Exception e) {	
@@ -4535,6 +4559,39 @@ public class B {
 	}
 }
 
+⚠️ Bonus Trap: Changing Class After Serialization
+
+If you serialize an object and later modify the class (add/remove fields), deserialization can fail unless:
+serialVersionUID is unchanged
+Compatible changes are made (adding optional fields is safe)
+
+🔹 Can serialVersionUID be anything?
+✅ Yes, you can assign any long value as serialVersionUID.
+
+🔹 Example
+private static final long serialVersionUID = 42L;     // Valid
+private static final long serialVersionUID = 1234567890123456789L;  // Also valid
+
+💡 But Why Do We Use It?
+serialVersionUID is used to verify that the sender and receiver of a serialized object have loaded classes for that object that are compatible concerning serialization.
+
+🔐 What happens without it?
+If you don’t define serialVersionUID, the Java compiler automatically generates it based on class structure (fields, methods, modifiers, etc.).
+
+But the auto-generated value is not consistent across:
+Different compilers (javac vs Eclipse)
+Even minor changes in the class (adding/removing a method or variable)
+
+🚨 Interview Trap
+Q: Can I remove or skip defining serialVersionUID if my class implements Serializable?
+❌ Wrong Answer: Yes, it's optional
+✅ Correct Answer: Technically optional, but highly recommended. Without it, even small changes in the class can cause InvalidClassException during deserialization.
+
+🧠 Best Practices
+Always manually declare serialVersionUID for Serializable classes.
+Choose any long value that’s meaningful to you (version number, timestamp, or arbitrary value).
+
+👨‍💻 Example
 package p1;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -4545,14 +4602,16 @@ public class C {
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			A a1 = (A)ois.readObject();
 			System.out.println(a1.name);
-			System.out.println(a1.password);
-			
+			System.out.println(a1.password); // The object is restored, but password will be null because it was marked transient
 			ois.close();	
 		} catch (Exception e) {	
 			e.printStackTrace();
 		}
 	}
 }
+
+If class doesn’t implement Serializable	❌ NotSerializableException will be thrown at runtime
+Can static fields be serialized		❌ No. Static fields are class-level, not object-level, so not serialized.
 
 JDBC - Java Database Connectivity
 ##########################################
