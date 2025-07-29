@@ -4768,10 +4768,136 @@ public class D {
 	}
 }
 
+✅ Custom Exception in Java
+##############################
+Custom exceptions are user-defined exceptions that extend either the Exception class (for checked exceptions) or the RuntimeException class (for unchecked exceptions).
+
+🔹 Syntax for Custom Exception
+✅ 1. Checked Exception (extends Exception)
+// Custom checked exception
+public class MyCheckedException extends Exception {
+    public MyCheckedException(String message) {
+        super(message);
+    }
+}
+
+✅ 2. Unchecked Exception (extends RuntimeException)
+// Custom unchecked exception
+public class MyUncheckedException extends RuntimeException {
+    public MyUncheckedException(String message) {
+        super(message);
+    }
+}
+
+🔧 Example with Usage
+📌 Example: Creating and Using a Checked Exception
+// Custom exception class
+class AgeInvalidException extends Exception {
+    public AgeInvalidException(String message) {
+        super(message);
+    }
+}
+
+// Business logic
+public class CustomExceptionDemo {
+    public static void validateAge(int age) throws AgeInvalidException {
+        if (age < 18) {
+            throw new AgeInvalidException("❌ Age is not valid for voting!");
+        } else {
+            System.out.println("✅ You are eligible to vote.");
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            validateAge(15);
+        } catch (AgeInvalidException e) {
+            System.out.println("Caught Exception: " + e.getMessage());
+        }
+    }
+}
+
+📘 Best Practices for Custom Exceptions
+➤ Always extend Exception or RuntimeException.
+➤ Provide constructors for messages and causes.
+➤ Use descriptive names (InvalidAgeException, UserNotFoundException).
+➤ Don’t overuse — prefer standard exceptions when they fit.
+
+🧠 Interview Tips & Traps
+| ❓ Question                                             | ✅ Good Answer                                                 |
+| ------------------------------------------------------ | ------------------------------------------------------------- |
+| Should I extend `Throwable` directly?                  | ❌ No, use `Exception` or `RuntimeException`.                  |
+| Can I throw a custom exception without the `throws` keyword? | ✅ Yes, but only if it extends `RuntimeException` (unchecked). |
+| Why create custom exceptions?                          | To handle specific business logic and improve code clarity.   |
+| Can custom exceptions have multiple constructors?      | ✅ Yes, just like any class (with message, cause, etc.).       |
+
+✅ Difference between throw and throws in Java
+##################################################
+| Feature                  | `throw`                                       | `throws`                                                |
+| ------------------------ | --------------------------------------------- | ------------------------------------------------------- |
+| Purpose              | Used to explicitly throw an exception     | Used to declare exceptions a method might throw     |
+| Location             | Inside method or block                        | In method signature                                     |
+| Number of Exceptions | Can throw only one exception at a time    | Can declare multiple exceptions separated by commas |
+| Type                 | Followed by an object of `Throwable` type | Followed by one or more **exception class names       |
+| Usage                | Used for triggering exception                 | Used for declaring exception handling responsibility    |
+| Syntax               | `throw new ExceptionType("msg");`             | `public void method() throws IOException`               |
+
+✅ Syntax and Example
+🔹 throw keyword example (used inside method)
+public class ThrowExample {
+    public static void main(String[] args) {
+        int age = 16;
+        if (age < 18) {
+            throw new ArithmeticException("❌ Age must be 18+ to vote");
+        }
+        System.out.println("✅ You can vote");
+    }
+}
+
+🔹 throws keyword example (used in method declaration)
+import java.io.*;
+
+public class ThrowsExample {
+    // declaring that this method may throw IOException
+    public static void readFile() throws IOException {
+        FileReader fr = new FileReader("file.txt"); // may throw IOException
+        BufferedReader br = new BufferedReader(fr);
+        System.out.println(br.readLine());
+    }
+
+    public static void main(String[] args) {
+        try {
+            readFile(); // handle the exception
+        } catch (IOException e) {
+            System.out.println("Caught IOException: " + e.getMessage());
+        }
+    }
+}
+
+🔍 Key Points
+➤ throw is used within a method, while throws is used in the method declaration.
+➤ throws a single instance of an exception.
+➤ throws can declare multiple exceptions that a method might throw.
+➤ Use throw to generate an exception during custom logic validation.
+➤ Use throws to inform the caller method to handle the exception.
+
+⚠️ Common Interview Traps
+| ❓ Trap Question                                                        | ✅ Correct Clarification                                                  |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Can we use `throw` without creating exception object?                  | ❌ No, `throw` must be followed by a `Throwable` object.                  |
+| Can we write `throws` inside method body?                              | ❌ No, `throws` is only used in **method signature**.                     |
+| Can we throw multiple exceptions with `throw`?                         | ❌ No, only **one exception object** at a time.                           |
+| What happens if a method declares `throws` but doesn't actually throw? | ✅ That’s allowed — declaration is just a **promise**, not a requirement. |
+
+✅ Best Practices
+➤ Use throws for checked exceptions that you don’t want to handle in the method.
+➤ Use throw for custom exception logic or early exits.
+➤ Always handle checked exceptions using try-catch or declare them using throws.
+
 Multi-catch blocks:
 ---------------------
 ➤We can create multiple catch blocks.
-➤Always start withthe  child exception class followed by the parent exception class
+➤Always start with the  child exception class, followed by the parent exception class
 
 Example:
 ---------
@@ -4850,10 +4976,9 @@ Exception in thread "main" java.lang.ArithmeticException: / by zero
 	at jdbc_examples.E.main(E.java:7)
 
 
-Note: Can u give a practical example where the finally block can be used?
-Ans: 
+Example where the finally block can be used?
 a. We can perform a database closing operation
-b. We can performa  file closing operation / Database closing Operation
+b. We can perform a file closing operation / Database closing Operation
 
 Example :
 package p1;
