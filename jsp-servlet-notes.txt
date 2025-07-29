@@ -22,7 +22,6 @@ Step 6: Select tomcat entry and click on remove button
 Step 7: Click on apply and close
 Step 8: Click on cancel button
 
-
 Create First HTML page
 ##############################
 Step 1 : Create Dynamic web project
@@ -202,7 +201,6 @@ Example 2: Servlet should read form data
 	</body>	
 </html>
 
-
 package p1;
 
 import jakarta.servlet.ServletException;
@@ -245,7 +243,6 @@ Similarly for emailId and mobile.
 Ankur
 ankur@example.com
 1234567890
-
 
 Example 3: Save Data into database using servlets after reading form data
 
