@@ -984,3 +984,386 @@ Example 1:
 </html>
 
 
+🧠Injecting HTML code in JSP code
+menu.html
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<a href="">create registration</a>
+	<a href="">List registration</a>
+	<a href="">logout</a>
+</body>
+</html>
+⚠️ The menu.html already has <html>, <head>, and <body> tags, which will conflict with those in the JSP file. This can lead to invalid HTML structure in the final output. 
+
+Instead of putting full HTML structure in menu.html, do this:
+menu.html
+
+<nav>
+	<a href="registration_page.jsp">Create Registration</a>
+	<a href="list_registration.jsp">List Registration</a>
+	<a href="logout.jsp">Logout</a>
+</nav>
+
+This way, you can safely include it inside your JSPs:
+<body>
+	<%@ include file="menu.html" %>
+	<h1> Register </h1>
+</body>
+
+➤ The line <%@ include file="menu.html" %> imports the HTML content from menu.html at compile-time (also called static include).
+➤ So, when the JSP is compiled, the content of menu.html is copied and pasted at the top of the JSP.
+➤ It's better if menu.html only contains the <nav> or menu part, not the full HTML skeleton.
+
+First we have inserted HTML code inside the JSP page now doing vice-versa:
+
+🧠 What We’re Doing:
+You are putting links to JSP pages (registration.jsp, list_registration.jsp, logout.jsp) directly inside an HTML file (menu.html). This file is then included in JSP pages for furthur feature Enhancements.
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Registration Form</title>
+</head>
+<body>
+	<a href="registration.jsp">create registration</a>
+	<br/>
+	<a href="list_registration.jsp">List registration</a>
+	<br/>
+	<a href="logout.jsp">logout</a>
+</body>
+</html>
+
+🔍 Behind the Scenes (How It Works):
+
+At Compile-Time:
+The JSP engine replaces this line:
+<%@ include file="menu.html" %>
+➤ With the full HTML content of menu.html.
+➤ So it’s as if that HTML was written directly in the JSP.
+
+At Run-Time:
+➤ The browser reads the full HTML output of the JSP page (which now contains the menu).
+➤ When the user clicks a link like <a href="list_registration.jsp">, it sends an HTTP request to the server for that JSP.
+➤ The server compiles/executes that JSP, includes menu.html again, and returns the new page.
+
+✅ Final Project Structure (Recommended)
+
+project/
+├── menu.html
+├── registration.jsp
+├── list_registration.jsp
+├── logout.jsp
+
+And in each JSP:
+<%@ include file="menu.html" %>
+This creates a proper reusable menu.
+
+🔷 Inter-Servlet Communication (ISC)
+Inter-Servlet Communication refers to the process of calling one servlet from another servlet, or even calling a JSP page from a servlet.
+
+✅ Why Use It:
+➤ To reuse logic written in another servlet
+➤ To redirect or forward to another resource (servlet or JSP) as part of modular application flow
+➤ Helps build project flow based on business logic, especially in multi-step processes (e.g., login → dashboard → data processing)
+
+✅ Ways to Achieve Inter-Servlet Communication:
+
+1. Using RequestDispatcher (Most Common Way)
+Forward the request from one servlet to another.
+✅Code:
+RequestDispatcher rd = request.getRequestDispatcher("SecondServlet");
+rd.forward(request, response); // Control moves to SecondServlet
+
+Can also forward to a JSP:
+✅Code
+RequestDispatcher rd = request.getRequestDispatcher("result.jsp");
+rd.forward(request, response);
+
+Purpose: Server-side forward; client doesn’t know the change in control.
+
+2. Using sendRedirect()
+✅Code
+response.sendRedirect("SecondServlet");
+➤ Sends a response to the browser telling it to make a new request to SecondServlet.
+➤ Purpose: Client-side redirect; new request is created.
+
+3. Using ServletContext.getRequestDispatcher()
+Used when dispatching to a resource outside the current context path.
+✅Code
+ServletContext context = getServletContext();
+RequestDispatcher rd = context.getRequestDispatcher("/SecondServlet");
+rd.forward(request, response);
+
+✅ Key Differences: forward() vs sendRedirect()
+| Feature        | `forward()`               | `sendRedirect()`                 |
+| -------------- | ------------------------- | -------------------------------- |
+| Request type   | Single request            | New request                      |
+| URL in browser | Not changed               | Changed                          |
+| Performance    | Faster (server-side)      | Slower (extra round-trip)        |
+| Scope          | Shares request attributes | Doesn’t share request attributes |
+
+✅ Example Flow:
+➤ LoginServlet → validates login
+➤ On success → forwards to DashboardServlet
+➤ DashboardServlet → forwards to welcome.jsp
+
+✅Example 1: Calling get method of second servlet from first servlet
+Make the method in the form of first.html as get
+
+first.html file
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+		<form action="first" method="get">
+			<input type="submit"/>
+		</form>
+</body>
+</html>
+
+❗FirstServlet.java file
+
+package p1;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/first")
+public class FirstServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public FirstServlet() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//Will Point to second Servlet
+		RequestDispatcher rd = request.getRequestDispatcher("second");
+		rd.forward(request, response);
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+}
+
+✅SecondServlet.java file
+package p1;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/second")
+public class SecondServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public SecondServlet() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("Second Servlet get method");
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+}
+
+🧭 Flow Explanation:
+🔹 Step 1: User requests /first
+FirstServlet.doGet() is called
+
+Inside it:
+RequestDispatcher rd = request.getRequestDispatcher("second");
+rd.forward(request, response);
+
+This forwards the same request and response objects to /second (i.e., SecondServlet).
+
+🔹 Step 2: SecondServlet.doGet() executes
+Since forward() is used, the control moves server-side, and SecondServlet's doGet() method is executed.
+
+It prints:
+System.out.println("Second Servlet get method");
+
+So on your server console, you’ll see: Second Servlet get method
+
+✅ The browser still thinks it is on /first, because forward() is server-side and does not change the browser URL.
+
+✅ Summary
+| Action                            | What happens                              |
+| --------------------------------- | ----------------------------------------- |
+| User visits `/first`              | FirstServlet is triggered                 |
+| FirstServlet forwards to `second` | `SecondServlet`'s `doGet()` is executed   |
+| URL stays as `/first`             | Because `forward()` does **not redirect** |
+| Console output                    | `Second Servlet get method`               |
+
+✅ Diagram (Visual)
+Browser → [ /first ] → FirstServlet 
+                          ↓
+                  RequestDispatcher.forward()
+                          ↓
+                     SecondServlet → console output
+
+
+✅Example 2: Calling post method of second servlet from first servlet
+Make the method in the form of first.html as post
+Similar to the get method 
+
+❗first.html file
+
+		<form action="first" method="post">
+			<input type="submit"/>
+		</form>
+
+
+✅FirstServlet.java file
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//Will Point to second Servlet
+		RequestDispatcher rd = request.getRequestDispatcher("second");
+		rd.forward(request, response);
+	}
+
+✅SecondServlet.java
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("Second Servlet post method");
+	}
+
+Example 3: Supply data from html form to first servlet and then from first servlet supply data to second servlet using request.setAttribute()
+
+✅ GOAL:
+➡️ Take name input from an HTML form
+➡️ Send it to FirstServlet using POST
+➡️ FirstServlet passes the name to SecondServlet via request.setAttribute()
+➡️ SecondServlet reads it using request.getAttribute() and prints it
+
+
+
+🧭 STEP-BY-STEP FLOW:
+🔹 1. HTML Form: form.html
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form action="first" method="post">
+		<input type="text" name="name"/>
+		<input type="submit" />
+	</form>
+</body>
+</html>
+
+When the user submits the form:
+➤ A POST request is sent to FirstServlet (/first)
+➤ The name field is sent as a parameter
+
+🔹 2. FirstServlet.java
+package p1;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/first")
+public class FirstServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public FirstServlet() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		RequestDispatcher rd = request.getRequestDispatcher("second");
+		rd.forward(request, response);
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String name=request.getParameter("name");
+		request.setAttribute("x", name);
+		
+		RequestDispatcher rd=request.getRequestDispatcher("second");
+		rd.forward(request, response);
+	}
+}
+➤ Extracts the form value using getParameter()
+➤ Stores it as an attribute named "x"
+➤ Forwards the request to /second (SecondServlet)
+➤ Because forward() is used, the same request and response are passed forward
+
+🔹 3. SecondServlet.java
+package p1;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/second")
+public class SecondServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public SecondServlet() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("Second Servlet get method");
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String name=(String)request.getAttribute("x");
+		System.out.println(name);
+	}
+}
+➤ It retrieves the attribute "x" from the request
+➤ Prints the value to the server console
+
+🔍 Output
+Suppose user enters: Ankur
+Console output will be:
+Ankur
+
+✅ Success — you successfully passed form data from one servlet to another using request.setAttribute() and RequestDispatcher.forward().
+
+✅ Visual Summary:
+form.html
+   |
+   |--> POST /first
+             |
+             |--> FirstServlet:
+             |     - getParameter("name")
+             |     - setAttribute("x", name)
+             |     - forward --> /second
+                           |
+                           |--> SecondServlet:
+                                 - getAttribute("x") => prints name
+
+💡 Tip:
+You can also display the value on a JSP instead of printing to the console:
+
+In SecondServlet.java:
+
+request.setAttribute("name", name);
+request.getRequestDispatcher("welcome.jsp").forward(request, response);
+
+In welcome.jsp:
+<p>Welcome, ${name}!</p>
+Let me know if you want this example extended to JSP display.
+
+Line 1147 from the github
