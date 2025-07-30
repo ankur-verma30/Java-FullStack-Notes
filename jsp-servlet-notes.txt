@@ -704,3 +704,283 @@ finally {
     try { stmnt.close(); } catch(Exception e) {}
     try { con.close(); } catch(Exception e) {}
 }
+
+✅ JSP - JavaServer 
+
+➤ JSP stands for JavaServer Pages.
+➤ It is a server-side technology used to create dynamic web content using Java.
+➤ It allows embedding Java code inside HTML pages, making it easier for developers to write dynamic web pages.
+
+🔹 Key Points:
+➤ JSP is an extension of Servlet technology.
+➤ JSP files are saved with .jsp extension.
+➤ During execution, JSP is converted into a Servlet by the server internally.
+
+🔹 Why Use JSP?
+➤ Mixes HTML and Java logic, unlike Servlets which are purely Java.
+➤ Easy for frontend + backend integration.
+➤ Reduces the complexity of HTML generation in Servlets (no need for out.println() for every tag).
+
+🔹 How JSP Works (Lifecycle):
+➤ JSP File → Servlet: JSP is converted into a Servlet.
+➤ Compilation: The Servlet is compiled into .class.
+➤ Execution: JVM executes the class and sends output as HTML to the client.
+
+🧠 JSP Tags
+✅ scriptlet tag
+A scriptlet in JSP allows us to embed raw Java code directly inside HTML.
+
+🔹 Characteristics:
+➤ The code inside <% ... %> is placed inside the _jspService() method when the JSP is converted to a servlet.
+➤ You can declare variables, loops, conditionals, method calls, etc.
+➤ Cannot declare methods (use <%! ... %> for that).
+➤ Has access to implicit objects.
+
+Example 1: registration_page.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<%
+		for(int i=0;i<5;i++){
+			System.out.println(i);
+		}
+	%>
+</body>
+</html>
+
+➤ ⚠️ System.out.println(i); will not print in the browser, it prints to the server console.
+➤ ✅ Use out.println(...) to display on the browser.
+
+🔹 Best Practice:
+	<%
+		for(int i=0;i<5;i++){
+			out.println(i);
+		}
+	%>
+
+✅ What is an Implicit Object in JSP?
+➤ Implicit Objects are predefined objects that are automatically available in every JSP page without needing to declare or create them.
+
+➤ They are provided by the JSP container (like Apache Tomcat), and they allow you to access key parts of the HTTP request/response lifecycle, like session data, output to browser, application context, etc.
+
+🔹 Available Implicit Objects in Scriptlet:
+| Object        | Description                               |
+| ------------- | ----------------------------------------- |
+| `out`         | Used to send output to client (browser)   |
+| `request`     | Represents HTTP request                   |
+| `response`    | Represents HTTP response                  |
+| `session`     | Session between client and server         |
+| `application` | ServletContext shared across app          |
+| `config`      | ServletConfig object for current page     |
+| `pageContext` | Provides access to all JSP scoped objects |
+| `exception`   | Available in error pages only             |
+| `page`        | This JSP page (like `this`)               |
+
+🚫 Why Can't We Use:
+1. Access specifier inside the scriptlet tag.
+2. static / non static variables
+3. create methods inside scriptlet tag
+
+✅Example:
+    <%
+		public int x; // ❌ Error
+		public void test(){ // ❌ Error
+		}
+	%>
+
+	The JSP engine translates your JSP page into a Servlet class, like this:
+
+	public class SomeJspServlet extends HttpServlet {
+    public void _jspService(...) {
+        // your scriptlet code goes here
+        public int x;  // ❌ Not allowed inside method
+        public void test() {}  // ❌ Can't define a method inside another method
+    }
+}
+
+🧠 In Java, you can't declare access modifiers (public, private, etc.) or define methods inside other methods. That’s why the above gives a compile-time error.
+
+Note: Only local variable can be created inside scriptlet
+Because scriptlet code is inserted inside a method, not at the class level.
+✅Example:
+	<%
+		int x=10;//------>Local Variable
+		out.println(x);
+		
+	%>
+
+Note: We cannot write html code inside scriptlet tag
+
+✅ Declaration Tag in JSP
+Syntax: <%! ... %>
+
+Used to declare:
+1. Variables (static/non-static)
+2. Methods
+3. Anything you would normally write at class level in Java
+
+🔍 Key Rules for Declaration Tag
+| Feature                     | Allowed in Declaration Tag? |
+| --------------------------- | --------------------------- |
+| `public static` or `public` | ✅ Yes                       |
+| Implicit objects like `out` | ❌ No                        |
+| HTML code                   | ❌ No                        |
+| Java methods                | ✅ Yes                       |
+| Class-level variables       | ✅ Yes                       |
+
+
+Example 1:
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<%! 
+    public static int y = 100;       // static variable
+    public int x = 10;               // instance variable
+    public String test() {           // method
+        return "hello";
+    }
+%>
+
+<%
+    out.println(y);        // ✅ prints 100
+    out.println(x);        // ✅ prints 10
+    out.println(test());   // ✅ prints hello
+%>
+
+</body>
+</html>
+
+✔️ Behind the Scenes (What JSP Compiles To):
+
+public class YourJspPage extends HttpServlet {
+
+    public static int y = 100;
+    public int x = 10;
+
+    public String test() {
+        return "hello";
+    }
+
+    public void _jspService(HttpServletRequest request, HttpServletResponse response) {
+        JspWriter out = response.getWriter();
+        out.println(y);
+        out.println(x);       // accesses instance variable
+        out.println(test());  // calls instance method
+    }
+}
+
+🧠 Important Notes
+➤ out, request, response, etc. are not available in <%! %> — they exist only in <% %> (scriptlet) or inside the _jspService() method.
+➤ You can access the declared variables/methods from scriptlet or expression tags, like in your example.
+➤ HTML is NOT allowed inside <%! %> — it will throw an error because it's compiled as Java code.
+
+
+✅ Expression Tag in JSP
+🔹 Syntax: <%= expression %>
+
+🔹 Purpose:
+➤ It evaluates a Java expression and prints the result to the HTML response (webpage).
+➤ Here we can write only one statement
+
+❗ Common Mistakes to Avoid
+➤ Ending the expression with a semicolon (;) → ❌ will cause a syntax error.
+<%= x; %>   // ❌ Wrong
+<%= x %>    // ✅ Correct
+
+➤ Using statements like loops/conditions → ❌ not allowed.
+<%= for(int i=0; i<5; i++) {} %> // ❌ Wrong
+
+🔍 Key Features
+| Feature                      | Explanation                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| No LHS (Left-hand side)  | You're not assigning — you're just evaluating and printing directly to the response. |
+| Output goes to browser   | The result is added to the `HttpServletResponse` via `JspWriter out`.                |
+| No semicolon          | Only expressions are allowed, not full Java statements.                              |
+| Implicit objects allowed | Yes, like `out`, `request`, `response`, etc.                                         |
+| Auto converted           | It's internally converted into `out.print(...)`.                                     |
+
+🧠 Why No LHS?
+➤ This tag is only for output.
+➤ Think of it like System.out.print() — but the destination is the browser (via the out object).
+➤ You're not assigning values — you're saying:
+👉 "Evaluate this expression, and show it to the user."
+
+Example:
+--------
+	<%!
+		public static int y=100;
+		public int x=10;
+		public String test(){
+			return "hello";
+		}
+		
+	%>
+	
+	<%=x %>
+	<%=y %>
+	<%=test() %>
+
+	Output in Browser:
+	10
+	100
+	hello
+
+🔧 What JSP Converts This To (Internally):
+out.print(x);        // instance variable
+out.print(y);        // static variable
+out.print(test());   // method call
+
+🧠 Directive tag
+Syntax: <%@ directive attribute="value" %>
+
+🔹 Purpose:
+The directive tag is used to give global-level instructions to the JSP engine before the actual content is processed.
+
+🔸 Types of Directive Tags
+| Type      | Purpose                                                               |
+| --------- | --------------------------------------------------------------------- |
+| `page`    | Set page-level instructions (language, import, buffer, session, etc.) |
+| `include` | Include contents of another file at compile-time                  |
+| `taglib`  | Used when working with custom tag libraries (e.g., JSTL)              |
+
+Example 1:
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.ArrayList" %> //class import
+<%@ include file="test1.txt" %> //file import
+<%@ taglib prefix="prefixName" uri="taglibURI" %> //import custom tags or JSTL
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<%=new Date() %>
+	<% 
+	ArrayList<Integer> arr = new ArrayList();
+	%>
+
+</body>
+</html>
+
+
