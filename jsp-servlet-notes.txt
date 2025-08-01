@@ -1242,15 +1242,13 @@ Similar to the get method
 		System.out.println("Second Servlet post method");
 	}
 
-Example 3: Supply data from html form to first servlet and then from first servlet supply data to second servlet using request.setAttribute()
+🧠Example 3: Supply data from html form to first servlet and then from first servlet supply data to second servlet using request.setAttribute()
 
 ✅ GOAL:
 ➡️ Take name input from an HTML form
 ➡️ Send it to FirstServlet using POST
 ➡️ FirstServlet passes the name to SecondServlet via request.setAttribute()
 ➡️ SecondServlet reads it using request.getAttribute() and prints it
-
-
 
 🧭 STEP-BY-STEP FLOW:
 🔹 1. HTML Form: form.html
@@ -1366,4 +1364,323 @@ In welcome.jsp:
 <p>Welcome, ${name}!</p>
 Let me know if you want this example extended to JSP display.
 
-Line 1147 from the github
+🧠Example 4:🔁 Servlet forwarding data to a JSP using the request implicit object.
+
+🔍 What is happening here?
+1. First.java – Servlet
+This servlet is mapped to /first.
+
+First.java
+---------
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/first")
+public class First extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public First() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//rd points to jsp page
+		request.setAttribute("x", "mike");
+		
+		
+		RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+		rd.forward(request, response);
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+
+}
+When a user accesses /first, the doGet() method executes.
+
+Inside doGet():
+request.setAttribute("x", "mike");
+✅ This line stores the value "mike" in the request scope with the key "x".
+
+Then:
+RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+rd.forward(request, response);
+✅ This forwards the request (with its data) to index.jsp.
+
+2. index.jsp – JSP Page
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>Index page</h2>
+	<%
+		out.println((String)request.getAttribute("x"));
+	%>
+</body>
+</html>
+
+Receives the request along with the attribute x set earlier.
+This line:
+out.println((String)request.getAttribute("x"));
+✅ Fetches the value of x from the request (which is "mike") and prints it on the browser.
+
+✅ MVC Architecture – Java Web Application (Servlet + JSP)
+🧩 MVC Stands for:
+➤ M – Model: Business logic and data layer
+➤ V – View: User interface (JSP, HTML)
+➤ C – Controller: Logic that handles incoming requests and routes data (Servlet)
+
+💡 Why Use MVC?
+➤ Separation of concerns: Cleaner, maintainable code.
+➤ Reusable components.
+➤ Easier to debug and test.
+
+🔁 Data Flow in MVC:
+[User] 
+   ↓ (enters data in form)
+[View (JSP)] 
+   ↓ (form submit)
+[Controller (Servlet)] 
+   ↓ (calls logic)
+[Model (Java Class)]
+   ↓ (returns result)
+[Controller]
+   ↓ (forwards result)
+[View (JSP)]
+   ↓ 
+[User sees result]
+
+
+🧪 Practical Example – Add Two Numbers (MVC)
+🖼️ 1. View: add.jsp
+
+<form action="add" method="post">
+    Number 1: <input type="text" name="num1" /><br>
+    Number 2: <input type="text" name="num2" /><br>
+    <input type="submit" value="Add" />
+</form>
+
+🎮 2. Controller: AddController.java
+
+@WebServlet("/add")
+public class AddController extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int num1 = Integer.parseInt(request.getParameter("num1"));
+        int num2 = Integer.parseInt(request.getParameter("num2"));
+        
+        AddService service = new AddService();
+        int result = service.add(num1, num2);
+        
+        request.setAttribute("result", result);
+        RequestDispatcher rd = request.getRequestDispatcher("result.jsp");
+        rd.forward(request, response);
+    }
+}
+
+🧠 3. Model: AddService.java
+public class AddService {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+
+📄 4. View: result.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<html>
+<body>
+    <h3>Result is: <%= request.getAttribute("result") %></h3>
+</body>
+</html>
+
+
+✅ EMS Project - Iteration 1 (Employee Management System)
+📚 Objective:
+To build a web-based Login Module where users can log in using their email and password, which are verified from a MySQL database.
+
+🧱 Tech Stack:
+Frontend (View): JSP (index.jsp)
+Controller: Servlet (LoginController.java)
+Backend (Model): JDBC-based (DBService.java, DBServiceImpl.java)
+Database: MySQL
+
+⚙️ Project Structure:
+ems-project/
+├── WebContent/
+│   └── index.jsp              --> View (Login form)
+├── src/
+│   └── com/
+│       └── ems/
+│           ├── controller/
+│           │   └── LoginController.java   --> Controller
+│           └── model/
+│               ├── DBService.java         --> Interface
+│               └── DBServiceImpl.java     --> JDBC Logic
+└── DB/
+    └── emsdb.sql              --> SQL setup for DB
+
+🔄 MVC Architecture Breakdown:
+ View - index.jsp
+➤ Collects user credentials
+➤ Displays error messages using request.setAttribute("error", ...)
+
+index.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>Login Here...</h2>
+	<form action="login" method="post">
+		<label>Email: </label> <input type="text" name="email" /> <br /> <label>Password:
+		</label> <input type="password" name="password" /> <br /> <input
+			type="submit" value="login" />
+	</form>
+	<%
+	if (request.getAttribute("error")!=null) {
+		out.println(request.getAttribute("error"));
+	}
+	%>
+</body>
+</html>
+
+🔹 Controller - LoginController.java
+➤ Acts as a mediator between JSP and Database.
+➤ Gets form data using request.getParameter(...)
+➤ Forwards to index.jsp on error.
+
+package com.ems.controller;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import com.ems.model.DBServiceImplementation;
+
+@WebServlet("/login")
+public class LoginController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public LoginController() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+
+		DBServiceImplementation service = new DBServiceImplementation();
+		service.connectDB();
+		boolean status = service.verifyLogin(email, password);
+
+		if (status) {
+			RequestDispatcher rd = request.getRequestDispatcher("dashboard.jsp");
+			rd.forward(request, response);
+		} else {
+			request.setAttribute("error", "Invalid email/password");
+			RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+			rd.forward(request, response);
+		}
+	}
+}
+
+🔹Show dashboard.jsp on successfully login
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>Login Successful</h2>
+	<h3>Welcome to the application</h3>
+</body>
+</html>
+
+🔹 Model - DBService.java and DBServiceImpl.java
+DBService.java – Just the interface
+
+public interface DBService {
+	public void connectDB();
+	public boolean verifyLogin(String email, String password);
+}
+
+DBServiceImpl.java – Implements DB operations
+package com.ems.model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class DBServiceImplementation implements DBService {
+	private Connection conn;
+	private Statement stmnt;
+
+	@Override
+	public void connectDB() {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ems", "root", "ankur@1234");
+			stmnt = conn.createStatement();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean verifyLogin(String email, String password) {
+		try {
+			ResultSet result = stmnt
+					.executeQuery("select * from user where email='" + email + "' and password='" + password + "'");
+			return result.next();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+}
+
+🗃️ Database Setup (MySQL)
+CREATE DATABASE ems;
+USE ems;
+
+CREATE TABLE user (
+  id INT PRIMARY KEY,
+  username VARCHAR(45),
+  name VARCHAR(45),
+  email VARCHAR(128),
+  password VARCHAR(20)
+);
+
+INSERT INTO user VALUES (1, "mike", "mike", "mike@gmail.com", "testing");
+INSERT INTO user VALUES (2, "adam", "adam", "adam@gmail.com", "testing");
+
+⚠️ Important Notes:
+✅ Don’t use Statement in real projects due to SQL Injection risk. Use PreparedStatement.
+❗ Currently, password is stored in plain text – not recommended for real-world applications.
+
+Start from line no. 1423
