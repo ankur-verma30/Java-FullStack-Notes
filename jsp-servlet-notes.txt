@@ -1683,4 +1683,692 @@ INSERT INTO user VALUES (2, "adam", "adam", "adam@gmail.com", "testing");
 ✅ Don’t use Statement in real projects due to SQL Injection risk. Use PreparedStatement.
 ❗ Currently, password is stored in plain text – not recommended for real-world applications.
 
-Start from line no. 1423
+############################
+Project - ems - Iteration 2
+############################
+✅ EMS Project - Iteration 2 (Employee Management System) Registration with Session Handling
+
+➤ Now, we're extending the project:
+➤ After login, users are redirected to a secured registration form.
+➤ This form is inside /WEB-INF/views, only accessible through servlet (not directly from browser).
+➤ Session variable is used to remember the user's identity.
+
+✅ New Table: registration
+CREATE TABLE registration (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45),
+  course VARCHAR(60),
+  email VARCHAR(145),
+  mobile VARCHAR(10),
+  user_id INT
+);
+
+✅ Workflow - Iteration 2
+User logs in via index.jsp
+
+➤ If login is successful:
+➤ Email is stored in session:
+session.setAttribute("email", email);
+
+User is forwarded to:
+/WEB-INF/views/registration.jsp
+➤ This JSP page is protected (cannot be accessed directly by URL)
+
+When registration form is submitted:
+➤ RegistrationController is called
+➤ It accesses the session to retrieve the user's email:
+
+String email = (String) session.getAttribute("email");
+
+✅ Code Breakdown
+📄 registration.jsp
+This file is placed under WEB-INF/views
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h2>Login Successfully</h2>
+<form action="registrationController"></form>
+</body>
+</html>
+
+Can only be opened via servlet, not directly
+
+🔧 Updated LoginController.java
+package com.ems.controller;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+
+import com.ems.model.DBServiceImplementation;
+
+@WebServlet("/login")
+public class LoginController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public LoginController() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+
+		DBServiceImplementation service = new DBServiceImplementation();
+		service.connectDB();
+		boolean status = service.verifyLogin(email, password);
+
+		if (status) {
+			✅Updated Code Here....
+			HttpSession session=request.getSession(true);
+			session.setAttribute("email", email);
+			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/registration.jsp");
+			rd.forward(request, response);
+		} else {
+			request.setAttribute("error", "Invalid email/password");
+			RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
+			rd.forward(request, response);
+		}
+	}
+
+}
+
+🔧 RegistrationController.java - Here Access Session variable
+
+package com.ems.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+
+@WebServlet("/registrationController")
+public class RegistrationController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public RegistrationController() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		String email = (String)session.getAttribute("email");
+	}
+}
+
+############################
+Project - ems - Iteration 3
+############################
+✅ EMS Project - Iteration 3 (Employee Management System)
+
+To allow a logged-in user to create a registration record using a form (registration.jsp), and store that data in the database (registration table), associating it with the current user.
+
+🔧 Controller: RegistrationController.java
+➤ Handles form submission from registration.jsp.
+➤ Retrieves the logged-in user's email from the session (session.getAttribute("email")).
+➤ Uses that email to fetch the user ID from the user table via model.
+➤ Extracts form data (name, course, emailId, mobile) from request.
+➤ Calls the Model (DBServiceImpl) to insert a registration entry in the registration table.
+➤ Stores success message as request.setAttribute("message", ...).
+➤ Forwards the request to the View (registration.jsp) using RequestDispatcher.
+
+📄 View: registration.jsp
+➤ A simple HTML form to input registration data.
+➤ Submits the form to registrationController via POST.
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<h2>Register here....</h2>
+	<form action="registrationController" method="post">
+		<pre>
+			<label>Name: </label>
+			<input type="text" name="name"/>
+			<br/>
+			<label>Course: </label>
+			<input type="text" name="course"/>
+			<br/>
+			<label>Email: </label>
+			<input type="text" name="email"/>
+			<br/>
+			<label>Mobile: </label>
+			<input type="text" name="mobile"/>
+			<br/>
+			<input type="submit" value="register"/>
+		</pre>
+	</form>
+	
+	<%
+		if(request.getAttribute("message")!=null){
+			out.println(request.getAttribute("message"));
+		}
+	%>
+</body>
+</html>
+➤ Displays a message (if any) returned by the controller using: RegistrationController
+
+💡 Key Concepts Demonstrated
+
+1. Session usage
+HttpSession session = request.getSession(false);
+String email = (String) session.getAttribute("email");
+→ Maintains login context and fetches user-specific data.
+
+2. Request scope and forwarding
+request.setAttribute(...): Passes data to the JSP.
+
+RequestDispatcher.forward(...): Transfers control to JSP while preserving request data.
+
+3. Form data handling
+Retrieves input via request.getParameter(...).
+
+4. MVC Architecture in Action
+| Layer      | Component                | Role                                    |
+| ---------- | ------------------------ | --------------------------------------- |
+| View       | `registration.jsp`       | Shows form and feedback                 |
+| Controller | `RegistrationController` | Receives form data, processes, forwards |
+| Model      | `DBServiceImpl.java`     | Business logic and database interaction |
+
+✅ RegistrationController.java
+Purpose:
+This servlet handles the form submission logic, connects to the database, retrieves user info, and creates a new registration record.
+
+🔧 Key Components:
+@WebServlet("/registrationController"):
+Maps the servlet to the URL /registrationController.
+
+doPost():
+➤ Gets session to retrieve the logged-in user's email.
+➤ Connects to DB using DBServiceImpl.
+➤ Fetches user ID using getUserByEmail(email).
+➤ Reads form data: name, course, emailId, mobile.
+➤ Inserts registration record via createRegistration(...).
+➤ Sends success message back to registration.jsp.
+
+RegistrationController.java
+
+package com.ems.controller;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+
+import com.ems.model.DBServiceImpl;
+
+@WebServlet("/registrationController")
+public class RegistrationController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public RegistrationController() {
+        super();
+    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			HttpSession session = request.getSession(false);
+			String email = (String)session.getAttribute("email");
+			
+			DBServiceImpl service = new DBServiceImpl();
+			service.connectDB();
+			ResultSet result = service.getUserByEmail(email);
+			int userId = 0;
+			if(result.next()) {
+				userId = result.getInt(1);
+			}
+			String name = request.getParameter("name");
+			String course = request.getParameter("course");
+			String emailId = request.getParameter("email");
+			String mobile = request.getParameter("mobile");
+			
+			service.createRegistration(name,course,emailId,mobile,userId);
+			
+			request.setAttribute("message", "Registration created");
+			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/registration.jsp");
+			rd.forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+✅ DBServiceImpl.java
+Purpose:
+Implements all database methods declared in DBService.
+
+DBService.java
+
+package com.ems.model;
+
+import java.sql.ResultSet;
+
+public interface DBService {
+	public void connectDB();//->Connecting to database
+	public boolean verifyLogin(String email, String password);
+	public ResultSet getUserByEmail(String email);
+	public void createRegistration(String name, String course, String emailId, String mobile, int userId);
+}
+
+🔧 Important Implementations:
+➤ connectDB()
+1. Loads MySQL JDBC driver.
+2. Connects to database emsdb.
+3. Initializes Statement for SQL queries.
+
+➤ verifyLogin(...)
+Checks whether the email and password combination exists in the user table.
+
+➤ getUserByEmail(email)
+Queries the user table using the email to get user information (e.g., userId).
+
+➤ createRegistration(...)
+Inserts registration data (name, course, email, mobile, user_id) into registration table.
+
+DBServiceImplementation.java
+
+package com.ems.model;
+import java.sql.*;
+public class DBServiceImpl implements DBService {
+	
+	private Connection con;
+	private Statement stmnt;
+	
+
+	@Override
+	public void connectDB() {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/emsdb","root","test");
+			stmnt = con.createStatement();
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean verifyLogin(String email, String password) {
+		try {
+		 ResultSet result = stmnt.executeQuery("select * from user where email='"+email+"' and password='"+password+"'");
+		 return result.next();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	@Override
+	public ResultSet getUserByEmail(String email) {
+		try {
+			 ResultSet result = stmnt.executeQuery("select * from user where email='"+email+"'");
+			 
+			 return result;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+	}
+
+	public void createRegistration(String name, String course, String emailId, String mobile, int userId) {
+		try {
+			stmnt.executeUpdate("INSERT INTO registration (name, course, email, mobile, user_id) VALUES ('"+name+"', '"+course+"', '"+emailId+"', '"+mobile+"', '"+userId+"')");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	}
+}
+
+
+############################
+Project - ems - Iteration 4
+############################
+✅ EMS Project - Iteration 4 (Employee Management System)
+
+✅ Objective of Iteration 4
+Implement functionality to:
+➤ Authenticate user via session.
+➤ Allow logged-in users to:
+➤ Create registrations.
+➤ View only their own registrations.
+
+🔧 Updated DBService Interface
+📁 DBService.java
+New Method:
+public ResultSet getRegistrationsByUser(int userId);
+Purpose:
+Fetch all registration records specific to a user (based on user_id foreign key).
+
+✅Code Implementation
+DBService.java
+
+package com.ems.model;
+
+import java.sql.ResultSet;
+
+public interface DBService {
+	public void connectDB(); // Connection to the database
+	public boolean verifyLogin(String email, String password);
+	public ResultSet getUserByEmail(String email);
+	public void createRegistration(String name,String course,String emailId,String mobile, int userId);
+	public ResultSet getRegistrationsByUser(int userId);
+	
+}
+
+🔧 Implementation of Interface
+📁 DBServiceImplementation.java
+
+package com.ems.model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class DBServiceImplementation implements DBService {
+	private Connection conn;
+	private Statement stmnt;
+
+	@Override
+	public void connectDB() {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ems", "root", "ankur@1234");
+			stmnt = conn.createStatement();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean verifyLogin(String email, String password) {
+		try {
+			ResultSet result = stmnt
+					.executeQuery("select * from user where email='" + email + "' and password='" + password + "'");
+			return result.next();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	@Override
+	public ResultSet getUserByEmail(String email) {
+		try {
+			ResultSet result=stmnt.executeQuery("select * from user where email='"+email+"'");
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public void createRegistration(String name, String course, String emailId, String mobile, int userId) {
+		try {
+			stmnt.executeUpdate("insert into registration (name,course, email,mobile,user_id) values('"+name+"', '"+course+"', '"+emailId+"', '"+mobile+"', '"+userId+"')");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	@Override
+	public ResultSet getRegistrationsByUser(int userId) {
+	try {
+		ResultSet result=stmnt.executeQuery("Select * from registration where user_id='"+userId+"'");
+		return result;
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	return null;
+	}
+}
+Purpose:
+This method executes SQL to fetch registrations for the currently logged-in user.
+
+✅ User Registration Creation and Listing Logic
+📁 RegistrationController.java
+🔹 doGet() – Show Form
+
+Purpose:
+Loads the registration form when users visit the page directly.
+
+package com.ems.controller;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+
+import com.ems.model.DBServiceImplementation;
+
+@WebServlet("/registrationController")
+public class RegistrationController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+ 
+    public RegistrationController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/views/registration.jsp");
+		rd.forward(request, response);
+	}
+
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	try {
+		HttpSession session=request.getSession(false);
+		String email=(String)session.getAttribute("email");
+		
+		DBServiceImplementation service=new DBServiceImplementation();
+		service.connectDB();
+		
+		ResultSet result=service.getUserByEmail(email);
+		int userId=0;
+		if(result.next()) {
+			userId=result.getInt(1);
+			
+			String name=request.getParameter("name");
+			String course=request.getParameter("course");
+			String emailId=request.getParameter("email");
+			String mobile=request.getParameter("mobile");
+			
+			service.createRegistration(name,course,emailId,mobile,userId);
+			request.setAttribute("message", "Registered Successfully");
+			RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/views/registration.jsp");
+			rd.forward(request, response);
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+ 	}
+}
+
+🔹 doPost() – Save Registration
+➤ Fetches the current user's ID from the session.
+➤ Creates a new record in the registration table for that user.
+
+✅ ReadRegistration.java
+package com.ems.controller;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+
+import com.ems.model.DBServiceImplementation;
+
+
+@WebServlet("/readRegistration")
+public class ReadRegistration extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+   
+    public ReadRegistration() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			HttpSession session=request.getSession(false);
+			String email=(String )session.getAttribute("email");
+			
+			DBServiceImplementation service=new DBServiceImplementation();
+			service.connectDB();
+			
+			ResultSet result=service.getUserByEmail(email);
+			
+			int userId=0;
+			ResultSet registations=service.getRegistrationsByUser(userId);
+			request.setAttribute("registrations", registations);
+			RequestDispatcher rd=request.getRequestDispatcher("/WEB-INF/views/list_registrations.jsp");
+			rd.forward(request, response);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
+	}
+}
+
+✅Purpose:
+➤ Uses session email to identify user.
+➤ Fetches all registrations belonging to that user.
+➤ Forwards the data to the JSP to be displayed.
+
+
+✅ menu.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Menu Card</title>
+</head>
+<body>
+<a href="registrationController">Create registration</a>
+	<a href="readRegistration">List registration</a>
+</body>
+</html>
+
+Purpose:
+➤ Provides navigation links to:
+➤ Add registration
+➤ List user-specific registrations➤ 
+➤ Used as a common include file in other JSPs.
+
+✅ list_registrations.jsp
+Purpose:
+Displays registrations returned from the servlet using a ResultSet.
+
+✅Code Implementation
+<%@page import="java.sql.ResultSet"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<table>
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Course</th>
+			<th>Email</th>
+			<th>Mobile</th>
+		</tr>
+
+		<%
+		ResultSet result = (ResultSet) request.getAttribute("registrations");
+		while (result.next()) {
+		%>
+		<tr>
+			<td><%=result.getInt(1)%></td>
+			<td><%=result.getString(2)%></td>
+			<td><%=result.getString(3)%></td>
+			<td><%=result.getString(4)%></td>
+			<td><%=result.getString(5)%></td>
+		</tr>
+
+		<%
+		}
+		%>
+	</table>
+
+</body>
+</html>
+
+Result:
+Dynamically renders all the user's registrations in a table.
+
+✅ You should start/run the application from index.jsp.
+Because:
+➤ index.jsp contains the login form.
+➤ On form submission, the login request goes to LoginController.java.
+
+If login is successful:
+➤ LoginController sets the session and redirects to menu.jsp (or directly to registration.jsp depending on your setup).
+
+############################
+Project - ems - Iteration 5
+############################
+✅ EMS Project - Iteration 5 (Employee Management System)
