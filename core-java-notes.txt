@@ -327,15 +327,15 @@ Garbage Collection is a process by which the Java Virtual Machine (JVM) automati
 Java developers don’t manually free memory (unlike in C/C++). Instead, the Garbage Collector (GC) handles it.
 
 🧩 Key Goals of GC:
-➤Reclaim memory used by unreachable objects
-➤Prevent memory leaks
-➤Keep the heap memory clean and efficient
+➤ Reclaim memory used by unreachable objects
+➤ Prevent memory leaks
+➤ Keep the heap memory clean and efficient
 
 🔄 When Does GC Run?
-➤GC runs automatically in the background.
-➤It is non-deterministic — you can't predict exactly when it will run.
-➤You can suggest GC using System.gc(), but the JVM may ignore it.
-➤Only Heap memory is subject to GC.
+➤ GC runs automatically in the background.
+➤ It is non-deterministic — you can't predict exactly when it will run.
+➤ You can suggest GC using System.gc(), but the JVM may ignore it.
+➤ Only Heap memory is subject to GC.
 
 🔍 Object Lifecycle in Java
 1. The object is created using new
@@ -370,10 +370,9 @@ Return without value vs Return value in Java
 The difference between return and return value lies in what you're returning and why.
 
 return without value keyword:
------------------------------
-➤A method has to be void
-➤It is optional
-➤It will return control to the method calling statement
+➤ A method has to be void
+➤ It is optional
+➤ It will return control to the method calling statement
 
 Note: If we write code after the return keyword, then that code will 100% not run. This error is called an unreachable code error
 
@@ -393,9 +392,9 @@ Output: unreachable code error
 
 Returning "value"
 -----------------
-➤The method has to be non-void.
-➤It is mandatory to use a return "value" statement inside a non-void method
-➤It will return control and value to the method calling statement
+➤ The method has to be non-void.
+➤ It is mandatory to use a return "value" statement inside a non-void method
+➤ It will return control and value to the method calling statement
 
 public class C {
 	public static void main(String[] args) {}
@@ -408,9 +407,9 @@ public class C {
 
 Method Arguments
 ##################
-➤Using method arguments, we supply values to the method when we call it
-➤The method argument is a local variable
-➤Arguments inside the method values that you supply to the method should match
+➤ Using method arguments, we supply values to the method when we call it
+➤ The method argument is a local variable
+➤ Arguments inside the method values that you supply to the method should match
 
 Example:
 public class C {
@@ -471,7 +470,7 @@ public class C {
 	public static void test1() {
 		System.out.println(599);
 	}
-  public static int test2() {
+ 	public static int test2() {
 		return 100;
 	}
 }  
@@ -481,11 +480,9 @@ Java Data Types
 Java data types are divided into 2 main categories:
 
 🔹 1. Primitive Data Types (8 types)
--------------------------------------
 Built-in, fixed-size types that store actual values directly.
 
 🔸 Integer Types (for whole numbers)
---------------------------------------
 Type	       Size     	Default Value	      Range
 byte	       1 byte	            0	              -128 to 127
 short	       2 bytes	   	    0	              -32,768 to 32,767
@@ -493,7 +490,6 @@ int	       4 bytes	            0	              -2,147,483,648 to 2,147,483,647
 long           8 bytes	            0	              -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
 
 🔸 Floating Point Types (for decimals)
-----------------------------------------
 Type	    Size	      Default Value	        Range
 float	    4 bytes	      0.0f	              ±3.40282347E+38F (single-precision)
 double	    8 bytes	      0.0d	              ±1.79769313486231570E+308 (double-precision)
