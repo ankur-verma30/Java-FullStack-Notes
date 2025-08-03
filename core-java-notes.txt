@@ -1,6 +1,6 @@
 🧠 What is OOP in Java?
 Object-Oriented Programming (OOP) is a programming paradigm that organizes code using objects, which are instances of classes.
-Java is a pure object-oriented language (except for primitive types) and is built entirely around the concept.
+Java is a pure object-oriented language (except for primitive types). To overcome the lack of object orientation in primitives, Java provides Wrapper Classes.
 Properties (State) – Data/attributes
 Methods (Behavior) – Functions/actions
 
@@ -11,36 +11,33 @@ Methods (Behavior) – Functions/actions
 ➤Scalability and maintainability
 
 What is a class?
--> A class in Java is a blueprint or template for creating objects.
--> It defines the data (fields/attributes) and the behavior (methods/functions) that the objects created from the class will have.
--> Class helps us to create objects in Java.
+➤ A class in Java is a blueprint or template for creating objects.
+➤ It defines the data (fields/attributes) and the behavior (methods/functions) that the objects created from the class will have.
+➤ Class helps us to create objects in Java.
 
 Class Naming Convention
 #######################
--> In Java, we use the class keyword to create a class, and the class keyword should be in lowercase. The class name should start with an uppercase letter only.
--> If more than one word is used, then we should use camel casing.
+➤ In Java, we use the class keyword to create a class, and the class keyword should be in lowercase. The class name should start with an uppercase letter only.
+➤ If more than one word is used, then we should use camel casing.
 
-Note: Class names cannot start with a number, but they can begin with $ or an underscore (_), although this is not recommended.
+Note: Class names cannot start with a number, but they can begin with a dollar sign ($) or an underscore (_), although this is not recommended.
 
 Example :
 class A {}
--> We define the boundary of a class using curly brackets.
+➤ We define the boundary of a class using curly brackets.
   
 Example :
--> Will execute without any error
+➤ Will execute without any error
 public class Bank_Account_Number {}// Snake Casing-->Should not use for Java
 
 Note:
 1. Do not use specials characters like #,@ % & etc while creating class.
-2. $Class name will execute. However, never create a class with a special character ($).
+2. $Class name will execute. However, never create a class with a special character.
 
 Breakdown of PSVM
 ###################
 public static void main(String[] args)
-It’s the starting point of any Java program, and each keyword has a specific purpose. Here's the full form and meaning of each part:
-
-✅ Detailed Breakdown:
-
+It’s the starting point of any Java program, and each keyword has a specific purpose.
 1️⃣ public
 ➤It's an access modifier.
 ➤Makes the main method accessible by the JVM from outside the class.
@@ -64,7 +61,47 @@ Represents command-line arguments.
 It is an array of Strings, which means you can pass values when running the program:
 
 java MyProgram Hello World
-Then args[0] = "Hello", args[1] = "World"
+Then args[0] = "Hello", args[1] = "World"  
+
+🔷 Why Use Command-Line Arguments? (Use Cases)
+➤ Dynamic input without Scanner or BufferedReader
+➤ Script automation (e.g., batch processing, config values)
+➤ File input/output paths
+➤ Running test cases with different inputs
+➤ Avoid hardcoding data into programs
+
+🔷 Real-Time Use Case: Calculator Program
+
+✅ Example: Add two numbers using command-line arguments
+public class CommandLineCalculator {
+    public static void main(String[] args) {
+        if(args.length < 2) {
+            System.out.println("Please provide two numbers.");
+            return;
+        }
+
+        // Convert strings to integers
+        int num1 = Integer.parseInt(args[0]);
+        int num2 = Integer.parseInt(args[1]);
+
+        int sum = num1 + num2;
+        System.out.println("Sum = " + sum);
+    }
+}
+
+🔷 How to Run This Program?
+Step 1: Compile
+javac CommandLineCalculator.java
+
+Step 2: Run with arguments
+java CommandLineCalculator 10 20
+
+Output:
+Sum = 30
+
+🔷 Interview Trap ❗
+Q: Can we pass primitive values as command-line arguments?
+A: No, command-line arguments are always String types. You need to manually parse them using Integer.parseInt(), Double.parseDouble(), etc.
 
 🔁 JVM Looks for This Exact Signature:
 public static void main(String[] args)
@@ -73,26 +110,23 @@ public static void main(String[] args)
 new keyword:
 ##############
 The new keyword in Java is used to create objects (instances) of a class. 
--> Using the new keyword, we send a request to the class to create an object
+➤ Using the new keyword, we send a request to the class to create an object
 Once the object is created, the new keyword will retrieve the object's address and store it in a reference variable.
 
 Syntax to create an object:
--------------------------
 ClassName variableName = new ClassName();
 
-Note:
 Two types of camel casing:
-a. Upper Case Camel Casing: Used for naming class, interface, abstract class, etc
-b. Lower Case Camel Casing: Used for creating methods, variables, etc
-_______________________________________________________________________ 
+➤ UpperCase Camel Casing: Used for naming class, interface, abstract class, etc
+➤ lowerCase Camel Casing: Used for creating methods, variables, etc
 
 Non-static Variable/ Instance Variable /Object Variables
 #########################################################
 It is a variable declared inside a class, but outside any method, and without the static keyword.
 📌 It belongs to:
-An instance of the class (not the class itself)
-Every object has its copy
-Without creating an object, we cannot access non-static variables.
+➤ An instance of the class (not the class itself)
+➤ Every object has its copy
+➤ Without creating an object, we cannot access non-static variables.
 
 Example :
 public class A {
@@ -109,22 +143,20 @@ public class A {
     		System.out.println(a2.z); // Output :0 //default value of int is 0
 	}
 }
-3. Every time we create an object non-static variable copy is loaded into that object.
-4. A copy of the variable in this object is different. That is, if you change the value of a variable in one object, those changes cannot be seen in another object.
-5. It is not mandatory to initialize a non-static variable. Depending on the data type, the default value will be automatically stored in it.
+➤ Every time we create an object non-static variable copy is loaded into that object.
+➤ A copy of the variable in this object is different. That is, if you change the value of a variable in one object, those changes cannot be seen in another object.
+➤ It is not mandatory to initialize a non-static variable. Depending on the data type, the default value will be automatically stored in it.
 
 Static variables:
 #################
-->A static variable is a class-level variable, meaning:
-->It belongs to the class, not the object.
-->It is shared among all instances of the class.
-->Only one copy exists in memory, regardless of how many objects are created.
+A static variable is a class-level variable, meaning:
+➤ It belongs to the class, not the object.
+➤ It is shared among all instances of the class.
+➤ Only one copy exists in memory, regardless of how many objects are created.
 
 1. We should create static variables inside a class but outside a method with the static keyword
 2. To access a static variable, we will use the following options:
-a. ClassName.variableName
-
-Example
+a. 🔧ClassName.variableName
 public class Main {
     static int x = 10;
     public static void main(String[] args) {
@@ -133,15 +165,13 @@ public class Main {
 }
 
 b. Accessing via variableName directly (With Constraints)
-Example
 class A {
     static int x = 10;
     void show() {
-        System.out.println(x); // ✅ Works inside the same class
+        System.out.println(x); 
     }
 }
-✅ Explanation:
-➤You can directly use x without the class name only when:
+You can directly use x without the class name only when:
 ➤You're inside the same class where the static variable is declared.
 ➤OR the static variable is imported statically (in some special cases).
 
@@ -152,8 +182,6 @@ This is allowed because the compiler understands the scope.
 ➤You use import static (less common).
 
 📌 Example Without import static:
-Example:
-
 public class MyClass {
     public static int count = 42;
 }
@@ -165,8 +193,6 @@ public class Test {
 }
 
 📌 Example with import static:
-Example:
-
 import static java.lang.Math.*;
 
 public class Demo {
@@ -181,19 +207,15 @@ Outside the class, you need to use either:
 ➤object.x (works but discouraged).
 
 c. objectAddress.variableName (Wrong Approach, but will work)
-✅ Explanation:
 ➤This works because the object refers to the class, and the static variable belongs to the class.
 ➤When you do a1.x, Java still resolves it as A.x internally.
 ➤But it's misleading because it looks like x is instance-specific when it's shared across all instances.
 
 🔁 Bonus Tip:
-You can even do:
-
 A a1 = null;
 System.out.println(a1.x); // Still works!
 
-Example:
----------------
+✅Example:
 public class A {
 	static int x=10 ;
 	public static void main(String[] args) {
@@ -210,15 +232,12 @@ public class A {
 
 Types of variables in Java
 ############################
-
 1. Local Variable
-######################
-a. Local variables should be created inside methods
-b. We should use local variables within the created method only
-c. Without initialization, if you are using a local variable, you will get an error.
+➤ Local variables should be created inside methods
+➤ We should use local variables within the created method only
+➤ Without initialization, if you are using a local variable, you will get an error.
   
-Example 1:
----------
+✅Example:
 public class A {
 	static int y=10;
 	public static void main(String[] args) {
@@ -233,12 +252,11 @@ public class A {
         int z=100;
 	System.out.println(x);//Error because it is not present in this method
         System.out.println(z); //Correct
-        System.out.println(A.y);
+        System.out.println(A.y);//Correct because y is a static variable
 	}
 }
 
 ✅ Interview question based on Local Variable
-
 public class Test {
     public static void main(String[] args) {
         int x = 100;
@@ -266,12 +284,9 @@ A reference variable in Java is a variable that stores the memory address (refer
 a. Can hold either an Object address or a null value.
 b. The datatype of the reference variable is the class. 
 
-Example :
-----------
-In the below example, "a1" is created inside main, and hence it is a local variable. We cannot access that outside the main method
-
-Note: If we do not initialize a static reference variable, then by default null value will be stored in it.
-  
+In the example below, "a1" is created inside main, hence it is a local variable. We cannot access that outside the main method
+If we do not initialize a static reference variable, then by default null value will be stored in it.
+✅Example : 
 public class A {
 	static A a4;  //null
 	public static void main(String[] args) {
@@ -286,15 +301,14 @@ public class A {
 }
 
 🧱 Stack Memory – LIFO (Last In First Out)
-###########################################
 Stores:
-➤Method calls,
-➤local variables,
-➤reference variables (not actual objects).
+➤ Method calls,
+➤ local variables,
+➤ reference variables (not actual objects).
 
-➤Memory is automatically managed (pushed and popped as methods are called or returned).
-➤Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
-➤Faster but limited in size.
+➤ Memory is automatically managed (pushed and popped as methods are called or returned).
+➤ Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
+➤ Faster but limited in size.
 
 🧠 Example:
 When a method is called, its variables go on the stack. When it returns, they’re removed.
