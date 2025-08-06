@@ -158,4 +158,5 @@ int count = 0;
 for (int i = 0; i < x1.length(); i++) {
     if (x1.charAt(i) == 'a') count++;
 }
+
 System.out.println(count); // 4
