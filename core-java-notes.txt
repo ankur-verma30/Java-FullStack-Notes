@@ -1,0 +1,5418 @@
+🧠 What is OOP in Java?
+Object-Oriented Programming (OOP) is a programming paradigm that organizes code using objects, which are instances of classes.
+Java is a pure object-oriented language (except for primitive types). To overcome the lack of object orientation in primitives, Java provides Wrapper Classes.
+Properties (State) – Data/attributes
+Methods (Behavior) – Functions/actions
+
+🎯 Key Goals of OOPs:
+➤Code reusability
+➤Modularity
+➤Data hiding and security
+➤Scalability and maintainability
+
+What is a class?
+➤ A class in Java is a blueprint or template for creating objects.
+➤ It defines the data (fields/attributes) and the behavior (methods/functions) that the objects created from the class will have.
+➤ Class helps us to create objects in Java.
+
+Class Naming Convention
+#######################
+➤ In Java, we use the class keyword to create a class, and the class keyword should be in lowercase. The class name should start with an uppercase letter only.
+➤ If more than one word is used, then we should use camel casing.
+
+Note: Class names cannot start with a number, but they can begin with a dollar sign ($) or an underscore (_), although this is not recommended.
+
+Example :
+class A {}
+➤ We define the boundary of a class using curly brackets.
+  
+Example :
+➤ Will execute without any error
+public class Bank_Account_Number {}// Snake Casing-->Should not use for Java
+
+Note:
+1. Do not use specials characters like #,@ % & etc while creating class.
+2. $Class name will execute. However, never create a class with a special character.
+
+Breakdown of PSVM
+###################
+public static void main(String[] args)
+It’s the starting point of any Java program, and each keyword has a specific purpose.
+1️⃣ public
+➤It's an access modifier.
+➤Makes the main method accessible by the JVM from outside the class.
+➤If you make it private, JVM won’t be able to access it, and the program won’t run.
+
+2️⃣ static
+➤Means it belongs to the class, not the object.
+➤JVM doesn’t create an object of the class to call main() — it just calls it via the class name directly.
+➤That’s why it must be static.
+
+3️⃣ void
+➤Specifies that the method does not return any value.
+➤You can’t return anything from main() in standard Java execution.
+
+4️⃣ main
+➤This is the method name.
+➤JVM looks specifically for a method with this name as the entry point to start program execution.
+
+5️⃣ String[] args
+Represents command-line arguments.
+It is an array of Strings, which means you can pass values when running the program:
+
+java MyProgram Hello World
+Then args[0] = "Hello", args[1] = "World"  
+
+🔷 Why Use Command-Line Arguments? (Use Cases)
+➤ Dynamic input without Scanner or BufferedReader
+➤ Script automation (e.g., batch processing, config values)
+➤ File input/output paths
+➤ Running test cases with different inputs
+➤ Avoid hardcoding data into programs
+
+🔷 Real-Time Use Case: Calculator Program
+
+✅ Example: Add two numbers using command-line arguments
+public class CommandLineCalculator {
+    public static void main(String[] args) {
+        if(args.length < 2) {
+            System.out.println("Please provide two numbers.");
+            return;
+        }
+
+        // Convert strings to integers
+        int num1 = Integer.parseInt(args[0]);
+        int num2 = Integer.parseInt(args[1]);
+
+        int sum = num1 + num2;
+        System.out.println("Sum = " + sum);
+    }
+}
+
+🔷 How to Run This Program?
+Step 1: Compile
+javac CommandLineCalculator.java
+
+Step 2: Run with arguments
+java CommandLineCalculator 10 20
+
+Output:
+Sum = 30
+
+🔷 Interview Trap ❗
+Q: Can we pass primitive values as command-line arguments?
+A: No, command-line arguments are always String types. You need to manually parse them using Integer.parseInt(), Double.parseDouble(), etc.
+
+🔁 JVM Looks for This Exact Signature:
+public static void main(String[] args)
+⚠️ If the signature is different (e.g., not public, not static, or missing parameters), the program will compile but not run, and you’ll get a "Main method not found" error.
+
+new keyword:
+##############
+The new keyword in Java is used to create objects (instances) of a class. 
+➤ Using the new keyword, we send a request to the class to create an object
+Once the object is created, the new keyword will retrieve the object's address and store it in a reference variable.
+
+Syntax to create an object:
+ClassName variableName = new ClassName();
+
+Two types of camel casing:
+➤ UpperCase Camel Casing: Used for naming class, interface, abstract class, etc
+➤ lowerCase Camel Casing: Used for creating methods, variables, etc
+
+Non-static Variable/ Instance Variable /Object Variables
+#########################################################
+It is a variable declared inside a class, but outside any method, and without the static keyword.
+📌 It belongs to:
+➤ An instance of the class (not the class itself)
+➤ Every object has its copy
+➤ Without creating an object, we cannot access non-static variables.
+
+Example :
+public class A {
+	int x = 10;
+	int y = 20;
+ 	int z;
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(a1.x); // Output :10
+		System.out.println(a1.y); // Output :20
+
+    		A a2 = new A();
+		System.out.println(a2.x); // Output :10
+    		System.out.println(a2.z); // Output :0 //default value of int is 0
+	}
+}
+➤ Every time we create an object non-static variable copy is loaded into that object.
+➤ A copy of the variable in this object is different. That is, if you change the value of a variable in one object, those changes cannot be seen in another object.
+➤ It is not mandatory to initialize a non-static variable. Depending on the data type, the default value will be automatically stored in it.
+
+Static variables:
+#################
+A static variable is a class-level variable, meaning:
+➤ It belongs to the class, not the object.
+➤ It is shared among all instances of the class.
+➤ Only one copy exists in memory, regardless of how many objects are created.
+
+1. We should create static variables inside a class but outside a method with the static keyword
+2. To access a static variable, we will use the following options:
+a. 🔧ClassName.variableName
+public class Main {
+    static int x = 10;
+    public static void main(String[] args) {
+        System.out.println(Main.x);  // ✅ Recommended Output: 10
+    }
+}
+
+b. Accessing via variableName directly (With Constraints)
+class A {
+    static int x = 10;
+    void show() {
+        System.out.println(x); 
+    }
+}
+You can directly use x without the class name only when:
+➤You're inside the same class where the static variable is declared.
+➤OR the static variable is imported statically (in some special cases).
+
+This is allowed because the compiler understands the scope.
+
+❗ Constraints:
+➤This only works within the same class unless,
+➤You use import static (less common).
+
+📌 Example Without import static:
+public class MyClass {
+    public static int count = 42;
+}
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(MyClass.count); // 👈 Must use class name
+    }
+}
+
+📌 Example with import static:
+import static java.lang.Math.*;
+
+public class Demo {
+    public static void main(String[] args) {
+        System.out.println(sqrt(16)); // instead of Math.sqrt(16)
+        System.out.println(PI);       // instead of Math.PI
+    }
+}
+
+Outside the class, you need to use either:
+➤ClassName.x (best), or
+➤object.x (works but discouraged).
+
+c. objectAddress.variableName (Wrong Approach, but will work)
+➤This works because the object refers to the class, and the static variable belongs to the class.
+➤When you do a1.x, Java still resolves it as A.x internally.
+➤But it's misleading because it looks like x is instance-specific when it's shared across all instances.
+
+🔁 Bonus Tip:
+A a1 = null;
+System.out.println(a1.x); // Still works!
+
+✅Example:
+public class A {
+	static int x=10 ;
+	public static void main(String[] args) {
+		System.out.println(A.x);// Output :10
+		System.out.println(x);// Output :10
+    
+		//Wrong
+		A a1 = new A();
+		System.out.println(a1.x);//A.x, but will give the Output:10
+                A.x = 30;
+		System.out.println(A.x); //Ouput :30 
+  }
+}
+
+Types of variables in Java
+############################
+1. Local Variable
+➤ Local variables should be created inside methods
+➤ We should use local variables within the created method only
+➤ Without initialization, if you are using a local variable, you will get an error.
+  
+✅Example:
+public class A {
+	static int y=10;
+	public static void main(String[] args) {
+		int x = 100;
+		System.out.println(x);
+    		System.out.println(A.y);// Output :10
+		A a1 = new A();
+         	a1.test();
+    		System.out.println(y);//Output: 10
+	}
+	public void test() {
+        int z=100;
+	System.out.println(x);//Error because it is not present in this method
+        System.out.println(z); //Correct
+        System.out.println(A.y);//Correct because y is a static variable
+	}
+}
+
+✅ Interview question based on Local Variable
+public class Test {
+    public static void main(String[] args) {
+        int x = 100;
+        {
+            int x = 200;
+            System.out.println(x);
+        }
+    }
+}
+
+➤The code will give a compile-time error, but not because of creating a new scope — that is allowed in Java.
+The actual issue is:
+➤You are declaring two local variables with the same name, x, in overlapping scopes.
+➤Even though you're trying to redeclare int x = 200; in an inner block, Java does not allow hiding a local variable in an inner block with the same name.
+
+Also:
+Each method has its stack frame, and local variables are stored there, so naming conflicts like this are not allowed even in nested blocks.
+
+2. Static variable
+3. Non-static variable/instance variable
+
+4. Reference Variable
+#####################
+A reference variable in Java is a variable that stores the memory address (reference) of an object, not the actual object itself.
+a. Can hold either an Object address or a null value.
+b. The datatype of the reference variable is the class. 
+
+In the example below, "a1" is created inside main, hence it is a local variable. We cannot access that outside the main method
+If we do not initialize a static reference variable, then by default null value will be stored in it.
+✅Example : 
+public class A {
+	static A a4;  //null
+	public static void main(String[] args) {
+		A a1 = null;
+		A a2 = new A();
+    		A a3; // Reference Local Variable
+    		System.out.println(a3);// Error because "a3" is local variable and not initialized   
+	}
+  	public void test() {
+		System.out.println(a1);//Error
+	}
+}
+
+🧱 Stack Memory – LIFO (Last In First Out)
+Stores:
+➤ Method calls,
+➤ local variables,
+➤ reference variables (not actual objects).
+
+➤ Memory is automatically managed (pushed and popped as methods are called or returned).
+➤ Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
+➤ Faster but limited in size.
+
+🧠 Example:
+When a method is called, its variables go on the stack. When it returns, they’re removed.
+
+🗃️ Heap Memory
+################
+➤Used to store objects/instance variables.
+➤Every time you do new ClassName(), it creates an object in the heap.
+➤Objects stay in memory until they're no longer referenced.
+
+📍 Note: All reference variables (in the stack) point to objects in the heap.
+
+🧠 What is Garbage Collection in Java?
+Garbage Collection is a process by which the Java Virtual Machine (JVM) automatically removes unused objects (objects that are no longer reachable) from memory to free up space and avoid memory leaks.
+
+Java developers don’t manually free memory (unlike in C/C++). Instead, the Garbage Collector (GC) handles it.
+
+🧩 Key Goals of GC:
+➤ Reclaim memory used by unreachable objects
+➤ Prevent memory leaks
+➤ Keep the heap memory clean and efficient
+
+🔄 When Does GC Run?
+➤ GC runs automatically in the background.
+➤ It is non-deterministic — you can't predict exactly when it will run.
+➤ You can suggest GC using System.gc(), but the JVM may ignore it.
+➤ Only Heap memory is subject to GC.
+
+🔍 Object Lifecycle in Java
+1. The object is created using new
+2. The reference variable holds the object
+3. Once the reference is lost or goes out of scope, the object becomes unreachable
+4. JVM marks it as garbage
+5. GC reclaims that memory
+
+Methods in Java
+###############
+1. void keyword: A void method cannot return any value
+
+Example :
+----------
+public class C {
+	public static void main(String[] args) {
+		C c1 = new C();
+		int x = c1.test1(); //Error
+    		int y= c1.test2();
+		System.out.println(y);// Output :100
+	}
+	public void test1() {
+		return 100;//Error
+ 	 }
+	public int test2() {
+		return 100;
+  	}
+}
+
+Return without value vs Return value in Java
+#############################################
+The difference between return and return value lies in what you're returning and why.
+
+return without value keyword:
+➤ A method has to be void
+➤ It is optional
+➤ It will return control to the method calling statement
+
+Note: If we write code after the return keyword, then that code will 100% not run. This error is called an unreachable code error
+
+Example:
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+	  c1.test();
+	}	
+	public void test() {
+	      System.out.println(100);
+	      return;
+	      System.out.println(200);
+	}
+}
+Output: unreachable code error
+
+Returning "value"
+-----------------
+➤ The method has to be non-void.
+➤ It is mandatory to use a return "value" statement inside a non-void method
+➤ It will return control and value to the method calling statement
+
+public class C {
+	public static void main(String[] args) {}
+	public int test1() {}// Error
+  	public int test2() {
+		return 100; 
+		System.out.println(300);// Unreachable code error
+	}
+}
+
+Method Arguments
+##################
+➤ Using method arguments, we supply values to the method when we call it
+➤ The method argument is a local variable
+➤ Arguments inside the method values that you supply to the method should match
+
+Example:
+public class C {
+	public static void main(String[] args) {
+	 C c1 = new C();
+    	 C c2 = new C();
+	 c1.test1(100);
+    	 c2.test2(100,"mike");
+	}
+	public void test1(int x) {
+	  System.out.println(x);
+	}
+  public void test2(int x,String y) {
+	  System.out.println(x);
+	}
+}
+
+Note: When the method argument type is Object, then we can supply any value to it.
+
+Example
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+	  c1.test('a');
+	}
+	public void test(Object x) {
+	   System.out.println(x);
+	}
+}
+
+Using Varargs (Variable Arguments)
+##################################
+
+Example:
+public class C {
+	public static void main(String[] args) {
+	  C c1 = new C();
+	  c1.test("mike",100,200,300);
+	}
+	public void test(String y,int... x) { 
+		System.out.println(x[0]);// Output :100
+		System.out.println(x[1]);// Output :200
+		System.out.println(x[2]);// Output :300
+		System.out.println(y);// Output :mike
+	}
+}
+
+Static Methods in Java
+######################
+A static method belongs to the class, not to instances (objects) of the class.
+This means you can call a static method without creating an object of that class.
+public class C {
+	public static void main(String[] args) {
+	    C.test1();// Output :599
+    	    int x =  C.test2();
+	    System.out.println(x);// Output :100  
+	}
+	public static void test1() {
+		System.out.println(599);
+	}
+ 	public static int test2() {
+		return 100;
+	}
+}  
+
+Java Data Types 
+################
+Java data types are divided into 2 main categories:
+
+🔹 1. Primitive Data Types (8 types)
+Built-in, fixed-size types that store actual values directly.
+
+🔸 Integer Types (for whole numbers)
+Type	       Size     	Default Value	      Range
+byte	       1 byte	            0	              -128 to 127
+short	       2 bytes	   	    0	              -32,768 to 32,767
+int	       4 bytes	            0	              -2,147,483,648 to 2,147,483,647
+long           8 bytes	            0	              -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+
+🔸 Floating Point Types (for decimals)
+Type	    Size	      Default Value	        Range
+float	    4 bytes	      0.0f	              ±3.40282347E+38F (single-precision)
+double	    8 bytes	      0.0d	              ±1.79769313486231570E+308 (double-precision)
+
+Find the size of the datatype
+#########################
+Example:
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Size of int in bytes: " + Integer.BYTES);//4 INTEGER is a wrapper class of int (discussed later)
+        System.out.println("Size of int in bits: " + Integer.SIZE);//32
+    }
+}
+
+🔸 Other Primitive Types
+-----------------------------
+Type	    Size	            Default Value	          Description
+boolean	    (JVM dependent)	    false                   Only true or false
+char	    2 bytes	            ' ' (blank)	            0 to 65,535 (Unicode characters)
+
+🔹 2. Non-Primitive / Reference Data Types
+---------------------------------------------
+Type	               Description	                        Default Value
+String	        A class (sequence of characters)	          null
+Array	        Object that holds multiple values	          null
+Custom Classes	User-defined types	                          null
+
+📌 Notes:
+String is not a primitive type, but a class in java.lang package.
+All reference types default to null.
+➤Use long literals with L or l: long x = 123456789L;
+➤Use float literals with F or f: float y = 3.14F;
+
+A new type was introduced in Java version 10
+---------------------------------------------
+var type
+#########
+➤This was introduced in Java version 10
+➤It is a dynamic datatype concept. Depending on the value stored inside the variable, the datatype is allocated to it internally.
+
+Example:
+public class C {
+	public static void main(String[] args) {
+		var x1 =100;
+		var x2 =100.3;
+		var x3 ="mike";
+		var x4 =new C();
+		System.out.println(x1);
+		System.out.println(x2);
+		System.out.println(x3);
+		System.out.println(x4);
+	}
+  public var test(var x3) {}//Error
+}
+
+Properties and Constraints on the var keyword
+--------------------------------------------
+➤The var type can only be a local variable
+➤It cannot be a static / non-static variable
+➤It cannot be a method argument
+➤It cannot be a method return type
+
+✅ Wrapper Classes
+###################
+➤ Java is object-oriented, but primitive types (int, float, char, etc.) are not objects.
+➤ To treat them as objects, Java provides Wrapper Classes in the java.lang package.
+➤ A wrapper class wraps (encloses) a primitive type inside an object.
+
+🔹 List of Primitive Types and Their Wrapper Classes:
+| Primitive Type | Wrapper Class |
+| -------------- | ------------- |
+| byte           | Byte          |
+| short          | Short         |
+| int            | Integer       |
+| long           | Long          |
+| float          | Float         |
+| double         | Double        |
+| char           | Character     |
+| boolean        | Boolean       |
+
+🔹 Why Do We Need Wrapper Classes?
+➤ To store primitives in collections like ArrayList, which accept only objects.
+➤ For object manipulation (e.g., in multithreading, generics, reflection).
+➤ Useful in parsing strings into numeric values.
+➤ Enable the use of utility methods like Integer.parseInt(), Double.compare(), etc.
+
+❓ Are wrapper classes immutable?
+✅ Yes, all wrapper classes are immutable.
+
+🔹 Key Concepts
+1. Boxing (Manual Conversion)
+Converting primitive → object
+int a = 10;
+Integer i = new Integer(a); // Boxing
+
+2. Unboxing (Manual Conversion)
+Converting object → primitive
+Integer i = new Integer(10);
+int a = i.intValue(); // Unboxing
+
+3. Autoboxing
+The compiler automatically converts a primitive → wrapper object
+int x = 5;
+Integer obj = x;  // Autoboxing
+
+4. Auto-unboxing
+The compiler automatically converts wrapper → primitive
+Integer y = 100;
+int value = y;  // Auto-unboxing
+
+🔹 Commonly Used Wrapper Class Methods
+Integer.parseInt(String) → Converts string to int
+Double.parseDouble(String) → Converts string to double
+Character.isDigit(char) → Checks if the char is a digit
+Boolean.valueOf(String) → Converts string to Boolean object
+
+✅ Code Examples
+public class WrapperExample1 {
+    public static void main(String[] args) {
+        int a = 100;
+        Integer obj = new Integer(a); // Boxing
+        int b = obj.intValue();       // Unboxing
+        System.out.println("Boxed: " + obj + ", Unboxed: " + b);
+	Integer num = 50;     // Autoboxing
+        int val = num + 20;   // Auto-unboxing
+        System.out.println("Value: " + val);
+    }
+}
+
+🔸 Conceptual Trick Questions
+
+❓ What will happen here?
+Integer a = 128;
+Integer b = 128;
+System.out.println(a == b); ❌ Output: false compare refrences
+System.out.println(a.equals(b)); // true ✅ compare actual values.
+
+➤ Because integers from -128 to 127 are cached in Java
+➤ For values beyond that, new objects are created
+
+🔸 Deep Understanding
+❓ Difference between parseInt() and valueOf()?
+ parseInt() returns a primitive int
+ valueOf() returns an Integer object
+
+❓ Can you override methods in wrapper classes?
+❌ No, they are final classes
+
+❓ What is the default value of Integer vs int?
+ int → 0, Integer → null
+
+✅ Real-Time Application Use Case
+➤ Storing grades (int) in a List<Integer>
+➤ Reading user input from a file: converting String to int using Integer.parseInt()
+➤ Config settings: Boolean.valueOf("true")
+
+Constructors in Java
+####################
+Constructors are special methods used to initialize objects when they are created.
+
+🔹 Basic Rules:
+The constructor name must match the class name
+Constructors do not have a return type, not even void
+If you write void before a constructor, it becomes a method, not a constructor
+
+Example 1:
+----------
+public class C {
+	C(){
+		System.out.println(100);//will execute successfully Output :100
+		return 100;//Error
+	}
+	public static void main(String[] args) {
+		C c1 = new C();
+	}	
+}
+
+Note :
+➤Method, Variable name can be the same as the class name
+
+🔁 Constructor Overloading in Java
+####################################
+Constructor Overloading means having more than one constructor in the same class, but with different parameter lists.
+
+✅ Why Use Constructor Overloading?
+To create objects with different levels of information or default values, depending on what’s available.
+
+Example:
+--------
+public class A {
+	A(){//NoofArgs=0
+		System.out.println("A");
+	}
+	A(int x){//NoofArgs=1
+		System.out.println(x);
+	}
+	A(int x,int y){//NoofArgs=2
+		System.out.println(x);
+		System.out.println(y);
+	}
+	public static void main(String[] args) {
+		A a1 = new A();
+		A a2  = new A(100);
+		A a3 = new A(200,300);
+	}
+}
+
+🔷 This keyword in Java
+##########################
+This keyword in Java is a reference variable that refers to the current object — the object whose method or constructor is being executed.
+
+✅ Uses of this Keyword
+1. Differentiate Between Instance and Local Variables
+------------------------------------------------------
+When local variable names are the same as instance variables, use this to refer to the instance variable.
+
+Example:
+class Student {
+    String name;
+    Student(String name) {
+        this.name = name;  // 'this.name' is the instance variable, 'name' is the parameter
+    }
+}
+
+2. Call One Constructor from Another (Constructor Chaining)
+-----------------------------------------------------------
+Use this() to call another constructor within the same class.
+
+Example:
+class Student {
+    String name;
+    int age;
+    Student(String name) {
+        this(name, 18);  // calls the second constructor
+    }
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+3. Pass the Current Object as an Argument
+-----------------------------------------
+class Student {
+    void display() {
+        Helper.printStudent(this);  // pass current object
+    }
+}
+class Helper {
+    static void printStudent(Student s) {
+        System.out.println("Student object: " + s);
+    }
+}
+
+4. Return Current Object
+---------------------------
+Useful in method chaining.
+
+class Person {
+    private String name;
+    private int age;
+
+    Person setName(String name) {
+        this.name = name; // Set name and return current object
+        return this;
+    }
+
+    Person setAge(int age) {
+        this.age = age; // Set age and return current object
+        return this;
+    }
+
+    public static void main(String[] args) {
+        Person p1 = new Person();
+        
+        // Method chaining in action
+        p1.setName("Ankur").setAge(22).show();
+    }
+}
+
+5. Access Instance Methods and Variables
+-----------------------------------------
+You can use this to call other instance methods or access fields within the class explicitly.
+
+void print() {
+    this.show();  // same as just calling show()
+}
+
+void show() {
+    System.out.println("Hello");
+}
+➤This keyword is a special reference variable that holds the current object's address.
+
+Example:
+----------
+public class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(a1);
+		a1.test();
+	}
+	public void test() {
+		System.out.println(this);
+	}
+}
+
+➤Using this keyword, we can access non-static members of the class
+
+Example:
+--------
+public class A {
+	int x = 10;
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(a1.x);
+		a1.test();
+	}
+	public void test() {
+		System.out.println(this.x);
+	}
+}
+
+➤We cannot use this keyword inside a "static method"
+public class A {
+	int x=10;
+	public static void main(String[] args) {
+		A a1 = new A();
+		System.out.println(this);//Error
+	}
+	public static void test() {
+		System.out.println(this);// Error
+		System.out.println(this.x);// Error 
+	}
+}
+
+➤This keyword hold's current object address that is executing
+
+Example:
+--------
+public class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+		a1.test();
+		A a2 = new A();
+		a2.test();
+		a1.test();	
+	}
+	public void test() {
+		System.out.println(this);
+	}
+}
+
+this()- This syntax is used to call the constructor
+--------------------------------------------
+➤Using this() keyword, we can call a constructor
+
+Example:
+-------
+public class A {
+	A(){
+		System.out.println("A");
+	}
+	A(int x){
+		this();
+	}
+	public static void main(String[] args) {
+	   A a1 = new A(100);
+	}	
+}
+
+➤While calling a constructor using this() keyword, ensure calling is done from another constructor
+Example:
+--------
+public class A {
+	A(){
+		System.out.println("A");
+	}
+	A(int x){
+		this();
+	}
+	public static void main(String[] args) {
+	   A a1 = new A(100);
+	}
+	public void test() {
+		this();//Error, we cannot call the constructor from a method
+	}	
+}
+
+Example:
+---------
+public class A {
+	A(int x){
+		System.out.println(x);
+	}
+	A(){
+		this(100);
+	}
+	public static void main(String[] args) {
+	   A a1 = new A();
+	}	
+}
+
+➤While calling a constructor using this() keyword, ensure it is always the first statement inside another constructor
+
+Example:
+---------
+public class A {
+	A(int x){
+		System.out.println(x);
+	}
+	A(){
+		System.out.println(200);
+		this(100);//Error because it cannot be the second statement while calling the constructor	
+	}
+	public static void main(String[] args) {
+	   A a1 = new A();
+	}	
+}
+
+Example:
+---------
+public class A {
+	int x;//-->0
+	A(int x){////Step 4-->x=100
+		this.x=x;//Step 5
+		System.out.println(this.x);//Step 6===>100
+	}
+	A(){//Step 2
+		this(100);//Step 3
+	}
+	public static void main(String[] args) {
+	   A a1 = new A();//Step 1
+	}	
+}
+
+✅ Types of Constructor Chaining
+➤When we call one constructor from another constructor, it will form a chain-like flow structure. This is called constructor chaining.
+🔸 1. Within the Same Class → Use this().
+You can use this() to call another constructor in the same class.
+
+✅ Example:
+class Student {
+    String name;
+    int age;
+    Student() {
+        this("Unknown", 18);  // calls 2-arg constructor
+        System.out.println("Default constructor called");
+    }
+
+    Student(String name) {
+        this(name, 18);  // calls 2-arg constructor
+    }
+
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+        System.out.println("Parameterized constructor called");
+    }
+
+    void display() {
+        System.out.println("Name: " + name + ", Age: " + age);
+    }
+}
+▶️ Output:
+The parameterized constructor called  
+The default constructor is called 
+
+🔸 2. From Subclass to Superclass → Use super()
+You can call a constructor from the parent class using super().
+
+✅ Example:
+class Person {
+    Person() {
+        System.out.println("Person constructor");
+    }
+}
+
+class Student extends Person {
+    Student() {
+        super(); // calls Person constructor
+        System.out.println("Student constructor");
+    }
+}
+
+⚠️ Rules of Constructor Chaining
+✅ Only one constructor can be called using this() or super()	
+✅ Must be the first statement in the constructor	
+❌ Cannot mix this() and super() in the same constructor
+
+###############################
+Important Shortcuts in Eclipse
+################################
+1. Ctrl + Space:⚡ Content Assist — suggests code completions.
+2. Ctrl + 1: 💡 Quick fix — suggests solutions for errors or warnings.
+3. Ctrl + O: 🧭 Quick outline — shows methods/fields of the current class.
+4. F3: 🔄 Go to the declaration of a variable, method, or class.
+5. Ctrl + . : ➡️ Jump to the next error or warning in the file.
+
+📦 Packages in Java
+####################
+A package in Java is a namespace that organizes classes and interfaces into a structured folder system, making code modular, reusable, and easy to manage.
+
+c. Naming Convention for packages
+----------------------------------
+➤Package name cannot be a keyword like - new, static, public, etc...
+➤Do not start the package name with capital letters
+➤Package name not to be given as java
+➤When you create a class inside a package, you have to define the package keyword in your program as shown below:
+
+Example:
+package p1;
+public class A {}
+
+➤Create 2 classes in the same package and perform inheritance. Import is not required.
+Example:
+package p1;
+public class A {}
+
+package p1;
+public class B extends A {}
+
+➤Create 2 classes in different packages and perform inheritance. "Import required".
+Example:
+package p1;
+public class A {}
+
+package p2;
+import p1.A;
+public class C extends A{}
+
+Example:
+package p1;
+public class A {}
+
+package p2;
+public class C {}
+
+package p1;
+import p2.C;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+		C c1 = new C();
+	}
+}
+
+Example:
+package p1;
+public class A {}
+
+package p1;
+public class B {}
+
+package p2;
+import p1.*;
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();
+		B b1 = new B();
+	}
+}
+
+Example:
+package p1;
+public class A {}
+
+package p2;
+public class A {}
+
+package p3;
+public class B {
+	public static void main(String[] args) {
+		p1.A a1 = new p1.A();//---> p1
+		p2.A a2 = new p2.A();//---> p2
+	}
+}
+
+Object Oriented Programming -  Pillars
+########################################
+a. inheritance
+b. polymorphism
+c. encapsulation
+d. abstraction
+
+a. inheritance
+###############
+Inheritance is one of the core pillars of Object-Oriented Programming (OOP).
+It allows a class (subclass) to inherit fields and methods from another class (superclass).
+
+✅ Why Use Inheritance?
+➤Code reusability
+➤Improves maintainability
+➤Supports method overriding & polymorphism
+
+Example :
+package app_java_1;
+public class Animal {
+	public void eat() {
+		System.out.println("Eating");
+	}
+	public void sleep() {
+		System.out.println("sleeping");
+	}
+}
+
+package app_java_1;
+public class Dog extends Animal{
+	//eat(),sleep()--->Animal
+}
+
+package app_java_1;
+public class Cow extends Animal{
+	//eat(),sleep()--->Animal
+}
+
+package app_java_1;
+public class Root {
+	public static void main(String[] args) {
+		Dog d = new Dog();
+		d.eat();
+		d.sleep();
+		System.out.println("_______");
+		Cow cow = new Cow();
+		cow.eat();
+		cow.sleep();
+	}
+}
+
+ Multilevel inheritance
+#########################
+
+Example:
+package app_java_1;
+public class A {
+	public void test1() {
+		System.out.println(1);
+	}
+}
+package app_java_1;
+public class B extends A{
+	public void test2() {
+		System.out.println(2);
+	}
+}
+package app_java_1;
+public class C extends B{
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();//Output :1
+		c1.test2();//Output :2
+	}
+}
+
+What is multiple inheritance?
+Answer: When a child class has more than one parent class, it is called multiple inheritance
+
+Note: Java classes do not support multiple inheritance because of the diamond problem.
+
+ Diamond Problem in Java (Multiple Inheritance Problem)
+---------------------------------------------------------
+The Diamond Problem occurs in multiple inheritance when a class inherits from two classes that have a common superclass, leading to ambiguity about which method to inherit.
+
+Suppose we inherit a method from A->B->D,  and the Same method is inherited from A->C->D, then confusion arises from which parent class method is inherited by the child class D. This is called as DIAMOND PROBLEM. Hence, in Java, classes do not support multiple inheritance.
+
+Note: We can do multiple inheritance on an interface.
+
+Example: Multiple inheritance error
+
+package app_java_1;
+public class A {}
+
+package app_java_1;
+public class B{}
+
+package app_java_1;
+public class C extends A, B{//Error	
+}
+
+Access Specifiers in Java
+###############################
+
+| Access Context                | `public` |         `protected`          | `default` (no modifier)   | `private`  |
+| ------------------------------| :------: | :------------------------:   | :---------------------:   | :-------:  |
+| Same Class                    |     ✅   |              ✅             |            ✅            |     ✅     |
+| Same Package                  |     ✅   |              ✅             |            ✅            |     ❌     |
+| Subclass in Same Package      |     ✅   |              ✅             |            ✅            |     ❌     |
+| Non-Subclass in Same Package  |     ✅   |              ✅             |            ✅            |     ❌     |
+| Subclass in Other Package     |     ✅   | ✅ *(via inheritance only)* |            ❌            |     ❌     |
+| Non-Subclass in Other Package |     ✅   |              ❌             |            ❌            |     ❌     |
+
+a. private: When a variable/method is made private, then we can access that in the same class but not outside the class
+
+b. default: A variable/method with default access specifier can work only inside the same class or the same package, but cannot be accessed in a different package
+
+c. protected: We can access variables/methods in the same class/same package, and inside different packages only when inheritance is done
+
+d. public: When we make a variable/method public, then we can access that in the same class/the same package/different package
+
+Access Specifier on Constructors
+#######################################################
+
+Can we inherit the Constructor?
+Answer: No, constructors cannot be inherited in Java.
+Even though a subclass gets access to all public and protected members of the superclass, constructors are not part of inheritance.
+
+🔍 Why Are Constructors Not Inherited?
+✅ 1. Constructors are not members
+Constructors are not inherited because they are not class members like methods or fields.
+
+✅ 2. Constructors are class-specific
+A constructor is tightly bound to its class name.
+
+✅ 3. Subclass should define how it initializes its members
+A subclass may have new fields or different logic for initialization.
+Therefore, it requires a constructor to control its initialization.
+
+✅ 4. Java automatically provides a default constructor
+If you don't define any constructors, Java will insert a default no-arg constructor.
+But this doesn't mean the superclass constructor is inherited — it's just that Java calls the superclass constructor from the subclass constructor.
+They are special blocks used to initialize objects of a specific class.
+
+🔐 Private Constructor in Java
+A private constructor is a constructor that cannot be accessed outside its class.
+
+✅ Why Use a Private Constructor?
+❌ Prevent object creation	        for utility or helper classes
+✅ Implement Singleton Pattern		Ensure only one instance is created
+🔐 Hide object instantiation		Force object creation through factory methods
+➤If a constructor is made private, then its object cannot be created outside the class.
+
+Example :
+package p1;
+public class A {
+	private A() {}
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p1;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();//--->Error
+	}
+}
+package p2;
+import p1.A;
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();//-->Error
+	}
+}
+
+➤When a constructor is made private, then inheritance of that class is not allowed
+
+Example 2:
+----------
+package p1;
+public class A {
+	private A() {}	
+}
+
+package p1;
+public class B extends A{//-->Error	
+}
+
+package p2;
+import p1.A;
+public class C extends A{//-->Error	
+}
+
+🏗️ Default Constructor in Java
+################################
+A default constructor is a no-argument constructor that the Java compiler automatically provides if you do not define any constructors in your class.
+
+✅ Key Features:
+Feature					Description
+No parameters. 				Takes zero arguments
+Provided automatically			Only if no constructor is defined by the user
+Initializes variables,			sets fields to default values (e.g., 0, null)
+Used for object creation		Allows creation of objects without parameters
+➤If a constructor is made default, then its object can be created in the same class/same package, but not outside the package.
+
+Example 1:
+
+package p1;
+public class A {
+	A() {}
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p1;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+package p2;
+import p1.A;
+public class C{
+	public static void main(String[] args) {
+		A a1 = new A();//-->Error
+	}
+}
+
+Example 2:
+
+package p1;
+public class A {
+	A() {}
+}
+package p1;
+public class B extends A {}
+
+package p2;
+import p1.A;
+public class C extends A{//-->Error	
+}
+
+🔐 Protected Constructor in Java
+#################################
+A protected constructor means the constructor can only be accessed:
+✅ Within the same package
+✅ From subclasses (even in other packages)
+
+✅ Why Use a Protected Constructor?
+➤To restrict object creation outside the package
+➤To allow subclassing but prevent direct instantiation from unrelated classes
+➤Often used in inheritance-based designs, frameworks, or abstract factories
+
+Example 1:
+
+package p1;
+public class A {
+	protected A() {}
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+
+package p1;
+public class B  {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+
+package p2;
+import p1.A;
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();//-->Error
+	}
+}
+➤When a constructor is made protected, then inheritance of that class is  allowed in the same package / outside the package (both).
+
+Example 2:
+
+package p1;
+public class A {
+	protected A() {}
+}
+
+package p1;
+public class B extends A {}
+
+package p2;
+import p1.A;
+public class C extends A {}
+
+e. public Constructor
+
+➤If a constructor is made public, then its object can be created in the same class/same package, and outside the package also
+
+Example 1:
+
+package p1;
+public class A {
+	public A() {}
+	public static void main(String[] args) {
+		 A a1 = new A();
+	}
+}
+
+package p1;
+public class B  {
+	public static void main(String[] args) {
+		 A a1 = new A();
+	}
+}
+
+package p2;
+import p1.A;
+public class C  {
+	public static void main(String[] args) {
+		 A a1 = new A();
+	}
+}
+
+➤When a constructor is made public, then inheritance of that class is  allowed in the same package / outside the package (both)
+
+Example 2:
+
+package p1;
+public class A {
+	public A() {}
+}
+
+package p1;
+public class B extends A {}
+
+package p2;
+import p1.A;
+public class C extends A {}
+
+
+✅ Access Specifiers on Top-Level Classes:
+Access Specifier			Usage					Visibility
+public					public class ClassName {}		Visible to all classes everywhere (within the same package or other packages).
+Default (no modifier)			class ClassName {}			Visible to classes within the same package only.
+
+❌ Not allowed on top-level classes:
+private
+protected
+
+🔍 Reason: Java's Design Philosophy
+✅ 1. Top-level classes must be accessible to the JVM & compiler
+
+➤ If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
+➤ That breaks the point of having it at the top level — it becomes useless.
+
+✅ 2. Protected and private only make sense in class hierarchies
+
+➤ Protected is meaningful only within inheritance (i.e., subclass access).
+➤ Private is meaningful only within the enclosing class.
+➤ For a top-level class, there is no enclosing class, so these modifiers make no logical sense.
+
+Example 1:
+package p1;
+class A {}
+
+package p1;
+public class B extends A{} //Because A is default and inherited in B
+
+package p2;
+import p1.A;//-->Error
+public class C extends A{//-->Error	
+}
+
+Example 2:
+package p1;
+class A {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+
+package p1;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+	}
+}
+
+package p2;
+import p1.A;//--->Error because A is default and cannot be inherited in another package
+public class C {
+	public static void main(String[] args) {
+		A a1 = new A();//--->Error
+	}
+}
+
+What happens when a class is made public?
+Answer:
+➤Its object can be created in the same class/same package & inside a different package
+➤Inheritance is allowed in the same package & inside different packages
+
+Example :
+
+package p1;
+public class A {}
+
+package p1;
+public class B extends A{}
+
+package p2;
+import p1.A;
+public class C extends A{}
+
+Note:
+a. Compile Time
+➤This is the phase where source code is checked and translated into bytecode.
+➤Java source files (.java) are compiled by the Java Compiler (javac).
+➤The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
+
+[Source Code (.java file)]
+             |
+             v
+[JDK - javac Compiler]
+   (Compiles to Bytecode)
+             |
+             v
+[.class File (Bytecode)]
+             |
+             v
+[JVM Class Loader]
+   (Loads class into memory)
+             |
+             v
+[Bytecode Verifier]
+   (Validates bytecode)
+             |
+             v
+[Execution by JVM]
+     /           \
+    v             v
+[Interpreter]   [JIT Compiler]
+ (line-by-line)   (compiles hot code to native)
+             |
+             v
+[Native Machine Code]
+             |
+             v
+[CPU Executes Code → Output]
+
+Command: javac MyProgram.java
+Result: Creates MyProgram.class file.
+
+b. Run Time
+➤This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
+➤The JVM loads the .class file and executes the bytecode.
+➤Any exceptions or logical errors may occur during this phase.
+
+Command: java MyProgram
+Result: Runs the program using the bytecode inside MyProgram.class.
+
+✅ What Makes Java Platform Independent?
+Java is platform-independent because of its "Write Once, Run Anywhere" capability.
+This is mainly due to:
+🔑 1. Bytecode
+When you compile a Java program (.java file), the Java compiler (javac) doesn't generate platform-specific machine code.
+It generates bytecode (.class file) — an intermediate, platform-neutral code.
+
+// You write this
+HelloWorld.java
+↓
+// Compiled by javac to
+HelloWorld.class (bytecode)
+
+Bytecode is the key to platform independence — it's the same for all operating systems.
+
+🔑 2. Java Virtual Machine (JVM)
+JVM is platform-dependent (a different version exists for Windows, Linux, Mac, etc.).
+It executes the bytecode by converting it into native machine code at runtime.
+Since every OS has its own JVM, the same bytecode can run on any system with a compatible JVM.
+
+b. Polymorphism
+#################
+Two types of polymorphism:
+
+a. Overriding (Run-time polymorphism):
+➤Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
+➤It is used to achieve Run-time Polymorphism.
+➤The method signature (name + parameters) must be the same in both parent and child classes.
+➤The decision of which method to call is made at run-time, not compile-time.
+
+🔸 Key Rules of Method Overriding:
+Rule							Description
+Same method signature					Method name, return type, and parameters must be the same.
+Access modifier						Child method must have the same or more accessible modifier (e.g., can’t override public with private).
+Can't override final, static, or private methods	These are either not inherited or cannot be changed.
+Return type						should be the same or covariant (child class return type).
+Use @Override						Optional, but recommended to catch errors at compile time.
+
+Example:
+package p1;
+public class GoldAccount {
+	public void onlineBanking() {
+		System.out.println("yes");
+	}
+	public void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+	public void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+	public static void main(String[] args) {
+		PlatinumAccount p = new PlatinumAccount();
+		p.onlineBanking();
+		p.rateOfInterest()// Output: 6% PA
+		System.out.println("--------");
+		GoldAccount g = new GoldAccount();
+		g.onlineBanking();
+		g.rateOfInterest();//-->Output: nill
+	}
+}
+
+ What are Annotations?
+➤Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
+➤They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
+
+ Common Use: @Override
+--------------------------
+➤@Override is used to indicate that a method is intended to override a method in the superclass.
+➤It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
+
+package p1;
+	public class GoldAccount {	
+		public void rateOfInterest() {
+			System.out.println("nill");
+		}
+	}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+	@Override
+	public void rateOfInterests() {//-->Error because method name mismatch
+		System.out.println("6% PA");
+	}	
+}
+
+Question: Access Specifier should be the same or can it be different during Overriding?
+Answer: During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
+
+Example 1:
+package p1;
+public class GoldAccount {
+	void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+//No Error Because the default scope is increased to public	
+	@Override
+	public void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+}
+
+Example 2:
+
+package p1;
+public class GoldAccount {
+	public void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+//Error: Because the public scope is reduced to the default
+	@Override
+	void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+}
+
+Order of Access Specifiers
+Private -> Default -> Proctected -> Public
+
+Example 3:
+
+package p1;
+public class GoldAccount {
+	private void rateOfInterest() {
+		System.out.println("nill");
+	}
+}
+
+package p1;
+public class PlatinumAccount extends GoldAccount {
+//Error: Because private methods, we cannot inherit
+//Without inheritance, overriding cannot be done
+	@Override
+	protected void rateOfInterest() {
+		System.out.println("6% PA");
+	}
+}
+
+Note: Static members cannot be inherited
+❓ Are Static Members Inherited in Java?
+✅ Technically, static members are inherited — but they are not polymorphic, and they do not behave like instance members in inheritance.
+
+🔥 Common Misconception:
+People often say:
+❌ "Static members cannot be inherited."
+But that's not entirely accurate.
+
+✅ What Happens:
+1. Static members belong to the class, not to objects.
+They are class-level members, not instance-level.
+So they are shared across the inheritance hierarchy.
+So yes, static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
+
+⚠️ Why Static Members Are Not "Truly" Inherited:
+✅ 1. They don’t participate in runtime polymorphism
+
+class A {
+    static void show() {
+        System.out.println("A");
+    }
+}
+
+class B extends A {
+    static void show() {
+        System.out.println("B");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A obj = new B();// Upcasting 
+        obj.show(); // Output: A (not B)
+    }
+}
+Is this overriding?
+❌ No. This is method hiding, not method overriding, because the methods are static
+➤ Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
+
+Imagine static methods are like TV channels fixed on the remote brand, not on who's holding the remote.
+
+A obj = new B();
+➤ Here, you're using a remote (reference) of brand A, so Java checks what methods belong to A, not B.
+➤ Even though you created a B object, the method called depends on what reference type you're using.
+static = class-based decision (compile-time)
+non-static = object-based decision (run-time)
+
+✅ 2. They're not part of the instance, so “inheritance” isn’t meaningful
+Since they don’t get copied to each object or act differently per subclass instance, calling it "inheritance" is misleading.
+
+Example:
+A parent class: GoldAccount (in package p1)
+A child class: PlatinumAccount extends GoldAccount
+
+package p1;
+public class GoldAccount {
+    static int x = 100;
+    public static void rateOfInterest() {
+        System.out.println("nill");
+    }
+}
+
+package p1;
+
+public class PlatinumAccount extends GoldAccount {
+    public static void main(String[] args) {
+        PlatinumAccount.rateOfInterest();      // Output:  nill
+        System.out.println(PlatinumAccount.x); // Outuput: 100
+    }
+}
+
+🔍 What Is This Program Teaching?
+✅ 1. Static Methods and Variables Are Not Polymorphic. Even though PlatinumAccount inherits from GoldAccount, calling PlatinumAccount.rateOfInterest();
+It is resolved at compile time based on the class name, not the object type.
+
+Since PlatinumAccount does not override the method (it doesn’t define its rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
+is effectively the same as: GoldAccount.rateOfInterest();
+
+The same logic applies to the static variable x:
+PlatinumAccount.x; // resolves to GoldAccount.x (100)
+
+✅ Overloading in Java (Compile-Time Polymorphism)
+🔹 What is Method Overloading?
+➤Method Overloading means defining multiple methods with the same name in a class but with different parameter lists (type, number, or order of parameters).
+➤It allows compile-time polymorphism, where the method to be called is determined at compile time based on the method signature.
+
+| Feature                     | Allowed in Overloading? | Explanation                             |
+| --------------------------- | ----------------------- | --------------------------------------- |
+| Change number of parameters | ✅ Yes                   | Different arity                         |
+| Change type of parameters   | ✅ Yes                   | Different signatures                    |
+| Change order of parameters  | ✅ Yes                   | Only if types are different             |
+| Change return type only     | ❌ No                    | Causes compile-time error               |
+| Change access modifier only | ❌ No                    | Doesn't affect method signature         |
+| Change method name          | ❌ No                    | It's not overloading, it's a new method |
+
+🔸 Characteristics of Overloading:
+Feature					Description
+Method name				must be the same
+Parameter list				must be different (type, number, or order)
+Return type				can be the same or different, but doesn't affect overloading
+Access modifier				can be the same or different
+Inheritance				is not required for overloading
+Polymorphism type			Compile-time polymorphism
+
+Example:
+package p1;
+
+public class EmailService {
+	public void sendEmail(String to, String subject, String message) {
+		System.out.println("Email sending....");
+	}
+	public void sendEmail(String to, String subject, String message, String filePath) {
+		System.out.println("Email sending with attachment.....");
+	}
+	public static void main(String[] args) {
+		EmailService service = new EmailService();
+		service.sendEmail("mike@gmail.com", "Welcome", "Some Message","G:\\image.png");
+	}
+}
+
+Final Keyword
+################################
+➤If you make a variable final, then we cannot change its value(Just like constant variables).
+➤If you make a static/non-static variable final, then initialization is mandatory.
+
+Example:  
+---------
+public interface A {
+	int MAX_VAL=100;
+	static final int MIN_VAL=0;
+}
+package p1;
+
+public class B {
+	public static void main(String[] args) {
+		System.out.println(A.MAX_VAL);//Output: 100
+		System.out.println(A.MIN_VAL);//Output: 0
+	}
+}
+
+➤If you make a method final, then overriding is not allowed, but inheritance is allowed
+🔒 Why Use final on a Method?
+1. You want to prevent subclassing from changing the logic of a method.
+2. You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
+
+➤If you make a class final, then inheritance is not allowed
+A final class:
+❌ Cannot be extended/inherited.
+✅ Can have regular (non-final) methods.
+✅ Can have final methods too.
+
+But since the class itself cannot be inherited:
+🔒 No methods inside it — final or not — can ever be overridden.
+
+Example 1: 
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		final int x = 10;
+		x=20;//-->Cannot change the value of final variable
+		final int y;//->final mandatory to be initialized
+	        final static int z;//->final mandatory to be initialized
+	        //The above errors are called blank field errors
+		System.out.println(y);
+	}
+}
+
+Example 2:
+----------
+package p1;
+
+public class A {
+	final public void test() {
+		System.out.println(100);
+	}
+}
+package p1;
+
+public class B extends A{
+	@Override
+	public void test() {//--> Error because we cannot override final methods
+		System.out.println(100);
+	}
+}
+
+Example 3:
+----------
+package p1;
+
+final public class A {}
+package p1;
+
+public class B extends A{//---> Error because we cannot inherit final class	
+}
+
+✅ What Happens When a Reference Variable is Marked final?
+final Student s = new Student();
+➤ You can't reassign s to point to another object.
+➤ But you can still modify the object that s refers to(if it is mutable). unless the class itself is immutable(like String).
+
+✅ Example:
+class Student {
+    int marks = 80;
+}
+
+public class Test {
+    public static void main(String[] args) {
+        final Student s = new Student();
+        s.marks = 90;         // ✅ Allowed
+        // s = new Student(); // ❌ Not allowed (Compile-time error)
+        System.out.println(s.marks); // 90
+    }
+}
+
+Why do you use the final for references?
+To prevent reassignment, ensure safe dependency injection, and to make code more thread-safe and readable. It’s also a key part of writing immutable classes and predictable lambdas.
+
+Interfaces in Java - Abstraction
+##################################
+Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
+
+🔹 Key Points:
+Complete Abstraction (Java 7)
+➤ In Java 7 and earlier, interfaces could only have abstract methods (no method bodies).
+➤ They define what should be done, not how.
+
+➤ All Variables are public static final.
+➤ No need to specify these modifiers—they are applied by default.
+➤ No Object creation
+
+✅ Note: Drawback of Inheritance – Tightly Coupled Programming
+🔹 What is Tightly Coupled Programming?
+➤When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
+➤In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
+
+🔸 How Inheritance Causes Tight Coupling:
+Child class depends heavily on the parent class:
+➤In inheritance, the child class inherits both behavior and structure from the parent.
+➤If the parent class changes, it can break or affect the behavior of all child classes.
+
+Strong binding:
+➤The child class is strongly bound to the specific parent class.
+➤You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
+
+Hard to maintain and extend:
+➤Over time, inherited code becomes fragile.
+➤Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
+
+Example 1:
+package p1;
+
+public interface A {
+	public void test1() {}//-->Error because complete methods are not allowed in an interface	
+	public void test2(); //Correct version
+	}
+}
+
+Example 2:
+package p1;
+
+public interface NotificationService {
+	public void emailService();
+	public void whatsAppService();
+	public void smsService();
+}
+
+package p1;
+
+public class NotificationServiceImpl implements NotificationService {
+	@Override
+	public void emailService() {
+		System.out.println("Email Sending");
+	}
+	@Override
+	public void whatsAppService() {
+		System.out.println("Whats app Sending");
+	}
+	@Override
+	public void smsService() {
+		System.out.println("SMS Sending");
+	}
+	public static void main(String[] args) {
+		NotificationServiceImpl impl = new NotificationServiceImpl();
+		impl.emailService();
+		impl.smsService();
+		impl.whatsAppService();
+	}
+}
+
+Example:
+package p1;
+
+public interface Calculator {
+	public void add(int x, int y);
+	public void mul(int x, int y);
+}
+
+package p1;
+public class OrdinaryCalc implements Calculator{
+	@Override
+	public void add(int x, int y) {
+		System.out.println(x+y);
+	}
+	@Override
+	public void mul(int x, int y) {
+		System.out.println(x*y);
+	}
+}
+
+package p1;
+
+public class SciCalc implements Calculator{
+	@Override
+	public void add(int x, int y) {
+		System.out.println(x*x+y*y);
+	}
+	@Override
+	public void mul(int x, int y) {
+		int num1 = x*x;
+		int num2 = y*y;
+		System.out.println(num1*num2);
+	}
+}
+package p1;
+
+public class MainCalc {
+	public static void main(String[] args) {
+		OrdinaryCalc oc = new OrdinaryCalc();
+		oc.add(10, 20);
+		oc.mul(10, 20);
+		SciCalc sc = new SciCalc();
+		sc.add(10, 20);
+		sc.mul(10, 20);
+	}
+}
+
+🧠 Interview Questions:
+Question 1. Could this have been done with an abstract class?
+✅ Yes — abstract classes allow incomplete methods and inheritance.
+But the real reason for using an interface here is that you're defining pure behavior (what calculators must do), not common implementation logic.
+So:
+Interface → for capabilities
+Abstract class → for partial implementation + common state
+
+Question 2. Biggest advantage of using an interface instead of an Abstract Class?
+✅ Loose coupling and flexibility.
+You said it well — interfaces let you add new types of calculators later without changing the existing hierarchy.
+Also:
+Java allows multiple interfaces, but only single inheritance with abstract classes.
+
+✅ Advantages of Interfaces in Java
+1. Abstraction
+➤Interfaces facilitate complete abstraction.
+➤They allow you to hide implementation details and only expose what needs to be done, not how.
+
+Example: A Database interface may define connect(), disconnect(), but not how these are implemented.
+
+2. Contract Enforcement
+➤When a class implements an interface, it must implement all its methods.
+➤This imposes a strict contract on the class, ensuring consistency in structure and behavior across multiple classes.
+
+3. Good Design Practices
+➤Interfaces promote clear separation of responsibilities.
+➤They lead to clean, modular, and testable code.
+➤Developers can work independently on the interface and its implementations.
+
+4. Loose Coupling
+➤Classes that use interfaces depend only on method signatures, not on concrete implementations.
+➤This allows changes in implementations without affecting dependent classes.
+➤Enhances flexibility, extensibility, and maintainability of the system.
+
+5. Multiple Inheritance
+➤Java doesn’t support multiple inheritance with classes, but a class can implement multiple interfaces.
+➤This allows a class to inherit behavioral capabilities from multiple sources.
+
+6. Supports Plug-and-Play Architecture
+➤Interface-based design makes it easy to swap implementations (e.g., using different payment gateways, databases, or services) without changing the dependent code.
+
+Note:
+➤Class to Class Inheritance --> extends
+➤Interface to Interface Inheritance --> extends
+➤Interface to Class Inheritance --> implements
+
+Example :
+---------
+package p1;
+
+public interface A {
+	public void test1();
+}
+
+package p1;
+
+public interface B extends A{
+	public void test2();
+}
+
+public interface D{
+	public void test3();
+}
+
+package p1;
+
+public class C implements B, D { //If you do multiple inheritance on a class, then its parent should be interfaces only
+
+	@Override
+	public void test1() {
+		System.out.println("From test1");
+	}
+	@Override
+	public void test2() {
+		System.out.println("From test2");
+	}
+
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();
+		c1.test2();
+	}
+}
+
+Example 4:
+----------
+➤ In class, can we perform extends and implements together
+➤But ensure the extends is used first and then implementes
+
+package p1;
+public interface A {
+	public void test2();
+}
+
+package p1;
+public class B {
+	public void test1() {
+		System.out.println("From test1");
+	}
+}
+
+package p1;
+public class C extends B implements A {
+	@Override
+	public void test2() {
+		System.out.println("From test2");		
+	}
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();
+		c1.test2();
+	}
+}
+
+✅Example:
+interface A {
+    default void show() {
+        System.out.println("A");
+    }
+}
+
+interface B {
+    default void show() {
+        System.out.println("B");
+    }
+}
+
+class C implements A, B {
+    // ??----------------->// It does not compile
+}
+🧠Interview Question on above example
+❓ Will this compile?
+❓ If not, what do you do in class C to fix it?
+❓ Why does Java force you to resolve this?
+
+🧠 Why ??
+✔️ Because both interfaces A and B define a default void show() method.
+✔️ When C implements both, Java doesn’t know which one to inherit → 🔺 Diamond Problem (method ambiguity).
+
+✅ Fix in Class C:
+class C implements A, B {
+    public void show() {
+        A.super.show();  // or B.super.show();
+    }
+}
+
+✔️ You resolve the conflict by explicitly choosing which interface’s show() to call.
+📌 Why Java Forces This?
+Because, unlike classes (which can’t be inherited from more than one), interfaces can be — so Java must protect against silent conflicts, especially now that interfaces can have default (concrete) methods since Java 8.
+
+Java’s philosophy:
+✳️ “Explicit is better than implicit in cases of ambiguity.”
+
+Question: Can I develop an incomplete static method in an interface?
+Answer: We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
+
+Example:
+package p1;
+public interface A {
+	public static void test2();//-------> Error
+}
+
+Java 8 Features
+###################
+1. default keyword:
+➤ We can create complete methods inside an interface. This was introduced in Java version 8.
+Example:
+package javaconcepts.p3;
+
+public interface A {
+	default public void test1() {
+		System.out.println("From test1");
+	}
+	public void test2();
+}
+
+package javaconcepts.p3;
+
+public class B implements A {
+
+	public static void main(String[] args) {
+		B b1 = new B();
+		b1.test1();
+		b1.test2();
+	}
+	@Override
+	public void test2() {
+		System.out.println("From Overrided test2");
+	}	
+	@Override
+	public void test1() { //we can override the method
+		System.out.println("From Overrided Test1");
+	}
+}
+Output
+From Overrided Test1
+From Overrided test2
+
+Before Java 8:
+➤Interfaces could only contain abstract methods (no body).
+➤If you added a new method to an interface, all implementing classes would break unless they implemented the new method.
+
+✅ Benefits of default Methods in Interfaces
+1. Backward Compatibility
+➤You can add new methods to interfaces without breaking existing implementations.
+➤Existing classes don’t need to override the new default method.
+
+interface A {
+    void m1();  // originally
+    default void m2() { // added later
+        System.out.println("Default m2");
+    }
+}
+
+➤Even if old classes only implement m1(), they won’t break because m2() has a default body.
+
+interface A {
+    default void greet() {
+        System.out.println("Hello from A");
+    }
+}
+interface B {
+    default void greet() {
+        System.out.println("Hello from B");
+    }
+}
+class C implements A, B {
+    public void greet() {
+        A.super.greet();  // resolve conflict
+    }
+}
+This allows controlled multiple behavior inheritance.
+
+✅ 2. Functional Interface
+🔹 Definition:
+➤A Functional Interface is an interface that has exactly one abstract (incomplete) method.
+➤Can have multiple default or static methods (complete methods).
+➤ It enables lambda expressions and functional programming in Java.
+
+🔸 Key Points:
+➤A functional interface must contain only one abstract method.
+➤You can add any number of default or static methods (they're considered complete methods).
+➤If the interface inherits more than one abstract method (from multiple interfaces), it no longer remains a functional interface, and the compiler throws an error.
+➤Use @FunctionalInterface annotation to enforce the rule at compile-time.
+
+Example 1:
+--------------------
+@FunctionalInterface
+public interface A {//Error-> Because cannot have ZERO incomplete method
+}
+
+Example 2:
+----------
+@FunctionalInterface
+public interface A {
+	public void test1();
+}
+Output:  No Error because it has exactly one incomplete method
+
+Example 3:
+----------
+@FunctionalInterface
+public interface A {//Error->A functional interface should consist of exactly one //incomplete method inside it
+	public void test1();
+	public void test2();
+}
+
+Example 4:
+----------
+package p1;
+@FunctionalInterface
+public interface A {
+	public void test1();
+	default public void test2() {
+		System.out.println("From Test 2");
+	}
+	default public void test3() {
+		System.out.println("From Test 3");
+	}
+}
+package p1;
+public class B implements A {
+	public static void main(String[] args) {
+		B b1 = new B();
+		b1.test1();
+		b1.test2();
+		b1.test3();
+	}
+	@Override
+	public void test1() {
+		System.out.println("From test 1");
+	}
+		
+}
+Output:
+---------
+From test 1
+From Test 2
+From Test 3
+
+Example 5:
+-----------
+package p1;
+public interface A {
+	public void test1();
+}
+
+package p1;
+@FunctionalInterface
+public interface B extends A{}
+Output: No Error
+
+Example 6:
+----------
+package p1;
+public interface A {
+	public void test1();
+	public void test2();
+}
+package p1;
+@FunctionalInterface
+public interface B extends A{}
+Output: Error because we are inheriting 2 methods to a functional interface
+
+Example 6:
+---------
+package p1;
+public interface A {
+	public void test1();	
+}
+
+package p1;
+@FunctionalInterface
+public interface B extends A{
+	public void test2();
+}
+Output: Error because we are inheriting 1 method from a functional interface, and a functional interface has 1 method, which totals to 2 methods in an interface
+
+🔹Lambda Expression:
+A Lambda Expression is a short block of code that:
+➤Takes in parameters
+➤Executes a body
+➤Can be used in place of anonymous classes
+➤Requires a functional interface to work
+
+🔸 Key Points:
+✅ Introduced in Java 8
+Part of Java’s functional programming enhancements.
+
+✅ Reduces Code Length
+Allows writing concise code by eliminating boilerplate like anonymous class syntax.
+
+✅ Works With Functional Interfaces
+Lambda expressions can only be used where a functional interface (i.e., one abstract method) is expected.
+
+✅ Commonly Used in Stream API
+Lambdas  are widely used in filtering, mapping, sorting, and reducing data in the Java Stream API.
+
+🔹 Syntax of Lambda Expression:
+(parameters) -> { body }
+
+Examples:
+(x, y) -> x + y
+name -> System.out.println("Hello " + name)
+() -> System.out.println("No parameters")
+
+✅ How Lambda Expressions Work in Java?
+➤ It creates an anonymous class behind the scenes. A class without any name is called Anonymous.
+➤Then the lambda expression creates an object and loads the method by implementing it inside the object.
+➤Then we use an object reference to call that implemented method
+➤Replacing instances of anonymous classes that implement functional interfaces with a concise, inline function-like syntax.
+
+Example:
+@FunctionalInterface
+interface MyOperation {
+    void perform(int x);
+}
+
+✅ Lambda Expression
+MyOperation op = () -> System.out.println("Hello");
+op.perform();
+
+🧠Interview Question based on Lambda expression?
+Question 1. Why does this work without new?
+✔️ Yes — a lambda expression automatically creates an instance of the functional interface.
+🔧 But technically:
+It’s not creating an anonymous class; it creates a synthetic implementation of the interface using invokedynamic bytecode — more lightweight and efficient than anonymous inner classes.
+
+So:
+MyOperation op = (int x) -> { ... };
+
+is syntactic sugar for:
+MyOperation op = new MyOperation() {
+    public void perform(int x) {
+        // your lambda logic
+    }
+};
+
+But the lambda version is shorter, cleaner, and faster.
+Note: Functional Programming defines you to say "what you want, not how to do it step-by-step"
+
+Example 1:
+-----------
+package p1;
+@FunctionalInterface
+public interface A {
+	public void test1();	
+}
+package p1;
+public class B{
+	public static void main(String[] args) {
+		A a1 = ()->{
+			System.out.println(100);
+		};
+		a1.test1();//Output: 100
+	}
+}
+
+Example 2:
+----------
+package p1;
+@FunctionalInterface
+public interface A {
+	public void test1(int x);
+	default public void test2() {
+		System.out.println("test2");
+	}
+}
+package p1;
+public class B{
+
+	public static void main(String[] args) {
+		A a1 = (int y) -> {
+			System.out.println(y);
+		};
+		a1.test1(100);// Output: 100
+		a1.test2();// Output: test2
+	}
+}
+
+✅ Why were private methods added to interfaces in Java 9?
+🔐 Types of Private Interface Methods (Java 9)
+| Modifier         | Can Call From         | Description                         |
+| ---------------- | --------------------- | ----------------------------------- |
+| `private`        | Other default methods | Helps share common logic internally |
+| `private static` | Other static methods  | Helps static methods reuse logic    |
+
+🧪 Example: Private Methods in Interface
+interface MyInterface {
+
+    default void greet() {
+        log("Hello from default method");
+    }
+
+    static void staticGreet() {
+        logStatic("Hello from static method");
+    }
+
+    // ✅ Private instance method
+    private void log(String message) {
+        System.out.println("LOG: " + message);
+    }
+
+    // ✅ Private static method
+    private static void logStatic(String message) {
+        System.out.println("STATIC LOG: " + message);
+    }
+}
+
+Usage:
+public class Test implements MyInterface {
+    public static void main(String[] args) {
+        Test t = new Test();
+        t.greet();
+
+        MyInterface.staticGreet();
+    }
+}
+✅ Output:
+LOG: Hello from the default method
+STATIC LOG: Hello from static method
+
+🎯 Key Benefits
+➤ Code reusability: Avoids repeating logic in multiple default/static methods.
+➤ Encapsulation: Keeps helper methods hidden from implementing classes.
+➤ Cleaner design: Interfaces can now follow DRY (Don't Repeat Yourself) more cleanly.
+
+🧠 Interview Traps
+Q: Can private interface methods be accessed outside the interface?
+❌ No, only accessible within the interface for reuse by default/static methods.
+
+Q: Can we override private interface methods?
+❌ No, private methods cannot be inherited or overridden.
+
+Q: Are private methods mandatory in interfaces?
+❌ No, they are optional—use them to clean up repeated logic.
+
+4. Stream API
+---------------------
+Note: to learn Stream API, complete the following first
+a. Collection (Data Structure)
+b. Functional Programming
+
+5. Optional class - We have to learn the exception concept in Java first
+-----------------------------------------------------------------------
+
+Marker interface 
+------------------
+An empty interface is called a marker interface
+package p1;
+public interface A {}
+
+✅ Abstract Class in Java
+An abstract class in Java is a class that is declared with the abstract keyword. It cannot be instantiated directly and is typically used to provide a partial implementation that its subclasses must complete.
+
+🔹 Key Features of Abstract Class
+1. ✅ Can Have Both Complete and Incomplete Methods
+An abstract class can contain:
+➤Complete methods (methods with body)
+➤Incomplete methods (methods without a body)
+➤To declare an incomplete method, the abstract keyword is mandatory.
+
+abstract class Shape {
+    abstract void draw();        // Incomplete method
+    void color() {               // Complete method
+        System.out.println("Coloring shape");
+    }
+}
+
+2. ✅ Can Have Both Static and Non-Static Members
+You can define:
+➤ Static variables and methods
+➤ Non-static variables and methods
+
+abstract class Demo {
+    static int count = 0;
+    int id;
+    static void showCount() {
+        System.out.println("Count = " + count);
+    }
+}
+
+3. ✅ Static Methods Must Be Complete
+You cannot define abstract static methods.
+➤Because static methods belong to the class, and abstract methods must be overridden, which contradicts the purpose.
+
+abstract class Test {
+    // abstract static void display(); ❌ Not allowed
+    static void show() {         // ✅ Allowed
+        System.out.println("Static method");
+    }
+}
+
+4. ✅ Can Have main() Method
+➤An abstract class can contain the main() method and be used as the entry point of a Java program.
+
+abstract class Launcher {
+    public static void main(String[] args) {
+        System.out.println("Main inside abstract class");
+    }
+}
+
+5. ❌ Cannot Instantiate an Abstract Class
+➤You cannot create an object of an abstract class directly.
+Reason: It may contain incomplete methods, so Java doesn’t allow creating an object of something that’s not fully defined.
+
+abstract class Animal {
+    abstract void makeSound();
+}
+
+// Animal a = new Animal(); // ❌ Compile-time error
+
+6. ❌ Does Not Support Multiple Inheritance with Classes
+➤Java does not allow multiple inheritance with classes (i.e., a class cannot extend more than one class, abstract or not).
+➤This is to avoid ambiguity and diamond problems.
+
+abstract class A {
+    abstract void show();
+}
+
+abstract class B {
+    abstract void show();
+}
+
+// class C extends A, B { } // ❌ Not allowed
+Java solves this limitation using interfaces, which do support multiple inheritance.
+
+Example 1:
+----------
+package p1;
+abstract public class A {
+	public void test1() {}
+	abstract public void test2();
+	public static void test3() {}
+	public static void test4();//Error
+	public static void main(String[] args) {
+		A a1 = new A();//Error
+	}
+}
+
+Example 2: Error because multiple inheritance cannot be done
+-------------------------------------------------------------
+package p1;
+abstract public class A {}
+package p1;
+abstract public class B{}
+
+package p1;
+public abstract class C extends A,B{//Error
+}
+
+🧠 So, Why Use an Interface if an Abstract Class Can Have Abstract Methods?
+➤Java doesn't support multiple inheritance for classes; interfaces allow it.
+➤Interfaces are ideal for defining APIs and contracts, not implementations.
+➤Use abstract classes when you want to provide a common base with shared code.
+➤Use interfaces when you want to enforce a common behavior across unrelated classes.
+➤All variables in an interface by default are final & static, whereas inside an abstract class, we can create static/non-static/final variables
+
+✅ Real-World Analogy:
+| Concept        | Example                                                                     |
+| -------------- | --------------------------------------------------------------------------- |
+| Interface      | RemoteControl: defines buttons (on/off) — any brand can follow              |
+| Abstract class | SamsungRemote: provides partial button logic, common to all Samsung remotes |
+
+
+Example:
+-------
+package p1;
+abstract public class A {
+	static int x = 10;
+	public static void test() {
+		System.out.println(100);
+	}
+	public static void main(String[] args) {
+		System.out.println(A.x);//Output :10
+		A.test();// Output: 100
+	}
+}
+
+Example :
+---------
+package p1;
+abstract public class A {
+	int x = 10;
+	public void test() {
+		System.out.println(100);
+	}
+}
+package p1;
+public class B extends A {
+	public static void main(String[] args) {
+		B b1 = new B();
+		System.out.println(b1.x);// Outupt: 10
+		b1.test();// Output: 100
+	}
+}
+
+Example: Inheritance from interface-->abstract class-->class
+----------------------------------------------------------------
+package p1;
+public interface A {
+	public void test1();
+}
+
+package p1;
+abstract public class B implements A {
+	abstract public void test2();
+}
+
+package p1;
+public class C extends B{
+	@Override
+	public void test1() {
+		System.out.println("From test1");
+	}
+	@Override
+	public void test2() {
+		System.out.println("From test2");
+	}
+	public static void main(String[] args) {
+		C c1 = new C();
+		c1.test1();
+		c1.test2();
+	}
+}
+
+#############################################################################
+Note: In Java 8, we can develop complete static methods & main method in an interface
+#################################################################################
+
+Example:
+package p1;
+public interface A {
+	static int x = 100;
+	public static void test1() {
+		System.out.println("From test1");
+	}
+	public static void main(String[] args) {
+		System.out.println(A.x);// Output :100
+		A.test1();// Output: From test1
+	}
+}
+
+✅ Exception and Exception Handling in Java
+--------------------------------------------
+
+🔹 What is an Exception?
+➤An exception is an unexpected event that occurs during the execution of a program.
+➤It disrupts the normal flow of the program and may cause it to terminate abruptly if not handled properly.
+
+🔹 Why Do Exceptions Occur?
+They occur due to unforeseen errors like:
+➤Invalid user input (e.g., dividing by zero)
+➤Trying to access a null object
+➤File not found
+➤Network failure
+➤They can happen at runtime, even if the code compiles successfully.
+
+Example 1:
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int x = 10;
+		int y = 0;
+		int z = x / y;//Stop Program Here
+		System.out.println(z);
+		System.out.println("Welcome");
+	}
+}
+Output:
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+
+Exception handling
+#######################
+➤To handle exceptions, we will use a "try & catch" block in Java
+➤When an exception occurs in the try block, it will create an exception object, and that object's address is given to the catch block. Catch block will suppress that exception, and further code will continue to execute
+
+Example :
+----------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		try {
+			int x = 10;
+			int y = 0;
+			int z = x/y;
+			System.out.println(z);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Welcome");
+	}
+}
+
+Types of Exception in Java
+##########################
+
+There are two types of exceptions in Java:
+
+➤ Compile Time / Checked Exception - These exceptions will occur when a .java file is compiled to a .class file. That is, during compilation, we will get this exception.
+➤Runtime / Unchecked Exception - These exceptions will occur when we run a .class file. That is during runtime
+
+Runtime / unchecked Exceptions
+###############################
+
+1. ArithmeticException: This exception will occur when invalid mathematical operations are performed
+
+package p1;
+public class A {
+	public static void main(String[] args) {
+		try {
+			int x = 10;
+			int y = 0;
+			int z = x/y;// same for modulus %0
+			System.out.println(z);
+		} catch (ArithmeticException a) {
+			a.printStackTrace();
+		}
+		System.out.println("Welcome");
+	}
+}
+Output:
+java.lang.ArithmeticException: / by zero
+Welcome
+
+2. Null Pointer Exception: This exception will occur when with null reference variable we try to access non-static members of the class
+Example:
+--------
+package p1;
+public class A {
+	int x = 10;
+	public static void main(String[] args) {
+		try {
+			A a1 = null;
+			System.out.println(a1.x);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Welcome");
+	}
+}
+Output:
+java.lang.NullPointerException: Cannot read field "x" because "a1" is null
+Welcome
+
+Example 
+----------
+package p1;
+public class A {
+	static int x = 10;
+	public static void main(String[] args) {
+		try {
+			A a1 = null;
+			System.out.println(a1.x);//A.x  Output: 10
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Welcome");//Output: Welcome
+	}
+}
+
+
+Code Example:
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(test());
+    }
+
+    static int test() {
+        try {
+            return 1;
+        } catch (Exception e) {
+            return 2;
+        } finally {
+            return 3;
+        }
+    }
+}
+🧠Interview Question on Exception Handling
+1. What is the output?
+✅ Output is: 3
+
+2. Why does finally override the return in try?
+➤Because the finally block is always executed, and if it contains a return, it overrides any previous return values, even from try or catch.
+➤So even though try says return 1, and there's no exception, the finally block's return 3 overrides it.
+🧨 This is often called "return suppression".
+
+3. What if finally didn’t have a return?
+Then the return from try (or catch, if an exception occurs) would go through as normal.
+
+So if finally is:
+finally {
+    System.out.println("Cleaning up");
+}
+
+Then the output would be:
+Cleaning up ---> Output from finally  
+1 ----> returned output from try-catch block
+
+Code Example 2:
+public class Main {
+    public static void main(String[] args) {
+        try {
+            int a = 5 / 0;
+        } catch (ArithmeticException e) {
+            System.out.println("A");
+        } finally {
+            System.out.println("B");
+        }
+    }
+}
+And what if you remove the catch block — will it still print B? Why or why not?
+✅ Output:
+B  
+Exception in thread "main" java.lang.ArithmeticException: / by zero.
+
+✔️ Finally runs.
+Even when there's no catch, the finally block executes before the exception is thrown back to the JVM.
+
+Unary Operators in Java
+##############################
+
+1. Increment Operator
+   1.1 Post-Increment: Increment the value of the variable next time you see the same variable
+Example 1:
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int i=0;
+		int j = i++;
+		int k=10;
+		int l=k++ + k++ + k++;
+		System.out.println(i);//Output: 1
+		System.out.println(j);// Output: 0
+		System.out.println(k);//Output: 13
+		System.out.println(l);// Output: 33
+	} 
+}
+   1.2 Pre-Increment: Increment the value of the variable in the same step
+Example 1:
+-----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int i=10;		
+		int j = ++i;
+		int k=10;
+		int l=++k + ++k + ++k;
+		System.out.println(i);// Output: 11
+		System.out.println(j);// Output: 11
+		System.out.println(k);// Output: 13
+		System.out.println(l);// Output: 36
+	} 	
+}
+2. Decrement Operator
+   2.1 Post Decrement: Here we decrement the value of i by 1 when we next time see the same variable:
+
+Example:
+package p1;
+
+public class A {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = a-- + a--; 
+	int x = 10;
+        int y = x-- + x++ + x-- + x--; 
+        System.out.println(a); //Output: 8
+        System.out.println(b); //Output: 19
+        System.out.println(x); //Output: 8
+        System.out.println(y); //Output: 38
+    }
+}
+   2.2 Pre Decrement: Here we decrement the value of the variable in the same step by 1
+
+Example 1:
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int i=10;		
+		int j = --i + --i;
+		System.out.println(i);
+		System.out.println(j);
+	} 
+}
+
+✅ Type Casting of Data Types in Java
+In Java, type casting is used to convert a variable of one data type into another. This is commonly done between primitive types or object references (in case of inheritance).
+
+🔄 1. Type Casting Between Primitive Data Types
+There are two types:
+
+✅ a) Widening Casting (Implicit & Upcasting)
+➤Smaller type → Larger type
+➤Safe, automatic, without any loss of data
+
+byte → short → int → long → float → double
+
+🧪 Example:
+int a = 10;
+double b = a;  // int to double (widening)
+double x=10.3d;
+long y=x; // Larger -> Smaller, there is a loss of data so it will give an error.
+
+✅ b) Narrowing Casting (Explicit & Downcasting)
+ ➤Larger type → Smaller type
+➤Risky, must be done manually using cast () 
+➤Loss of data can take place
+
+double → float → long → int → short → byte
+
+🧪 Example:
+double x = 10.99;
+long i=10;
+int y = (int) x;  //output: 10 double to int (narrowing)
+byte j=i; // ----------> Throws error
+
+🧪 Example:
+long i=100;
+byte j=(byte)(int)i; //multiple downcasting is possible
+
+🧪 Example:
+int i=100;
+long j=(long)i; // No error
+
+🔍 Why is float → long considered downcasting, even though size increases?
+Because type casting in Java is not only about memory size, but also about type compatibility and precision:
+
+❗ float → long is narrowing because:
+➤You are going from floating-point to integer, which involves:
+➤Loss of precision (decimal part is truncated)
+➤Potential data loss if the value is too large
+➤Even if you're increasing memory size, you're going from a more complex representation (float) to a simpler one (integer).
+
+Primitive    Wrapper Class
+byte		Byte
+short		Short
+int		Integer
+long		Long
+float		Float
+double		Double
+char		Character
+
+Example 1: I want to convert a String to an Integer
+
+public class A {
+	public static void main(String[] args) {
+		String x = "100";
+		int  y = Integer.parseInt(x);
+		System.out.println(y);
+	}
+}
+
+Example 2:I want to convert a String to a Float
+float  y = Float.parseFloat(x);
+
+Example 3:I want to convert a String to a Double
+double  y = Double.parseDouble(x);
+
+Example 4:
+-----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		try {
+			String x = "10.3dasdsd";
+			double  y = Double.parseDouble(x);
+			System.out.println(y);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Welcome");
+		
+	}
+}
+Output:
+java.lang.NumberFormatException: For input string: "10.3dasdsd"
+Welcome
+
+What is class upcasting?
+########################
+➤Here we store the child class object address into the parent class reference variable, so that the reference variable becomes reusable
+
+Example: Reusing a reference variable
+
+public class A {}
+
+public class B extends A{}
+
+public class C extends A{
+	public static void main(String[] args) {
+		A a1 = new B();
+		System.out.println(a1);
+		a1 = new C();
+		System.out.println(a1);
+	}
+}
+
+Example 2: How can we implement polymorphism for multiple child classes by using the same reference variable
+
+public class A {
+	void display() {
+        System.out.println("Inside class A");
+    }
+}
+
+public class B extends A{
+	 @Override
+	    void display() {
+	        System.out.println("Inside class B");
+	    }
+}
+
+public class C extends A{
+	  @Override
+	    void display() {
+	        System.out.println("Inside class C");
+	    }
+	public static void main(String[] args) {
+				
+		A a1 = new B();
+		a1.display();    // Calls B's version => "Inside class B"
+		a1 = new C();
+		a1.display();    // Calls C's version => "Inside class C"
+	}
+}
+
+🧠 Why do we do it?
+1. To reuse the parent class reference for multiple child class objects.
+2. To enable polymorphism on multiple child classes.
+3. To write generic, flexible code that works with different subclasses.
+
+Note:
+instanceof - It will check which class object address is present inside the reference variable
+
+Example:
+
+public class A {}
+
+public class B extends A{}
+
+public class C extends A{	 
+	public static void main(String[] args) {
+				
+	  A a1 = new B();
+	  System.out.println(a1 instanceof B);// Output: true
+	}
+}
+
+What is class downcasting?
+##########################
+-> Here we store the parent class object address into the child class reference variable
+-> To perform downcasting, first do upcasting and then perform downcasting
+Example:
+---------
+public class A {}
+public class B extends A{}
+
+public class C extends A{	 
+	public static void main(String[] args) {
+		A a1 = new B();
+		if(a1 instanceof B) {
+			B b1 = (B)a1;
+			System.out.println("Downcasting successful!");
+		}
+	}
+}
+
+Example:
+--------
+public class A {
+	public void display() {
+		System.out.println("Inside class A");
+	}
+}
+public class B extends A{
+	public void showB() {
+        System.out.println("Inside class B");
+        }
+}
+public class C extends A {
+	public void showC() {
+		System.out.println("Inside class C");
+	}
+}
+public class MainClass {
+	public static void processObject(A obj) {
+        if (obj instanceof B) {
+            B b = (B) obj;  // Downcasting to B
+            b.showB();
+        } else if (obj instanceof C) {
+            C c = (C) obj;  // Downcasting to C
+            c.showC();
+        } else {
+            obj.display();
+        }
+    }
+    public static void main(String[] args) {
+    	processObject(new B());
+	}
+}
+
+Note:
+➤Using upcasting, we can access only parent class members, you cannot access child class members
+➤After upcasting to access child class members, we have to perform downcasting
+
+Example:
+---------
+package p1;
+
+public class A {
+	public void display() {
+		System.out.println("Inside class A");
+	}
+}
+public class B extends A{
+	public void showB() {
+       	 System.out.println("Inside class B");
+        }
+	public static void main(String[] args) {
+		A a1 = new B();
+		if(a1 instanceof B) {
+			B b1 = (B)a1;
+			b1.showB();
+		}
+	}
+}
+
+✅ Arrays in Java
+----------------------
+
+🔹 1. Arrays Hold a Collection of Values
+➤An array is a container object that can hold a fixed number of elements of the same data type.
+➤Instead of creating multiple individual variables for related values (like 10 integers), we can store all of them in one array.
+
+🔹 2. Anything That Holds a Collection of Values is Called a Data Structure
+➤Arrays are one of the simplest and most fundamental data structures.
+➤A data structure is a way to organize and store data efficiently for easy access and modification.
+➤Arrays serve as the base for many advanced data structures (like lists, stacks, queues, etc.).
+
+🔹 3. An array in Java is Treated as an Object
+➤In Java, arrays are not primitive types (like int, char, etc.)—they are objects.
+➤This means they are created using the new keyword internally.
+Being objects, they:
+Have a runtime class type
+Inherit methods from the Object class
+Have properties like .length to determine their size
+
+🔹 4. Arrays Start With Index Zero
+➤Array indexing in Java is zero-based.
+➤The first element is accessed with index 0, the second with 1, and so on.
+➤So, for an array of size n, the last valid index is n-1.
+
+🔹 5. To Store and Read Values We Use: start_address + index × memory_size
+➤Internally, the array elements are stored sequentially in memory.
+➤The memory address of any element can be calculated using:
+
+Address = Base Address + (Index×Size of Each Element)
+➤This allows direct access to any element using its index in constant time O(1), which makes arrays efficient for random access.
+
+🔹 6. Memory Allocation Happens in Sequence (Contiguous Allocation)
+➤When an array is created, Java allocates a block of continuous memory locations to store its elements.
+This contiguous allocation ensures that:
+Each element is placed right after the previous one in memory.
+Accessing any element is fast using index-based computation.
+But the array size cannot change after creation (fixed size limitation).
+
+Example 1:
+----------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int[] age = new int[4];
+		age[0] = 90;
+		age[1] = 89;
+		System.out.println(age[0]);
+		System.out.println(age[1]);
+	} 
+}
+
+➤To find the size of an array dynamically, we will use the  public final field "length". When the array is created this variable will get initialized
+
+Example 2:
+----------
+package p1;
+
+public class A {
+	public static void main(String[] args) {
+		int[] age = new int[40];
+		System.out.println(age.length);// Output :40
+	} 
+}
+
+Scanner class - Is used to provide user input
+################
+
+Example 1:
+----------
+package p1;
+import java.util.Scanner;
+public class A {
+	public static void main(String[] args) {
+		
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter your name:");
+		String name = scan.next();//Can read one String word only
+		System.out.println("Your name is "+name);
+		System.out.println("Enter your age:");
+		int age = scan.nextInt();//Can read on Integer value only
+		System.out.println("Your age is "+age);
+		System.out.println("Enter your weight:");
+		float weight = scan.nextFloat();//Can read on float values
+		System.out.println("Your weight is "+weight);
+		System.out.println("Enter your Answer:");
+		boolean ans = scan.nextBoolean();//Can read on boolean values
+		System.out.println("Your ans is "+ans);
+		scan.close();
+		
+	} 
+	
+}
+Output:
+Enter your name:
+mike
+Your name is Mike
+Enter your age:
+100
+Your age is 100
+Enter your weight:
+98.34
+Your weight is 98.34
+Enter your Answer:
+true
+Your ans is true
+
+Example 2: How to read multiple String words using the nextLine() method
+--------------------------------------------------------------------------
+package p1;
+import java.util.Scanner;
+public class A {
+	public static void main(String[] args) {	
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter your name:");
+		String name = scan.nextLine();//Can read Multiple String words
+		System.out.println(name);
+		scan.close();
+	} 	
+}
+⚠️ Note:
+➤Always close the scanner with sc.close() to free system resources.
+➤Use nextLine() carefully after nextInt() or next() due to newline issues.
+
+⚠️ Issue: nextLine() after nextInt() or next() doesn't behave as expected.
+✅ Root Cause:
+➤Methods like nextInt(), nextDouble(), and next() do not consume the newline character (\n) at the end of user input.
+➤But nextLine() does consume the full line, including the newline.
+
+So, if you call nextLine() immediately after nextInt() or next(), it may read the leftover newline from the previous input, resulting in an empty string.
+
+🔍 Example:
+Scanner sc = new Scanner(System.in);
+
+System.out.print("Enter age: ");
+int age = sc.nextInt();  // user enters: 25 + [Enter]
+
+System.out.print("Enter name: ");
+String name = sc.nextLine();  // reads leftover '\n' from above
+
+System.out.println("Age: " + age);
+System.out.println("Name: " + name);
+
+🔴 Output:
+Enter age: 25
+Enter name:
+Age: 25
+Name:
+❗Oops! name is empty because nextLine() consumed the leftover newline from nextInt().
+
+✅ How to Fix It:
+Solution: Add a sc.nextLine() dummy call after nextInt() or next() to consume the leftover newline.
+
+System.out.print("Enter age: ");
+int age = sc.nextInt();
+sc.nextLine(); // ← eat the leftover newline
+
+System.out.print("Enter name: ");
+String name = sc.nextLine();
+
+🔷 IIB — Instance Initialization Block
+########################################
+It runs every time an object is created, before the constructor, and is used to initialize instance (non-static) data.
+You can think of an IIB as an anonymous constructor fragment that runs before the real constructor.
+
+package p1;
+
+public class iiBTutorial {
+	int i;
+	int j;
+	static int k;
+	static void test() {
+		System.out.println("Test method called");
+	}
+	{
+		i = 10;
+		j = 20;
+		System.out.println("Intance Initialization Block 1 called");
+		System.out.println("The value of i: " + i);
+		System.out.println("The value of j: " + j);
+		System.out.println("The value of k: " + k);
+		test();
+		// new iiBTutorial();-----------> recursive calling of IIB stack overflow, cannot create object inside IIB
+	}
+	{
+		System.out.println("Intance Initialization Block 2 called");
+	}
+
+	iiBTutorial() {
+		System.out.println("B constructor called");
+	}
+
+	public static void main(String[] args) {
+		iiBTutorial b1 = new iiBTutorial();
+		test();
+	}
+}
+
+When you create an object, Java executes:
+1. Instance variable initializations
+2. IIB block(s) (in the order they appear)
+3. Constructor
+
+➤Use Case: To initialize instance variables or logic common to all constructors.
+➤Runs whenever an object creation takes place.
+➤Every time a new object is created, IIB runs.
+
+✅ When to Use IIB?
+➤When all constructors need to run some common code.
+➤To reduce duplication across overloaded constructors.
+
+Note: A Static variable/method can be accessed inside the IIB
+
+🔷 SIB — Static Initialization Block
+#######################################
+It runs once when the class is loaded, before the main() method or any static method/variable is accessed.
+
+package p1;
+public class SIBTutorial {
+	static int i;
+	int j;
+	static {
+		System.out.println("Static Initialization Block-1 called");
+		System.out.println("The value of i "+i);
+		i=20;
+		j=10;//cannot do that
+		System.out.println("The value of i "+i);	
+	}
+	static {
+		System.out.println("Static Initialization Block-2 called");
+	}
+	public static void main(String[] args) {}
+}
+
+Order of Execution:
+➤Static variable initializations
+➤SIB block(s) (in the order they appear)
+➤Main method
+
+🔥 Use Case:
+➤Initialize static variables
+➤Load configuration, logging, or static resources
+➤Run a one-time setup for the class
+
+Example 2: We can create an object inside SIB through which IIB and the constructor can be called.
+package p1;
+public class A {
+	{
+		System.out.println("IIB");// Print 1
+	}
+	static {
+		new A();
+		System.out.println("SIB"); // Print 3
+	}
+	A(){
+		System.out.println("Constructor of A called");// Print 2
+	}
+	public static void main(String[] args) {
+		System.out.println("Entered Main");// Print 4
+	}
+}
+
+Output 
+IIB
+Constructor of A called
+SIB
+Entered Main
+
+Super in Java
+###############
+The super keyword is a reference variable used within a subclass to refer to its immediate parent class (superclass) members, including variables, methods, and constructors.
+It helps achieve proper inheritance behavior and overriding control.
+
+✅ Uses of super in Java
+1️⃣ Access Parent Class Fields (Variables)
+When the subclass has a variable with the same name as the parent class, super helps distinguish the parent class version.
+It cannot access the private members of the super class.
+
+🎓 Real-World Analogy
+Imagine super as saying:
+"Hey, I want the version of this thing that came from my parent class."
+Just like a child might say:
+"I want to use my dad’s phone, not mine — because it's different."
+
+class A {
+    int num = 10;
+}
+class B extends A {
+    int num = 20;
+    void display() {
+        System.out.println("Child num: " + num);       // 20
+        System.out.println("Parent num: " + super.num); // 10
+    }
+}
+
+2️⃣ Call Parent Class Methods
+If the child class overrides a method, but you still want to call the parent version, use super.methodName().
+
+public class A {
+	 int x = 10;
+	 static int y=20;
+	  static void display() {
+		  System.out.println("This is a static display method");
+	  }
+	    void show() {
+	        System.out.println("In class A");
+	    }
+}
+
+public class B extends A {
+
+	public static void main(String[] args) {
+		B b1=new B();
+		b1.test();	
+	}
+	public void test() {
+		super.display();
+		System.out.println(super.x);
+		System.out.println(super.y);	
+	}
+}
+
+✅ What This Means:
+➤Super is meant to refer to instance (non-static) members of a superclass.
+➤Even though it is technically possible to write super.staticMethod() in Java, it is discouraged, and Java treats it the same as ParentClass.staticMethod() internally.
+➤So, it's not a compiler error, but a bad practice.
+
+✅ Best Practice:
+Always access static members using the class name, not super or this.
+// Good
+ParentClass.staticMethod();
+
+// Bad (misleading)
+super.staticMethod();
+
+3️⃣ Call Parent Class Constructor
+➤super() is used to call the constructor of the parent class from the child class constructor only.
+➤✅ This must be the first statement in the subclass constructor; Hence, super and this keyword cannot be used at the same time.
+➤If in the Child class constructor, this keyword is used, then in that constructor super keyword will not be automatically placed.
+class A {
+    A() {
+        System.out.println("Constructor of A");
+    }
+}
+class B extends A {
+    B() {
+        super();  // Must be first statement
+        System.out.println("Constructor of B");
+    }
+}
+📌 Output:
+Constructor of A
+Constructor of B
+
+Even though you didn’t write super() in class B, Java internally adds it:
+Even If we don't explicitly write the constructor, Java internally calls the constructor and add the super() keyword inside it(but only calls the default constructor of the parent class).
+B() {
+    super(); // inserted automatically by compiler
+    System.out.println("Constructor of B");
+}
+
+🎯 Why use it?
+➤To ensure proper construction of the inheritance chain
+➤To pass values to a parameterized parent constructor
+
+4️⃣ Use with Parameterized Constructors
+class A {
+    A(String msg) {
+        System.out.println("Message from A: " + msg);
+    }
+}
+class B extends A {
+    B() {
+        super("Hello"); // Pass value to superclass constructor
+        System.out.println("Constructor of B");
+    }
+}
+
+❌ super is not allowed in static methods
+The super keyword refers to the current object’s superclass, but static methods belong to the class, not to any object.
+
+🔍 Why This Causes an Error:
+➤Static methods do not have a this reference, because they can be called without creating an object.
+➤Since super is used to refer to the parent of this object, and this doesn't exist in a static context, super becomes invalid there.
+
+🧪 Example:
+class A {
+    int x = 10;
+    static void staticShow() {
+        System.out.println("Static method in A");
+    }
+}
+class B extends A {
+    static void staticTest() {
+        // System.out.println(super.x); ❌ Compile-time error
+        // super.staticShow();          ❌ Compile-time error
+    }
+}
+
+🚫 Both lines give:
+Cannot use 'super' in a static context
+
+✅ What You Can Do in Static Methods:
+If you need to access static members of the parent class in a static method:
+A.staticShow();  // ✅ Correct
+System.out.println(A.someStaticVariable);  // ✅ Correct
+
+Loops in Java
+##############
+1. for loop
+
+Example 1;
+---------
+public class A {
+	public static void main(String[] args) {
+		for (int i = 0; i < 4; i++) { //0 to 3
+			System.out.println(i);
+		}
+	} 
+}
+Example 2:
+a. The user will enter the PIN 1234
+b. If the entered PIN is valid, then the program should print Welcome and stop
+c. If the PIN is invalid, the user can attempt to enter it a maximum of three times.
+d. If all 3 times the PIN is invalid, then the card is blocked message we should get
+
+Code:
+package p1;
+import java.util.Scanner;
+//break
+//1. Can be used only inside loops and switch case statements
+//2. It stops the for loop execution
+public class A {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		
+		for(int i=0;i<3;i++) {//0 to 2
+			System.out.println("Enter the pin number");
+			int pinNumber = scan.nextInt();
+			if(pinNumber==1234) {
+				System.out.println("Welcome");
+				break;
+			}else {
+				System.out.println("Invalid Pin number");
+				if(i==2) {
+					System.out.println("Card is blocked");
+				}
+			}
+		}
+		scan.close();
+	} 
+}
+
+2. while loop
+Example 1:
+----------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int i=0;
+		while(i<3) {//If condition true will enter while loop
+			System.out.println(i);
+			i++;
+		}
+	}	
+}
+
+Example 2:
+--------
+a. Enter the amount, and we should get a message, please collect cash
+b. Then prompt a message: Do you want to continue(yes or no)
+c. If yes, again enter the amount, and we should get a message, please collect cash
+d. If no program is entered, it should stop
+
+Code:
+import java.util.Scanner;
+
+public class A {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		String i="yes";
+		while(i.equals("yes")) {//If condition true will enter while loop
+			System.out.println("Enter the amount");
+			int amount = scan.nextInt();
+			System.out.println("Please collect the cash: rs. "+amount);
+			System.out.println("Do you want to continue(yes/no)?");
+			i = scan.next();
+			
+			if(i.equals("no")) {
+				System.out.println("Thank you. Visit again");
+			}
+		}
+	}
+}
+
+3. do while loop -  Will run first time without condition check. For the second iteration, the condition will be evaluated
+
+Example 1:
+---------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int i=100;
+		do {
+			System.out.println(i);
+			i++;
+		}while(i<3);
+	}	
+}
+
+Example 2:
+----------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int i=0;
+		do {
+			System.out.println(i);
+			i++;
+		}while(i<3);
+	}	
+}
+
+4. for each loop - 
+-> Works only with a data structure
+-> Can only read the value of the data structure one by one
+-> The loop will run until all values are read in the given data structure
+
+Example:
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int[] age = new int[3];
+		age[0] = 100;
+		age[1] = 101;
+		age[2] = 120;
+		
+		for(int x:age) {
+			System.out.println(x);
+		}
+	}
+}
+
+Continuation of Arrays using Loops:
+######################
+
+Example 1:
+----------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int[] age = new int[3];
+		age[0] = 100;
+		age[1] = 101;
+		age[2] = 120;
+		
+		for (int i = 0; i < age.length; i++) {//0 to 2
+			System.out.println(age[i]);
+		}
+	}
+}
+
+ArrayIndexOutOfBoundsException
+#####################################
+➤When we exceed the array size, we get this exception
+
+Example:
+------
+package p1;
+public class A {
+	public static void main(String[] args) {
+		try {
+			int[] age = new int[3];
+			age[0] = 100;
+			age[1] = 101;
+			age[2] = 120;
+			age[3] = 103;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Welcome");
+	}
+}
+
+Output:
+java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+Welcome
+
+Continue Keyword in Java
+#####################
+The continue keyword is used inside loops (for, while, or do-while) to skip the current iteration and jump to the next one.
+
+package p1;
+public class A {
+	public static void main(String[] args) {
+		for (int i = 0; i < 5; i++) {
+			
+			if(i==3) {
+				continue;
+			}
+			System.out.println(i);//0 1 2 4
+		}
+	}
+}
+Output:
+0
+1
+2
+4
+
+else-if ladder statement
+######################
+-> If the user enters yes, it should print pass
+-> If the user enters no, it should print fail
+-> If the user enters something else, it should print invalid input
+
+Example:
+-------------
+package p1;
+
+import java.util.Scanner;
+
+public class A {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter the input(yes/no)");
+		String value = scan.next();
+		if(value.equals("yes")) {
+			System.out.println("Pass");
+		} else if(value.equals("no")) {
+			System.out.println("Fail");
+		} else {
+			System.out.println("Invalid Input");
+		}
+	}	
+}
+
+Switch Case
+############################
+
+package p1;
+
+import java.util.Scanner;
+
+public class A {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter the floor number");
+		int key=scan.nextInt();
+		switch (key) {
+		case 1:
+			System.out.println("1st Floor");
+			break;
+		case 2:
+			System.out.println("2nd Floor");
+			break;
+		case 3:
+			System.out.println("3rd Floor");
+			break;
+		default:
+			System.out.println("Invalid input");
+			break;
+		}
+	}	
+}
+
+Removing Duplicate elements from an array
+###########################################
+➤For the below logic array should be sorted
+
+Steps:
+1. Create a temp array which same size as that of x
+int[] x = {3,3,4,5,6,6,7};
+int[] temp = new int[x.length];
+
+2. Compare i with i+1 of array x, if not equal copy the value from x[i] to temp[j] and increment j by 1
+
+3. When you reach last index of array x, copy that value directly to temp[j];
+
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int[] x = {3,3,4,5,6,6};
+		int[] temp = new int[x.length];
+		int j=0;
+		for(int i=0;i<x.length-1;i++) {//i=5
+			if(x[i]!=x[i+1]) {//with index 5 to 6
+				temp[j] = x[i];
+				j++;
+			}
+		}
+		temp[j] = x[x.length-1];
+		
+		for(int arr:temp) {
+			System.out.println(arr);
+		}
+	}
+}
+
+Logic For Swapping
+##########################
+package p1;
+public class A {
+	public static void main(String[] args) {
+		int x = 10;
+		int y = 20;
+		int temp;
+		temp=y;
+		y=x;
+		x=temp;
+		System.out.println(x);
+		System.out.println(y);
+	}
+}
+
+File Handling in Java
+#######################
+File handling allows Java programs to create, read, write, and delete files or directories stored on disk.
+➤Java uses the java.io, java.nio.file, and java.util packages for file operations.
+
+Example:
+
+package p1;
+import java.io.File;
+public class A {
+	public static void main(String[] args) {
+		File f = new File("E:\\april\\t1.txt");
+		System.out.println(f);
+	}
+}
+
+File f = new File("E:\\april\\t1.txt");
+➤ This line does not check whether the file exists.
+➤ It simply creates a File object representing the given path.
+➤ That means you're just wrapping a file path inside a File object.
+
+System.out.println(f);
+➤ This prints the path stored in the object — it does not interact with the actual file.
+
+✅ exists() Method in Java
+➤ It is a non-static method present inside the File class
+➤ The return type of this method is boolean
+➤ It checks whether the file exists in the given path.
+
+💡 Interview Insights
+Question: Does it check only files or also directories?
+➤ It checks both files and directories.
+➤ exists() does not distinguish between files and directories.
+➤ Use isFile() or isDirectory() to differentiate.
+
+🧠 Code:
+if (f.exists()) {
+    if (f.isFile()) System.out.println("It's a file.");
+    if (f.isDirectory()) System.out.println("It's a directory.");
+}
+
+➤ If the file exists, it will return true, else false.
+
+🔍 Syntax
+File f = new File("path_to_file");
+boolean result = f.exists(); //if exist then true otherwise than false
+
+Example:
+---------
+package p1;
+import java.io.File;
+public class A {
+	public static void main(String[] args) {
+		File f = new File("G:\\april\\t100.txt");
+		boolean val = f.exists();
+		System.out.println(val); // true or false based on file existence
+	}
+}
+
+✅ delete() Method in Java
+➤ It is a non-static method present inside the File class
+➤ The return type of this method is boolean
+➤ It deletes the file that exists in the given path.
+➤ If the file is deleted, it will return true, else false
+
+🔍 Syntax
+File f = new File("path_to_file");
+boolean result = f.delete();
+
+💡 Interview Insights
+Question: How can you delete a directory with files in it?
+You must recursively delete all contents before deleting the directory.
+
+Example:
+--------
+package p1;
+import java.io.File;
+public class A {
+	public static void main(String[] args) {
+		File f = new File("G:\\april\\t1.txt");
+		boolean val = f.delete();
+		System.out.println(val);
+	}
+}
+
+⚙️ Interview Exercise
+How would you delete a non-empty folder in Java?
+
+public static void deleteDirectory(File dir) {
+    if (dir.isDirectory()) {
+        for (File file : dir.listFiles()) {
+            deleteDirectory(file);
+        }
+    }
+    dir.delete(); // delete files/subdirs and finally the directory itself
+}
+
+✅ mkdir() Method in Java
+
+➤ It is a non-static method present inside the File class
+➤ The return type of this method is boolean
+➤ It creates a folder  in the given path.
+➤ If a folder is created, it will return true, else false
+➤ It will neither replace the existing folder nor overwrite it.
+
+🔍 Syntax
+File f = new File("path_to_directory");
+boolean created = f.mkdir();
+
+💡 Interview Insights
+Will mkdir() create parent folders if they don’t exist?
+❌ No. It will return false if the parent directory is missing.
+
+What’s the difference between mkdir() and mkdirs()?
+mkdir() → Creates only the last directory if the parent exists
+mkdirs() → Creates entire directory hierarchy if needed
+
+🧠 Bonus Tip for Interviews
+If you want to create nested directories like G:\\april\\p2\\test\\demo, use:
+
+File f = new File("G:\\april\\p2\\test\\demo");
+f.mkdirs();  // creates all non-existing parent directories
+
+Example:
+-------
+package p1;
+import java.io.File;
+public class A {
+	public static void main(String[] args) {
+		File f = new File("G:\\april\\p2");
+		boolean val = f.mkdir(); // true if created, false if already exists or parent missing
+		System.out.println(val);
+	}
+}
+
+✅ Deleting Folders Using delete() in Java
+
+🔍 Syntax
+File f = new File("path_to_folder");
+boolean result = f.delete();
+
+💡 Interview Insights
+Q: What happens if the folder contains files/subfolders?
+❌ delete() will fail and return false.
+We have to use the recursive deletion method to delete a non-empty directory.
+
+public class A {
+	public static void main(String[] args) {
+		File f = new File("G:\\april\\p2"); // p2 must be empty
+		boolean val = f.delete();
+		System.out.println(val);
+	}
+}
+
+Note: The delete() method can delete both folders/files
+
+✅ length() Method in Java
+➤ It is a non-static method present inside the File class
+➤ The return type of this method is long
+➤ length() returns size in bytes, not characters.
+1 character ≠ 1 byte always (especially in UTF-8 or Unicode encoding)
+➤ White spaces and new lines are also counted as bytes.
+➤ Not valid for directories → returns 0 if used on a directory.
+
+🔍 Syntax
+File f = new File("path_to_file");
+long size = f.length();
+
+💡 Interview Insights
+Q: What if the file doesn't exist?
+➤ Returns 0, doesn't throw an exception.
+
+Q: Can length() be used to measure file upload size?
+➤ Yes, if used carefully. But beware of file encoding differences.
+
+Q: Is length() affected by file encoding?
+➤ Yes — different encodings may change the byte count.
+
+Example:
+--------
+package p1;
+import java.io.File;
+public class A {
+	public static void main(String[] args) {
+		File f = new File("G:\\april\\t1.txt");
+		long val = f.length();
+		System.out.println(val);
+	}
+}
+
+🧪 Bonus Tip: For Directory Size (Advanced)
+
+public static long folderSize(File folder) {
+    long total = 0;
+    for (File f: folder.listFiles()) {
+        if (f.isFile())
+            total += f.length();
+        else
+            total += folderSize(f);
+    }
+    return total;
+}
+
+Compile-time Exception/Checked Exception
+_____________________________________________
+
+➤ Checked Exceptions are exceptions that are checked at compile time.
+➤ The Java compiler forces you to either handle them using try-catch or declare them using throws.
+➤ These exceptions must be addressed in code; otherwise, the code will not compile.
+
+✅ createNewFile()
+
+➤ createNewFile() is a non-static method in the java.io.File class.
+➤ It attempts to create a new file in the specified path.
+➤ If the file already exists, it does not replace it — instead, it returns false.
+
+Example:
+------
+package p1;
+import java.io.File;
+import java.io.IOException;
+public class A {
+	public static void main(String[] args) {
+		try {
+			File f = new File("G:\\april\\t1.txt");
+			boolean val = f.createNewFile();
+			System.out.println(val);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+
+🧠 Interview Insights
+Q: Will the file be created if the path doesn't exist?
+❌ No, intermediate folders must already exist. Otherwise, it throws an exception.
+
+Q: Can createNewFile() create folders?
+❌ No, it is only for creating files, not directories. Use mkdir() for folders.
+
+IOException in Java
+➤ IOException is a checked exception in Java.
+➤ It is part of the java.io package.
+➤ It is thrown when an Input/Output operation fails or is interrupted.
+
+📌 Class Signature
+public class IOException extends Exception
+
+📂 Common Scenarios Where IOException Occurs
+| 🔍 Scenario            | 💡 Example                                            |
+| ---------------------- | ----------------------------------------------------- |
+| 📁 File not found      | Reading a file that doesn't exist (`FileInputStream`) |
+| 🔒 File not readable   | Accessing a file without permission                   |
+| 🌐 Network I/O failure | Socket gets disconnected during data transfer         |
+| ❌ Stream closed        | Reading from or writing to a closed stream            |
+| 💾 Full disk           | Writing to disk when no space is available            |
+
+
+
+6. list()-
+-------------------
+➤ list() is a non-static method present in the java.io.File class.
+➤ It returns a String[] array containing the names of files and directories in the current directory.
+➤ It does not include absolute or full paths—just the names.
+➤ To get the full path use listFiles() instead of list().
+
+📌 Syntax
+public String[] list()
+
+Example:
+-------
+package p1;
+import java.io.File;
+public class A {
+	public static void main(String[] args) {
+			File f = new File("G:\\april\\");
+			String[] val = f.list();
+			for(String x: val) {
+				System.out.println(x);
+			}
+			System.out.println(val.length);
+	}
+}
+
+🧠 Interview Insights
+Q: What is returned if the file object is not a directory?
+❌ null is returned, not an empty array — interview trap
+
+🧪 Common Mistakes (Interview Traps)
+| ❌ Mistake                                                 | ✅ Correct Understanding                                                 |
+| --------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Assuming `list()` works on files                          | `list()` **only works on directories**                                  |
+| Expecting full paths                                      | It returns **only names**, not full paths                               |
+| Not checking for `null`                                   | Always check if `list()` returns `null` to avoid `NullPointerException` |
+| Not handling security exceptions (e.g., read permissions) | `SecurityException` may occur — though it’s **unchecked**               |
+
+
+2. FileReader:
+➤ FileReader is a class in the java.io package used to read character-based files.
+➤ It is typically used for reading text files (e.g., .txt, .csv).
+➤ Return type is int, but it returns Unicode/ASCII value, so we often cast it to char.
+➤ It return -1(indicates EOF- End of file) when the file ends.
+➤ Not efficient for large files because it reads one character at a time. Prefer BufferReader.
+
+🧱 Constructor Signature
+FileReader fr = new FileReader(String filePath);
+
+Example 1:
+-----------
+package app_java_3;
+import java.io.FileReader;
+
+public class A {
+	public static void main(String[] args) {
+		try {
+			FileReader fr = new FileReader("G:\\april\\t1.txt");
+			System.out.println((char)fr.read());  // Reads only 1 character
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+Example 2:
+----------
+package app_java_3;
+import java.io.File;
+import java.io.FileReader;
+public class A {
+	public static void main(String[] args) {
+		try {
+			FileReader fr = new FileReader("file.txt");
+			int c;
+			while ((c = fr.read()) != -1) {
+   			 System.out.print((char)c);
+			}
+			fr.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+⚠️ Interview Trap – Don’t Use f.length() with Unicode Files
+✅ It works for simple English text files (ASCII), where 1 byte = 1 character
+❌ NOT SAFE for files with Unicode (multi-byte) characters like Hindi, Chinese, or emojis — f.length() returns byte size, not character count.
+
+File f = new File("file_with_हिंदी.txt");
+System.out.println(f.length());  // May return 18 bytes
+// But the actual number of characters could be < 18
+
+✅ Better alternative:
+int c;
+while ((c = fr.read()) != -1) {
+    System.out.print((char)c);
+}
+
+📌 2. Is FileReader character-based or byte-based?
+✅ FileReader is character-based
+⚠️ It automatically converts bytes to characters using the platform's default charset
+
+✅ FileReader read(char[] ch)
+
+char[] ch = new char[(int)f.length()];//type case to int because f.length returns long and array index only takes int values.
+
+➤ Allocates a character array whose size is equal to the file size in bytes.
+➤ (int)f.length() returns the size in bytes, not characters.
+➤ Risk: Unicode/multibyte characters can break this logic.
+
+fr.read(ch);
+➡️ It reads all the characters from the file into a character array and then prints them one by one.
+
+⚠️ Common Mistakes in Interviews
+
+❌ Assuming file length = number of characters
+char[] ch = new char[(int)f.length()]; // Problematic for UTF-8
+
+❌ Ignoring return value of read(ch)
+fr.read(ch);  // BAD — may not fill array completely
+
+✅ Better Practice:
+int len = fr.read(ch);
+for (int i = 0; i < len; i++) {
+    System.out.print(ch[i]);
+}
+
+Example
+-------
+package app_java_3;
+import java.io.File;
+import java.io.FileReader;
+public class A {
+	public static void main(String[] args) {
+		try {
+			File f = new File("G:\\april\\t1.txt");
+			FileReader fr = new FileReader(f);
+			char[] ch = new char[(int)f.length()];
+			fr.read(ch);
+			
+			for(char c:ch) {
+				System.out.print(c);
+			}
+			fr.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+📝 FileWriter in Java
+########################
+
+🔹 FileWriter Class (java.io)
+➤ Used to write character data to a file.
+➤ Belongs to the java.io package.
+➤ Can create a new file if it doesn’t exist.
+➤ The default behavior is to replace (overwrite) the existing file content.
+➤ You can append to existing content by passing true as a second parameter during object creation.
+
+🔸 Constructor Variants
+1. FileWriter fw = new FileWriter("path")
+Overwrites content if the file exists.
+Creates the file if it doesn’t exist.
+
+2. FileWriter fw = new FileWriter("path", false)
+Same as above — explicitly overwrites content.
+
+3. FileWriter fw = new FileWriter("path", true)
+Appends to the existing file content if present.
+Creates a new file if it doesn’t exist.
+
+🔹 Common Methods
+1. write(int ch): Writes a single character (based on ASCII value).
+2. write(String str): Writes an entire string.
+3. write(char[] ch): Write a character array.
+
+close()
+➤ Saves written content and closes the stream.
+➤ Must be called to avoid data loss or resource leakage.
+
+❓Interviewer Trick: "What happens if the file does not exist?" → FileWriter will create it only if the directory structure already exists; otherwise, it will throw a FileNotFoundException.
+
+✅ Example 1 – Overwriting a file
+package app_java_3;
+
+import java.io.FileWriter;
+
+public class A {
+	public static void main(String[] args) {
+		try {
+			FileWriter fw = new FileWriter("G:\\april\\t4.txt", false);
+			fw.write(97);            // Writes: a
+			fw.write("100");         // Writes: 100
+			fw.write(new char[]{'a','b','c'}); // Writes: abc
+			fw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+✅ Example 2 – Writing multiple lines
+package app_java_3;
+
+import java.io.FileWriter;
+
+public class A {
+	public static void main(String[] args) {
+		try {
+			FileWriter fw = new FileWriter("G://april//t1.txt");
+			fw.write("mike\n");
+			fw.write("stallin\n");
+			fw.write("adam\n");
+			fw.close();//Save the file content and close the file
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+📘 BufferedReader in Java
+#############################
+➤ BufferedReader is used to read text from a character-input stream, buffering characters for efficient reading of characters, arrays, and lines.
+➤ It significantly improves performance over using FileReader alone.
+➤ Introduced in the java.io package.
+
+1. Improved Performance
+Uses a buffer (default size: 8192 characters) to read chunks of data at once, reducing disk I/O.
+
+2. Works with FileReader
+BufferedReader wraps FileReader. On its own, it cannot read files because it doesn’t handle files directly.
+
+3. readLine() Method
+Allows reading one full line (till \n) at a time. Returns null when EOF (End Of File) is reached.
+
+4. Supports Other Input Types
+Can wrap any Reader (e.g., InputStreamReader, StringReader), not just FileReader
+
+📌 Commonly Used Constructors
+BufferedReader br = new BufferedReader(new FileReader("path"));
+BufferedReader br = new BufferedReader(new FileReader("path"), bufferSize); // optional buffer size
+
+➤ Example 1: Reading one character
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+FileReader fr = new FileReader("G://april//t1.txt");
+BufferedReader br = new BufferedReader(fr);
+System.out.println((char)br.read());  // Reads one character
+br.close();
+fr.close();
+
+➤ Example 2: Reading into a char array
+
+FileReader fr = new FileReader("G://f1//t1.txt");
+BufferedReader br = new BufferedReader(fr);
+char[] ch = new char[4];
+br.read(ch); // Reads 4 characters into the array
+for(char c: ch) {
+    System.out.print(c);
+}
+br.close();
+fr.close();
+
+➤ Example 3: Reading multiple lines using readLine()
+
+package p1;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class A{
+	public static void main(String[] args) {
+		try {
+			FileReader fr = new FileReader("file_location");
+			BufferedReader br= new BufferedReader(fr);
+			String line;
+			while ((line = br.readLine()) != null) {
+			    System.out.println(line);
+			}
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+}
+
+🔥 Internal Working
+➤ BufferedReader maintains an internal buffer (char[]).
+➤ When read() or readLine() is called and the buffer is empty, it:
+➤ Pulls a block of characters from the underlying Reader (FileReader)
+➤ Stores them in the buffer
+➤ Serves future reads from this buffer until it's empty again.
+➤ This reduces the number of physical reads from disk, improving performance.
+
+🎯 Advantages
+➤ Reduces file reading time, especially for large files.
+➤ readLine() makes line-by-line processing much easier.
+
+📘 BufferedWriter in Java
+###########################
+➤ BufferedWriter is a part of the java.io package.
+➤ It is used to write text efficiently to character output streams by buffering characters.
+➤ Improves performance by minimizing disk interaction (reducing write operations).
+
+🔍 Core Features
+Buffers characters before writing to the destination (default size: 8192 characters).
+Can write:
+1. Strings (write(String str))
+2. Single characters (write(int c))
+3. Character arrays (write(char[] cbuf))
+
+Supports newLine() to write platform-dependent line separator (\n, \r\n, etc.)
+Must be used with a Writer (e.g., FileWriter, OutputStreamWriter) — cannot directly write to files.
+
+🧪 Code Example:
+FileWriter fw = new FileWriter("G://april//t1.txt", true); // true = append mode
+BufferedWriter bw = new BufferedWriter(fw);
+bw.write("mike");
+bw.newLine(); //append new line
+bw.write(97); // Writes the character with ASCII value 97 ('a')
+char[] ch = {'b','c','d'}; //// Writes a char array {'b', 'c', 'd'}
+bw.newLine();
+bw.write(ch);
+
+bw.close(); // Always close in reverse order of creation
+fw.close();
+
+Q. When is the data written to the file?
+✅ When the buffer is full, or flush() / close() is called.
+Prefer flush() if writing in real-time or inside loops.
+
+💾 Serialization & Deserialization in Java
+############################################
+
+Serialization is the process of converting a Java object into a byte stream.
+This byte stream can be:
+1. Written to a file
+2. Transmitted over a network
+3. Saved to a database
+
+Deserialization is the reverse process: Converting a byte stream back into a Java object.
+
+🔄 Real-World Use Cases
+1. Saving the state of an object to a file (e.g., session persistence)
+2. Sending objects over a network (e.g., in RMI, sockets)
+3. Caching objects in memory/disk
+4. Java Messaging Service (JMS)
+
+📘 Key Concepts
+| Concept             | Details                                                             |
+| ------------------- | ------------------------------------------------------------------- |
+| `Serializable`      | Marker interface (`java.io.Serializable`) that must be implemented  |
+| `transient` keyword | Used to skip fields from serialization                              |
+| `serialVersionUID`  | Version control for the class — helps avoid `InvalidClassException` |
+
+Example:
+--------
+package p1;
+import java.io.Serializable;
+
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;  // Version control ID
+    String username = "mike";
+    transient String password = "secret123"; // Will not be serialized
+}
+
+
+➤ transient: tells JVM to skip this field during serialization
+➤ The password field will be null when deserialized
+
+🔐 transient Keyword – In Detail
+Prevents sensitive data (e.g., password, OTP) from being persisted
+Prevents circular references or unnecessarily heavy objects from being serialized
+
+Syntax:
+transient DataType fieldName;
+
+package p1;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+public class B {
+	public static void main(String[] args) {
+		A a1 = new A();
+		try {
+			FileOutputStream fos = new FileOutputStream("G:\\april\\file.ser");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(a1); // a1 is instance of A. The object a1 is converted to a byte stream and saved in a file.ser
+			oos.close();
+			fos.close();
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+	}
+}
+
+⚠️ Bonus Trap: Changing Class After Serialization
+
+If you serialize an object and later modify the class (add/remove fields), deserialization can fail unless:
+serialVersionUID is unchanged
+Compatible changes are made (adding optional fields is safe)
+
+🔹 Can serialVersionUID be anything?
+✅ Yes, you can assign any long value as serialVersionUID.
+
+🔹 Example
+private static final long serialVersionUID = 42L;     // Valid
+private static final long serialVersionUID = 1234567890123456789L;  // Also valid
+
+💡 But Why Do We Use It?
+serialVersionUID is used to verify that the sender and receiver of a serialized object have loaded classes for that object that are compatible concerning serialization.
+
+🔐 What happens without it?
+If you don’t define serialVersionUID, the Java compiler automatically generates it based on class structure (fields, methods, modifiers, etc.).
+
+But the auto-generated value is not consistent across:
+Different compilers (javac vs Eclipse)
+Even minor changes in the class (adding/removing a method or variable)
+
+🚨 Interview Trap
+Q: Can I remove or skip defining serialVersionUID if my class implements Serializable?
+❌ Wrong Answer: Yes, it's optional
+✅ Correct Answer: Technically optional, but highly recommended. Without it, even small changes in the class can cause InvalidClassException during deserialization.
+
+🧠 Best Practices
+Always manually declare serialVersionUID for Serializable classes.
+Choose any long value that’s meaningful to you (version number, timestamp, or arbitrary value).
+
+👨‍💻 Example
+package p1;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+public class C {
+	public static void main(String[] args) {
+		try {
+			FileInputStream fis = new FileInputStream("G:\\april\\file.ser");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			A a1 = (A)ois.readObject();
+			System.out.println(a1.name);
+			System.out.println(a1.password); // The object is restored, but password will be null because it was marked transient
+			ois.close();	
+		} catch (Exception e) {	
+			e.printStackTrace();
+		}
+	}
+}
+
+If class doesn’t implement Serializable	❌ NotSerializableException will be thrown at runtime
+Can static fields be serialized		❌ No. Static fields are class-level, not object-level, so not serialized.
+
+JDBC - Java Database Connectivity
+##########################################
+-> Database: Here we store data in the form of tables permanently
+-> Popular Databases: MySQL, PostgreSQL, Oracle, SQL Server, MongoDB, Derby, h2Database
+-> Install MySQL Database
+Download from here: https://dev.mysql.com/downloads/windows/installer/8.0.html
+-> When you download MySQL Workbench, you will get the following
+a. IDE - To Write SQL Query (Structured Query Language)
+(SQL query is used to interact with the database)
+b. MySQL Server
+
+Installation Doc: https://www.prowesstics.com/blogs/mysql-workbench-installation/
+
+-> Launch MySQL Workbench
+-> Create psaDB connection
+-> Crate Database: Create Database psaDB
+-> Connect to Database: use psaDB
+-> Create Table Student: 
+Create table student(
+	name varchar(45),
+    email varchar(128),
+    mobile varchar(10)
+)
+-> Read Table Content: Select * from student
+-> Insert data to table: insert into student values('mike','mike@gmail.com','9632629033')
+-> Read Table Content: Select * from student
+
+Assignment: Complete SQL Recorded Classes. Access will be given in the PSA App. Nearly covered 250+ examples
+
+After installing MySQL Workbench, we can now start with the JDBC Concept
+------------------------------------------------------------------------
+-> Interacting with the database using Java program
+-> Download Connector File for MySQL: https://dev.mysql.com/downloads/file/?id=538917
+-> Create a folder with the name lib inside the root path of your Java project & paste the connector jar file inside it
+-> Right click on project>>Go to properties>>select java build path>> click on libraries tab>>Click on add jar>>navigate to lib folder and select mysql connector j jar>> click apply + close
+
+Example 1: JDBC code to insert data
+-----------------------------------
+package jdbc_examples;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+
+public class A {
+	public static void main(String[] args) {
+		try {
+//Connect to database - use psaDB (SQL)
+			
+Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1","root","test");
+
+//Write & execute SQl query
+Statement stmnt =  con.createStatement();
+stmnt.executeUpdate("insert into student values('adam','adam@gmail.com','9632629555')");
+			
+//Close database connection
+con.close();
+} catch (Exception e) {
+	e.printStackTrace();
+}
+}
+}
+ 
+Example 2: JDBC Code to delete a record
+---------------------------------------
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+
+public class B {
+	public static void main(String[] args) {
+		try {
+			//Connect to database - use psaDB (SQL)
+		Connection con = 
+					DriverManager.
+	getConnection("jdbc:mysql://localhost:3306/psadb1","root","test");
+					
+			//Write & execute SQl query
+			
+			Statement stmnt =  con.createStatement();
+			stmnt.executeUpdate("Delete from student where email='adam@gmail.com'");
+			//Close database connection
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+Example 3: JDBC Code to update a Record
+-------------------------------------
+import java.sql.*;
+
+public class C {
+	public static void main(String[] args) {
+		try {
+			//Step Connect to Database
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
+			
+			//Step 2: Execute SQL Query
+			Statement stmnt = con.createStatement();
+			stmnt.executeUpdate("Update student set mobile='9632882052' where email='mike@gmail.com'");
+			
+			//Step 3: Close Database Connection
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+Example 4: JDBC Code to read data from the database
+-----------------------------------------------
+package p1;
+
+import java.sql.*;
+
+public class D {
+	public static void main(String[] args) {
+		try {
+			//Step Connect to Database
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
+			
+			//Step 2: Execute SQl Query
+			Statement stmnt = con.createStatement();
+			ResultSet result = stmnt.executeQuery("Select * from student");
+			
+			while(result.next()) {
+				System.out.println(result.getString(1));
+				System.out.println(result.getString(2));
+				System.out.println(result.getString(3));
+			}
+			
+			//Step 3: Close Database Connection
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+✅ Custom Exception in Java
+##############################
+Custom exceptions are user-defined exceptions that extend either the Exception class (for checked exceptions) or the RuntimeException class (for unchecked exceptions).
+
+🔹 Syntax for Custom Exception
+✅ 1. Checked Exception (extends Exception)
+// Custom checked exception
+public class MyCheckedException extends Exception {
+    public MyCheckedException(String message) {
+        super(message);
+    }
+}
+
+✅ 2. Unchecked Exception (extends RuntimeException)
+// Custom unchecked exception
+public class MyUncheckedException extends RuntimeException {
+    public MyUncheckedException(String message) {
+        super(message);
+    }
+}
+
+🔧 Example with Usage
+📌 Example: Creating and Using a Checked Exception
+// Custom exception class
+class AgeInvalidException extends Exception {
+    public AgeInvalidException(String message) {
+        super(message);
+    }
+}
+
+// Business logic
+public class CustomExceptionDemo {
+    public static void validateAge(int age) throws AgeInvalidException {
+        if (age < 18) {
+            throw new AgeInvalidException("❌ Age is not valid for voting!");
+        } else {
+            System.out.println("✅ You are eligible to vote.");
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            validateAge(15);
+        } catch (AgeInvalidException e) {
+            System.out.println("Caught Exception: " + e.getMessage());
+        }
+    }
+}
+
+📘 Best Practices for Custom Exceptions
+➤ Always extend Exception or RuntimeException.
+➤ Provide constructors for messages and causes.
+➤ Use descriptive names (InvalidAgeException, UserNotFoundException).
+➤ Don’t overuse — prefer standard exceptions when they fit.
+
+🧠 Interview Tips & Traps
+| ❓ Question                                             | ✅ Good Answer                                                 |
+| ------------------------------------------------------ | ------------------------------------------------------------- |
+| Should I extend `Throwable` directly?                  | ❌ No, use `Exception` or `RuntimeException`.                  |
+| Can I throw a custom exception without the `throws` keyword? | ✅ Yes, but only if it extends `RuntimeException` (unchecked). |
+| Why create custom exceptions?                          | To handle specific business logic and improve code clarity.   |
+| Can custom exceptions have multiple constructors?      | ✅ Yes, just like any class (with message, cause, etc.).       |
+
+✅ Difference between throw and throws in Java
+##################################################
+| Feature                  | `throw`                                       | `throws`                                                |
+| ------------------------ | --------------------------------------------- | ------------------------------------------------------- |
+| Purpose              | Used to explicitly throw an exception     | Used to declare exceptions a method might throw     |
+| Location             | Inside method or block                        | In method signature                                     |
+| Number of Exceptions | Can throw only one exception at a time    | Can declare multiple exceptions separated by commas |
+| Type                 | Followed by an object of `Throwable` type | Followed by one or more **exception class names       |
+| Usage                | Used for triggering exception                 | Used for declaring exception handling responsibility    |
+| Syntax               | `throw new ExceptionType("msg");`             | `public void method() throws IOException`               |
+
+✅ Syntax and Example
+🔹 throw keyword example (used inside method)
+public class ThrowExample {
+    public static void main(String[] args) {
+        int age = 16;
+        if (age < 18) {
+            throw new ArithmeticException("❌ Age must be 18+ to vote");
+        }
+        System.out.println("✅ You can vote");
+    }
+}
+
+🔹 throws keyword example (used in method declaration)
+import java.io.*;
+
+public class ThrowsExample {
+    // declaring that this method may throw IOException
+    public static void readFile() throws IOException {
+        FileReader fr = new FileReader("file.txt"); // may throw IOException
+        BufferedReader br = new BufferedReader(fr);
+        System.out.println(br.readLine());
+    }
+
+    public static void main(String[] args) {
+        try {
+            readFile(); // handle the exception
+        } catch (IOException e) {
+            System.out.println("Caught IOException: " + e.getMessage());
+        }
+    }
+}
+
+🔍 Key Points
+➤ throw is used within a method, while throws is used in the method declaration.
+➤ throws a single instance of an exception.
+➤ throws can declare multiple exceptions that a method might throw.
+➤ Use throw to generate an exception during custom logic validation.
+➤ Use throws to inform the caller method to handle the exception.
+
+⚠️ Common Interview Traps
+| ❓ Trap Question                                                        | ✅ Correct Clarification                                                  |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Can we use `throw` without creating exception object?                  | ❌ No, `throw` must be followed by a `Throwable` object.                  |
+| Can we write `throws` inside method body?                              | ❌ No, `throws` is only used in **method signature**.                     |
+| Can we throw multiple exceptions with `throw`?                         | ❌ No, only **one exception object** at a time.                           |
+| What happens if a method declares `throws` but doesn't actually throw? | ✅ That’s allowed — declaration is just a **promise**, not a requirement. |
+
+✅ Best Practices
+➤ Use throws for checked exceptions that you don’t want to handle in the method.
+➤ Use throw for custom exception logic or early exits.
+➤ Always handle checked exceptions using try-catch or declare them using throws.
+
+Multi-catch blocks:
+---------------------
+➤We can create multiple catch blocks.
+➤Always start with the  child exception class, followed by the parent exception class
+
+Example:
+---------
+package p1;
+
+public class E {
+	int x = 10;
+	public static void main(String[] args) {
+		try {
+			Integer.parseInt("ahsjkdhas687");
+			E a1 = null;
+			System.out.println(a1.x);
+			int x = 10/0;
+		}catch (ArithmeticException e) {
+			System.out.println(1);
+		}catch (NullPointerException e) {
+			System.out.println(2);
+		}catch (Exception e) {
+			System.out.println(3);
+		}
+		
+	}
+}
+
+Finally block in Java
+###########################
+➤ This isan  extension of try try-catch block
+➤The code that we write in the finally block will run 100%, regardless of the exception
+
+Example:
+--------
+public class E {
+	int x = 10;
+	public static void main(String[] args) {
+		try {
+			int x = 100/0;
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			System.out.println("Finally");//Output: Finally
+		}	
+	}
+}
+
+Example:
+--------
+public class E {
+	int x = 10;
+	public static void main(String[] args) {
+		try {
+			int x = 100/2;
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			System.out.println("Finally")//;Output: Finally
+		}
+		
+	}
+}
+
+Example: Can we write only a try-catch block: yes
+--------
+public class E {
+	int x = 10;
+	public static void main(String[] args) {
+		try {
+			int x = 100/0;
+		}finally {
+			System.out.println("Finally");
+		}
+		System.out.println("Welcome");
+	}
+}
+Output: Finally
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at jdbc_examples.E.main(E.java:7)
+
+
+Example where the finally block can be used?
+a. We can perform a database closing operation
+b. We can perform a file closing operation / Database closing Operation
+
+Example :
+package p1;
+
+import java.sql.*;
+
+public class A {
+	public static void main(String[] args) {
+		Connection con = null;
+		try {
+			//Step Connect to Database
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
+			
+			//Step 2: Execute SQl Query
+			Statement stmnt = con.createStatement();
+			stmnt.executeUpdate("insert into student values('adam','adam@gmail.com','9632629455')");
+					
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				//Step 3: Close Database Connection
+				con.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+	}
+}
+
+Interview Question:
+a. Difference between final, finally, and finalize
+=============================================================
+final
+--------
+-> final makes variable constant
+-> final prevents overriding
+-> final on class stops inheritance
+
+finally
+-------
+➤ This is an extension of a try-catch block.
+➤ The code that we write in the finally block will run 100%, regardless of the exception.
+
+finalize():
+----------
+➤ This is a method inside the Object class, and here, the Garbage collection logic is implemented.
+➤ We can try calling the garbage collector using System.gc(). But it will not guarantee 100% execution.
+
+Multithreading in Java
+#########################
+
+✅ Multitasking vs Multiprocessing 
+| Feature            | Multitasking                                          | Multiprocessing                                      |
+| ------------------ | ----------------------------------------------------- | ---------------------------------------------------- |
+| Definition     | Running multiple tasks simultaneously on a single CPU | Running multiple processes on multiple CPUs or cores |
+| Type           | Software-level (tasks share same CPU)                 | Hardware-level (tasks run on separate processors)    |
+| Performance    | Slower compared to multiprocessing                    | Faster execution due to multiple processors          |
+| Cost           | Cost-effective (uses single processor)                | Expensive (requires multiple processors/cores)       |
+| Resource Usage | Shares resources, hence limited                       | Dedicated resources per process                      |
+| Risk           | Can affect performance due to context switching       | More stable and isolated                             |
+| Example        | Multiple threads in a browser                         | OS running browser, editor, and games separately     |
+
+🧠 Interview Trap:
+Q: Which is better, multitasking or multiprocessing?
+✅ Answer: Depends on context.
+
+For lightweight tasks, multitasking via threads is better.
+For CPU-bound tasks, multiprocessing gives better performance.
+
+🔹 2. Threads in Java
+A thread is a lightweight sub-process.
+It is the smallest unit of execution in a program.
+Java uses threads to perform multitasking at the program level.
+
+🔹 Main thread: Default thread started by JVM.
+🔹 User-defined thread: Thread created by programmer.
+
+Methods to Create Threads
+✅ Method 1: Extending the Thread class
+🔧 Steps:
+Create a class that extends Thread
+Override the run() method
+Create an object and call the start() method to begin execution
+
+✅Example:
+public class A extends Thread {
+    public void run() {
+        for (int i = 0; i <= 1000; i++) {
+            System.out.println("Task 1");
+        }
+    }
+
+    public static void main(String[] args) {
+        A a1 = new A(); // Create thread object
+        a1.start();     // Start new thread
+
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("Task 2");
+        }
+    }
+}
+
+☑️ start() → starts a new thread and invokes run() internally.
+❌ Calling run() directly doesn’t create a new thread; it runs on the main thread.
+
+✅ Method 2: Implementing Runnable interface
+🔧 Steps:
+Create a class implementing Runnable
+Override the run() method
+Pass object to Thread constructor
+Call start() on Thread object
+
+✅Example:
+public class A implements Runnable {
+    public void run() {
+        for (int i = 0; i <= 1000; i++) {
+            System.out.println("Task 1");
+        }
+    }
+
+    public static void main(String[] args) {
+        A a1 = new A();             // Runnable object
+        Thread t1 = new Thread(a1); // Thread object
+        t1.start();                 // Start new thread
+
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("Task 2");
+        }
+    }
+}
+
+🧠 Runnable is preferred in real-world Java apps because:
+Java supports single inheritance → extending Thread restricts class hierarchy
+Runnable makes a class more flexible and reusable
+
+📌 Key Differences: Thread vs Runnable
+| Aspect           | `Thread` Class                          | `Runnable` Interface                       |
+| ---------------- | --------------------------------------- | ------------------------------------------ |
+| Inheritance      | Extends Thread                          | Implements Runnable                        |
+| Flexibility      | Less flexible (no multiple inheritance) | More flexible (can extend other classes)   |
+| Resource Usage   | More memory usage                       | Lightweight, better for large applications |
+| Real-world usage | Less preferred                          | More commonly used in production           |
+
+⚠️ Interview Traps & Questions:
+Q: What if we call run() instead of start()?
+It will not create a new thread – the task runs on the main thread, defeating the purpose of threading.
+
+Q: Why use Runnable over extending Thread?
+Because Java does not support multiple inheritance, implementing Runnable allows extending another class.
+
+Q: What is the difference between process and thread?
+A process is an independent program with its own memory space; a thread is a unit of execution within a process.
+
+Q: Is start() synchronous or asynchronous?
+It is asynchronous – after calling start(), JVM schedules thread to run separately from main thread.
+
+✅ Thread Synchronization in Java
+➤Synchronization is the process of controlling access to shared resources by multiple threads in a multithreaded environment.
+➤It ensures that only one thread can access the critical section (shared resource) at a time, preventing data inconsistency.
+
+🔹 Why Synchronization is Needed?
+In Java, threads run asynchronously (independently).
+
+If two or more threads access the same data or object simultaneously, it can lead to race conditions and data corruption.
+
+🔥 Example Scenario:
+balance = 0;
+
+Thread 1 → balance -= i;  (deducting)
+Thread 2 → balance += i;  (adding)
+If both threads execute without coordination, the final balance will be incorrect.
+
+🔹 Thread join() Method
+join() is used to pause the current thread (main thread) until the target thread finishes execution.
+
+This ensures that the main thread waits for the child threads to complete before proceeding.
+
+✅ Use Case:
+t1.join(); // Main thread waits until t1 finishes
+t2.join(); // Main thread waits until t2 finishes
+
+🔹 Real-World Example:
+⚠️ Without Synchronization
+
+class A {
+    int balance;
+
+    public void add() {
+        for (int i = 0; i <= 10000; i++) {
+            balance -= i;
+        }
+    }
+
+    public void sub() {
+        for (int i = 0; i <= 10000; i++) {
+            balance += i;
+        }
+    }
+
+    public void account() {
+        Thread t1 = new Thread(() -> add());
+        Thread t2 = new Thread(() -> sub());
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        A a1 = new A();
+        a1.account();
+        System.out.println(a1.balance);  // May print incorrect result due to race condition
+    }
+}
+
+✅ With Synchronization
+class A {
+    int balance;
+
+    public synchronized void add() {
+        for (int i = 0; i <= 10000; i++) {
+            balance -= i;
+        }
+    }
+
+    public synchronized void sub() {
+        for (int i = 0; i <= 10000; i++) {
+            balance += i;
+        }
+    }
+
+    public void account() {
+        Thread t1 = new Thread(() -> add());
+        Thread t2 = new Thread(() -> sub());
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        A a1 = new A();
+        a1.account();
+        System.out.println(a1.balance); // Always 0 if synchronized correctly
+    }
+}
+
+🔹 Meaning of synchronized Keyword
+➤ The synchronized keyword tells the JVM to acquire a lock on the current object before entering the method.
+➤ Only one thread can hold the lock at a time → other threads are blocked until the lock is released.
+
+🔐 How Lock Works:
+1. Every object in Java has an intrinsic lock (monitor).
+2. When a thread enters a synchronized method, it acquires the lock for that object.
+3. After the method is complete, the lock is released.
+
+🔹 Interview-Level Questions
+Can two threads execute two different synchronized methods of the same object at the same time?
+No. If both methods are synchronized and belong to the same object, one thread must wait.
+
+What happens if you don’t use synchronization in shared data scenarios?
+Unpredictable results – race conditions, incorrect values, or crashes.
+
+Can synchronization be done on a block instead of a method?
+Yes! Use synchronized block to lock only the critical part of the method (better performance):
+synchronized(this) {
+   // critical section
+}
+
+Is join() used for synchronization?
+Not directly. join() is for waiting, not for data safety.
+Use join() to make sure threads finish before the main thread proceeds.
+
+✅ wait(), notify(), notifyAll() in Java
+##########################################
+These are methods of the Object class, not the Thread class.
+
+Why? Because every object in Java has a monitor (lock), and these methods are used to control thread communication on an object's lock.
+
+| Method        | Purpose                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| `wait()`      | Causes the **current thread** to wait until another thread calls `notify()` or `notifyAll()` |
+| `notify()`    | Wakes up **one waiting thread** (chosen arbitrarily) on the object's monitor                 |
+| `notifyAll()` | Wakes up **all waiting threads** on the object's monitor                                     |
+
+🔹 Why Use wait() / notify()?
+Used when:
+Threads need to communicate or coordinate their execution
+For example, producer-consumer problems, or when a thread must pause until another completes
+
+🔹 ⚠️ Important Rules for Using wait() / notify()
+| Rule                                                                | Description                                          |
+| ------------------------------------------------------------------- | ---------------------------------------------------- |
+| Must be called inside `synchronized` block/method                   | Otherwise, you'll get `IllegalMonitorStateException` |
+| Must be called on the **object** whose monitor you're synchronizing |                                                      |
+| `wait()` releases the lock temporarily, `notify()` does not         |                                                      |
+🔹 🔍 Wrong Example (Race Condition)
+class A {
+    public static void main(String[] args) {
+        B b1 = new B();
+        b1.start();
+        System.out.println(b1.balance); // ❌ Likely prints 0 — race condition!
+    }
+}
+
+class B extends Thread {
+    int balance;
+    public void run() {
+        for (int i = 0; i <= 10000; i++) {
+            balance += i;
+        }
+    }
+}
+❌ Problem:
+main() prints balance before run() finishes.
+No synchronization or communication between threads.
+
+✅ Correct Way with wait() and notify()
+class A {
+    public static void main(String[] args) {
+        B b1 = new B();
+        b1.start();
+
+        synchronized (b1) {
+            try {
+                b1.wait();  // Main thread waits for notification from b1
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Final balance: " + b1.balance);  // ✅ Correct value
+    }
+}
+
+class B extends Thread {
+    int balance;
+
+    public void run() {
+        synchronized (this) {
+            for (int i = 0; i <= 10000; i++) {
+                balance += i;
+            }
+            this.notify(); // Wakes up the main thread waiting on this object
+        }
+    }
+}
+
+🔹 When to Use notifyAll() Instead of notify()?
+Use notifyAll() when:
+Multiple threads are waiting for different conditions
+You’re not sure which thread should continue — let the scheduler decide
+
+✅ wait() + notifyAll() Example:
+class Shared {
+    void printMessage() {
+        synchronized (this) {
+            System.out.println(Thread.currentThread().getName() + " is waiting...");
+            try {
+                wait(); // thread goes into waiting state
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(Thread.currentThread().getName() + " is resumed.");
+        }
+    }
+}
+
+class MyThread extends Thread {
+    Shared shared;
+
+    MyThread(Shared shared, String name) {
+        super(name);
+        this.shared = shared;
+    }
+
+    public void run() {
+        shared.printMessage();
+    }
+}
+
+public class NotifyAllSimple {
+    public static void main(String[] args) throws InterruptedException {
+        Shared shared = new Shared();
+
+        MyThread t1 = new MyThread(shared, "Thread-1");
+        MyThread t2 = new MyThread(shared, "Thread-2");
+
+        t1.start();
+        t2.start();
+
+        Thread.sleep(1000); // Allow both threads to call wait()
+
+        synchronized (shared) {
+            System.out.println("Main thread is calling notifyAll...");
+            shared.notifyAll(); // wake up both t1 and t2
+        }
+    }
+}
+
+🟢 Output:
+Thread-1 is waiting...
+Thread-2 is waiting...
+Main thread is calling notifyAll...
+Thread-2 is resumed.
+Thread-1 is resumed.
+
+Note: The order in which resumed threads are executed may change depending on the JVM.
+
+🟢 Thread Life Cycle
+######################
+
+
+
