@@ -580,7 +580,7 @@ Properties and Constraints on the var keyword
 ✅ Yes, all wrapper classes are immutable.
 
 🔹 Key Concepts
-1. Boxing (Manual Conversion)
+1. Boxing (Manual Conversion) Depricated
 Converting primitive → object
 int a = 10;
 Integer i = new Integer(a); // Boxing
@@ -590,7 +590,7 @@ Converting object → primitive
 Integer i = new Integer(10);
 int a = i.intValue(); // Unboxing
 
-3. Autoboxing
+3. Autoboxing- Mostly Used
 The compiler automatically converts a primitive → wrapper object
 int x = 5;
 Integer obj = x;  // Autoboxing
@@ -613,7 +613,7 @@ public class WrapperExample1 {
         Integer obj = new Integer(a); // Boxing
         int b = obj.intValue();       // Unboxing
         System.out.println("Boxed: " + obj + ", Unboxed: " + b);
-	Integer num = 50;     // Autoboxing
+		Integer num = 50;     // Autoboxing
         int val = num + 20;   // Auto-unboxing
         System.out.println("Value: " + val);
     }

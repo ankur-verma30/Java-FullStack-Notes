@@ -1,0 +1,29 @@
+ArrayList<E>
+➤ Resizable array implementation of List.
+➤ Stores elements in contiguous memory like arrays.
+➤ Allows random access using index.
+➤ Maintains insertion order, supports duplicates, and allows null values.
+
+✅ Features:
+➤ Dynamic resizing (internally uses arrays)
+➤ Fast access (O(1) for get)
+➤ Slower insertions/deletions in middle (O(n))
+
+🔍 Example Use:
+ArrayList<String> countries = new ArrayList<>();
+countries.add("India");
+countries.add("USA");
+countries.add("Germany");
+countries.add("India"); // allows duplicates
+
+System.out.println(countries.get(0));     // India
+countries.set(1, "UK");                   // replaces "USA" with "UK"
+countries.remove("India");               // removes 1st occurrence
+System.out.println(countries);
+
+🆕 Java 21+ Example: SequencedCollection Methods
+System.out.println(countries.getFirst());     // First element
+System.out.println(countries.getLast());      // Last element
+System.out.println(countries.reversed());     // Reversed view (immutable)
+countries.removeFirst();                      // Removes first
+countries.removeLast();                       // Removes last
