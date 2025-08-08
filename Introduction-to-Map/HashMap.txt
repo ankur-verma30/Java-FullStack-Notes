@@ -1,0 +1,92 @@
+📒 HashMap in Java 
+
+1. Introduction
+➤ A HashMap is a part of the Java Collections Framework.
+➤ It implements the Map interface and stores data in key-value pairs.
+➤ Keys → Must be unique.
+➤ Values → Can be duplicated.
+➤ Null Support → One null key allowed, multiple null values allowed.
+
+2. Hierarchy
+Map (Interface)
+    |
+    v
+HashMap (Class)
+
+3. Features of HashMap
+➤ Unordered: Does not maintain insertion order.
+➤ Unique Keys: Duplicate keys overwrite the previous value.
+➤ Null Values: One null key, multiple null values allowed.
+
+➤ Time Complexity:
+1. Average case → O(1) for put(), get(), remove().
+2. Worst case → O(n) (when hash collisions occur heavily).
+➤ Non-synchronized: Not thread-safe (use Collections.synchronizedMap() or ConcurrentHashMap for thread safety).
+
+
+5. Example Code
+package p1;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class HashMapIntro {
+    public static void main(String[] args) {
+        Map<String, Integer> mp = new HashMap<>();
+
+        // Adding entries
+        mp.put("234567", 3454);
+        mp.put("345654", 4544); // Numbers with leading 0 are octal → avoid for strings
+        System.out.println(mp); // {234567=3454, 345654=4544}
+
+        // Removing entry
+        int val = mp.remove("234567");
+        System.out.println(val); // 3454
+
+        // Printing after removal
+        System.out.println(mp); // {345654=4544}
+    }
+}
+
+6. Common Methods
+| Method                        | Description                      |
+| ----------------------------- | -------------------------------- |
+| `put(K key, V value)`         | Adds or updates a key-value pair |
+| `get(Object key)`             | Returns value for the given key  |
+| `remove(Object key)`          | Removes entry by key             |
+| `containsKey(Object key)`     | Checks if key exists             |
+| `containsValue(Object value)` | Checks if value exists           |
+| `keySet()`                    | Returns set of keys              |
+| `values()`                    | Returns collection of values     |
+| `entrySet()`                  | Returns set of key-value entries |
+
+7. Iterating Through HashMap
+Using for-each on entrySet()
+for (Map.Entry<String, Integer> entry : mp.entrySet()) {
+    System.out.println(entry.getKey() + " → " + entry.getValue());
+}
+
+Using keySet()
+for (String key : mp.keySet()) {
+    System.out.println(key + " → " + mp.get(key));
+}
+
+Using Iterator
+Iterator<Map.Entry<String, Integer>> itr = mp.entrySet().iterator();
+while (itr.hasNext()) {
+    Map.Entry<String, Integer> entry = itr.next();
+    System.out.println(entry.getKey() + " → " + entry.getValue());
+}
+
+8. Real-World Use Cases in Projects
+➤ Database Caching → Store query results temporarily with query as key.
+➤ User Session Management → Map session IDs to user objects.
+➤ Counting Occurrences → Word frequency counters in text processing.
+➤ Configuration Settings → Map setting names to their values.
+
+9. Points to Remember (Interview)
+➤ Order Not Maintained → Use LinkedHashMap if you want insertion order.
+➤ Thread Safety → Use ConcurrentHashMap in multi-threaded environments.
+➤ Fail-Fast → Iterators throw ConcurrentModificationException if map is modified during iteration (except via iterator’s remove()).
+➤ Performance Tuning → You can set initial capacity & load factor in constructor for better performance.
+
