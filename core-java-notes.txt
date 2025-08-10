@@ -1171,9 +1171,9 @@ A private constructor is a constructor that cannot be accessed outside its class
 ❌ Prevent object creation	        for utility or helper classes
 ✅ Implement Singleton Pattern		Ensure only one instance is created
 🔐 Hide object instantiation		Force object creation through factory methods
-➤If a constructor is made private, then its object cannot be created outside the class.
+➤ If a constructor is made private, then its object cannot be created outside the class.
 
-Example :
+Example 1:
 package p1;
 public class A {
 	private A() {}
@@ -1195,10 +1195,9 @@ public class C {
 	}
 }
 
-➤When a constructor is made private, then inheritance of that class is not allowed
+➤ When a constructor is made private, then inheritance of that class is not allowed
 
 Example 2:
-----------
 package p1;
 public class A {
 	private A() {}	
@@ -1214,19 +1213,17 @@ public class C extends A{//-->Error
 }
 
 🏗️ Default Constructor in Java
-################################
 A default constructor is a no-argument constructor that the Java compiler automatically provides if you do not define any constructors in your class.
 
 ✅ Key Features:
-Feature					Description
-No parameters. 				Takes zero arguments
+Feature							Description
+No parameters. 					Takes zero arguments
 Provided automatically			Only if no constructor is defined by the user
 Initializes variables,			sets fields to default values (e.g., 0, null)
 Used for object creation		Allows creation of objects without parameters
-➤If a constructor is made default, then its object can be created in the same class/same package, but not outside the package.
+➤ If a constructor is made default, then its object can be created in the same class/same package, but not outside the package.
 
 Example 1:
-
 package p1;
 public class A {
 	A() {}
@@ -1249,7 +1246,6 @@ public class C{
 }
 
 Example 2:
-
 package p1;
 public class A {
 	A() {}
@@ -1263,18 +1259,16 @@ public class C extends A{//-->Error
 }
 
 🔐 Protected Constructor in Java
-#################################
 A protected constructor means the constructor can only be accessed:
 ✅ Within the same package
 ✅ From subclasses (even in other packages)
 
 ✅ Why Use a Protected Constructor?
-➤To restrict object creation outside the package
-➤To allow subclassing but prevent direct instantiation from unrelated classes
-➤Often used in inheritance-based designs, frameworks, or abstract factories
+➤ To restrict object creation outside the package
+➤ To allow subclassing but prevent direct instantiation from unrelated classes
+➤ Often used in inheritance-based designs, frameworks, or abstract factories
 
 Example 1:
-
 package p1;
 public class A {
 	protected A() {}
@@ -1297,10 +1291,9 @@ public class C {
 		A a1 = new A();//-->Error
 	}
 }
-➤When a constructor is made protected, then inheritance of that class is  allowed in the same package / outside the package (both).
+➤ When a constructor is made protected, then inheritance of that class is allowed in the same package / outside the package (both).
 
 Example 2:
-
 package p1;
 public class A {
 	protected A() {}
@@ -1313,12 +1306,10 @@ package p2;
 import p1.A;
 public class C extends A {}
 
-e. public Constructor
-
-➤If a constructor is made public, then its object can be created in the same class/same package, and outside the package also
+🌟Public Constructor
+➤ If a constructor is made public, then its object can be created in the same class/same package, and outside the package also
 
 Example 1:
-
 package p1;
 public class A {
 	public A() {}
@@ -1342,10 +1333,9 @@ public class C  {
 	}
 }
 
-➤When a constructor is made public, then inheritance of that class is  allowed in the same package / outside the package (both)
+➤ When a constructor is made public, then inheritance of that class is allowed in the same package / outside the package (both)
 
 Example 2:
-
 package p1;
 public class A {
 	public A() {}
@@ -1358,11 +1348,10 @@ package p2;
 import p1.A;
 public class C extends A {}
 
-
 ✅ Access Specifiers on Top-Level Classes:
-Access Specifier			Usage					Visibility
-public					public class ClassName {}		Visible to all classes everywhere (within the same package or other packages).
-Default (no modifier)			class ClassName {}			Visible to classes within the same package only.
+Access Specifier				Usage							Visibility
+public							public class ClassName {}		Visible to all classes everywhere (within the same package or other packages).
+Default (no modifier)			class ClassName {}				Visible to classes within the same package only.
 
 ❌ Not allowed on top-level classes:
 private
@@ -1416,12 +1405,10 @@ public class C {
 }
 
 What happens when a class is made public?
-Answer:
-➤Its object can be created in the same class/same package & inside a different package
-➤Inheritance is allowed in the same package & inside different packages
+➤ Its object can be created in the same class/same package & inside a different package
+➤ Inheritance is allowed in the same package & inside different packages
 
 Example :
-
 package p1;
 public class A {}
 
@@ -1432,11 +1419,10 @@ package p2;
 import p1.A;
 public class C extends A{}
 
-Note:
-a. Compile Time
-➤This is the phase where source code is checked and translated into bytecode.
-➤Java source files (.java) are compiled by the Java Compiler (javac).
-➤The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
+🔗 Compile Time
+➤ This is the phase where source code is checked and translated into bytecode.
+➤ Java source files (.java) are compiled by the Java Compiler (javac).
+➤ The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
 
 [Source Code (.java file)]
              |
@@ -1468,13 +1454,51 @@ a. Compile Time
              v
 [CPU Executes Code → Output]
 
+The JVM uses both an interpreter and a JIT (Just-In-Time) compiler because it’s designed to balance fast startup with high runtime performance.
+
+1️⃣ Roles of Each
+Interpreter
+➤ Reads bytecode line by line and executes it directly.
+➤ Advantage: Immediate execution → fast startup.
+➤ Disadvantage: Slower in the long run because every instruction has to be interpreted again and again.
+
+JIT Compiler
+➤ Detects “hot code” (frequently executed methods/loops).
+➤ Translates those bytecode parts into native machine code.
+➤ Advantage: Native code runs much faster (close to C/C++ speeds).
+➤ Disadvantage: Compilation takes time and memory.
+
+2️⃣ Why JVM Combines Them
+If the JVM only used:
+➤ Interpreter only → Quick startup but poor long-term performance.
+➤ JIT only → Very slow startup (needs to compile everything first).
+
+By combining:
+➤ Start with the interpreter → get the program running instantly.
+➤ Monitor execution → detect methods/loops used often.
+➤ Switch to JIT for those hot parts → gain native-speed execution.
+
+This is called adaptive optimization.
+
+3️⃣ Real-Life Analogy
+➤ Interpreter = You read a speech word-by-word from paper → you can start immediately, but it’s slow if you have to repeat it.
+➤ JIT = You memorize the speech (compile to native) → takes time initially, but then you can say it much faster.
+➤ JVM = First read it from the paper, and for parts you repeat often, memorize them.
+
+4️⃣ Execution Flow in JVM
+➤ Bytecode Verifier checks safety.
+➤ Interpreter starts running bytecode.
+➤ JVM profiling detects “hot” methods.
+➤ JIT compiles those into native code.
+➤ Native code replaces the interpreted version for future calls.
+
 Command: javac MyProgram.java
 Result: Creates MyProgram.class file.
 
-b. Run Time
-➤This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
-➤The JVM loads the .class file and executes the bytecode.
-➤Any exceptions or logical errors may occur during this phase.
+🔗 Run Time
+➤ This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
+➤ The JVM loads the .class file and executes the bytecode.
+➤ Any exceptions or logical errors may occur during this phase.
 
 Command: java MyProgram
 Result: Runs the program using the bytecode inside MyProgram.class.
@@ -1499,23 +1523,22 @@ JVM is platform-dependent (a different version exists for Windows, Linux, Mac, e
 It executes the bytecode by converting it into native machine code at runtime.
 Since every OS has its own JVM, the same bytecode can run on any system with a compatible JVM.
 
-b. Polymorphism
-#################
+🔄 Polymorphism
 Two types of polymorphism:
 
 a. Overriding (Run-time polymorphism):
-➤Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
-➤It is used to achieve Run-time Polymorphism.
-➤The method signature (name + parameters) must be the same in both parent and child classes.
-➤The decision of which method to call is made at run-time, not compile-time.
+➤ Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
+➤ It is used to achieve Run-time Polymorphism.
+➤ The method signature (name + parameters) must be the same in both parent and child classes.
+➤ The decision of which method to call is made at run-time, not compile-time.
 
 🔸 Key Rules of Method Overriding:
-Rule							Description
-Same method signature					Method name, return type, and parameters must be the same.
-Access modifier						Child method must have the same or more accessible modifier (e.g., can’t override public with private).
-Can't override final, static, or private methods	These are either not inherited or cannot be changed.
-Return type						should be the same or covariant (child class return type).
-Use @Override						Optional, but recommended to catch errors at compile time.
+Rule													Description
+Same method signature									Method name, return type, and parameters must be the same.
+Access modifier											Child method must have the same or more accessible modifier (e.g., can’t override public with private).
+Can't override final, static, or private methods		These are either not inherited or cannot be changed.
+Return type												should be the same or covariant (child class return type).
+Use @Override											Optional, but recommended to catch errors at compile time.
 
 Example:
 package p1;
