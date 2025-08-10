@@ -1560,7 +1560,6 @@ public class PlatinumAccount extends GoldAccount {
 		PlatinumAccount p = new PlatinumAccount();
 		p.onlineBanking();
 		p.rateOfInterest()// Output: 6% PA
-		System.out.println("--------");
 		GoldAccount g = new GoldAccount();
 		g.onlineBanking();
 		g.rateOfInterest();//-->Output: nill
@@ -1568,13 +1567,12 @@ public class PlatinumAccount extends GoldAccount {
 }
 
  What are Annotations?
-➤Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
-➤They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
+➤ Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
+➤ They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
 
  Common Use: @Override
---------------------------
-➤@Override is used to indicate that a method is intended to override a method in the superclass.
-➤It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
+➤ @Override is used to indicate that a method is intended to override a method in the superclass.
+➤ It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
 
 package p1;
 	public class GoldAccount {	
@@ -1591,8 +1589,8 @@ public class PlatinumAccount extends GoldAccount {
 	}	
 }
 
-Question: Access Specifier should be the same or can it be different during Overriding?
-Answer: During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
+❗Access Specifier should be the same, or can it be different during Overriding?
+ During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
 
 Example 1:
 package p1;
@@ -1612,7 +1610,6 @@ public class PlatinumAccount extends GoldAccount {
 }
 
 Example 2:
-
 package p1;
 public class GoldAccount {
 	public void rateOfInterest() {
@@ -1622,9 +1619,8 @@ public class GoldAccount {
 
 package p1;
 public class PlatinumAccount extends GoldAccount {
-//Error: Because the public scope is reduced to the default
 	@Override
-	void rateOfInterest() {
+	void rateOfInterest() { //❌Error: Because the public scope is reduced to the default
 		System.out.println("6% PA");
 	}
 }
@@ -1633,7 +1629,6 @@ Order of Access Specifiers
 Private -> Default -> Proctected -> Public
 
 Example 3:
-
 package p1;
 public class GoldAccount {
 	private void rateOfInterest() {
@@ -1643,22 +1638,17 @@ public class GoldAccount {
 
 package p1;
 public class PlatinumAccount extends GoldAccount {
-//Error: Because private methods, we cannot inherit
-//Without inheritance, overriding cannot be done
 	@Override
-	protected void rateOfInterest() {
+	protected void rateOfInterest()  //❌Error: Because private methods cannot be inherited, without inheritance, overriding cannot be done
 		System.out.println("6% PA");
 	}
 }
 
-Note: Static members cannot be inherited
 ❓ Are Static Members Inherited in Java?
 ✅ Technically, static members are inherited — but they are not polymorphic, and they do not behave like instance members in inheritance.
 
 🔥 Common Misconception:
-People often say:
-❌ "Static members cannot be inherited."
-But that's not entirely accurate.
+❌ "Static members cannot be inherited." But that's not entirely accurate.
 
 ✅ What Happens:
 1. Static members belong to the class, not to objects.
@@ -1687,6 +1677,7 @@ public class Main {
         obj.show(); // Output: A (not B)
     }
 }
+
 Is this overriding?
 ❌ No. This is method hiding, not method overriding, because the methods are static
 ➤ Even though obj is of type B, A.show() gets called because static methods are resolved at compile time, based on the reference type, not the object.
@@ -1715,7 +1706,6 @@ public class GoldAccount {
 }
 
 package p1;
-
 public class PlatinumAccount extends GoldAccount {
     public static void main(String[] args) {
         PlatinumAccount.rateOfInterest();      // Output:  nill
@@ -1748,12 +1738,12 @@ PlatinumAccount.x; // resolves to GoldAccount.x (100)
 | Change method name          | ❌ No                    | It's not overloading, it's a new method |
 
 🔸 Characteristics of Overloading:
-Feature					Description
-Method name				must be the same
+Feature						Description
+Method name					must be the same
 Parameter list				must be different (type, number, or order)
-Return type				can be the same or different, but doesn't affect overloading
+Return type					can be the same or different, but doesn't affect overloading
 Access modifier				can be the same or different
-Inheritance				is not required for overloading
+Inheritance					is not required for overloading
 Polymorphism type			Compile-time polymorphism
 
 Example:
@@ -1773,18 +1763,17 @@ public class EmailService {
 }
 
 Final Keyword
-################################
-➤If you make a variable final, then we cannot change its value(Just like constant variables).
-➤If you make a static/non-static variable final, then initialization is mandatory.
+➤ If you make a variable final, then we cannot change its value(Just like constant variables).
+➤ If you make a static/non-static variable final, then initialization is mandatory.
 
-Example:  
----------
+Example:
+package p1;
 public interface A {
 	int MAX_VAL=100;
 	static final int MIN_VAL=0;
 }
-package p1;
 
+package p1;
 public class B {
 	public static void main(String[] args) {
 		System.out.println(A.MAX_VAL);//Output: 100
@@ -1792,12 +1781,12 @@ public class B {
 	}
 }
 
-➤If you make a method final, then overriding is not allowed, but inheritance is allowed
+➤ If you make a method final, then overriding is not allowed, but inheritance is allowed
 🔒 Why Use final on a Method?
 1. You want to prevent subclassing from changing the logic of a method.
 2. You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
 
-➤If you make a class final, then inheritance is not allowed
+➤ If you make a class final, then inheritance is not allowed
 A final class:
 ❌ Cannot be extended/inherited.
 ✅ Can have regular (non-final) methods.
@@ -1807,22 +1796,20 @@ But since the class itself cannot be inherited:
 🔒 No methods inside it — final or not — can ever be overridden.
 
 Example 1: 
-----------
 package p1;
 
 public class A {
 	public static void main(String[] args) {
 		final int x = 10;
-		x=20;//-->Cannot change the value of final variable
+		x=20;//-->Cannot change the value of a final variable
 		final int y;//->final mandatory to be initialized
 	        final static int z;//->final mandatory to be initialized
-	        //The above errors are called blank field errors
+	        //❌The above errors are called blank field errors
 		System.out.println(y);
 	}
 }
 
 Example 2:
-----------
 package p1;
 
 public class A {
@@ -1834,25 +1821,23 @@ package p1;
 
 public class B extends A{
 	@Override
-	public void test() {//--> Error because we cannot override final methods
+	public void test() {//❌ Error because we cannot override final methods
 		System.out.println(100);
 	}
 }
 
 Example 3:
-----------
 package p1;
-
 final public class A {}
-package p1;
 
-public class B extends A{//---> Error because we cannot inherit final class	
+package p1;
+public class B extends A{//❌ Error because we cannot inherit final class	
 }
 
-✅ What Happens When a Reference Variable is Marked final?
+✅ What Happens When a Reference Variable is marked final?
 final Student s = new Student();
 ➤ You can't reassign s to point to another object.
-➤ But you can still modify the object that s refers to(if it is mutable). unless the class itself is immutable(like String).
+➤ But you can still modify the object that refers to(if it is mutable). unless the class itself is immutable(like String).
 
 ✅ Example:
 class Student {
@@ -1869,10 +1854,9 @@ public class Test {
 }
 
 Why do you use the final for references?
-To prevent reassignment, ensure safe dependency injection, and to make code more thread-safe and readable. It’s also a key part of writing immutable classes and predictable lambdas.
+To prevent reassignment, ensure safe dependency injection, and make code more thread-safe and readable. It’s also a key part of writing immutable classes and predictable lambdas.
 
 Interfaces in Java - Abstraction
-##################################
 Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
 
 🔹 Key Points:
@@ -1884,29 +1868,28 @@ Complete Abstraction (Java 7)
 ➤ No need to specify these modifiers—they are applied by default.
 ➤ No Object creation
 
-✅ Note: Drawback of Inheritance – Tightly Coupled Programming
-🔹 What is Tightly Coupled Programming?
-➤When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
-➤In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
+❗ Drawback of Inheritance – Tightly Coupled Programming
+➤ When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
+➤ In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
 
 🔸 How Inheritance Causes Tight Coupling:
 Child class depends heavily on the parent class:
-➤In inheritance, the child class inherits both behavior and structure from the parent.
-➤If the parent class changes, it can break or affect the behavior of all child classes.
+➤ In inheritance, the child class inherits both behavior and structure from the parent.
+➤ If the parent class changes, it can break or affect the behavior of all child classes.
 
 Strong binding:
-➤The child class is strongly bound to the specific parent class.
-➤You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
+➤ The child class is strongly bound to the specific parent class.
+➤ You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
 
 Hard to maintain and extend:
-➤Over time, inherited code becomes fragile.
-➤Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
+➤ Over time, inherited code becomes fragile.
+➤ Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
 
 Example 1:
 package p1;
 
 public interface A {
-	public void test1() {}//-->Error because complete methods are not allowed in an interface	
+	public void test1() {}//❌ Error because complete methods are not allowed in an interface	
 	public void test2(); //Correct version
 	}
 }
@@ -2000,37 +1983,36 @@ Abstract class → for partial implementation + common state
 
 Question 2. Biggest advantage of using an interface instead of an Abstract Class?
 ✅ Loose coupling and flexibility.
-You said it well — interfaces let you add new types of calculators later without changing the existing hierarchy.
-Also:
-Java allows multiple interfaces, but only single inheritance with abstract classes.
+Interfaces let you add new types of calculators later without changing the existing hierarchy.
+Also, Java allows multiple interfaces, but only single inheritance with abstract classes.
 
 ✅ Advantages of Interfaces in Java
 1. Abstraction
-➤Interfaces facilitate complete abstraction.
-➤They allow you to hide implementation details and only expose what needs to be done, not how.
+➤ Interfaces facilitate complete abstraction.
+➤ They allow you to hide implementation details and only expose what needs to be done, not how.
 
 Example: A Database interface may define connect(), disconnect(), but not how these are implemented.
 
 2. Contract Enforcement
-➤When a class implements an interface, it must implement all its methods.
-➤This imposes a strict contract on the class, ensuring consistency in structure and behavior across multiple classes.
+➤ When a class implements an interface, it must implement all its methods.
+➤ This imposes a strict contract on the class, ensuring consistency in structure and behavior across multiple classes.
 
 3. Good Design Practices
-➤Interfaces promote clear separation of responsibilities.
-➤They lead to clean, modular, and testable code.
-➤Developers can work independently on the interface and its implementations.
+➤ Interfaces promote clear separation of responsibilities.
+➤ They lead to clean, modular, and testable code.
+➤ Developers can work independently on the interface and its implementations.
 
 4. Loose Coupling
-➤Classes that use interfaces depend only on method signatures, not on concrete implementations.
-➤This allows changes in implementations without affecting dependent classes.
-➤Enhances flexibility, extensibility, and maintainability of the system.
+➤ Classes that use interfaces depend only on method signatures, not on concrete implementations.
+➤ This allows changes in implementations without affecting dependent classes.
+➤ Enhances flexibility, extensibility, and maintainability of the system.
 
 5. Multiple Inheritance
-➤Java doesn’t support multiple inheritance with classes, but a class can implement multiple interfaces.
-➤This allows a class to inherit behavioral capabilities from multiple sources.
+➤ Java doesn’t support multiple inheritance with classes, but a class can implement multiple interfaces.
+➤ This allows a class to inherit behavioral capabilities from multiple sources.
 
 6. Supports Plug-and-Play Architecture
-➤Interface-based design makes it easy to swap implementations (e.g., using different payment gateways, databases, or services) without changing the dependent code.
+➤ Interface-based design makes it easy to swap implementations (e.g., using different payment gateways, databases, or services) without changing the dependent code.
 
 Note:
 ➤Class to Class Inheritance --> extends
@@ -2038,15 +2020,12 @@ Note:
 ➤Interface to Class Inheritance --> implements
 
 Example :
----------
 package p1;
-
 public interface A {
 	public void test1();
 }
 
 package p1;
-
 public interface B extends A{
 	public void test2();
 }
@@ -2056,7 +2035,6 @@ public interface D{
 }
 
 package p1;
-
 public class C implements B, D { //If you do multiple inheritance on a class, then its parent should be interfaces only
 
 	@Override
@@ -2076,9 +2054,8 @@ public class C implements B, D { //If you do multiple inheritance on a class, th
 }
 
 Example 4:
-----------
 ➤ In class, can we perform extends and implements together
-➤But ensure the extends is used first and then implementes
+➤ But ensure the extends is used first and then implementes
 
 package p1;
 public interface A {
@@ -2121,12 +2098,12 @@ interface B {
 class C implements A, B {
     // ??----------------->// It does not compile
 }
-🧠Interview Question on above example
+🧠Interview Question on the above example
 ❓ Will this compile?
 ❓ If not, what do you do in class C to fix it?
 ❓ Why does Java force you to resolve this?
 
-🧠 Why ??
+🧠It will not compile. Why ??
 ✔️ Because both interfaces A and B define a default void show() method.
 ✔️ When C implements both, Java doesn’t know which one to inherit → 🔺 Diamond Problem (method ambiguity).
 
@@ -2144,22 +2121,21 @@ Because, unlike classes (which can’t be inherited from more than one), interfa
 Java’s philosophy:
 ✳️ “Explicit is better than implicit in cases of ambiguity.”
 
-Question: Can I develop an incomplete static method in an interface?
-Answer: We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
+❗Can I develop an incomplete static method in an interface?
+We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
 
 Example:
 package p1;
 public interface A {
-	public static void test2();//-------> Error
+	public static void test2();//❌ Error
 }
 
 Java 8 Features
-###################
 1. default keyword:
 ➤ We can create complete methods inside an interface. This was introduced in Java version 8.
+
 Example:
 package javaconcepts.p3;
-
 public interface A {
 	default public void test1() {
 		System.out.println("From test1");
@@ -2168,9 +2144,7 @@ public interface A {
 }
 
 package javaconcepts.p3;
-
 public class B implements A {
-
 	public static void main(String[] args) {
 		B b1 = new B();
 		b1.test1();
@@ -2190,13 +2164,13 @@ From Overrided Test1
 From Overrided test2
 
 Before Java 8:
-➤Interfaces could only contain abstract methods (no body).
-➤If you added a new method to an interface, all implementing classes would break unless they implemented the new method.
+➤ Interfaces could only contain abstract methods (no body).
+➤ If you added a new method to an interface, all implementing classes would break unless they implemented the new method.
 
 ✅ Benefits of default Methods in Interfaces
 1. Backward Compatibility
-➤You can add new methods to interfaces without breaking existing implementations.
-➤Existing classes don’t need to override the new default method.
+➤ You can add new methods to interfaces without breaking existing implementations.
+➤ Existing classes don’t need to override the new default method.
 
 interface A {
     void m1();  // originally
@@ -2205,7 +2179,7 @@ interface A {
     }
 }
 
-➤Even if old classes only implement m1(), they won’t break because m2() has a default body.
+➤ Even if old classes only implement m1(), they won’t break because m2() has a default body.
 
 interface A {
     default void greet() {
@@ -2226,24 +2200,22 @@ This allows controlled multiple behavior inheritance.
 
 ✅ 2. Functional Interface
 🔹 Definition:
-➤A Functional Interface is an interface that has exactly one abstract (incomplete) method.
-➤Can have multiple default or static methods (complete methods).
+➤ A Functional Interface is an interface that has exactly one abstract (incomplete) method.
+➤ Can have multiple default or static methods (complete methods).
 ➤ It enables lambda expressions and functional programming in Java.
 
 🔸 Key Points:
-➤A functional interface must contain only one abstract method.
-➤You can add any number of default or static methods (they're considered complete methods).
-➤If the interface inherits more than one abstract method (from multiple interfaces), it no longer remains a functional interface, and the compiler throws an error.
-➤Use @FunctionalInterface annotation to enforce the rule at compile-time.
+➤ A functional interface must contain only one abstract method.
+➤ You can add any number of default or static methods (they're considered complete methods).
+➤ If the interface inherits more than one abstract method (from multiple interfaces), it no longer remains a functional interface, and the compiler throws an error.
+➤ Use @FunctionalInterface annotation to enforce the rule at compile-time.
 
 Example 1:
---------------------
 @FunctionalInterface
-public interface A {//Error-> Because cannot have ZERO incomplete method
+public interface A {//❌ Error-> Because cannot have ZERO incomplete method
 }
 
 Example 2:
-----------
 @FunctionalInterface
 public interface A {
 	public void test1();
@@ -2251,15 +2223,13 @@ public interface A {
 Output:  No Error because it has exactly one incomplete method
 
 Example 3:
-----------
 @FunctionalInterface
-public interface A {//Error->A functional interface should consist of exactly one //incomplete method inside it
+public interface A {//❌ Error->A functional interface should consist of exactly one //incomplete method inside it
 	public void test1();
 	public void test2();
 }
 
 Example 4:
-----------
 package p1;
 @FunctionalInterface
 public interface A {
@@ -2286,13 +2256,11 @@ public class B implements A {
 		
 }
 Output:
----------
 From test 1
 From Test 2
 From Test 3
 
 Example 5:
------------
 package p1;
 public interface A {
 	public void test1();
@@ -2304,19 +2272,19 @@ public interface B extends A{}
 Output: No Error
 
 Example 6:
-----------
 package p1;
 public interface A {
 	public void test1();
 	public void test2();
 }
+
 package p1;
 @FunctionalInterface
 public interface B extends A{}
-Output: Error because we are inheriting 2 methods to a functional interface
 
-Example 6:
----------
+Output:❌ Error because we are inheriting 2 methods to a functional interface
+
+Example 7:
 package p1;
 public interface A {
 	public void test1();	
@@ -2327,14 +2295,14 @@ package p1;
 public interface B extends A{
 	public void test2();
 }
-Output: Error because we are inheriting 1 method from a functional interface, and a functional interface has 1 method, which totals to 2 methods in an interface
+Output:❌ Error because we are inheriting 1 method from a functional interface, and a functional interface has 1 method, which totals to 2 methods in an interface
 
 🔹Lambda Expression:
 A Lambda Expression is a short block of code that:
-➤Takes in parameters
-➤Executes a body
-➤Can be used in place of anonymous classes
-➤Requires a functional interface to work
+➤ Takes in parameters
+➤ Executes a body
+➤ Can be used in place of anonymous classes
+➤ Requires a functional interface to work
 
 🔸 Key Points:
 ✅ Introduced in Java 8
@@ -2359,9 +2327,9 @@ name -> System.out.println("Hello " + name)
 
 ✅ How Lambda Expressions Work in Java?
 ➤ It creates an anonymous class behind the scenes. A class without any name is called Anonymous.
-➤Then the lambda expression creates an object and loads the method by implementing it inside the object.
-➤Then we use an object reference to call that implemented method
-➤Replacing instances of anonymous classes that implement functional interfaces with a concise, inline function-like syntax.
+➤ Then the lambda expression creates an object and loads the method by implementing it inside the object.
+➤ Then we use an object reference to call that implemented method
+➤ Replacing instances of anonymous classes that implement functional interfaces with a concise, inline function-like syntax.
 
 Example:
 @FunctionalInterface
