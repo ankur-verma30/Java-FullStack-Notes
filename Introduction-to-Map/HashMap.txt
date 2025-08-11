@@ -61,17 +61,17 @@ public class HashMapIntro {
 | `entrySet()`                  | Returns set of key-value entries |
 
 7. Iterating Through HashMap
-Using for-each on entrySet()
+🔷 Using for-each on entrySet()
 for (Map.Entry<String, Integer> entry : mp.entrySet()) {
     System.out.println(entry.getKey() + " → " + entry.getValue());
 }
 
-Using keySet()
+🔷 Using keySet()
 for (String key : mp.keySet()) {
     System.out.println(key + " → " + mp.get(key));
 }
 
-Using Iterator
+🔷 Using Iterator
 Iterator<Map.Entry<String, Integer>> itr = mp.entrySet().iterator();
 while (itr.hasNext()) {
     Map.Entry<String, Integer> entry = itr.next();
@@ -84,9 +84,124 @@ while (itr.hasNext()) {
 ➤ Counting Occurrences → Word frequency counters in text processing.
 ➤ Configuration Settings → Map setting names to their values.
 
-9. Points to Remember (Interview)
+9. Points to Remember 
 ➤ Order Not Maintained → Use LinkedHashMap if you want insertion order.
 ➤ Thread Safety → Use ConcurrentHashMap in multi-threaded environments.
 ➤ Fail-Fast → Iterators throw ConcurrentModificationException if map is modified during iteration (except via iterator’s remove()).
 ➤ Performance Tuning → You can set initial capacity & load factor in constructor for better performance.
+
+📒 Internal Working of HashMap in Java
+1. Internal Data Structure
+➤ HashMap internally uses a Hash Table to store data.
+➤ A hash table is basically an array of buckets.
+➤ Bucket → Each position in the array can store multiple entries if collisions occur (via linked list or tree).
+➤ In Java 8+, if a single bucket gets too many elements (default threshold: 8), it is converted from LinkedList to a balanced Red-Black Tree to improve performance from O(n) to O(log n).
+
+2. Initial Capacity
+Default initial capacity = 16 buckets (array length).
+
+You can set capacity in the constructor:
+Map<String, String> mp = new HashMap<>(32);
+
+This means the hash table will start with 32 buckets.
+
+3. Load Factor
+Load factor = 0.75 (default).
+Formula: Threshold = Capacity × Load Factor
+
+Example:
+Initial capacity = 16
+Threshold = 16 × 0.75 = 12
+
+When the 13th entry is inserted, capacity doubles to 32.
+New threshold = 32 × 0.75 = 24.
+
+Why Load Factor Exists?
+➤ To balance time complexity and memory usage.
+Higher load factor → fewer resizes (less memory usage, but more collisions).
+➤ Lower load factor → more resizes (faster lookups, but higher memory usage).
+
+4. hashCode() in HashMap
+➤ Every Java object has a hashCode() method (from Object class).
+➤ hashCode() returns an integer representing the object’s memory-like identity (but not actual memory address).
+
+➤ HashMap uses it to determine bucket index:
+index = (hashCode(key) & (capacity - 1))
+& (capacity - 1) works because capacity is always a power of two → faster than % capacity.
+
+5. Collision in HashMap
+➤ Collision = Two different keys generate the same bucket index.
+
+How it’s handled:
+➤ Before Java 8 → Collision handled by LinkedList chaining in the bucket.
+➤ Java 8 and later:
+1. If bucket size < 8 → stored as LinkedList.
+2. If bucket size ≥ 8 → converted to Red-Black Tree for faster lookups.
+3. If bucket size reduces < 6 → Tree is converted back to LinkedList.
+
+Example:
+Map<Integer, String> map = new HashMap<>();
+map.put(1, "A");
+map.put(17, "B"); // 1 and 17 might fall into the same bucket (collision)
+
+7. Step-by-Step Flow of put()
+➤ Check if table is empty → initialize to default capacity (16).
+➤ Compute hash from hashCode() of the key.
+➤ Calculate index = (hash & (capacity - 1)).
+➤ If no entry exists in that bucket → insert new node.
+
+➤ If entry exists:
+1. If key matches → update value.
+2. If key different but same index → collision → add to LinkedList or Tree.
+➤ If size exceeds threshold → rehash (double capacity).
+
+8. Step-by-Step Flow of get()
+➤ Compute hash from hashCode() of key.
+➤ Calculate index.
+➤ Search bucket:
+1. If LinkedList → iterate and match key using equals().
+2. If Tree → binary search.
+➤ Return value if found, else return null
+
+Drawbacks / Limitations of HashMap
+1. No Order Guarantee
+➤ HashMap does not maintain insertion order or any sorted order of keys.
+➤ Iteration order can change when new entries are added (especially after rehashing).
+➤ If order is important, use LinkedHashMap (insertion order) or TreeMap (sorted order).
+
+2. Not Thread-Safe
+➤ HashMap is not synchronized → multiple threads modifying it at the same time can cause data corruption or infinite loops.
+➤ For thread safety:
+1. Use Collections.synchronizedMap() wrapper.
+2. Or use ConcurrentHashMap.
+
+3. High Memory Usage
+➤ HashMap needs extra memory for buckets, linked lists, and tree nodes.
+➤ More collisions = more memory usage.
+➤ Large load factor → more collisions → more chaining → higher memory consumption.
+
+4. Performance Degrades with Poor hashCode()
+➤ If hashCode() is poorly implemented, many keys may end up in the same bucket.
+➤ This increases collision frequency → performance drops from O(1) to O(n).
+➤ In Java 8+, this degrades to O(log n) if treeified, but still slower than constant time.
+
+5. One Null Key Limit
+➤ Can only have one null key.
+➤ Multiple null values are allowed, but only a single null key.
+➤ Sometimes inconvenient if multiple null-like placeholders are needed.
+
+6. Rehashing Cost
+When the threshold is exceeded, rehashing happens:
+1. Doubles capacity
+2. Redistributes all existing keys
+3. Can be CPU intensive for large maps.
+
+7. Fail-Fast Behavior
+➤ Iterators of HashMap are fail-fast:
+1. If the map is structurally modified during iteration (except via the iterator’s own remove method), it throws ConcurrentModificationException.
+➤ This makes multi-threaded iteration tricky without external synchronization.
+
+8. Large Data = Cache Unfriendly
+➤ Since entries are spread across buckets and nodes, large HashMaps can be less cache-efficient compared to arrays.
+➤ This can cause slower real-world performance despite good average-case complexity.
 
