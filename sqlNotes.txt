@@ -1,0 +1,101 @@
+🔷 Database and Table Navigation
+➤ SHOW DATABASES;                 -- Show all databases
+➤ USE database_name;               -- Use a specific database
+➤ SHOW TABLES;                     -- Show all tables in the selected database
+
+🔷 Reading Data from Tables
+🌟  Select All Columns
+➤ SELECT * FROM emplyoee;
+
+Example Output:
+| EID | EName | Salary | Cities |
+| --- | ----- | ------ | ------ |
+| 1   | Ankur | 10000  | BGLR   |
+| 2   | Ram   | 20000  | BGLR   |
+| 3   | Smith | 5000   | MBI    |
+| 4   | Carlo | 2000   | MBI    |
+| 5   | Manas | 1000   | LKO    |
+| 6   | Ramu  | 15000  | LKO    |
+
+🔷 Reading Specific Columns
+🌟 Sometimes you may only need to retrieve certain columns instead of all the data. For example, if you only want to see the EID and EName columns for every employee, you can write:
+➤ SELECT EID, EName FROM emplyoee;
+
+🔷 Filtering Records Using WHERE
+🌟 If you want to fetch the name of the employee whose salary is exactly 10000, you can apply a filter using the WHERE clause as follows:
+➤ SELECT EName FROM emplyoee WHERE Salary = 10000;
+
+🌟 If you wish to retrieve the names of employees whose salary is greater than or equal to 10000, the query will be:
+➤ SELECT EName FROM emplyoee WHERE Salary >= 10000;
+
+🌟 If you want to get the names of employees whose salary is either 5000 or 2000, you can use the IN operator:
+➤ SELECT EName FROM emplyoee WHERE Salary IN (5000, 2000);
+
+🌟 If your goal is to get the employee IDs for those whose names are either Smith or Carlo, you can write:
+➤ SELECT EID FROM emplyoee WHERE EName IN ('Smith', 'Carlo');
+
+🔷 Using HAVING for Filtering
+🌟 The HAVING clause is generally used to filter aggregated data after a GROUP BY operation, but it can also be applied without grouping. For example, if you want to display all employees whose salary is exactly 10000 using HAVING, you can write:
+➤ SELECT * FROM emplyoee HAVING Salary = 10000;
+
+🌟 Similarly, if you need the employee ID for the employee named "Vikram" using HAVING, the query will be:
+➤ SELECT EID FROM emplyoee HAVING EName = 'Vikram';
+
+🔷 Sorting Data Using ORDER BY
+🌟 If you want to see employee IDs sorted in descending order, you can use:
+➤ SELECT EID FROM emplyoee ORDER BY EID DESC;
+
+🌟 To get employee names sorted in descending order alphabetically:
+➤ SELECT EName FROM emplyoee ORDER BY EName DESC;
+
+🌟 And if you need employee IDs sorted in ascending order:
+➤ SELECT EID FROM emplyoee ORDER BY EID ASC;
+
+🔷 Using Aggregate Functions
+🌟 If you want to find the maximum salary among all employees, you can use the MAX() function:
+➤ SELECT MAX(Salary) FROM emplyoee;
+
+🌟 To find the second-highest salary, you can write:
+➤ SELECT MAX(Salary) 
+FROM emplyoee 
+WHERE Salary < (SELECT MAX(Salary) FROM emplyoee);
+
+🌟 To calculate the average salary of all employees:
+➤ SELECT AVG(Salary) FROM emplyoee;
+
+🌟 If you want to find the total sum of all salaries:
+➤ SELECT SUM(Salary) FROM emplyoee;
+
+🌟 To count the total number of employees:
+➤ SELECT COUNT(EID) FROM emplyoee;
+
+🔷 Grouping Records with GROUP BY
+🌟 If you want to count the number of employees in each city, you can group by the Cities column:
+➤ SELECT Cities, COUNT(EID) 
+FROM emplyoee 
+GROUP BY Cities;
+
+🌟 If you want to count employees city-wise and then sort them in ascending order of count:
+➤ SELECT Cities, COUNT(EID) AS EmpCount
+FROM emplyoee
+GROUP BY Cities
+ORDER BY EmpCount ASC;
+
+🌟 If you want to count the number of cities and sort them alphabetically:
+➤ SELECT Cities, COUNT(Cities) 
+FROM emplyoee
+GROUP BY Cities
+ORDER BY Cities ASC;
+
+🌟 If you want to group employees by city but only for those in Bangalore (BGLR), you can filter with WHERE first:
+➤ SELECT COUNT(Cities) 
+FROM emplyoee
+WHERE Cities = 'BGLR'
+GROUP BY Cities;
+
+🔷 Changing Case of Text
+🌟 To display all employee names in uppercase, you can use the UCASE() function:
+➤ SELECT UCASE(EName) FROM emplyoee;
+
+🌟 To display them in lowercase, use:
+➤ SELECT LCASE(EName) FROM emplyoee;
