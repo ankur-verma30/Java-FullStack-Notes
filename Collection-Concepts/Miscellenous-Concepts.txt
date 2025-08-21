@@ -1,0 +1,92 @@
+🧠 Method Referencing in Java
+🔹 What is Method Referencing
+➤ A shorthand syntax of lambda expressions when the lambda body only calls an existing method.
+➤ Improves readability and makes code look cleaner.
+➤ Introduced in Java 8 with functional programming features.
+
+🔹 Syntax
+ClassName::methodName
+object::methodName
+ClassName::new  (for constructors)
+
+🔹 Types of Method References
+✅Type 1: Reference to a static method
+
+list.forEach(System.out::println);  
+// equivalent to: list.forEach(x -> System.out.println(x));
+
+✅Type 2: Reference to an instance method of a particular object
+String str = "hello";
+Supplier<Integer> s = str::length;
+System.out.println(s.get());  // 5
+
+✅Type 3: Reference to an instance method of an arbitrary object of a particular type
+List<String> names = Arrays.asList("Ankur", "Ravi", "Megha");
+names.sort(String::compareToIgnoreCase);
+// equivalent to (a, b) -> a.compareToIgnoreCase(b)
+
+✅Type 4: Reference to a constructor
+Supplier<Student> s = Student::new;
+Student st = s.get();
+
+🔹 Why Method Reference?
+➤ Makes lambda shorter and cleaner.
+➤ Avoids boilerplate (param) -> obj.method(param).
+➤ mproves readability in sorting, filtering, mapping, etc.
+
+🔹 Example: Sorting with Method Reference
+students.sort(Comparator.comparingInt(Student::getAge));
+
+Equivalent lambda:
+students.sort((s1, s2) -> Integer.compare(s1.getAge(), s2.getAge()));
+
+⚡ Tips
+➤ Method reference is just syntactic sugar for lambdas.
+➤ Works only when the method signature matches the functional interface method.
+➤ Commonly used in Streams API (map, filter, forEach) and Comparator.
+
+✅ Example Code Snippet
+package collections;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
+class Student {
+	String name;
+	double gpa;
+
+	Student(String name, double gpa) {
+		this.name = name;
+		this.gpa = gpa;
+	}
+
+	String getName() {
+		return this.name;
+	}
+
+	double getGpa() {
+		return this.gpa;
+	}
+
+} 
+public class ArrayListIntro {
+
+	public static void main(String[] args) {
+		List<Student> students = new ArrayList<>();
+		students.add(new Student("Charlie", 3.5));
+		students.add(new Student("Bob", 3.7));
+		students.add(new Student("Alice", 3.5));
+		students.add(new Student("Ankur", 3.9));
+
+		Comparator<Student> comparator = Comparator.comparing(Student::getGpa).reversed()
+				.thenComparing(Student::getName);
+
+		students.sort(comparator);
+		for (Student s : students) {
+			System.out.println(s.getName() + " " + s.getGpa());
+		}
+
+	}
+}

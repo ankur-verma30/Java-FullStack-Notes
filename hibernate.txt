@@ -1,0 +1,164 @@
+🔷 Hibernate
+➤ Hibernate is an Object Relational Mapping (ORM) framework in Java.
+➤ It maps Java classes to database tables and Java objects to table rows.
+➤ It removes the need to write raw SQL queries by providing an abstraction layer.
+➤ CRUD operations are automated and handled internally by Hibernate.
+➤ It is an implementation of JPA (Java Persistence API) specification.
+
+🔷  Features of Hibernate
+👉 ORM support → Direct mapping between Java objects and database tables.
+👉 Database Independent → Code works with multiple RDBMS without changes.
+👉 HQL (Hibernate Query Language) → Object-oriented query language.
+👉 Caching support → Improves performance using first-level and second-level cache.
+👉 Lazy Loading → Data fetched only when required.
+👉 Automatic Table Creation → Schema generation can be managed.
+👉 Transaction Management → Integrated with JTA and JDBC transactions.
+
+🔷 Advantages of Hibernate
+➤ Eliminates boilerplate JDBC code.
+➤ Portable across different databases.
+➤ Improved productivity → Less code, more functionality.
+➤ HQL provides flexibility compared to SQL.
+➤ Performance optimization using caching and batch fetching.
+➤ Easy relationship management between entities (@OneToOne, @OneToMany, etc.).
+
+🔹 4. Hibernate Architecture
+➤ Configuration → Loads settings (hibernate.cfg.xml or annotations).
+➤ SessionFactory → Heavyweight, thread-safe object created once; used to open sessions.
+➤ Session → Lightweight, non-thread-safe; represents a single unit of work.
+➤ Transaction → Manages commit/rollback.
+➤ Query/Criteria API → Used to interact with database objects.
+
+✅Flow:
+Application → SessionFactory → Session → Transaction → Database
+
+✅Example Code Snippet: Entity Class Employee
+
+@Entity
+public class Employee {	
+	@Id
+	private int id;
+	private String name;
+	private float salary;
+	
+	//setters
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setSalary(float salary) {
+		this.salary = salary;
+	}
+
+	//Getters
+	public int getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public float getSalary() {
+		return salary;
+	}	
+}
+
+⚡ Explanation:
+➤ @Entity → tells Hibernate: “This class should be mapped to a database table.”
+➤ By default, table name = class name (Employee).
+➤ @Id → tells Hibernate which field is the primary key column in the table.
+➤ Other fields (name, salary) will be mapped as columns in the table.
+
+✅Flow Diagram:
+Employee class  <-->  Employee table
+id              <-->  primary key column
+name            <-->  column name
+salary          <-->  column salary
+
+🔷 Hibernate Annotations
+✔️ @Entity → Marks a class as an entity.
+✔️ @Table(name="...") → Maps class to table.
+✔️ @Id → Marks primary key field.
+✔️ @GeneratedValue → Defines primary key generation strategy.
+✔️ @Column(name="...") → Maps property to a column.
+
+Relationships:
+✔️ @OneToOne
+✔️ @OneToMany
+✔️ @ManyToOne
+✔️ @ManyToMany
+
+🔷 JPA
+👉JPA (Java Persistence API) is a specification, not an implementation.
+👉It defines a standard set of interfaces, annotations, and rules for persisting Java objects into relational databases.
+👉JPA itself does not provide the actual code — it’s like a contract that ORM tools must follow.
+
+Example JPA annotations:
+@Entity, @Id, @Table, @Column
+
+Example JPA interface:
+EntityManager (similar to Hibernate’s Session)
+
+👉 Think of JPA as a blueprint: It only says “this is how persistence should be done”, but does not do the work itself.
+
+🔷 Relation between Hibernate and JPA
+➤ Hibernate is an implementation of JPA.
+➤ It provides the actual code that fulfills JPA specifications.
+➤ It extends JPA and adds extra features not covered by JPA, like:
+    🔗 Hibernate Query Language (HQL)
+    🔗 Advanced caching
+    🔗 Better performance tuning options
+
+➤ Other JPA implementations besides Hibernate:
+    🔗 EclipseLink
+    🔗 OpenJPA
+    🔗 DataNucleus
+
+👉 Think of Hibernate as a real car built from JPA’s design:
+JPA = design/specification
+Hibernate = actual car (with even more features)
+
+✅ Tip:
+What is the difference between JPA and Hibernate?
+✔️ JPA is a specification (interfaces + annotations, no implementation).
+✔️ Hibernate is an implementation of JPA, plus it offers additional features.
+✔️ So, when you write JPA code, you’re usually running it on Hibernate underneath.
+
+🔷 Hibernate Mappings
+
+🌟 OneToMany Mapping
+➤ One record in Table A is related to multiple records in Table B.
+➤ Annotation: @OneToMany
+✅ Example:
+    1. In an E-commerce application, one Customer can have multiple Delivery Addresses saved in their profile.
+    2. In a Banking system, one Bank Branch can have multiple Accounts.
+    3. In a Healthcare system, one Doctor can have multiple Patients assigned.
+
+🌟 ManyToOne Mapping
+➤ Multiple records in Table A map to one record in Table B.
+➤ Annotation: @ManyToOne
+✅ Example:
+    1. In an E-commerce system, many Orders belong to one Customer.
+    2. In a Corporate HR system, many Employees report to one Department.
+    3. In a Travel Booking platform, many Flight Bookings are associated with one User.    
+
+🌟 ManyToMany Mapping
+➤ Records in one table are associated with multiple records in another table and vice versa.
+➤ Annotation: @ManyToMany
+✅ Example:
+    1. In a Learning Management System (LMS), many Students can enroll in many Courses.
+    2. In a Job Portal, many Candidates can apply to many Job Postings.
+    3. In a Music Streaming App, many Artists can be part of many Playlists, and playlists can include multiple artists.    
+
+🌟 OneToOne Mapping
+One record in Table A maps exactly to one record in Table B.
+Annotation: @OneToOne
+✅ Example:
+    1. In a Banking application, one Customer has exactly one PAN Card or KYC record.
+    2. In an HR system, one Employee has exactly one EmployeeProfile record (with DOB, address, etc.).
+    3. In a Car Rental app, one Car has exactly one Insurance Policy.    

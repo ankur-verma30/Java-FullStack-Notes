@@ -49,7 +49,6 @@ public class LinkedListIntro {
 }
 
 3. Important Notes
-
 Java 21 Addition:
 LinkedList now implements SequencedCollection
 

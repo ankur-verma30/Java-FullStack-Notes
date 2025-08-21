@@ -49,8 +49,7 @@ x.add(2345676543L);
 ➤ This fails because List.of() returns an immutable list.
 ➤ You can read from it but cannot modify it.
 
-Error:
-java.lang.UnsupportedOperationException
+Error: java.lang.UnsupportedOperationException
 
 4. Why Use Immutable Lists?
 ✅ Thread-safety (no risk of accidental modifications).

@@ -99,3 +99,420 @@ GROUP BY Cities;
 
 🌟 To display them in lowercase, use:
 ➤ SELECT LCASE(EName) FROM emplyoee;
+
+🔷 Limiting Records with LIMIT()
+If you want to get only the top 2 records of the employee table, the correct approach is to first sort the records in ascending order based on the primary key (EID) and then limit the number of rows displayed.
+➤ SELECT * FROM employee ORDER BY EID ASC LIMIT 2;
+
+🌟 If you want to fetch only the first record from the table, you can simply sort in ascending order and limit the output to 1 row.
+➤ SELECT * FROM employee ORDER BY EID ASC LIMIT 1;
+
+🌟 To get the last two records, sort the table in descending order of EID and then limit it to 2 rows.
+➤ SELECT * FROM employee ORDER BY EID DESC LIMIT 2;
+
+🔷 Extracting Substrings with MID()
+🌟 If you want the city column to display only the first three letters of each city name, you can use the MID() function.
+➤ SELECT MID(Cities, 1, 3) FROM employee;
+
+🔷 Displaying Current System Time
+🌟 If you want to print the current system date and time in SQL, you can use the NOW() function.
+➤ SELECT NOW();
+
+🌟 You can also give an alias to the column name so that the output displays as timestamp.
+➤ SELECT NOW() AS timestamp;
+
+🔷 Using Column Aliases
+🌟 If you want to change the column name EName to Name in the output, you can use the AS keyword.
+➤ SELECT EName AS Name FROM employee;
+
+🔷 Pattern Matching with Wildcards (LIKE)
+🌟 If you want to find the employees whose names end with the letter m, you can use the LIKE operator with %.
+➤ SELECT EName FROM employee WHERE EName LIKE "%m";
+
+🌟 If you want employees whose names contain the letter m anywhere in them:
+➤ SELECT EName FROM employee WHERE EName LIKE "%m%";
+
+🌟 If you want to fetch employees whose names start with the letter s:
+➤ SELECT EName FROM employee WHERE EName LIKE "s%";
+
+🌟 If you want to find employee names that have exactly three letters, you can use underscores (_) as wildcards.
+➤ SELECT EName FROM employee WHERE EName LIKE "___";
+
+🌟 If you want names that have exactly three letters and end with m, you can combine conditions.
+➤ SELECT EName FROM employee WHERE EName LIKE "___" AND EName LIKE "%m";
+
+🔷 Deleting Records
+🌟 If you want to delete a record where the employee ID is 101:
+➤ DELETE FROM employee WHERE EID = 101;
+
+🌟 If you want to delete multiple records with IDs 101 and 102:
+➤ DELETE FROM employee WHERE EID IN (101, 102);
+
+🌟 If you want to delete records where the employee name is "Smith":
+➤ DELETE FROM employee WHERE EName = "Smith";
+
+🌟 If you want to remove the entire table structure and data, you can drop the table.
+➤ DROP TABLE employee;
+
+🔷 Removing Duplicate Records with DISTINCT
+🌟 If you want to get all unique city names from the employee table, you can apply the DISTINCT keyword.
+➤ SELECT DISTINCT Cities FROM employee;
+
+🔷 Concatenating Columns with CONCAT()
+🌟 If you want to join employee names and their salaries into one output column:
+➤ SELECT CONCAT(EName, Salary) FROM employee;
+
+🌟 If you want to concatenate the name and salary with an underscore in between:
+➤ SELECT CONCAT(EName, "_", Salary) FROM employee;
+You can also concatenate multiple columns or strings together in one query.
+
+🔷 Trimming Whitespace with LTRIM(), RTRIM(), and TRIM()
+🌟 If you want to remove whitespace from the left side of employee names:
+➤ SELECT LTRIM(EName) FROM employee;
+
+🌟 If you want to remove whitespace from both sides of the employee name and salary and then concatenate them with an underscore:
+➤ SELECT CONCAT(TRIM(EName), "_", TRIM(Salary)) FROM employee;
+
+🌟 If you want to concatenate employee name and salary and then display the results in descending order:
+➤ SELECT CONCAT(EName, Salary) 
+FROM employee 
+ORDER BY CONCAT(EName, Salary) DESC;
+
+🔷 Updating Records with UPDATE
+🌟 If you want to change the name of an employee from "Smith" to "abc":
+➤ UPDATE employee SET EName = "abc" WHERE EName = "Smith";
+
+🌟 If you want to update the employee name where ID is 101:
+➤ UPDATE employee SET EName = "abc" WHERE EID = 101;
+
+🌟 If you want to update the employee ID from 101 to 110:
+➤ UPDATE employee SET EID = 110 WHERE EID = 101;
+
+🌟 If you want to delete all records of employees whose salary is 10000:
+➤ DELETE FROM employee WHERE Salary = 10000;
+
+🌟 If you want to increase everyone’s salary by 200:
+➤ UPDATE employee SET Salary = Salary + 200;
+
+🔷 Altering Table Structure with ALTER TABLE
+🌟 If you want to add a new column email at the end of the table:
+➤ ALTER TABLE employee ADD email VARCHAR(50);
+
+🌟 If you want to add the email column at the beginning of the table:
+➤ ALTER TABLE employee ADD email VARCHAR(50) FIRST;
+
+🌟 If you want to add the column after the EName column:
+➤ ALTER TABLE employee ADD email VARCHAR(50) AFTER EName;
+
+🌟 If you want to delete the email column from the table:
+➤ ALTER TABLE employee DROP email;
+
+🔷 Measuring String Length with LENGTH()
+🌟 If you want to find the length of each employee’s name:
+➤ SELECT LENGTH(EName) FROM employee;
+
+🔷Understanding Subqueries
+A subquery is a query nested inside another query. The output of the inner query is passed to the outer query for further processing. Subqueries are often used with operators like IN, NOT IN, <, >, and =.
+One important point is that when building a subquery across two different tables, a common column must exist between them.
+
+🌟 Finding the Second and Third Maximum Salaries
+If you want to get the second maximum salary, one approach is to manually write a condition such as salary < 12000. However, the problem is that you must already know the maximum salary.
+➤ SELECT MAX(Salary) 
+FROM employee 
+WHERE Salary < 12000;
+
+🌟 A better approach is to use a subquery to automatically find the maximum salary first, and then compare salaries less than that maximum.
+➤ SELECT MAX(Salary) 
+FROM employee 
+WHERE Salary < (SELECT MAX(Salary) FROM employee);
+
+🌟 If you want the third maximum salary, you can nest another subquery inside:
+➤ SELECT MAX(Salary) 
+FROM employee 
+WHERE Salary < (
+    SELECT MAX(Salary) 
+    FROM employee 
+    WHERE Salary < (
+        SELECT MAX(Salary) 
+        FROM employee
+    )
+);
+
+3. Finding Employees Who Got Incentives
+🌟 To find employees who received incentives, you can check which employee IDs in the employee table also exist in the Incentive_List table.
+➤ SELECT DISTINCT EName 
+FROM employee 
+WHERE EID IN (SELECT EID FROM Incentive_List);
+
+4. Finding Unmarried Employees
+🌟 If you want to display the names of employees who are not married, you can use a subquery on the Status table where maritalStatus = "NO".
+➤ SELECT EName 
+FROM employee 
+WHERE EID IN (SELECT EID FROM Status WHERE maritalStatus = "NO");
+
+5. Finding Female Employees and Their Salaries
+🌟 To fetch employee names along with their salaries for only the female employees, you can filter using a subquery on the Status table.
+➤ SELECT EName, Salary 
+FROM employee 
+WHERE EID IN (SELECT EID FROM Status WHERE Gender = "F");
+
+6. Employees Who Got High Incentives
+🌟 If you want the names of employees who received an incentive greater than or equal to 5000, you can use a subquery on the Incentive_List.
+➤ SELECT EName 
+FROM employee 
+WHERE EID IN (SELECT EID FROM Incentive_List WHERE incen_amount >= 5000);
+
+7. Married Employees Who Also Got Incentives
+🌟 To find the employees who are married and have received incentives, you can use a nested subquery. The innermost query filters married employees, and the outer query fetches their names.
+➤ SELECT EName 
+FROM employee 
+WHERE EID IN (
+    SELECT DISTINCT EID 
+    FROM Incentive_List 
+    WHERE EID IN (
+        SELECT EID FROM Status WHERE maritalStatus = "YES"
+    )
+);
+
+8. Employees Who Did Not Get Incentives
+🌟 If you want to display employees who have not received any incentives, you can use the NOT IN operator along with a subquery on the Incentive_List.
+➤ SELECT EName 
+FROM employee 
+WHERE EID NOT IN (SELECT EID FROM Incentive_List);
+
+9. Incentive Dates for Employees Whose Names End with ‘a’
+🌟 If you want to display the incentive dates for employees whose names end with the letter a, you can use a subquery on the employee table with the LIKE operator
+➤ SELECT date 
+FROM Incentive_List 
+WHERE EID IN (SELECT EID FROM employee WHERE EName LIKE "%a");
+
+🔷 MySQL Data Types
+MySQL supports 3 major categories of data types:
+
+1. Numeric Data Types
+➤ INT / INTEGER → Stores whole numbers (range: -2,147,483,648 to 2,147,483,647).
+➤ SMALLINT → Smaller range than INT (-32,768 to 32,767).
+➤ TINYINT → Very small numbers (-128 to 127). Commonly used for Boolean flags (0/1).
+➤ BIGINT → Large integers (up to ±9.22e18).
+➤ DECIMAL / NUMERIC (p, s) → Fixed-point numbers (p = precision, s = scale). Best for financial data (e.g., DECIMAL(10,2) = 8 digits before decimal + 2 digits after).
+➤ FLOAT → Approximate single-precision floating-point (7 digits).
+➤ DOUBLE / REAL → Approximate double-precision floating-point (15 digits).
+➤ BIT(M) → Stores binary values (M = number of bits, default = 1).
+
+2. Date & Time Data Types
+➤ DATE → Stores date only (YYYY-MM-DD).
+➤ DATETIME → Stores both date & time (YYYY-MM-DD HH:MM:SS).
+➤ TIMESTAMP → Similar to DATETIME but stored in UTC. Auto-updates with current time.
+➤ TIME → Stores only time (HH:MM:SS).
+➤ YEAR(2 | 4) → Stores year (2-digit or 4-digit format).
+
+3. String (Character/Text) Data Types
+➤ CHAR(n) → Fixed-length string (padded with spaces if shorter). Faster but wastes space.
+➤ VARCHAR(n) → Variable-length string (up to 65535 characters depending on row size). Efficient for dynamic text.
+➤ TEXT → Large text (up to 65,535 characters). Types:
+      ➤ TINYTEXT (255 chars)
+      ➤ TEXT (65,535 chars)
+      ➤ MEDIUMTEXT (16 million chars)
+      ➤ LONGTEXT (4 billion chars)
+
+➤ ENUM → Stores one value from a predefined list (ENUM('M','F')). Good for fixed categories.➤ 
+➤ SET → Stores multiple values from a predefined list.➤ 
+➤ BLOB (Binary Large Object) → Used for images, videos, or raw binary data. Types:
+      ➤ TINYBLOB, BLOB, MEDIUMBLOB, LONGBLOB
+
+🧠 Constraints in SQL
+Constraints are rules applied to columns or tables to maintain the accuracy, validity, and integrity of data in a database.
+
+✅ Common SQL Constraints:
+🧠 SQL Constraints with Examples
+Each of the following examples uses a new table to demonstrate a specific constraint.
+
+✅ 1. UNIQUE Constraint
+Ensures that all values in a column are distinct (no duplicates).
+can be NULL also as two null values are considered distinct.
+CREATE TABLE student (
+    phonenbr INT UNIQUE
+);
+-- Inserts unique phone numbers
+INSERT INTO student VALUES (123), (456);
+
+✅ 2. NOT NULL Constraint
+Ensures a column cannot be left empty (NULL values not allowed) but can be duplicates.
+
+CREATE TABLE student1 (
+    age INT,
+    rollno INT NOT NULL
+);
+-- Valid: rollno is NOT NULL
+INSERT INTO student1 VALUES (23, 123);
+
+✅ 3. CHECK Constraint
+Applies a condition that each value in the column must satisfy.
+
+CREATE TABLE student2 (
+    age INT CHECK(age > 18)
+);
+-- Valid: 19 > 18
+INSERT INTO student2 VALUES (19);
+
+✅ 4. DEFAULT Constraint
+Automatically assigns a default value to a column if no value is specified.
+
+CREATE TABLE student3 (
+    schoolName VARCHAR(50) DEFAULT 'RLB',
+    age INT
+);
+-- Only age is given, schoolName will be set to default 'RLB'
+INSERT INTO student3 (age) VALUES (23);
+
+-- View inserted data
+SELECT * FROM student3;
+
+✅ 5. PRIMARY KEY Constraint
+Uniquely identifies each row. It combines UNIQUE + NOT NULL. Only one per table.
+
+CREATE TABLE student4 (
+    age INT,
+    rollNo INT PRIMARY KEY
+);
+-- All rollNo values must be unique and not null
+INSERT INTO student4 VALUES (12,1), (13,2), (14,3), (15,5), (16,6);
+
+-- View data
+SELECT * FROM student4;
+
+✅ 6. FOREIGN KEY Constraint
+Establishes a relationship between two tables by referencing the primary key of another table.
+Can have multiple foreign keys in a table.
+
+CREATE TABLE course (
+    courseName VARCHAR(50),
+    rollNo INT,
+    FOREIGN KEY (rollNo) REFERENCES student4(rollNo)
+);
+-- Inserting data with rollNo values that exist in student4
+INSERT INTO course VALUES ('DBMS', 1), ('OS', 2);
+
+✅ 7. AUTO_INCREMENT Constraint
+➤ Automatically generates a unique number for each new row.
+➤ Works only with integer types and typically on PRIMARY KEY.
+Example:
+
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50)
+);
+🔑 Use when you need a surrogate key instead of natural key.
+
+✅ 8. ENUM as a Constraint➤ 
+➤ ENUM lets you restrict a column to one value from a predefined list.➤ 
+➤ Acts like a check constraint.
+
+Example:
+CREATE TABLE employee (
+    emp_id INT PRIMARY KEY,
+    gender ENUM('Male', 'Female', 'Other') NOT NULL
+);
+➤ Here, gender can only take one of the listed values.
+➤ If you try to insert something outside the list → MySQL throws an error.
+
+🔑 Use case: Limited categorical choices (gender, status, priority).
+
+✅ 9. SET as a Constraint
+➤ SET lets you store multiple values from a predefined list.
+
+Example:
+CREATE TABLE student (
+    id INT PRIMARY KEY,
+    subjects SET('Math', 'Science', 'English', 'History')
+);
+➤ Here, subjects can be 'Math', 'Science', 'Math,Science', etc.
+➤ Useful for multi-choice constraints (skills, hobbies, languages).
+
+⚠️ Important Points
+➤ ENUM & SET behave like constraints because they restrict data, but technically they are data types with built-in validation, not separate constraints.
+➤ ENUM → only one value allowed.
+➤ SET → allows multiple values, stored as a comma-separated string internally.
+➤ They are not portable (other DBs like PostgreSQL/Oracle don’t support them directly).
+➤ Best practice in enterprise apps → prefer CHECK constraint or lookup/reference table instead of ENUM/SET (for flexibility).
+
+👉 So the answer is:
+✔️ Yes, ENUM and SET can be used like constraints in MySQL.
+❌ But they are data types, not formal constraints.
+
+🎯 Problem Definition: Subtracting Two Tables
+Suppose we have two tables with the same structure:
+
+TableA
+id | name
+-----------
+1  | Ram
+2  | Shyam
+3  | Mohan
+
+TableB
+id | name
+-----------
+2  | Shyam
+3  | Mohan
+
+We want TableA – TableB = records present in A but not in B.
+Expected Output:
+id | name
+-----------
+1  | Ram
+
+✅ Methods to Subtract Tables in MySQL
+🧠 Method 1. Using LEFT JOIN + IS NULL
+SELECT a.id, a.name
+FROM TableA a
+LEFT JOIN TableB b ON a.id = b.id
+WHERE b.id IS NULL
+
+👉 Gives only rows present in TableA and not in TableB.
+This is the most common approach in MySQL.
+
+🧠 Method 2. Using NOT IN
+SELECT id, name
+FROM TableA
+WHERE id NOT IN (SELECT id FROM TableB);
+
+⚠️ Caveat → If TableB.id contains NULL, the whole query may return nothing.
+So safer to use NOT EXISTS.
+
+🧠 Method 3. Using NOT EXISTS (Preferred)
+SELECT id, name
+FROM TableA a
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM TableB b 
+    WHERE a.id = b.id
+);
+✔️ More reliable than NOT IN.
+✔️ Works even if NULLs exist.
+
+🧠 Method 4. Using UNION and EXCEPT Logic
+MySQL doesn’t support EXCEPT, but we can simulate it:
+
+SELECT id, name FROM TableA
+UNION
+SELECT id, name FROM TableB
+EXCEPT
+SELECT id, name FROM TableB;
+⚠️ Only works in MySQL 8.0+ with CTE simulation (otherwise not directly).
+
+⚡Tip
+If asked in MySQL:
+Say: "MySQL does not have a direct MINUS operator like Oracle, but we can achieve subtraction using LEFT JOIN ... IS NULL or NOT EXISTS."
+
+Then write the LEFT JOIN query — it's the cleanest.
+
+🔷 JOINS in MySQL
+JOINS are used to combine rows from two or more tables based on a related column between them. MySQL supports several types of JOINS:
+1. INNER JOIN
+2. LEFT JOIN (or LEFT OUTER JOIN)
+3. RIGHT JOIN (or RIGHT OUTER JOIN)
+4. FULL JOIN (or FULL OUTER JOIN)
+5. CROSS JOIN
+6. SELF JOIN
+7. NATURAL JOIN
