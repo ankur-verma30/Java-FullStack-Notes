@@ -574,3 +574,366 @@ WHERE o.OrderID = 101;
 ⚡ 3NF: Remove transitive dependencies (move customer details to Customers; drop derived LineTotal).
 
 Result: minimal redundancy, better integrity; queries use joins to rebuild the full picture.
+
+🔷 Spring Data JPA
+Spring Data JPA is a Spring framework project built on top of JPA (Java Persistence API) that makes database access and persistence operations easier.
+
+👉 In short:
+➤ JPA = Specification (interfaces & annotations, no implementation).
+➤ Hibernate = Implementation of JPA.
+➤ Spring Data JPA = Abstraction layer that makes working with JPA implementations (like Hibernate) much easier.
+
+🔹 Why Spring Data JPA?
+Without it, you’d need to write a lot of boilerplate DAO code like this:
+
+public class EmployeeRepository {
+    @PersistenceContext
+    private EntityManager em;
+
+    public void save(Employee emp) {
+        em.persist(emp);
+    }
+
+    public Employee findById(Long id) {
+        return em.find(Employee.class, id);
+    }
+}
+
+With Spring Data JPA, this becomes:
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+}
+✅ Done. Spring auto-generates the implementation at runtime.
+
+🌟 Key Features
+🔄 Repository Abstractions
+➤ Provides ready-made repository interfaces:
+  🔗 CrudRepository<T, ID> → basic CRUD.
+  🔗 JpaRepository<T, ID> → CRUD + pagination + sorting.
+➤ No need to implement DAO manually.
+
+🔄 Derived Query Methods
+Spring parses method names and generates SQL automatically.
+
+Example:
+List<Employee> findByDepartment(String department);
+List<Employee> findBySalaryGreaterThan(double salary);
+👉 These automatically generate SELECT queries.
+
+🔄 Custom Queries with JPQL / Native SQL
+➤ Use @Query annotation for custom queries:
+@Query("SELECT e FROM Employee e WHERE e.salary > :salary")
+List<Employee> findHighEarners(@Param("salary") double salary);
+
+➤ Native SQL also supported:
+@Query(value = "SELECT * FROM employee WHERE department = :dept", nativeQuery = true)
+List<Employee> findByDept(@Param("dept") String dept);
+
+🔄 Pagination and Sorting
+➤ Built-in support:
+Page<Employee> findAll(Pageable pageable);
+List<Employee> findAll(Sort sort);
+
+🔄 Transaction Management
+➤ Integrated with Spring’s @Transactional.
+➤ Spring handles opening, committing, rolling back transactions automatically.
+
+🔄 Auditing
+➤ Track createdBy, createdDate, lastModifiedBy, lastModifiedDate with annotations:
+@CreatedDate
+private LocalDateTime createdAt;
+
+⚡ How it Works Behind the Scenes
+➤ You declare a repository interface (e.g., EmployeeRepository extends JpaRepository<Employee, Long>).
+➤ At runtime, Spring Data JPA creates a proxy implementation of this interface.
+➤ The proxy internally uses EntityManager (from JPA) → which is backed by Hibernate (default in Spring Boot).
+➤ SQL queries are generated based on:
+  🔗 Method name conventions (e.g., findByName).
+  🔗 @Query annotations.
+  🔗 Default CRUD methods from JpaRepository.
+
+📌 Repository Layer in Spring Boot
+➤ The Repository Layer in Spring Boot is the layer that interacts with the database.
+➤ It provides predefined methods to perform CRUD (Create, Read, Update, Delete) operations without writing SQL queries.
+➤ It is built on Spring Data JPA, which internally uses Hibernate (by default) for ORM.
+
+⚡ How It Works
+➤ Instead of writing your own DAO (Data Access Object) classes with JDBC/Hibernate queries,
+you just create an interface that extends one of Spring Data JPA’s repository interfaces.
+➤ Spring Boot automatically creates the implementation at runtime.
+
+Example:
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+}
+Here:
+Employee → Entity class
+Integer → Primary Key type
+
+🔄 Common Utility Methods
+Repository interfaces provide many ready-made methods, such as:
+
+🔧 save(entity) → Insert or update entity in DB
+🔧 findById(id) → Retrieve entity by primary key
+🔧 findAll() → Get all records
+🔧 delete(entity) → Delete a record
+🔧 deleteById(id) → Delete by primary key
+🔧 count() → Count total records
+
+🔄 Custom Query Methods
+You can also define custom finder methods just by following naming conventions.
+
+Example:
+List<Employee> findByName(String name);
+List<Employee> findBySalaryGreaterThan(float salary);
+👉 Spring Data JPA automatically generates queries for these methods.
+
+🔄 Industry-level Use
+➤ In enterprise applications, Repository Layer is where all database interaction is isolated.
+➤ The Service Layer calls the Repository Layer, and repository handles DB operations.
+➤ This ensures separation of concerns and clean architecture.  
+
+📌 Dependency Injection (DI) in Spring Boot➤ 
+➤ Dependency Injection (DI) is a design pattern where an object’s dependencies (other objects it needs to work) are provided (injected) by the Spring Framework instead of the class creating them manually.
+➤ Spring Boot manages the creation, configuration, and lifecycle of these dependencies at runtime.
+
+🔄 Analogy
+👉 Think of building a house:
+You need bricks, cement, wood.
+Instead of making these materials yourself, you ask suppliers to provide them.
+
+Similarly, your class does not create its required objects itself; Spring provides them automatically.
+
+🔄 Why Use DI?
+✅ Loose Coupling
+➤ Classes do not depend on how objects are created, only on what they can do.
+➤ Easier to swap implementations (e.g., change from MySQL DB to MongoDB without modifying business logic).
+
+✅ Automatic Lifecycle Management
+➤ Spring controls the object creation, initialization, and destruction.
+➤ You don’t need to manually manage memory or cleanup.
+
+🔄 Improved Testability
+Since dependencies are injected, you can easily mock objects for unit testing.
+
+🔄 Types of Dependency Injection in Spring Boot
+📝 Constructor Injection ✅ (Most recommended in modern Spring Boot)
+
+@Service
+public class EmployeeService {
+    private final EmployeeRepository employeeRepository;
+
+    // Constructor Injection
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+}
+
+📝 Setter Injection
+@Service
+public class EmployeeService {
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+}
+
+📝 Field Injection ❌ (Not recommended for large apps, but commonly seen in small projects)
+@Service
+public class EmployeeService {
+    @Autowired
+    private EmployeeRepository employeeRepository;
+}
+
+🔄 How DI Works in Spring Boot
+➤ Spring Boot scans the project for classes annotated with @Component, @Service, @Repository, @Controller, etc.
+➤ It creates objects (called Spring Beans) of these classes.
+➤ Whenever another class requires these objects, Spring injects them automatically (instead of you writing new).
+
+Example:
+@RestController
+public class EmployeeController {
+
+    private final EmployeeService employeeService;
+
+    // Constructor Injection
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+
+    @GetMapping("/employees")
+    public List<Employee> getAllEmployees() {
+        return employeeService.getEmployees();
+    }
+}
+
+👉 Here:
+➤ EmployeeController depends on EmployeeService.
+➤ Spring Boot automatically injects an instance of EmployeeService.
+
+🌱 Spring IoC (Inversion of Control)
+➤ IoC (Inversion of Control) is the principle where the control of object creation and management is transferred from the developer to the Spring IoC Container.
+➤ In simple words: You don’t control the objects, Spring does.
+
+🔄 Spring IoC Container
+➤ Core of the Spring Framework.
+➤ Responsible for:
+  🔗 Creating objects (beans)
+  🔗 Configuring them
+  🔗 Injecting dependencies (DI)
+  🔗 Managing their lifecycle
+
+🔄 How It Works
+➤ You annotate/configure classes with @Component, @Service, @Repository, @Controller etc.
+➤ Spring IoC Container scans the project, finds these beans, and creates objects automatically.
+➤ Dependencies between beans are resolved using Dependency Injection (DI).
+
+🔄 Advantages
+➤ Promotes loose coupling (objects don’t create their dependencies).
+➤ Makes applications modular and testable.
+➤ Simplifies configuration and lifecycle management.
+
+🔄 Analogy
+👉 Think of a restaurant:
+➤ You don’t cook yourself; you just order.
+➤ The kitchen (IoC Container) manages all cooking, preparation, and delivery.
+➤ Similarly, you just define what you need, and Spring IoC takes care of how it’s created and managed.
+
+🌀 Spring Bean Lifecycle
+📝 Lifecycle Stages
+➤ Bean Creation
+  🔗 Spring IoC creates the bean object.
+  🔗 Example: using @Component or configuration class.
+
+➤ Dependency Injection
+Dependencies are injected (e.g., using @Autowired or constructor injection).
+
+➤ Initialization (Optional Hooks)
+If the bean implements InitializingBean or has @PostConstruct method → executed here.
+
+➤ Execution (In Use)
+The bean is ready to be used by the application.
+
+➤ Destruction
+  🔗 When the application context shuts down, Spring destroys the bean.
+  🔗 Example: @PreDestroy method or DisposableBean interface.
+
+✔️ Diagram (Flow)
+Bean Instantiation 
+       ↓
+Dependencies Injection (@Autowired)
+       ↓
+Initialization (@PostConstruct, afterPropertiesSet)
+       ↓
+Bean is Ready (used by app)
+       ↓
+Destruction (@PreDestroy, destroy())
+
+Example
+@Component
+public class MyBean implements InitializingBean, DisposableBean {
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("Bean is initialized");
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("Bean is destroyed");
+    }
+}
+
+✅ JUnit in Spring Boot (Unit Testing)
+➤ JUnit is a testing framework used in Java to perform unit testing.
+➤ In unit testing (white-box testing), we test individual pieces of code (methods, classes) rather than the whole application.
+➤ Spring Boot projects by default include the JUnit library, so you don’t need to add it manually.
+
+⚡ Important Annotations in JUnit
+🔄 @Test
+➤ Marks a method as a test case.
+➤ JUnit will execute this method and report PASS / FAIL based on output or assertions.
+➤ Multiple @Test methods can exist in one class, each runs independently.
+
+🔄 @BeforeEach
+➤ Runs before every @Test method.
+➤ Usually used for setting up resources or initialization.
+
+🔄 @AfterEach
+➤ Runs after every @Test method.
+➤ Used for cleanup activities (e.g., closing DB connections).
+
+🔄 @BeforeAll
+➤ Runs once before all tests in the class.
+➤ Must be static.
+➤ Used for global setup (e.g., starting an in-memory database).
+
+🔄 @AfterAll
+➤ Runs once after all tests in the class.
+➤ Must be static.
+➤ Used for global cleanup (e.g., stopping server, closing shared resources).
+
+🖥️ Example Code
+package com.demo1;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class Demo1ApplicationTests {
+
+    // This runs ONCE before any test method
+    @BeforeAll
+    public static void beforeAll() {
+        System.out.println(">>> Before All - Runs only once before all tests");
+    }
+
+    // This runs BEFORE EACH test method
+    @BeforeEach
+    public void beforeTest() {
+        System.out.println(">>> Before Each - Runs before every test case");
+    }
+
+    // Test case 1
+    @Test
+    void test1() {
+        System.out.println(">>> Executing Test 1");
+    }
+
+    // Test case 2
+    @Test
+    void test2() {
+        System.out.println(">>> Executing Test 2");
+    }
+
+    // This runs AFTER EACH test method
+    @AfterEach
+    public void afterTest() {
+        System.out.println(">>> After Each - Runs after every test case");
+    }
+
+    // This runs ONCE after all test methods have executed
+    @AfterAll
+    public static void afterAll() {
+        System.out.println(">>> After All - Runs only once after all tests");
+    }
+}
+
+📌 Expected Execution Flow
+When you run the test class, JUnit will call methods in the following order:
+
+>>> Before All - Runs only once before all tests
+
+>>> Before Each - Runs before every test case
+>>> Executing Test 1
+>>> After Each - Runs after every test case
+
+>>> Before Each - Runs before every test case
+>>> Executing Test 2
+>>> After Each - Runs after every test case
+
+>>> After All - Runs only once after all tests

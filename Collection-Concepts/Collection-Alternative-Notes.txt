@@ -576,4 +576,138 @@ Is vector empty after clear? true
 👉 In moder Java applications, ArrayList is generally preferred over Vector when synchronization isn't required. For thread-safe collections, the CopyOnWriteArrayList or ConcurrentHashMap from the java.util.concurrent package are often recommended.
 
 🌟 Stack
+👉 Stack extends Vector, it is synchronized making it thread-safe.
+👉 LIFO structure: Stack follows the Last-In-First-Out(LIFO) principle, where the last element added is the first one to be removed.
+👉 Inheritance: Stack is a subclass of Vector, which means it inherits all the features of a dynamic array but is constrained by the stack's LIFO nature.
 
+
+✅Code Implementation
+📝Method 1
+package collections;
+
+import java.util.Stack;
+
+public class StackDemo {
+
+	public static void main(String[] args) {
+		Stack<Integer> st = new Stack<>();
+
+		// to add the elements in the stack
+		st.push(1);
+		st.push(2);
+		st.push(3);
+		st.push(4);
+		st.push(5);
+
+		// to remove the top element
+		int removedElement = st.pop();
+		System.out.println(removedElement);
+		System.out.println(st);
+
+		// to see what the top element
+		System.out.println(st.peek());
+
+		// to check whether the stack is empty or not
+		System.out.println(st.isEmpty());
+
+		// to check the size of the stack
+		System.out.println(st.size());
+
+		//to search the element
+		//Gives the index from the top
+		System.out.println(st);
+//		3 is at the 2nd index from the top
+		System.out.println(st.search(3));	
+	}
+}
+
+📝Method 2:
+package collections;
+
+import java.util.LinkedList;
+import java.util.Stack;
+
+public class StackDemo {
+
+	public static void main(String[] args) {
+		LinkedList<Integer> linkedlist = new LinkedList<>();
+
+		// adding element in the LIFO manner
+		linkedlist.addLast(1);
+		linkedlist.addLast(2);
+		linkedlist.addLast(3);
+		linkedlist.addLast(4);
+		linkedlist.addLast(5);
+
+		// removing elements
+		linkedlist.removeLast();
+
+		// peek at the top element
+		linkedlist.getLast();
+
+		// return boolean whether the linkedlist is empty or not
+		linkedlist.isEmpty();
+	}
+}
+
+🌟 CopyOnWriteArrayList
+👉 Copy on Write means that whenever an element is added or removed from the ArrayList, a new copy is created. This ensures that the ArrayList remains thread-safe even if multiple threads are accessing it concurrently.
+
+👉 Read Operations: Fast and direct, since they happen on a stable list without interference from modifications.
+👉 Write Operations: A new copy of the list is created for every modification. 
+👉 The reference to the list is then updated so that subsequent reads use this new list.
+👉 Useful when read operations are more in comparison to write operations because on writing each time a new copy is created hence memory consumption take place.
+
+❌ Problem with List and ArrayList
+package collections;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CopyOnWriteArrayListDemo {
+
+	public static void main(String[] args) {
+List<String>copyArrayList=new ArrayList<>();
+		copyArrayList.add("Milk");
+		copyArrayList.add("Eggs");
+		copyArrayList.add("Bread");
+		copyArrayList.add("Meat");
+		
+		for(String item:copyArrayList) {
+			System.out.println(item);
+			if(item.equals("Eggs")) {
+				copyArrayList.add("Butter");
+				System.out.println("Added Butter while Reading");
+			}
+		}
+		System.out.println("The new udpated Array List");
+		System.out.println(copyArrayList);
+	}
+}
+
+❌Output:
+Milk
+Eggs
+Added Butter while Reading
+Exception in thread "main" java.util.ConcurrentModificationException
+	at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1096)
+	at java.base/java.util.ArrayList$Itr.next(ArrayList.java:1050)
+	at CollectionFramework/collections.CopyOnWriteArrayListDemo.main(CopyOnWriteArrayListDemo.java:15)
+
+While Iterating we cannot modify the list, it will throw an exception.
+
+✅ Using CopyOnWriteArrayList:
+List<String>copyArrayList=new CopyOnWriteArrayList<>(); //using this we will get the
+
+⚡Output:
+Milk
+Eggs
+Added Butter while Reading
+Bread
+Meat
+The new udpated Array List
+[Milk, Eggs, Bread, Meat, Butter]
+
+🔷 Maps in Java
+In Java, a Map is an object that maps keys to values. It cannot contain duplicate keys, and each key can map to at most one value. Thik of it as a dictionary where you look up a word(key ) to find its defintion(value).
+1:51:00
