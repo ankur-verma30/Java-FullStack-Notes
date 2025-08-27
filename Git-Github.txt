@@ -239,3 +239,120 @@ git config --global alias.<shortcut> "<full command>"
 🔗 git config --global alias.st "status" → Now git st = git status
 🔗 git config --global alias.lo1 "log --oneline" → Now git lo1 = git log --oneline
 
+🗂️ Git Rebase
+➤ Rebase = rewrite history.
+➤ Moves or combines a sequence of commits to a new base commit.
+➤ Unlike merge (which creates a new commit), rebase applies commits one by one on top of another branch → results in a linear, cleaner history.
+
+🔄 Important Rule
+✅ Use rebase only on local branches (your private work).
+❌ Avoid rebasing shared/public branches → rewriting history can cause conflicts for other developers.
+
+🔄 Common Commands
+🔗 git rebase <branch> → Rebases current branch onto <branch>.
+
+✅ Example:
+🔗 git checkout feature
+🔗 git rebase main
+Moves feature commits on top of main.
+
+🔗 git rebase -i <commit-hash> (interactive rebase) → Lets you edit history: squash, reorder, delete, or edit commits.
+
+✅ Example:
+🔗 git rebase -i HEAD~3 → Interactively edit the last 3 commits.
+
+🔗 git rebase --continue → After resolving conflicts during rebase, continue the process.
+🔗 git rebase --abort → Abort rebase and return to original branch state.
+🔗 git rebase --skip → Skip the commit causing conflict and move to next.
+
+🗂️ GitHub Workflow – Notes
+🔄 What is GitHub?
+➤ A web-based platform for hosting Git repositories.
+➤ Provides:
+    ✔️ Remote hosting → Store code in the cloud.
+    ✔️ Collaboration tools → Issues, Pull Requests (PRs), Reviews.
+    ✔️ Version control → Track history, branches, and merges.
+
+🔄 Collaboration Workflow (Team Scenario)
+➤ Developers create branches
+✅ Example:
+    ✔️ Dev A → feature/authentication
+    ✔️ Dev B → bugfix/data-retrieval
+
+➤ Push branches to GitHub
+Share work with team.
+➤ Create Pull Requests (PRs)
+    ✔️ Explain changes.
+    ✔️ Ask for reviews.
+➤ Code Review & Discussion
+    ✔️ Team reviews, comments, suggests changes.
+➤ Merge into Main Branch
+    ✔️ After approval → merged → changes reflected in project.
+
+🔄 Common GitHub Commands
+1. Clone a Repository
+
+🔗 git clone <url> → Copies remote repo (files, branches, history) locally.
+🔗 git clone -b <branch> <url> → Clone a repo and directly checkout a branch
+
+✅ Example: 🔗 git clone https://github.com/user/repo.git
+
+2. Push Code
+🔗 git push origin <branch> → Push local <branch> to remote origin.
+🔗 git push -f → Force push (⚠️ overrides remote history). Use carefully.
+
+3. View Branches
+🔗 git branch -r → List remote branches.
+🔗 git branch -a → List all branches (local + remote).
+
+4. Fetch & Pull
+🔗 git fetch origin <branch> → Download changes (but not merge).
+🔗 git fetch --all → Fetch all branches.
+🔗 git fetch → Fetch from default remote (origin).
+🔗 git pull origin <branch> → Fetch + Merge remote branch into local branch.
+
+5. Remote Management
+🔗 git remote add origin <url> → Connect local repo to remote.
+🔗 git remote -v → View remotes & URLs.
+
+🔄 Key Differences
+🔗 git fetch → Downloads changes (does NOT merge).
+🔗 git pull → Downloads + merges in one step.
+🔗 git push → Uploads local changes to remote repo.
+
+🔗 Git Commands → https://git-scm.com/directories
+
+🔄.gitignore (Ignore Files)
+Used to tell Git which files/folders to ignore.
+
+✅ Example .gitignore:
+node_modules/
+.env
+*.log
+
+🔗 touch .gitignore   # create ignore file
+
+
+🔄 Tagging & Releases
+Used for marking versions (important in deployment).
+🔧 Commands:
+🔗 git tag v1.0             # lightweight tag
+🔗 git tag -a v1.0 -m "msg" # annotated tag
+🔗 git show v1.0            # view tag details
+🔗 git push origin v1.0     # push specific tag
+🔗 git push origin --tags   # push all tags
+
+🔄 Cherry-Pick (Selective Commit)
+Apply a specific commit from another branch:
+
+🔗 git cherry-pick <commit-hash> → Useful when you need only one fix/
+feature commit without merging entire branch.
+
+🔄 Squash Commits (in Merge)
+To keep history clean, multiple commits can be squashed into one:
+
+🔗 git merge --squash <branch>
+🔗 git commit -m "Squashed commit"
+
+🔄 Forking Workflow (GitHub Specific)
+Fork repo → clone → make changes → push to fork → open PR → merge to upstream.
