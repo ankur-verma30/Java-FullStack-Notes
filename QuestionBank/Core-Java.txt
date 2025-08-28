@@ -1,0 +1,362 @@
+❓ Define JDK, JRE, and JVM
+🔹 1. JVM (Java Virtual Machine)
+➤ JVM is an abstract machine that provides a runtime environment to execute Java bytecode.
+
+⚡Responsibilities:
+✔️ Converts bytecode → machine code using JIT (Just-In-Time compiler).
+✔️ Provides platform independence (“Write Once, Run Anywhere”).
+✔️ Manages memory (heap, stack, method area, GC).
+✔️ Ensures security via bytecode verification.
+🔧 Key Point: JVM is platform-dependent (different implementations for Windows/Linux/Mac), but bytecode is platform-independent.
+
+➡️ Interview Insight:
+Many confuse JVM = Java compiler → Wrong! Compiler (javac) converts Java code → bytecode; JVM executes that bytecode.
+
+🔹 2. JRE (Java Runtime Environment)
+➤ JRE provides libraries, JVM, and other components to run Java applications.
+
+Includes:
+✔️ JVM
+✔️ Core libraries (like java.lang, java.util, java.io)
+✔️ Supporting files
+🔧 Key Point: JRE does not include development tools (compiler, debugger). It’s only for running Java programs.
+
+➡️ Interview Trap:
+If asked, “Can you run Java code with just JRE?” → Yes, if you already have compiled bytecode. But you cannot compile .java files with JRE.
+
+🔹 3. JDK (Java Development Kit)
+➤ JDK is the full package required for Java development.
+
+Includes:
+✔️ JRE (which has JVM + libraries)
+✔️ Development tools → javac (compiler), jdb (debugger), javadoc, jar, etc.
+🔧 Key Point: JDK is for developers; JRE is for users.
+
+➡️ Interview Trap:
+Some interviewers ask: “If JDK contains JRE, and JRE contains JVM, can we say JDK = JVM?”
+Answer: No. JDK = JRE + Development Tools. JVM is just part of JRE.
+
+🔹 Hierarchy Diagram
+JDK 
+ └── JRE 
+      └── JVM
+
+🔹 One-Liner for Revision
+➤ JVM → Runs bytecode.
+➤ JRE → JVM + Libraries (to run Java apps).
+➤ JDK → JRE + Tools (to develop Java apps).
+
+❓ Significance of public static void main(String[] args)
+The main() method is the entry point of every Java program. The JVM calls it to start execution. Each keyword has a special meaning:
+
+🔹 1. public
+➤ Reason: Must be accessible to JVM outside the class.
+➤ JVM looks for main() from anywhere, so it cannot be private or default.
+➤ If not public → main method not found error.
+
+➡️ Interview Trap:
+Q: “What if I make main() private or protected?”
+A: JVM won’t be able to access it → runtime error.
+
+🔹 2. static
+➤ Reason: JVM doesn’t need to create an object of the class to call main().
+➤ Being static, it belongs to the class rather than an object.
+➤ Ensures execution starts immediately when the class is loaded.
+
+➡️ Interview Trap:
+Q: “Can main() be non-static?”
+A: Yes, it compiles, but JVM won’t recognize it as a valid entry point.
+
+🔹 3. void
+➤ Reason: main() doesn’t return any value to JVM.
+➤ JVM doesn’t expect a return type.
+➤ If you try to return something, compilation error occurs.
+
+🔹 4. main
+➤ Reason: Name is predefined and reserved by JVM as the entry point.
+➤ If you change it, JVM won’t start execution.
+
+🔹 5. (String[] args)
+➤ Reason: Accepts command-line arguments when program is executed.
+✅ Example:
+class Demo {
+    public static void main(String[] args) {
+        System.out.println(args[0]); // prints first command line argument
+    }
+}
+Run: java Demo Hello → Output: Hello
+
+➡️ Alternate forms accepted by JVM:
+✔️ public static void main(String args[])
+✔️ public static void main(String... args) (var-args since Java 5)
+
+🔹 One-Liner for Quick Revision
+✔️ public → JVM can access.
+✔️ static → No object needed.
+✔️ void → No return value.
+✔️ main → JVM’s entry point.
+✔️ String[] args → Command-line inputs.
+
+🔹 Interview Insights
+➤ “What if signature is public static int main()?” → Compilation error.
+➤ “What if I overload main()?” → Allowed, but JVM only calls the public static void main(String[] args).
+➤ “What if args is changed to String... args?” → Still valid.
+
+
+❓ Why does the main method support String[] args?
+🔹 1. Command-Line Arguments Support
+String[] args lets us pass data from outside (command line) to the program at runtime.
+✅ Example:
+
+class Demo {
+    public static void main(String[] args) {
+        System.out.println("First argument: " + args[0]);
+    }
+}
+⚡ Run: java Demo Hello
+Output: First argument: Hello
+
+➡️ Without String[] args, the JVM couldn’t pass inputs from command line.
+
+🔹 2. Why Specifically String?
+➤ Every input from command line is text-based.
+➤ JVM collects arguments as strings (e.g., "123" not number 123).
+
+➤ If you need another type (int, double), you must parse it manually:
+int num = Integer.parseInt(args[0]); // converts "123" → 123
+
+🔹 3. Why Array []?
+➤ Because we may pass multiple arguments separated by space.
+
+✅ Example:
+java Demo Alice Bob Charlie
+
+Then:
+args[0] = "Alice"
+args[1] = "Bob"
+args[2] = "Charlie"
+➡️ An array is the best way to store variable-length inputs.
+
+🔹 4. Alternative Forms Accepted by JVM
+➤ JVM doesn’t strictly enforce String[] args.
+➤ The following are also valid:
+    ✔️ String args[]
+    ✔️ String... args (var-args since Java 5).
+
+🔹 5. What if we remove it?
+If you write: public static void main()
+❗ Compiles fine, but JVM won’t recognize it as a valid entry point → Runtime error:
+❌ Error: Main method not found in class Demo
+
+🔹 One-Liner for Quick Revisio
+👉 String[] args is used because JVM needs a standard way to pass runtime command-line arguments, and all inputs are strings by default.
+
+🔹 Interview Insights
+🧠 Trick Q: “Why not int[] args or Object[] args?”
+➤ Because JVM can only guarantee that inputs will be Strings from command line.
+🧠 Trick Q: “Can we overload main() with different parameters?”
+➤ Yes, but JVM only calls public static void main(String[] args). Others can only be called manually inside code.
+
+❓ Constructor Chaining in Java
+Constructor Chaining means calling one constructor from another constructor (in the same class or parent class) to reuse initialization code and avoid duplication.
+
+🔹 Types of Constructor Chaining
+
+🔄 Within the same class → using this()
+    ✔️ Calls another constructor of the same class.
+    ✔️ Must be the first statement in the constructor.
+
+🔄 Between parent and child class → using super()
+    ✔️ Calls the parent class constructor.
+    ✔️ Must be the first statement in the constructor.
+
+✅ Example 1: Same Class (this())
+class Student {
+    private String name;
+    private int age;
+
+    // Constructor 1
+    Student() {
+        this("Unknown", 18);  // calling parameterized constructor
+    }
+
+    // Constructor 2
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    void display() {
+        System.out.println(name + " - " + age);
+    }
+}
+
+public class Demo {
+    public static void main(String[] args) {
+        Student s1 = new Student();
+        Student s2 = new Student("Alice", 22);
+        s1.display(); // Unknown - 18
+        s2.display(); // Alice - 22
+    }
+}
+➡️ Here, default constructor calls the parameterized constructor to avoid duplicate code.
+
+✅ Example 2: Parent → Child (super())
+class Person {
+    Person() {
+        System.out.println("Person constructor");
+    }
+}
+
+class Employee extends Person {
+    Employee() {
+        super();  // calls parent constructor
+        System.out.println("Employee constructor");
+    }
+}
+
+public class Demo {
+    public static void main(String[] args) {
+        new Employee();
+    }
+}
+✅ Output:
+Person constructor
+Employee constructor
+➡️ Here, super() ensures parent class initialization happens first.
+
+🔹 Rules of Constructor Chaining
+➤ Either this() or super() must be the first statement.
+➤ Circular calls (like a constructor calling itself) → compile-time error.
+➤ If you don’t write super(), the compiler automatically inserts super() (default constructor).
+➤ Cannot use both this() and super() in the same constructor → only one allowed.
+
+🔹 Why is it Important?
+➤ Code Reusability → No duplication of initialization logic.
+➤ Readability → Clear execution order.
+➤ Mandatory for Inheritance → Parent must always be initialized before child.
+
+🔹 One-Liner for Quick Revision
+👉 Constructor Chaining = Calling one constructor from another (same class via this(), parent class via super()) to reuse initialization logic.
+
+🔹 Interview Insights
+🧠 Q: “What happens if parent has only parameterized constructor and child does not call it?”
+➤ Compilation error (because compiler inserts super() but no default constructor exists).
+🧠 Q: “Can this() and super() be used together?”
+➤ No, only one can be the first line.
+🧠 Q: “What if I call a method before super() inside a constructor?”
+➤ Compilation error: Constructor call must be the first statement.
+
+
+❓ OOPs Concepts(Inheritance, Polymorphism, Encapsulation, Abstraction)
+🔹 1. Encapsulation → Data Hiding + Binding
+➤ Wrapping variables (data) and methods (logic) into a single unit (class). Provides controlled access via getters/setters.
+
+✅ Daily Life Example:
+A bank account: Your balance is hidden (private), but you can access it using deposit/withdraw methods.
+➤ One-liner: “Encapsulation = data hiding using access modifiers + methods.”
+
+🔹 2. Abstraction → Hiding Implementation
+➤ Showing only essential details, hiding internal complexity. Achieved using abstract classes / interfaces.
+
+✅ Daily Life Example:
+Car driving: You use the steering wheel, accelerator, brakes without knowing how the engine, gears, and sensors work internally.
+➤ One-liner: “Abstraction = show what it does, hide how it does.”
+
+🔹 3. Inheritance → Reusability
+➤ One class acquires properties and methods of another (parent → child). Promotes code reuse.
+
+✅ Daily Life Example:
+    ✔️ Father → Son: A child inherits properties (like eye color) and behaviors (like habits) from parents.
+    ✔️ In software: class Dog extends Animal.
+➤ One-liner: “Inheritance = child gets features from parent.”
+
+🔹 4. Polymorphism → Many Forms
+➤ Same method/operation behaves differently in different contexts.
+    ✔️ Compile-time polymorphism → Method overloading.
+    ✔️ Runtime polymorphism → Method overriding.
+
+✅ Daily Life Example:
+Mobile Phone Button:
+    ✔️ Single button = different actions (tap → open app, double tap → camera, long press → assistant).
+➤ One-liner: “Polymorphism = same name, different behavior.”
+
+🔹 Interview-Ready Summary (One Sentence)
+👉 OOPs = Encapsulation (data hiding), Abstraction (hiding implementation), Inheritance (reusability), and Polymorphism (same method different forms) — just like real-world objects such as cars, bank accounts, or family inheritance.
+
+❓ Difference between Interface and Abstract Class
+➤ Interface: A contract that specifies what a class must do, but not how.
+➤ Abstract Class: A class that may have partial implementation (some abstract methods + some concrete methods).
+
+🔹 2. Method Implementation
+➤ Interface:
+    ✔️ Before Java 8 → only abstract methods (implicitly public abstract).
+    ✔️ Java 8 → allowed default & static methods.
+    ✔️ Java 9 → allowed private methods.
+
+➤ Abstract Class:
+    ✔️ Can have both abstract and concrete methods.
+    ✔️ Can provide partial implementation.
+
+🔹 3. Variables
+➤ Interface:
+    ✔️ Variables are always public static final (constants).
+    ✔️ Must be initialized at declaration.
+
+➤ Abstract Class:
+    ✔️ Can have instance variables.
+    ✔️ Can use any access modifier (private, protected, etc.).
+
+🔹 4. Inheritance & Multiple Inheritance
+Interface: Supports multiple inheritance (a class can implement multiple interfaces).
+Abstract Class: Supports single inheritance only (a class can extend only one abstract class).
+
+🔹 5. Constructors
+Interface: ❌ Cannot have constructors (cannot be instantiated).
+Abstract Class: ✅ Can have constructors (called when subclass object is created).
+
+🔹 6. Use Cases
+➤ Interface:
+    ✔️ Used to define a contract/blueprint for unrelated classes.
+    ✅ Example: Comparable, Runnable, Serializable.
+
+➤ Abstract Class:
+    ✔️ Used when classes share common behavior + state but still have some abstract methods.
+
+✅ Example: AbstractList in Java Collections.
+
+🔹 7. Code Example
+// Interface example
+interface Vehicle {
+    void start(); // abstract method
+}
+
+class Car implements Vehicle {
+    public void start() {
+        System.out.println("Car starts with key");
+    }
+}
+
+// Abstract class example
+abstract class Animal {
+    abstract void sound();   // abstract method
+    void sleep() {           // concrete method
+        System.out.println("Sleeping...");
+    }
+}
+
+class Dog extends Animal {
+    void sound() {
+        System.out.println("Bark");
+    }
+}
+
+🔹 8. One-Liner for Interview
+➤ Interface → “Defines what to do, no state.”
+➤ Abstract Class → “Defines what to do + partial how to do, can have state.”
+
+🔹 9. Interview Traps & Insights
+🧠 Q: “Can an interface extend another interface?” → ✅ Yes (multiple inheritance of interfaces allowed).
+🧠 Q: “Can an abstract class implement an interface?” → ✅ Yes, but must provide implementation for methods or remain abstract.
+🧠 Q: “Which is faster, abstract class or interface?” → Abstract class is slightly faster (direct method call vs dynamic dispatch in interfaces).
+🧠 Q: “When to prefer interface over abstract class?” → Use interface when unrelated classes need common behavior (e.g., Flyable, Drivable). Use abstract class when related classes share state/logic (e.g., Shape).

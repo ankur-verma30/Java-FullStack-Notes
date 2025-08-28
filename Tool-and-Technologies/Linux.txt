@@ -1,0 +1,153 @@
+🐧 Linux Commands 
+🔄 1. Structure of a Linux Command
+Format: command [options] [arguments]
+➤ command → name of the program (e.g., cat, ls, ncal)
+➤ options → modify the behavior of the command
+    ✔️ short form → -n
+    ✔️ long form → --number
+➤ arguments → file, directory, or input on which the command operates
+⚡ Key Point: Options are case-sensitive and multiple options can be combined.
+
+🔄 2. File Viewing: cat
+🔗 cat abc.txt → show file content
+🔗 cat -n abc.txt → show content with line numbers (short option)
+🔗 cat --number abc.txt → same, with long option
+💡 Used for quick viewing, concatenating, or creating files.
+
+🔄 3. Directory Listing: ls
+🔗 ls → list current directory contents
+🔗 ls -a → show all files (including hidden, starting with .)
+🔗 ls -l → long format (permissions, size, owner, date, etc.)
+🔗 ls -al or ls -la → combine options: all files + long format
+💡 Common in interviews: Explain what ls -al does.
+
+🔄 4. Calendar: ncal
+🔗 ncal → show current month calendar
+🔗 ncal 2022 → show full year 2022
+🔗 ncal july 2022 → show July 2022
+🔗 ncal november 2022 -w → show Nov 2022 with week numbers
+🔗 ncal -3 → previous, current, and next month
+💡 Interview Tip: Difference between cal (horizontal layout) vs ncal (vertical layout).
+
+🔄 5. Manual Pages: man
+man cat → shows detailed documentation of cat
+man ls → options for ls
+Navigation inside man:
+Space → next page
+b → previous page
+q → quit
+
+💡 Interview Tip: man is your go-to help tool in Linux.
+
+🔄 6. File Copy: cp
+cp abc.txt abc2.txt → copy abc.txt into abc2.txt
+cp file1 file2 dir/ → copy multiple files into directory
+cp -r dir1 dir2 → copy directories recursively
+
+🔷 Working with Files and Folders (Linux)
+📍 Basic Navigation
+🔗 pwd → print current working directory (absolute path)
+🔗 cd → change directory
+🔗 cd / → go to root directory
+🔗 cd .. → move to parent directory
+🔗 cd ~ → go to home directory
+🔗 cd /home/user/Documents → navigate via absolute path
+🔗 cd Documents/ → navigate via relative path
+
+💡 Key Point:
+➤ Absolute path → starts from / (root).
+➤ Relative path → starts from current location.
+
+📂 Listing Files
+🔗 ls -alh → list all files (including hidden) in long format with human-readable sizes
+🔗 ls -t → sort by time (newest first)
+🔗 ls -t -r → sort by time (oldest first)
+🔗 ls -r → sort in reverse order (alphabetical or as per option)
+🔗 ls temp/ → list contents of temp/ folder
+
+📁 Creating and Deleting
+🔗 mkdir temp/ → create folder temp/
+🔗 rm -r temp/ → remove folder temp/ recursively
+
+💡 Safety Tip: Use rm -rf cautiously in interviews — interviewer may test your awareness of its danger.
+
+🏠 Directory Structure Insight
+🔗 / → root directory (top-level, contains everything)
+🔗 /home/ → user directories (/home/ankur, /home/user)
+🔗 Other important system directories under / include:
+🔗 /bin → essential binaries
+🔗 /etc → configuration files
+🔗 /var → variable data (logs, cache)
+🔗 /usr → user-installed programs
+
+🎯 Insights
+➤ Root vs Home → / is system root, ~ is user’s home.
+➤ ls -alh is a common test to check if you know hidden files (.) and human-readable sizes.
+➤ Recursive remove (rm -r) is dangerous — mention caution to score points.
+
+⚡nano food.txt → edit file in-place
+Ctrl + x + y → save and exit
+
+🔷 TimeStamps:Modification, Access, and Change TimeStamps
+we have a directory in which we have a file named food.txt.
+🔗 ls food.txt → show file content
+🔗 ls -l food.txt → show file modification time
+🔗 stat food.txt → show file stats
+🔗 ls -lc → shows the change time of the file
+🔗 ls -lu → shows the access time of the file
+
+🔷 File Management Commands (Linux)
+📂 Directory Management
+🔗 mkdir folderName → create a directory
+🔗 rm folderName → remove an empty directory
+🔗 mkdir folderName1 folderName2 folderName3 → create multiple directories at once
+🔗 rm folderName1 folderName2 folderName3 → remove multiple directories (empty only)
+🔗 rm -r folderName1 folderName2 folderName3 → remove multiple directories recursively (including their contents)
+🔗 mkdir -p folderName1/folderName2/folderName3 → create nested directories (parent dirs auto-created if missing)
+
+💡 Interview Tip: rm -r is destructive. Always mention caution when using it.
+
+📄 File Creation & Time Management
+🔗 touch fileName
+    ✔️ If file does not exist → creates it
+    ✔️ If file exists → updates timestamps (access + modification time)
+🔗 touch -m fileName → update only modification time
+🔗 touch -a fileName → update only access time
+
+💡 Common Test Question:
+Difference between access time (atime) and modification time (mtime).
+✔️  atime → last time file was read.
+✔️  mtime → last time file content was modified.
+
+📊 File Type & Metadata
+🔗 file fileName → shows file type and encoding (inspects content, not extension)
+
+✅ Example:
+If fileName.txt contains:
+Apple
+Banana
+Cherry
+
+🔗 Command: file fileName.txt
+✅ Output: ASCII text
+
+🔗 Example with misleading extension:
+File: temp.mp4 (but contains text)
+🔗 Command: file temp.mp4
+✅ Output: ASCII text
+
+💡 Interview Tip: Demonstrates Linux philosophy — file extensions don’t determine file type; content does.
+
+📌 Special Cases
+touch 'a b' → create a file with spaces in the name (quotes escape special characters)
+
+🎯 Interview Insights
+➤ Difference between rm and rm -r → recursive vs non-recursive.
+➤ Difference between mkdir and mkdir -p → -p avoids errors when parent dirs don’t exist.
+➤ touch command → often asked: creates files and updates timestamps.
+➤ file command → works on content, not extensions.
+
+🔷 Working with Nano
+➤ Nano is a simle, easyto-use text editor that operates within a terminal window.
+➤ If a file is not there, it creates and open it.
+🔗 nano food.txt
