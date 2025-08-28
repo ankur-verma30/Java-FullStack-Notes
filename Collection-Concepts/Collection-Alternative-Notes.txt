@@ -772,7 +772,6 @@ public class HashMapDemo {
 		System.out.println(isRemoved); //because no entry exist of that type
 
 	}
-
 }
 
 ❌Output:
@@ -1187,3 +1186,205 @@ Sleeps for 10 seconds → gives JVM time to clear weakly referenced keys.
 ✔️ Values (Image) are still strongly referenced, but without a strong key reference, they become unreachable.
 ✔️ Useful for memory-sensitive caching.
 
+🧠 Trap Question
+package collections;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class IdentityHashMapDemo {
+
+	public static void main(String[] args) {
+		String key1 = new String("Key");
+		String key2 = new String("Key");
+		Map<String, Integer> map = new HashMap<>();
+		map.put(key1, 1);
+		map.put(key2, 2);
+		System.out.println(map);
+	}
+
+}
+✅ Output: {key=2};
+🧠Explaination: Even though string is made through new keyword, that hashcode will not be generated based on the memory address, as string already has a function to calculate hashcode based on the value stored inside the string so both the values are same. 
+Therefore, inside the map it will use the key1.equals(key2) and it will return true so it will return the value of key2 which is 2.
+
+If we want output like {key=1, key=2} then we can use IdentityHashMap.
+
+🔷IdentityHashMap
+➤ IdentityHashMap is a special implementation of Map in Java where keys are compared using reference equality (==) instead of equals().
+➤ It is part of java.util package.
+
+🌟 Key Features
+➤ Uses reference equality (==) for both key comparison and hashing.
+➤ Allows null keys and null values.
+➤ Performance is similar to HashMap.
+➤ Not synchronized (like HashMap).
+➤ It breaks the general contract of Map because two logically equal keys (according to .equals()) may not be treated as equal here.
+
+🆚 Difference from HashMap
+| Feature        | `HashMap`                     | `IdentityHashMap`                |
+| -------------- | ----------------------------- | -------------------------------- |
+| Key comparison | Uses `equals()`               | Uses `==` (reference equality)   |
+| Hashing        | Uses `hashCode()` of key      | Uses `System.identityHashCode()` |
+| Usage          | When logical equality matters | When reference identity matters  |
+
+✅ Example 1:
+import java.util.*;
+
+public class IdentityHashMapDemo {
+    public static void main(String[] args) {
+        Map<String, String> map = new IdentityHashMap<>();
+
+        String a = new String("hello");
+        String b = new String("hello");
+
+        map.put(a, "Value A");
+        map.put(b, "Value B");
+
+        System.out.println("Size: " + map.size());
+        System.out.println(map);
+    }
+}
+
+✅ Output:
+Size: 2
+{hello=Value A, hello=Value B}
+👉 Even though a.equals(b) is true, IdentityHashMap treats them as different keys because a != b (different objects in memory).
+
+🌟 Use Cases
+✔️ When you need object identity instead of equality.
+✔️ Caching frameworks (where reference equality is important).
+✔️ Serialization/deserialization where temporary objects need unique tracking.
+✔️ Graph processing (tracking visited nodes by identity).
+✔️ Object pools.
+
+✅ Example: What will happen if you put two equal String objects as keys?
+package collections;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
+
+public class IdentityHashMapDemo {
+
+	public static void main(String[] args) {
+		String key1 = new String("Key");
+		String key2 = new String("Key");
+		Map<String, Integer> map = new IdentityHashMap<>();
+		map.put(key1, 1);
+		map.put(key2, 2);
+		System.out.println(map);
+	}
+}
+✅Output : {Key=2}
+
+🔷 Comparable
+➤ Belongs to java.lang package.
+➤ Used to define the natural/default ordering of objects.
+➤ A class implements Comparable to provide its own comparison logic.
+➤ It has one method:
+🔗 public int compareTo(T o):
+Returns:
+	✔️ 0 → equal
+	✔️ <0 → current object < given object
+	✔️ >0 → current object > given object
+
+🔸 Example: Student sorting by age (natural order)
+class Student implements Comparable<Student> {
+    String name;
+    int age;
+
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public int compareTo(Student s) {
+        return this.age - s.age; // ascending order
+    }
+}
+
+✅ Comparator (Interface)
+➤ Belongs to java.util package.
+➤ Used when we want to define multiple sorting strategies or sorting logic outside the class.
+➤ It has two main methods Java 8 added comparing() and thenComparing() for chaining.:
+	✔️ public int compare(T o1, T o2);
+	✔️ public boolean equals(Object obj); // rarely overridden
+➤ Can be used with lambda/method references for concise sorting.
+
+🔸 Example: Sorting Student by name
+import java.util.*;
+
+class Student {
+    String name;
+    int age;
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+class NameComparator implements Comparator<Student> {
+    public int compare(Student s1, Student s2) {
+        return s1.name.compareTo(s2.name);
+    }
+}
+🔄 Usage: Collections.sort(list, new NameComparator());
+
+🆚 Comparable vs Comparator — Differences
+| Feature             | Comparable                              | Comparator                                          |
+| ------------------- | --------------------------------------- | --------------------------------------------------- |
+| Package             | `java.lang`                             | `java.util`                                         |
+| Method              | `compareTo(Object o)`                   | `compare(Object o1, Object o2)`                     |
+| Sorting logic       | Defined **inside the class**            | Defined **outside the class**                       |
+| Natural Order       | Provides **default (natural)** ordering | Provides **custom/multiple** orderings              |
+| Modifies class code | Yes (must implement inside class)       | No (separate comparator class or lambda)            |
+| One vs Many         | One natural order only                  | Many possible comparators                           |
+| Java 8 support      | No enhancements                         | Added `comparing()`, `thenComparing()` for chaining |
+
+✅ Example with Both
+import java.util.*;
+
+class Student implements Comparable<Student> {
+    String name;
+    int age;
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // Natural order: by age
+    @Override
+    public int compareTo(Student s) {
+        return this.age - s.age;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + age + ")";
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        List<Student> list = new ArrayList<>();
+        list.add(new Student("John", 25));
+        list.add(new Student("Alice", 22));
+        list.add(new Student("Bob", 30));
+
+        // Using Comparable (natural order: by age)
+        Collections.sort(list);
+        System.out.println("Sorted by age: " + list);
+
+        // Using Comparator (custom order: by name)
+        Collections.sort(list, (s1, s2) -> s1.name.compareTo(s2.name));
+        System.out.println("Sorted by name: " + list);
+    }
+}
+
+🌟 Insights
+➤ Comparable → "I have a natural order, built inside the class."
+➤ Comparator → "I allow multiple sorting logics, outside the class."
+➤ Common trick: “Can a class implement both?” → ✅ Yes, a class can have a natural order (Comparable) and also be sorted by different comparators when needed.
+
+🔷 SortedMap

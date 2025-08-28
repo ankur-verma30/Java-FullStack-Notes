@@ -276,10 +276,20 @@ Also:
 Each method has its stack frame, and local variables are stored there, so naming conflicts like this are not allowed even in nested blocks.
 
 2. Static variable
+📌 Where are static variables stored in Java?
+➤ In Java, memory is divided into different areas managed by the JVM (Java Virtual Machine):
+➤ Heap → For objects.
+➤ Stack → For local variables and method calls.
+➤ Method Area / Metaspace (Java 8+) → For class-level data like:
+	✔️ Class metadata (name, methods, fields)
+	✔️ Static variables
+	✔️ Constant pool
+➤ PC Register → Keeps track of execution in threads.
+➤ Native Method Stack → For native (C/C++) calls.
+
 3. Non-static variable/instance variable
 
 4. Reference Variable
-#####################
 A reference variable in Java is a variable that stores the memory address (reference) of an object, not the actual object itself.
 a. Can hold either an Object address or a null value.
 b. The datatype of the reference variable is the class. 
