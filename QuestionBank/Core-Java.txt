@@ -360,3 +360,470 @@ class Dog extends Animal {
 🧠 Q: “Can an abstract class implement an interface?” → ✅ Yes, but must provide implementation for methods or remain abstract.
 🧠 Q: “Which is faster, abstract class or interface?” → Abstract class is slightly faster (direct method call vs dynamic dispatch in interfaces).
 🧠 Q: “When to prefer interface over abstract class?” → Use interface when unrelated classes need common behavior (e.g., Flyable, Drivable). Use abstract class when related classes share state/logic (e.g., Shape).
+
+❓ Multi-catch Block in Java
+➤ A multi-catch block allows you to handle multiple exceptions in a single catch block using the | (pipe) operator.
+➤ Introduced in Java 7 to reduce code duplication.
+
+✅ Example (Before Java 7 → Repetitive Code)
+try {
+    int arr[] = new int[5];
+    arr[5] = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("Arithmetic Exception: " + e.getMessage());
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("Array Index Exception: " + e.getMessage());
+}
+❌ Problem: Code is repetitive; two separate blocks with same logic.
+
+✅ Example (After Java 7 → Multi-Catch)
+try {
+    int arr[] = new int[5];
+    arr[5] = 10 / 0;
+} catch (ArithmeticException | ArrayIndexOutOfBoundsException e) {
+    System.out.println("Exception: " + e.getMessage());
+}
+➡️ Same result with cleaner code.
+
+🔹 Rules of Multi-catch
+➤ Use | (pipe) to separate multiple exception types.
+➤ Exceptions must be unrelated (not parent-child).
+
+✅ Allowed: IOException | SQLException
+❌ Not Allowed: IOException | FileNotFoundException (because FileNotFoundException is a subclass of IOException).
+
+⚡ The exception variable (e) is final implicitly → You cannot reassign it inside the block.
+
+🔹 Why Multi-catch is Useful?
+➤ Reduces boilerplate code (no duplicate catch blocks).
+➤ Improves readability.
+➤ Optimizes bytecode (compiler generates smaller, efficient bytecode).
+
+🔹 One-Liner for Quick Revision
+👉 Multi-catch block = Handle multiple exceptions in one catch block using | operator (Java 7+), avoiding code duplication.
+
+🔹 Interview Insights
+🧠 Q: “Can we catch exceptions in order?”
+In multi-catch, order doesn’t matter because it’s a single block.
+🧠 Q: “What if exceptions have parent-child relation?”
+Compile-time error. Use separate catch blocks instead.
+🧠 Q: “Is the exception object final in multi-catch?”
+Yes, you cannot assign e = new Exception() inside.
+
+
+❓ Difference between final, finally, and finalize()
+🔹 1. final (Keyword)
+➤ Usage: Restrict modification.
+➤ Applied to: Variable → makes it a constant (cannot be reassigned).
+
+final int x = 10;
+// x = 20; ❌ Compile-time error
+
+➤ Method → prevents overriding in child class.
+class A {
+    final void show() { System.out.println("A"); }
+}
+class B extends A {
+    // void show() {} ❌ Not allowed
+}
+
+➤ Class → prevents inheritance.
+final class A {}
+// class B extends A {} ❌ Not allowed
+➡️ One-liner: final = constant / no overriding / no inheritance.
+
+🔹 2. finally (Block)
+➤ Usage: Used in exception handling.
+➤ Purpose: Ensures a block of code always executes, regardless of exception occurrence.
+➤ Commonly used for resource cleanup (closing files, DB connections).
+
+✅ Example:
+try {
+    int x = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("Exception: " + e);
+} finally {
+    System.out.println("Finally block always executes");
+}
+
+✅ Output:
+Exception: java.lang.ArithmeticException: / by zero
+Finally block always executes
+
+➡️ Special case: If you call System.exit(0), the finally block won’t execute.
+➡️ One-liner: finally = block that always executes (for cleanup).
+
+🔹 3. finalize() (Method)
+A method in Object class called by Garbage Collector (GC) before destroying an object.
+Usage: To release resources (like closing file handles, DB connections) before object is removed.
+
+✅ Example:
+class Demo {
+    protected void finalize() {
+        System.out.println("Finalize method called before GC");
+    }
+    public static void main(String[] args) {
+        Demo d = new Demo();
+        d = null;
+        System.gc(); // Suggests JVM to call GC
+    }
+}
+✅ Output: Finalize method called before GC
+
+
+➡️ Important Notes:
+➤ finalize() execution is not guaranteed. GC may or may not run.
+➤ From Java 9, finalize() is deprecated (use try-with-resources instead).
+➡️ One-liner: finalize() = method called by GC before object destruction (deprecated).
+
+🔹 Interview-Ready Comparison
+| Feature           | `final` (Keyword)                        | `finally` (Block)            | `finalize()` (Method)                 |
+| ----------------- | ---------------------------------------- | ---------------------------- | ------------------------------------- |
+| **Category**      | Modifier                                 | Block                        | Method in `Object` class              |
+| **Used For**      | Constants, no overriding, no inheritance | Cleanup code after try-catch | Cleanup before object destruction     |
+| **When Executes** | At compile-time restriction              | Always after try-catch       | Called by GC before destroying object |
+| **Control**       | Programmer                               | Programmer                   | JVM/GC decides                        |
+| **Deprecation**   | ❌ Not deprecated                         | ❌ Not deprecated             | ✅ Deprecated in Java 9+               |
+
+
+❓ Why is String inheritable? (or is it?)
+🔹 Truth about String class
+The String class in Java is declared as:
+✅ Code Structure:
+public final class String implements Serializable, Comparable<String>, CharSequence
+Notice the final keyword → this means:
+    ✔️ String cannot be inherited (cannot have a subclass).
+    ✔️ This is done to ensure immutability and security.
+➡️ So, String is NOT inheritable. If you try to extend it:
+class MyString extends String {} // ❌ Compile-time error
+
+🔹 Why did Java make String final?
+➤ Immutability: Prevents someone from extending String and overriding methods to break immutability.
+➤ Security: Strings are used in sensitive areas (file paths, DB URLs, network connections). If String could be inherited and tampered, it would be a major security risk.
+➤ Performance: String pool (interning) relies on immutability. If strings were mutable or extendable, pooling would fail.
+
+❓ How can we create our own inheritance class?
+If you want a custom class that supports inheritance, don’t mark it as final. Example:
+
+// Parent class
+class Vehicle {
+    String brand = "Generic";
+
+    void start() {
+        System.out.println("Vehicle starting...");
+    }
+}
+
+// Child class
+class Car extends Vehicle {
+    int wheels = 4;
+
+    @Override
+    void start() {
+        System.out.println(brand + " Car starting with " + wheels + " wheels!");
+    }
+}
+
+public class Demo {
+    public static void main(String[] args) {
+        Car c = new Car();
+        c.brand = "Tesla";
+        c.start(); // Tesla Car starting with 4 wheels!
+    }
+}
+
+🔹 Rules for creating an inheritance class
+➤ Use extends keyword for class inheritance.
+➤ Use implements for interface implementation.
+➤ Methods in parent can be overridden in child (unless final/static/private).
+➤ Parent’s constructor is always called first (via super()).
+➤ Multiple inheritance of classes is not allowed in Java → solve via interfaces.
+
+❓What is Runtime Polymorphism?
+Runtime polymorphism in Java is method overriding — when a method call is resolved at runtime (not compile-time).
+It’s also called Dynamic Method Dispatch.
+
+✅ Example: Method Overriding
+class Animal {
+    void sound() {
+        System.out.println("Animal makes a sound");
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+
+class Cat extends Animal {
+    @Override
+    void sound() {
+        System.out.println("Cat meows");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a1 = new Dog();  // reference is Animal, object is Dog
+        Animal a2 = new Cat();  // reference is Animal, object is Cat
+
+        a1.sound();   // Dog barks  (resolved at runtime)
+        a2.sound();   // Cat meows  (resolved at runtime)
+    }
+}
+
+🔹 Key Points
+➤ Happens via method overriding.
+➤ The object’s actual type (Dog, Cat) decides which method gets executed.
+➤ The reference type (Animal) only decides which methods are accessible.
+➤ Achieved only with non-static, non-final, non-private methods.
+
+🔸 Static vs Runtime Polymorphism
+✔️ Compile-time (Static) Polymorphism → Method Overloading.
+(Resolved during compilation).
+✔️ Runtime Polymorphism → Method Overriding.
+(Resolved during execution using Dynamic Method Dispatch).
+
+📌 Interview Insights
+➤ If a superclass reference points to a subclass object, and an overridden method is called → subclass version runs (not superclass).
+➤ Constructors cannot be overridden, so runtime polymorphism does not apply to them.
+➤ Helps in loose coupling → code works on interface/superclass reference, actual object can vary.
+
+
+❓ What is the need of creating incomplete methods in Interface?
+Interfaces define a contract/blueprint for classes.
+They say “these methods must exist” but do not dictate how they should be implemented.
+
+✅ Needs & Advantages:
+⚡ Achieve Abstraction
+    ✔️ Interface methods are incomplete because the how depends on the class.
+
+✅ Example:
+interface Vehicle {
+    void start();  // every vehicle must start, but differently
+}
+
+class Car implements Vehicle {
+    public void start() { 
+        System.out.println("Car starts with a key"); 
+    }
+}
+
+class Bike implements Vehicle {
+    public void start() { 
+        System.out.println("Bike starts with a self-start button"); 
+    }
+}
+
+
+⚡ Multiple Implementations (Polymorphism)
+    ✔️ Same method, different behavior → achieved by leaving method incomplete in the interface.
+
+Car.start() ≠ Bike.start(), but both guarantee they implement start().
+
+⚡ Standardization / Contract
+    ✔️ Interfaces ensure all implementing classes must follow a standard contract.
+
+✅ Example: Comparable interface → any class implementing it must define compareTo().
+
+⚡Loose Coupling
+    ✔️ Code depends on interface (contract) and not on concrete classes.
+This allows swapping implementations easily.
+
+✅ Example:
+List<String> list = new ArrayList<>();
+list = new LinkedList<>();  // works fine, same interface
+
+
+Future Extensibility
+    ✔️ Library/framework writers define interfaces → application developers provide their own implementations.
+✅ Example: JDBC → Connection, Statement, ResultSet are interfaces.
+
+Oracle, MySQL, PostgreSQL → provide their own implementations.
+
+🔸 Why not give default method bodies?
+➤ Before Java 8, interfaces could only have incomplete methods → pure abstraction.
+➤ Since Java 8 → default and static methods allowed in interfaces (to provide common behavior if needed).
+➤ But abstract (incomplete) methods are still necessary → to enforce implementation.
+
+❓ Difference between this and super keyword?
+| Feature                   | this                                                           | super                                                          |
+| Refers to                 | Current class object                                           | Immediate parent class object                                      |
+| Usage in constructor      | Calls another constructor in the same class → `this()`         | Calls parent class constructor → `super()`                         |
+| Access                    | Access current class fields, methods, and constructors         | Access parent class fields, methods, and constructors              |
+| Variable access           | Resolves name conflict between instance variable and local variable  | Resolves name conflict between child and parent class variable |
+| Method access             | Calls current class method (can be used explicitly,usually implicit)| Calls parent class method (useful in overriding)                   |
+| Constructor call position | `this()` must be the first statement in a constructor                | `super()` must also be the first statement in a constructor    |
+| Inheritance               | Does not involve inheritance (refers to same object)                 | Used in inheritance (refers to parent part of the object)          |
+
+✅ Examples
+1. Variable Shadowing
+class A {
+    int x = 10;
+}
+
+class B extends A {
+    int x = 20;
+
+    void show() {
+        System.out.println(x);        // 20 → child’s variable
+        System.out.println(this.x);   // 20 → child’s variable explicitly
+        System.out.println(super.x);  // 10 → parent’s variable
+    }
+}
+
+2. Constructor Chaining
+class A {
+    A() {
+        System.out.println("Parent constructor");
+    }
+}
+
+class B extends A {
+    B() {
+        super(); // calls parent constructor
+        System.out.println("Child constructor");
+    }
+}
+
+3. Method Overriding
+class A {
+    void display() {
+        System.out.println("Parent display");
+    }
+}
+
+class B extends A {
+    void display() {
+        System.out.println("Child display");
+    }
+
+    void test() {
+        this.display();   // Child display
+        super.display();  // Parent display
+    }
+}
+
+❓ What is a ClassLoader in Java?
+➤ A ClassLoader is a part of JVM responsible for loading classes into memory (RAM) when they are first referenced in a Java program.
+➤ It loads .class bytecode files from file system, network, or other sources into JVM’s method area.
+➤ Without ClassLoader, JVM wouldn’t know how to find and use your classes.
+
+✅ Types of ClassLoaders (Hierarchy)
+
+➤ Bootstrap ClassLoader
+    ✔️ Loads core Java classes (rt.jar, java.lang, java.util, etc.).
+    ✔️ Part of native JVM code (not a Java class).
+✅ Example: String, Integer.
+
+➤ Extension (Platform) ClassLoader
+    ✔️ Loads classes from JDK extensions (jre/lib/ext or modules).
+✅ Example: javax.* packages.
+
+➤ Application (System) ClassLoader
+    ✔️ Loads classes from the classpath (-cp or CLASSPATH env var).
+    ✔️ This is the default loader for your project classes.
+✅ Example: your com.myapp.Student class.
+
+✅ ClassLoader Hierarchy (Parent Delegation Model)
+Bootstrap ClassLoader
+        ↓
+Extension (Platform) ClassLoader
+        ↓
+Application (System) ClassLoader
+        ↓
+Your Custom ClassLoader (optional)
+
+👉 Whenever a class is needed:
+➤ Application loader asks parent first.
+➤ If parent doesn’t find it, the current loader loads it.
+(This avoids multiple loaders loading the same core classes.)
+
+✅ Example
+public class ClassLoaderDemo {
+    public static void main(String[] args) {
+        // String class → core class → loaded by Bootstrap
+        System.out.println(String.class.getClassLoader()); 
+        // null (Bootstrap is written in native code)
+
+        // This class → loaded by Application ClassLoader
+        System.out.println(ClassLoaderDemo.class.getClassLoader()); 
+    }
+}
+
+📌 Key Interview Insights
+🧠 Why parent delegation model?
+To prevent security issues (e.g., custom malicious java.lang.String class).
+🧠 Can we write a custom ClassLoader?
+Yes, by extending ClassLoader and overriding findClass() (used in frameworks like Spring, Tomcat, Hibernate).
+
+🧠 Tricky point:
+Bootstrap loader returns null in getClassLoader() because it’s implemented in native code.
+
+❓ What are access specifiers in Java?
+Access Specifiers (or Modifiers) control the visibility/scope of classes, methods, constructors, and variables in Java.
+
+There are 4 main access specifiers:
+
+✅ 1. public
+➤ Visible everywhere (inside same class, package, subclass, outside package).
+➤ Can be accessed from anywhere in the project.
+
+public class Student {
+    public String name;
+    public void display() {
+        System.out.println("Name: " + name);
+    }
+}
+
+✅ 2. protected
+Accessible:
+    ✔️ Inside the same package
+    ✔️ In subclasses (even if in different package)
+    ✔️ Not visible to non-subclasses outside the package.
+
+class Person {
+    protected int age;
+}
+class Student extends Person {
+    void showAge() {
+        System.out.println(age); // ✅ allowed (in subclass)
+    }
+}
+
+✅ 3. default (package-private → when no specifier is written)
+➤ Accessible only within the same package.
+➤ Cannot be accessed outside the package, even in subclasses.
+
+class Teacher {  // default access
+    String subject;
+    void printSubject() {
+        System.out.println(subject);
+    }
+}
+
+✅ 4. private
+➤ Accessible only within the same class.
+➤ Not visible to subclass or other classes.
+
+class Account {
+    private double balance;
+    private void displayBalance() {
+        System.out.println(balance);
+    }
+}
+
+| Specifier     | Same Class | Same Package | Subclass (diff pkg) | Outside Package |
+| ------------- | ---------- | ------------ | ------------------- | --------------- |
+| **public**    | ✅         | ✅          | ✅                  | ✅             |
+| **protected** | ✅         | ✅          | ✅                  | ❌             |
+| **default**   | ✅         | ✅          | ❌                  | ❌             |
+| **private**   | ✅         | ❌          | ❌                  | ❌             |
+
+📌 Interview Insights
+➤ default keyword does not exist — it just means no specifier is written.
+➤ protected is commonly misunderstood — it allows subclass access even outside package.
+➤ private → best practice for encapsulation (fields should be private + exposed via getters/setters).
+➤ Classes can only be public or default (not protected or private).

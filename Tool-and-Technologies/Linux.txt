@@ -86,7 +86,7 @@ cp -r dir1 dir2 → copy directories recursively
 ➤ Recursive remove (rm -r) is dangerous — mention caution to score points.
 
 ⚡nano food.txt → edit file in-place
-Ctrl + x + y → save and exit
+Ctrl + x → save and exit
 
 🔷 TimeStamps:Modification, Access, and Change TimeStamps
 we have a directory in which we have a file named food.txt.
@@ -150,4 +150,353 @@ touch 'a b' → create a file with spaces in the name (quotes escape special cha
 🔷 Working with Nano
 ➤ Nano is a simle, easyto-use text editor that operates within a terminal window.
 ➤ If a file is not there, it creates and open it.
+
 🔗 nano food.txt
+
+🌟 Navigation inside the editor
+➤ Ctrl+ upKey → move cursor up
+➤ Ctrl+ downKey → move cursor down
+➤ Ctrl+ leftKey → move cursor left
+➤ Ctrl+ rightKey → move cursor right
+➤ Alt+G → Go to a specific line, asks linenumber and columnnumber(1-based indexing)
+
+🌟 Basic Editing in Nano
+➤ Ctrl+Shift+C: Copy to global
+➤ Ctrl+Shift+V: Paste from global
+➤ Ctrl-K: Cut a line/selected(current line)
+➤ Alt+^: Copy the line/selected(current line)
+➤ Ctrl-U: Paste
+➤ Alt:U: Undo
+
+🌟 Searching/replace in nano
+➤ Ctrl+W - Search for a string or a regular expression(case in-sensitive).
+➤ Ctrl+\ - Replace a string
+
+➤ Ctrl + e → move cursor to end of line
+➤ Ctrl + a → move cursor to beginning of line
+➤ Ctrl + x → Close the current file buffer and exit the editor
+➤ Ctrl + o → write the current file to disk
+➤ Ctrl + q → exit without saving
+
+🔷 File Operations
+
+👉 Removing the files
+➤ rm fileName → remove a file
+➤ rm -d dirName → remove only the empty directory
+➤ rm -r dirName → remove a directory with its contents
+➤ rm file1 file2 dirName → remove multiple files and directories
+
+👉 Moving and Copying
+➤ cp fileName1 fileName2 → copy a file
+➤ cp -r dirName1 dirName2 → copy a directory(copying recursively)
+➤ mv fileName1 fileName2 → move a file
+➤ mv -r dirName1 dirName2 → move a directory
+
+👉 Move and copy command can Rename the file or directory
+➤ mv another.mp4 ../horror/another_2012.mp4 → move the another.mp4 to horror folder and changed its name to another_2012.mp4
+➤ cp another.mp4 ../horror/another_2012.mp4 → copy the another.mp4 to horror folder and changed its name to another_2012.mp4
+
+⚡Key Insight: cp a.mp4 a → copy the a.mp4 and paste to same directory and changed its name to a.mp4 but if a folder already exist then a.mp4 will be copied to that folder
+
+🔷 Working with cat Command
+🔗 cat fileName → print the content of a file
+🔗 cat -n fileName → print the content of a file with line numbers
+🔗 cat --number fileName → same, with long option
+🔗 cat file1 file2 → take file1 and file2 and concatenate them and show their content one after another.
+🔗 cat file1 file2 > file3 → concatenate the content of file1 and file2 and put them inside the file3(overwrite)
+🔗 cat file1 file2 >> file3 → concatenate the content of file1 and file2 and put them inside the file3(append)
+🔗 cat >> a.txt →  write the content then append to the a.txt use Ctrl+D to tell it is the end of the input then Ctrl+C to exit writing
+🔗 cat > a.txt →  write the content then overwrite to the a.txt use Ctrl+D to tell that it is the end of the input then use Ctrl+C to exit writing
+🔗 tac fileName → vertically invert the contents of the file by lineNumber other workings are same as cat command just in reverse
+🔗 rev fileName → reverse the content horizontally every line, vertical order is same 
+
+❗Same things can be achived through echo command
+
+💡 Interview Tip: cat is used for quick viewing, concatenating, or creating files.
+
+📌 Special Cases
+cat 'a b' → print the content of a file with spaces in the name (quotes escape special characters)
+
+🔷 Viewing File Content in Linux
+📖 1. head – View Beginning of File
+🔗 head foods.txt → prints first 10 lines (default)
+🔗 head -n 5 foods.txt → prints first 5 lines
+💡 Useful for quickly checking file headers, configs, or log starts.
+
+📖 2. tail – View End of File
+🔗 tail foods.txt → prints last 10 lines (default)
+🔗 tail -n 5 foods.txt → prints last 5 lines
+🔗 tail -f foods.txt → prints last 10 lines and keeps watching for changes in real-time
+💡 Commonly used for monitoring log files (tail -f /var/log/syslog).
+
+📖 3. less – Scrollable File Viewer
+🔗 less foods.txt → open file with navigation:
+✔️ Space / ↓ → scroll down
+✔️ ↑ / b → scroll up
+✔️ /word → search forward
+✔️ ?word → search backward
+✔️ q → quit
+💡 Preferred over cat for large files (doesn’t load everything into memory).
+
+🎯 Interview Insights
+➤ Difference between head, tail, cat, less
+    ✔️ cat → dump full file
+    ✔️ head/tail → preview start/end
+    ✔️ less → navigate inside file efficiently
+➤ tail -f is often asked → used in real-time log monitoring (very common in DevOps/production).
+
+➤ Combination usage:
+    ✔️ head -n 20 file | tail -n 5 → prints lines 16–20.
+
+🔷 Standard Output (stdout) & Standard Error (stderr) in Linux
+📍 Basics
+
+➤ Every command/program produces:
+    ✔️ stdout (1) → normal output (default stream)
+    ✔️ stderr (2) → error messages
+💡 By default, both are displayed in the terminal.
+
+📂 Redirection Operators
+➤ > → redirect (overwrite)
+➤ >> → append
+
+📖 Redirecting Standard Output
+➤ ls > a.txt → redirect output to a.txt (overwrite if exists)
+➤ ls >> a.txt → append output to a.txt
+💡 Stream number 1 (stdout) is implied.
+So ls > a.txt ≡ ls 1> a.txt
+
+📖 Redirecting Standard Error
+➤ ls -z 2> a.txt → redirect errors only into a.txt
+➤ ls -z 2>> a.txt → append errors only into a.txt
+💡 2 explicitly denotes stderr.
+
+📖 Redirecting Both stdout and stderr
+➤ ls -z > output.txt 2> error.tx
+    ✔️ stdout → output.tx
+    ✔️ stderr → error.tx
+➤ ls -z >> output.txt 2>> error.tx
+    ✔️ append stdout → output.tx
+    ✔️ append stderr → error.txt
+
+🎯 Interview Insights
+➤ Stream numbers:
+    ✔️ 0 → stdin (input)
+    ✔️ 1 → stdout (output)
+    ✔️ 2 → stderr (errors)
+Default: > means 1> unless otherwise specified.
+
+🔷 sort Command in Linux
+The sort command is used to arrange lines of text in files or input streams.
+
+⚡Syntax: sort [options] fileName
+
+📖 Common Options
+🔗 sort fileName → sort file content in ascending (alphabetical) order
+🔗 sort -r fileName → sort in reverse (descending) order
+🔗 sort -n fileName → sort numerically (instead of alphabetically)
+🔗 sort -nr fileName → sort numerically in reverse order
+🔗 sort -u fileName → sort and remove duplicates
+
+📊 Sorting by Column
+🔗 sort -k5h fileName → sort using 5th column, numbers in human-readable format (K, M, G, etc.)
+🔗 sort -k5hr fileName → sort by 5th column, human-readable, in reverse order
+💡 Example with ls -alh output: ls -alh | sort -k5h
+Sorts files by size (column 5).
+
+🎯 Interview Insights
+➤ Default behavior: sorts alphabetically (lexicographic order).
+➤ -n is important — without it, 10 comes before 2 (alphabetical).
+➤ -u is often tested for removing duplicates.
+➤ Column sorting (-k) is frequently used with commands like ls, ps, and df.
+➤ Human-readable (-h) helps when sorting sizes with suffixes (K, M, G).
+
+🔷 Pipe Operator (|) in Linux
+➤ The pipe (|) operator takes the output of one command and uses it as the input to another command.
+➤ Enables command chaining without creating intermediate files.
+
+📖 Example – Without Pipe
+ls -lh >> files        # save directory listing to 'files'
+sort -k5hr files       # sort by 5th column (size) in reverse
+
+📖 Example – With Pipe
+🔗 ls -lh | sort -k5hr >> files
+
+➤ ls -lh → list files with human-readable sizes
+➤ sort -k5hr → sort by size (descending)
+➤ >> files → append result to files
+💡 Pipe makes it a single streamlined command.
+
+📖 Multiple Pipes
+You can chain multiple pipes:
+ps aux | sort -k3nr | head -n 5
+
+➤ ps aux → list running processes
+➤ sort -k3nr → sort by CPU usage (column 3, numeric, reverse)
+➤ head -n 5 → show top 5 CPU-consuming processes
+
+🎯 Interview Insights
+➤ Pipe vs Redirection:
+    ✔️ > / >> → redirect output to a file
+    ✔️ | → send output directly to another command
+Common usage:
+➤ ls | grep txt → list only .txt files
+➤ dmesg | less → scroll through logs
+➤ cat file | wc -l → count lines in a file
+
+🔷 Searching in Linux – grep Command
+
+📍 Basic Usage: grep "pattern" fileName
+➤ Searches pattern inside fileName.
+➤ Case-sensitive by default.
+➤ Use double quotes to protect special characters (*, ?, |).
+
+📖 Common Options
+✔️ -i → ignore case
+🔗 grep -i "error" logs.txt
+
+✔️ -c → count matches (integer only)
+🔗 grep -ic "error" logs.txt
+
+✔️ -w → match whole word only (not substrings)
+🔗 grep -iw "cat" animals.txt   # matches "cat", not "concatenate"
+
+✔️ -n → show line numbers of matches
+🔗 grep -in "error" logs.txt
+
+📖 Context Options
+✔️ -B n → show n lines before match
+✔️ -A n → show n lines after match
+✔️ -C n → show n lines before & after match
+
+✅ Examples:
+🔗 grep -iB2 "error" app.log    # 2 lines before match
+🔗 grep -iA2 "error" app.log    # 2 lines after match
+🔗 grep -iC2 "error" app.log    # 2 lines before & after
+🔗 grep -iB2 -A3 "error" app.log  # 2 before, 3 after
+
+📖 Recursive Search
+Search in all files under a directory:
+
+🔗 grep -r "pattern" dirName
+🔗 grep -r "pattern"   # searches in current directory
+
+📖 Multiple Files
+🔗 grep "pattern" file1 file2
+
+📖 Combination with Other Commands
+🔗 ls -lh | grep "txt" → show only .txt files
+🔗 tail -f app.log | grep "error" -C10 → live monitor logs, showing 10 lines before & after each "error"
+
+🎯 Insights
+➤ Pipe + grep is a favorite interview question → e.g., ps aux | grep java
+➤ Regex supported → grep -E "cat|dog" (use -E for extended regex)
+➤ grep → basic regex
+➤ egrep (or grep -E) → extended regex (+, ?, {})
+➤ fgrep (or grep -F) → fixed string search, no regex (faster)
+
+❗Common traps:
+⚡ Forgetting quotes → shell may expand special characters before grep sees them.
+⚡ Case sensitivity → by default grep is case-sensitive.
+⚡ Large log search → always combine with tail -f or less for efficiency.
+
+🔷 Arithmetic Operations and Expressions in Linux
+🔗 $(command) → Command substitution (runs a command inside).
+🔗 $((expression)) → Arithmetic expansion (evaluates math expressions).
+
+🔗 Arithmetic with $(( ))
+✔️ echo $((2 + 3))    # 5
+✔️ echo $((2 * 3))    # 6
+✔️ echo $((2 - 3))    # -1
+✔️ echo $((2 / 3))    # 0 → integer division only
+✔️ echo $((2 % 3))    # 2 → modulo operator
+✔️ echo $((2**3))     # 8 → exponentiation
+
+
+⚡ Key Insights:
+Integer-only: $(( )) supports only integers, not decimals.
+For floating-point, use bc:
+✔️ echo "2/3" | bc -l    # 0.666666...
+
+You can also use variables inside:
+a=10; b=3
+✔️ echo $((a + b))    # 13
+
+🔗 Command Substitution $( )
+Runs a command inside, not math:
+
+🔗 echo $(pwd)     # prints current directory
+🔗 echo $(date)    # prints current date
+
+🔗 Logical Chaining in Linux
+
+👉; → Always runs commands sequentially
+🔗 d Downloads/ ; ls
+
+👉 → Even if cd fails, ls runs.
+👉 && → Run second only if first succeeds
+
+🔗 cd Downloads/ && ls → If cd works, then list contents.
+
+👉 || → Run second only if first fails 
+🔗 cd Downloads/ || ls
+✔️ If cd fails, then run ls in current dir.
+
+🎯 Interview Insights
+➤ $(( )) is faster than using expr command (old style).
+➤ Don’t confuse $( ) vs $(( )):
+    ✔️ $( ) → run command
+    ✔️ $(( )) → run math
+
+➤ let is another way but less preferred:
+let x=2+3
+echo $x   # 5
+
+
+🔷 Linux Terminal Shortcuts
+⌨️ Navigation
+👉 Ctrl + A → Move to beginning of line
+👉 Ctrl + E → Move to end of line
+👉 Alt + B → Move one word backward
+👉 Alt + F → Move one word forward
+
+📝 Editing
+👉 Ctrl + K → Delete from cursor to end of line
+👉 Ctrl + U → Delete from cursor to beginning of line
+👉 Ctrl + W → Delete word backwards (up to space)
+👉 Alt + D → Delete word forwards (up to space)
+👉 Ctrl + Y → Paste last cut text (yank)
+
+🔎 History & Searc
+👉 Ctrl + R → Reverse search through history ((reverse-i-search)
+👉 Ctrl + G → Exit history search without running a comman
+👉 ↑ / ↓ → Navigate through command history
+
+🖥️ Screen Control
+👉 Ctrl + L → Clear screen (like clear)
+👉 Ctrl + D → Logout / exit terminal (EOF signal)
+👉 Ctrl + Z → Suspend current job (can resume with fg)
+
+🔗 Tabs & Session
+👉 Ctrl + Alt + T → Open new terminal windo
+👉 Ctrl + Shift + T → Open new terminal tab (in supporting terminals like GNOME)
+
+🔤 Font & Display
+👉 Ctrl + Shift + “+” → Increase font size
+👉 Ctrl + “-” → Decrease font size
+👉 Ctrl + 0 → Reset font size
+
+⚡ Productivity Boosters
+👉 Tab → Auto-complete command/file names
+👉 Tab Tab → Show all possible completions
+👉 !! → Run last command again
+👉 !<word> → Run last command starting with <word> (e.g., !ls)
+👉 Ctrl + C → Kill current process
+👉 Ctrl + Shift + C → Copy text
+👉 Ctrl + Shift + V → Paste text
+
+🎯 Insights
+Ctrl + D vs Ctrl + C
+Ctrl + D → End Of File (exit shell if nothing to read).
+Ctrl + C → Interrupt/kill the running process.
+Job Control (Ctrl + Z, fg, bg) is a hidden gem often asked in interviews.

@@ -1,0 +1,122 @@
+❓ Internal Working of HashMap in Java
+➤ HashMap = key-value data structure based on hashing.
+➤ Stores entries in buckets using an array of nodes (Node<K,V>).
+➤ Each Node stores:
+
+static class Node<K,V> implements Map.Entry<K,V> {
+    final int hash;
+    final K key;
+    V value;
+    Node<K,V> next; // for handling collisions (linked list / tree)
+}
+
+🔹 2. Steps of put(K key, V value)
+⚡ Compute Ha
+    ✔️ HashMap calls hashCode() of key → integer has
+    ✔️ Then applies hash function ((hash) ^ (hash >>> 16)) to spread bits → reduces collisions.
+
+⚡ Find Bucket Inde
+    ✔️ Index = (n - 1) & hash where n = table size (power of 2)
+    ✔️ Example: Table size = 16 → index between 0–15.
+
+⚡ Insert Entry
+    ✔️ If bucket empty → new node stored.
+    ✔️ If bucket occupied → collision handled:
+        🔗 Java 7 → Linked List.
+        🔗 Java 8+ → If >8 entries in same bucket & table size >= 64 → bucket becomes Balanced Tree (Red-Black Tree) for faster O(log n) lookup.
+
+⚡ Check Duplicates
+If same key exists (checked using equals()), old value is replaced.
+
+⚡ Rehashing / Resize
+    ✔️ HashMap default capacity = 16, load factor = 0.75.
+    ✔️ If size exceeds capacity × loadFactor → table doubles in size, and entries are rehashed.
+
+🔹 3. Steps of get(K key)
+➤ Compute hash of key.
+➤ Find bucket index.
+➤ Traverse bucket:
+    ✔️ If only one node → return value.
+    ✔️ If multiple → check equals() to match correct key.
+    ✔️ If tree bucket → search in Red-Black Tree.
+
+🔹 4. Collision Handling
+➤ Hash collisions occur when two keys map to same bucket index.
+➤ Handled via:
+    ✔️ Linked List (Chaining) → nodes linked in list.
+    ✔️ Tree (Java 8+) → if list too long → converted to balanced tree.
+
+🔹 5. Important Features
+⚡ Time Complexity:
+    ✔️ Average → O(1) (constant time for put/get).
+    ✔️ Worst → O(log n) (tree) or O(n) (linked list).
+
+⚡ Null keys/values:
+    ✔️ Allows 1 null key and multiple null values.
+
+⚡ Thread-safety:
+    ✔️ Not synchronized → use ConcurrentHashMap for thread-safe operations.
+
+✅ 6. Example Walkthrough
+import java.util.*;
+
+public class Demo {
+    public static void main(String[] args) {
+        HashMap<String, Integer> map = new HashMap<>();
+        
+        map.put("A", 1);  // hash("A") → index → store
+        map.put("B", 2);  // hash("B") → different index
+        map.put("C", 3);  // hash("C") → may collide with "A" → linked list/tree
+       
+        System.out.println(map.get("B")); // Recomputes index, finds value = 2
+    }
+}
+
+🔹 7. One-Liner for Quick Revision
+👉 HashMap = Array of buckets + Linked List / Tree for collisions, uses hashCode() + equals() to store & retrieve key-value pairs efficiently.
+
+🔹 8. Interview Insights & Common Traps
+🧠 Q: “What if two keys have same hashCode() but different equals()?”
+They go to same bucket, then resolved via equals().
+🧠 Q: “What if two keys have same hashCode() and same equals()?”
+Considered same key → value is replaced.
+🧠 Q: “Why default load factor is 0.75?”
+Good tradeoff between time (collisions) and space (memory).
+🧠 Q: “Why power of 2 size for table?”
+(n-1) & hash works faster than % operator, improves performance.
+🧠 Q: “Why use both hashCode() and equals()?”
+hashCode() → narrow down bucket.
+equals() → confirm exact key match.
+
+❓What is String.intern() in Java?
+➤ intern() is a method of the String class (public String intern()).
+➤ It ensures that all identical string literals share the same reference ➤ from the String Pool (a special memory area in the heap).
+➤ When you call s.intern(), JVM:
+    ✔️ Checks if the string already exists in the String Pool.
+    ✔️ If yes → returns the reference from the pool.
+    ✔️ If no → adds the string to the pool and then returns the pooled reference.
+
+✅ Example
+public class InternDemo {
+    public static void main(String[] args) {
+        String s1 = new String("hello");   // stored in heap (outside pool)
+        String s2 = "hello";              // stored in String pool
+
+        System.out.println(s1 == s2);     // false (different references)
+
+        String s3 = s1.intern();          // moves "hello" to pool
+        System.out.println(s3 == s2);     // true (same reference from pool)
+    }
+}
+
+🔹 Key Points
+➤ Without intern: new String("abc") → creates a new object in heap, even if "abc" already exists in the pool.
+➤ With intern: It ensures "abc" is taken from the pool (no duplicates).
+➤ Helps in memory optimization (all identical string literals share one instance).
+➤ Mostly useful when you have many duplicate strings (like parsing XML/JSON, DB rows, etc.).
+
+🔸 Interview Insights
+➤ intern() is about reference equality (==), not content equality.
+➤ String literals are automatically interned by the compiler.
+➤ intern() is explicit, used for dynamically created strings.
+➤ Overusing intern() may increase String Pool size → can cause memory overhead in very large applications.

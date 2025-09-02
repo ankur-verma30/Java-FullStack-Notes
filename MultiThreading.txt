@@ -1,0 +1,105 @@
+Program❓
+A Program is a set of instructions written in a programming language that tells the computer how to perform a specific task.
+✅ For Example: Microsoft Word is a program that allows you to write and edit documents. It is a program that is used to create and edit documents.
+
+Process❓
+A process is an instance of a program that is being executed. When a program runs, the operating system creates a process to manage its execution.
+When we open Microsoft Word, it becomes a process in the operating system.          
+
+Thread❓
+A thread is the smallesst unit of execution within a process. A process can have multiple threads, which share the same resources but can run independently.
+A thread is a light-weight process that can be created and destroyed at runtime.
+✅For Example: A we browser like Google Chrome might use multiple threads for different tabs, with each tab running in its own thread.
+
+Multitasking❓
+Multitasking is the ability of a computer to run multiple tasks or programs at the same time. On single-core CPUs, this is done through time-sharing, rapdily switching between tasks. On multi-core CPUs, this is done through parallelism, where multiple cores, true paralled execution occurs, with tasks distributed across the cores. The OS scheduler balances the load, ensuring efficient and resposive system performance.
+
+It utilizes the capabilities of a CPU and its cores. When an OS performs multitasking, it can assign different tasks to different cores. This is mroe efficient than assigning all tasks to a single core.
+✅For Example: We are browsing the internet while listening to music and dowloading files at the same time.
+
+MultiThreading❓
+Multithreading is a technique in which multiple threads of execution are created within a single process. Each thread is a separate execution path within the process.
+Multithreading is used to improve the performance of a program by allowing it to execute multiple tasks concurrently.
+✅For Example: A web browser can use mutlithreading by having seperate threads for rendering the page, running JavaScript, and handling user input. This makes the browser more resposive and efficient.
+
+It enhances the efficiency of multitasking by breaking down individual tasks into smaller sub-tasks or threads. These threads can be processed simultaneously, making better use of the CPU's capabilities and resources.
+
+📝In Single-Core System:
+Both threads and processes are managed by the OS scheduler through time slicing ad context switching to create the illusion of simultaneous execution.
+📝In Multi-Core System:
+Both threads and processes can run in true parallelism, with tasks distributed across the cores to optimize performance.
+
+🔷 Thread Creation Techniques
+
+1. Using Thread Class
+
+package p1;
+
+public class World extends Thread {
+	@Override
+	public void run() {
+		for (; ; ) {
+			System.out.println(Thread.currentThread().getName());
+		}
+	}
+}
+
+package p1;
+
+public class intro {
+
+	public static void main(String[] args) {
+		World w = new World();
+		w.start();
+		for (; ;) {
+			System.out.println(Thread.currentThread().getName());
+		}
+	}
+
+}
+🔗 Steps:
+➤ A new class World is created that extends Thread.
+➤ The run method is overridden to define the code constitutes the new thread.
+➤ start method is called to initiate the new thread.
+
+2. Using Runnable Interface
+
+package p1;
+
+public class World implements Runnable {
+    @Override
+    public void run() {
+        for (; ; ) {
+            System.out.println(Thread.currentThread().getName());
+        }
+    }
+}
+
+package p1;
+
+public class intro {
+
+    public static void main(String[] args) {
+        Thread t = new Thread(new World());
+        t.start();
+        for (; ;) {
+            System.out.println(Thread.currentThread().getName());
+        }
+    }
+}
+🔗 Steps:
+➤ A new class World is created that implements Runnable.
+➤ The run method is overridden to define the code constitutes the new thread.
+➤ A Thread object is created by passing an instance of the World class to the Thread constructor.
+➤ The start method is called to initiate the new thread.
+
+
+🔷 Thread Lifecycle
+The lifecycle of a thread is Java consist of several states, which a thread can move through during its execution.
+The lifecycle of a thread is as follows:
+
+1. New: A new thread is created but not yet started.
+2. Runnable: After the start method is called, the thread becomes runnable. It's ready to ru and is waiting for CPU time.
+3. Running: The thread is in this state when it is executing.
+4. Blocked/Waiting: A thread is in this state when it is  waiting for a resource or for another thread to perform an action.
+5. Terminated: The thread has completed its execution.
