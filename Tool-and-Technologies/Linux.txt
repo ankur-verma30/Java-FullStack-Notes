@@ -500,3 +500,107 @@ Ctrl + D vs Ctrl + C
 Ctrl + D → End Of File (exit shell if nothing to read).
 Ctrl + C → Interrupt/kill the running process.
 Job Control (Ctrl + Z, fg, bg) is a hidden gem often asked in interviews.
+
+
+🔷 Find Command in Linux
+👉 Used to search for files/directories in a given path with conditions.
+👉 Syntax: find [path...] [expression]
+
+👉 Case-sensitive by default → use -iname for case-insensitive search.
+
+🌟 Wildcard Characters in find -name
+* → Any number of characters
+? → Any single character
+[abc] → Matches a, b, or c
+[!abc] → Matches anything except a, b, or c
+[0-9] → Any digit from 0–9
+[!0-9] → Not a digit
+
+✅ Examples:
+👉 🔗 find . -name "*.txt" → Find all text files in the current directory
+
+🔹 Search by Type
+🔗 find /path -type f -name "*.txt"   # files
+🔗 find /path -type d -name "*.txt"   # directories
+
+🔹 Search by Size
+🔗 find /path -type f -size +100k -size -200k   # files between 100KB–200KB
+🔗 find /path -type d -size +1M                 # directories > 1MB
+
+🔹 Search by Time
+✔️ -mmin / -mtime → Modified time
+✔️ -amin / -atime → Accessed time
+✔️ -cmin / -ctime → Metadata changed
+
+➤ Note: min gives minutes and time is in days
+✅ Examples:
+🔗 find /path -mtime -7    # modified in last 7 days
+🔗 find /path -mtime +7    # modified more than 7 days ago
+🔗 find /path -mtime 7     # modified exactly 7 days ago
+🔗 find /path -mmin -30    # modified in last 30 minutes
+
+🔹 Logical Operators
+🔗 find /path -type f -name "*.txt" -size +100k -mtime -7   # AND condition
+🔗 find /path \( -name "*.txt" -o -name "*.pdf" \)          # OR condition
+🔗 find /path ! -name "*.txt"   # NOT condition
+
+🔹 Empty Files/Directories
+🔗 find /path -type f -empty    # empty files
+🔗 find /path -type d -empty    # empty directories
+
+🔹 Execute Commands on Results
+🔗 find /path -name "*.txt" -exec cat {} \;    # run `cat` on each file
+🔗 find /path -empty -exec rm -rf {} \;        # delete empty files/dirs
+✔️ {} → placeholder for current file
+✔️ \; → end of exec command
+
+🔹 Using xargs
+🔗 find . -name "*.log" | xargs rm     # delete all .log files
+🔗 find . | xargs file                 # run `file` command on each
+
+🔹 -exec vs xargs
+➤ -exec → runs inside find, handles spaces/special chars safely
+➤ xargs → more efficient for bulk operations, but may fail on files with spaces/newlines
+
+🔷 Permissions in Linux
+lrwxrwxrwx
+l can be:
+    ➤ - → regular file
+    ➤ l- → symbolic link
+    ➤ d → directory
+    ➤ b → block device file
+    ➤ c → character device file
+    ➤ p → named pipe
+    ➤ s → socket
+
+🌟 Permission Bits (rwx)
+➤ r → Read
+    ✔️ File: allows viewing contents
+    ✔️ Directory: allows listing files (ls)
+
+➤ w → Write
+    ✔️ File: allows modifying contents
+    ✔️ Directory: allows adding/removing files
+
+➤ x → Execute
+    ✔️ File: allows executing as a program/script
+    ✔️ Directory: allows entering (cd) and accessing metadata
+
+possibilities of characters:
+➤ first character: r or -
+➤ second character: w or -
+➤ third character: x or -   
+
+🌟 Permission Groups (3 sets of 3 bits = 9 characters)
+✅ Example: -rwxr-xr--
+👉 Owner (User): first 3 bits → rwx
+👉 Group: next 3 bits → r-x
+👉 Others: last 3 bits → r--
+
+rest 9 characters will be divided into three groups: rwx,rwx,rwx
+➤ first set of 3 characters → owner permissions
+➤ second set of 3 characters → group permissions
+➤ third set of 3 characters → other permissions
+
+
+🔷 Changing the Permissions chmod command

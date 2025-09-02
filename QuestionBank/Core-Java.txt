@@ -827,3 +827,90 @@ class Account {
 ➤ protected is commonly misunderstood — it allows subclass access even outside package.
 ➤ private → best practice for encapsulation (fields should be private + exposed via getters/setters).
 ➤ Classes can only be public or default (not protected or private).
+
+❓Difference between Object Oriented Programming (OOP) and Procedure Oriented Programming (POP)?
+| Feature                | Procedure-Oriented Programming (POP)                              | Object-Oriented Programming (OOP)
+| Approach           | Focuses on functions (procedures) that operate on data.           | Focuses on objects that encapsulate both data & behavior.                    |
+| Data Security      | Data is global and can be accessed by any function → less secure. | Data is encapsulated inside objects → more secure.                           |
+| Modularity         | Functions are the building blocks.                                | Classes & objects are the building blocks.                                   |
+| Reusability        | Limited reusability, functions need rewriting for new requirements.   | High reusability via inheritance & polymorphism.                       |
+| Example Language   | C, Pascal                                                             | Java, C++,Python                                                         |
+| Scalability        | Harder to manage large codebases → less scalable.                    | Easier to manage large projects → more scalable.                          |
+| Data Handling      | Data moves **freely between functions**.                              | Data is hidden & accessed via methods (getters/setters).                 |
+| Abstraction        | No direct support, manual handling.                                   | Strong support with **abstract classes & interfaces.                     |
+| Real-World Mapping | Poor real-world representation.                                      | Maps naturally to real-world entities (Car, Employee, BankAccount, etc.). |
+
+Interview One-Liners
+➤ POP = "Functions-first, Data-second"
+➤ OOP = "Data-first, Functions bound to Data"
+➤ POP is like writing a recipe step by step, OOP is like designing a kitchen with appliances (objects).
+
+
+❓Is Java 100% Object-Oriented?
+➤ No, Java is not 100% Object-Oriented.
+➤ Even though Java follows Object-Oriented Programming principles (Encapsulation, Inheritance, Polymorphism, Abstraction), it is not purely OOP.
+
+Reasons Why Java is NOT 100% OOP:
+🔄 Primitive Data Types
+    ✔️ Java has 8 primitive types (int, char, byte, short, long, float, double, boolean).
+    ✔️ These are not objects; they are stored directly in memory for performance.
+    ✔️ If Java was 100% OOP, even these would be objects.
+(Wrapper classes like Integer, Double, etc., were later introduced to wrap primitives.)
+
+🔄 Static Members
+    ✔️ static keyword allows access without creating an object.
+    ✔️ This violates the “everything should be an object” rule.
+
+🔄 main() Method
+    ✔️ public static void main(String[] args) is static, so JVM can call it without creating an object.
+
+🔄 Other Non-OOP Features
+    ✔️ Use of operator overloading is not allowed (only + for String is overloaded).
+    ✔️ Supports procedural code inside static methods.
+
+✅ Conclusion
+    ✔️ Java is Object-Oriented, but not 100% OOP.
+    ✔️ The major reason: primitives + static context.
+
+
+❓Why Pointers in not used in Java?
+Java does not support explicit pointers (like in C/C++) because of security, simplicity, and memory management reasons. Instead, Java uses references to access objects.
+
+Detailed Reasons
+
+🔄 Security
+    ✔️ Pointers allow direct memory access.
+    ✔️ This can lead to:
+        👉 Unauthorized access to memory (hacking, buffer overflow).
+        👉 Modification of critical JVM memory areas.
+    ✔️ By removing pointers, Java prevents such security vulnerabilities.
+
+🔄 Simplicity & Readability
+    ✔️ Pointers make code complex (pointer arithmetic, dangling pointers, memory leaks).
+    ✔️ Java was designed to be beginner-friendly, so pointers were avoided.
+    ✔️ Instead, Java developers work with references (safe pointers handled internally by JVM).
+
+🔄 Automatic Memory Management (Garbage Collection)
+    ✔️ In C/C++, developers must manually allocate (malloc) and free (free) memory.
+    ✔️ Pointers complicate memory management, leading to memory leaks.
+    ✔️ Java uses Garbage Collector (GC) to manage memory automatically, and explicit pointers would interfere with GC.
+
+🔄 Platform Independence
+    ✔️ Pointers are machine-dependent (addressing varies across architectures).
+Java’s motto is “Write Once, Run Anywhere”.
+    ✔️ By avoiding pointers, Java programs remain portable across different systems.
+
+🔄 Use of References Instead
+    ✔️ In Java, when you create an object:
+String s = new String("Hello");
+
+    ✔️ s is a reference, not a pointer.
+    ✔️ You can use it to access the object, but you cannot perform pointer arithmetic (like s+1).
+
+One-Liner
+👉 "Java does not support explicit pointers to ensure security, simplicity, automatic memory management, and platform independence. Instead, Java uses references, which are safe and managed by JVM."
+
+✅ Common Trap in Interviews:
+🧠If asked "But aren’t references in Java like pointers?" 
+✅ Answer:
+"Yes, references are somewhat like pointers, but they don’t allow pointer arithmetic or direct memory access, making them safer and JVM-controlled."
