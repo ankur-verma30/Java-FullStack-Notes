@@ -120,3 +120,932 @@ public class InternDemo {
 ➤ String literals are automatically interned by the compiler.
 ➤ intern() is explicit, used for dynamically created strings.
 ➤ Overusing intern() may increase String Pool size → can cause memory overhead in very large applications.
+
+
+❓What is Collection?
+A Collection in Java is a framework that provides classes and interfaces to store, manipulate, and retrieve groups of objects efficiently.
+
+Instead of writing data structures (like arrays, linked lists, stacks, queues) manually, Java provides them as ready-made implementations in the Collections Framework (java.util package).
+
+Hierarchy
+➤ Collection Framework = Interfaces + Implementations + Algorithms
+➤ Interfaces (contract) → Collection, List, Set, Queue, Map (Map is separate but part of framework).
+➤ Classes (implementations) → ArrayList, HashSet, LinkedList, PriorityQueue, HashMap, etc.
+➤ Algorithms → Utility methods in Collections class (sort(), binarySearch(), shuffle(), etc.).
+
+Key Features of Collection Framework
+✔️ Dynamic size → Unlike arrays, collections can grow/shrink dynamically.
+✔️ Built-in Data Structures → List, Set, Queue, Map implementations ready to use.
+✔️ Polymorphic Algorithms → Sorting, searching, etc., are already implemented.
+✔️ Reduces Coding Effort → No need to manually implement DS logic.
+✔️ Consistency → All classes follow a unified architecture.
+
+
+❓Difference between List and Map?
+| Feature           |                               List                                        |                  Map
+| Definition        | Ordered collection of elements (values).                                  | Collection of key–value pairs.                                       |
+| Interface         | `List` (extends `Collection`).                                            | `Map` (separate from `Collection`).                                  |
+| Storage           | Stores only values.                                                       | Stores keys and values together.                                     |
+| Order             | Maintains **insertion order (index-based).                                | No guaranteed order (except `LinkedHashMap` / `TreeMap`).            |
+| Indexing / Access | Access elements by index (e.g., `list.get(0)`).                           | Access values by key (e.g., `map.get(key)`).                         |
+| Duplicates        | Allows duplicate elements.                                                | Keys must be unique, values can be duplicate.                        |
+| Null Handling     | Allows multiple `null` values, one `null` element.                        | Allows one null key (in HashMap) and multiple null values.           |
+| Use Case          | When you need an ordered list of items (like shopping cart).              | When you need lookup by key (like dictionary, ID → StudentName).     |
+| Example Classes   | `ArrayList`, `LinkedList`, `Vector`                                       | `HashMap`, `LinkedHashMap`, `TreeMap`, `Hashtable`                   |
+
+List is an ordered collection of elements (allows duplicates, accessed by index), while Map is a collection of key–value pairs (keys unique, values accessed by key).
+
+❓Difference between ArrayList and LinkedList?
+| Feature                   |      ArrayList                                              |                   LinkedList                                                |
+| Underlying Data Structure | Dynamic array.                                              | Doubly linked list.                                                         |
+| Access (get/set by index) | Fast (O(1)) → direct index-based access.                    | Slow (O(n)) → traversal needed from head/tail.                              |
+| Insertion / Deletion      | Slow (O(n)) → shifting required if not at the end.          | Fast (O(1)) if adding/removing from start/middle (just pointer change).     |
+| Memory Usage              | Less memory → only stores values.                           | More memory → stores values + two extra references (prev, next).            |
+| Iteration Performance     | Better cache locality → generally faster iteration.         | Slower iteration due to scattered memory locations.                         |
+| When to Use               | When frequent access/read operations.                       | When frequent insert/delete operations (especially in middle).              |
+| Null Handling             | Allows multiple `null` values.                              | Allows multiple `null` values.                                              |
+| Thread-Safety             | Not synchronized (use `Collections.synchronizedList()`   ). | Not synchronized (same handling needed).                                    |
+| Example Use Cases         | Lookup-heavy apps, reading config data.                     | Real-time queues, frequently modified lists.                                |
+
+➤ ArrayList is better for searching/access, LinkedList is better for insertion/deletion.
+➤ ArrayList uses dynamic arrays, LinkedList uses doubly linked nodes.
+
+
+❓Difference between List and Set?
+Feature                                 List                                                                Set
+----------------------------------------------------------------------------------------------------------------
+Order                                   Maintains insertion order                               Does not guarantee order
+                                                                                                (LinkedHashSet keeps insertion order,
+                                                                                                TreeSet keeps sorted order)
+
+Duplicates                              Allows duplicates                                        Does not allow duplicates
+
+Indexing                                Supports index-based access                              No indexing (access via iterator)
+                                        (get(int index))                   
+
+Null Values                             Can have multiple nulls                                  Allows only one null (HashSet, LinkedHashSet)
+                                                                                                 TreeSet does not allow null
+
+Common Implementations                  ArrayList, LinkedList, Vector                             HashSet, LinkedHashSet, TreeSet
+
+Performance                             ArrayList → O(1) get (random)                            HashSet → O(1) add/search
+                                        LinkedList → O(n) get                                    TreeSet → O(log n) add/search (sorted)
+
+Use Cases                               When order & duplicates matter                            When uniqueness is required
+                                        (e.g., shopping cart, marks)                              (e.g., user IDs, emails)
+
+Example Classes                         ArrayList, LinkedList, Vector                             HashSet, LinkedHashSet, TreeSet
+
+
+❓Difference between Arrays and ArrayList?
+Feature                 Arrays                              ArrayList
+-----------------------------------------------------------------------------------
+Size                    Fixed (cannot be changed once set)  Dynamic (can grow/shrink at runtime)
+
+Storage Type            Stores both primitives and objects  Stores only objects (wrapper classes
+                                                            for primitives, e.g., Integer for int)
+
+Performance             Faster (less overhead)              Slightly slower (due to dynamic resizing)
+
+Memory Usage            Less memory (continuous allocation) More memory (stores extra info)
+
+Length/Size Access      length (property)                   size() (method)
+
+Type Safety             Can be multi-dimensional            Single dimensional (for multi-dim,
+                                                            use List of Lists)
+
+Generics                Not supported directly              Supports Generics (e.g., ArrayList<String>)
+
+Iteration               for loop, for-each loop             for loop, for-each loop, Iterator
+
+Utility Methods         No built-in methods (manual ops)    Rich methods (add, remove, contains, etc.)
+
+Use Cases               When size is fixed and performance  When size is dynamic and need
+                        is critical                         collection methods
+
+➤ Array is fixed-size and can store primitives, ArrayList is dynamic and only stores objects.
+➤ Use Array when performance and memory are key; use ArrayList when flexibility is needed.
+
+
+❓Difference between Vector and ArrayList?
+Feature                 Vector                             ArrayList
+-----------------------------------------------------------------------------------
+Thread-Safety           Synchronized (thread-safe)          Not synchronized (not thread-safe)
+
+Performance             Slower (due to synchronization)     Faster (no synchronization overhead)
+
+Default Capacity        10 elements                         10 elements
+
+Growth Rate             Doubles its size when full          Increases by 50% of current size when full
+
+Legacy Status           Legacy class (from JDK 1.0)         Part of Collections Framework (from JDK 1.2)
+
+Traversal               Supports Iterator + Enumeration     Supports Iterator only
+
+Use Cases               When thread safety is required       When single-threaded & performance is key
+
+➤ Vector is synchronized and legacy, ArrayList is unsynchronized and modern.
+➤ ArrayList is preferred unless thread safety is explicitly needed.
+
+
+⚡Follow-up trap questions:
+👉 “If ArrayList is not synchronized, how can you make it thread-safe?”
+Answer:
+➤ Use Collections.synchronizedList(new ArrayList<>())
+➤ Or use CopyOnWriteArrayList from java.util.concurrent
+
+
+❓Difference between Vector and Queue?
+Feature                 Vector                             Queue
+-----------------------------------------------------------------------------------
+Definition              Legacy class in Java that           Interface in Java representing
+                        implements List, grows              FIFO (First In First Out) data structure
+                        dynamically
+
+Underlying DS           Dynamic array                       Varies by implementation:
+                                                            LinkedList, PriorityQueue, ArrayDeque
+
+Order                   Maintains insertion order           Follows FIFO (some impl. like PriorityQueue
+                                                            use priority-based ordering)
+
+Thread-Safety           Synchronized (thread-safe)          Not synchronized (must use
+                                                            ConcurrentLinkedQueue for thread-safety)
+
+Duplicates              Allows duplicates                   Allows duplicates
+
+Access Type             Random access via index (get/set)   No index access, only head/tail operations
+                                                            (offer, poll, peek)
+
+Traversal               Iterator + Enumeration              Iterator
+
+Performance             Slower (sync overhead,              Generally faster (non-sync), optimized for
+                        resizing cost)                      add/remove at ends
+
+Use Cases               When dynamic array with             For scheduling, task processing,
+                        thread-safety is needed             producer-consumer, queuing systems
+
+➤ Vector is a legacy synchronized List, Queue is a FIFO interface for element processing.
+➤ Vector supports random access by index, Queue works with head/tail operations.
+
+⚡Follow-up trap questions:
+👉 “If Vector is synchronized and Queue is not, how can we make Queue thread-safe?”
+Answer: Use ConcurrentLinkedQueue or wrap with Collections.synchronizedCollection().
+
+
+❓Difference between hashset and LinkedHashSet?
+Feature                 HashSet                           LinkedHashSet
+-----------------------------------------------------------------------------------
+Order                   Does not maintain order             Maintains insertion order
+
+Underlying DS           Hash table                         Hash table + Doubly Linked List
+
+Performance             Faster (slightly better             Slightly slower due to maintaining
+                        since no ordering)                  insertion order
+
+Duplicates              Not allowed                        Not allowed
+
+Null Values             Allows only one null               Allows only one null
+
+Iteration Order         Unpredictable                      Predictable (in insertion order)
+
+Use Cases               When order of elements              When you need both uniqueness
+                        does not matter                     and predictable iteration order
+
+➤ HashSet is unordered, LinkedHashSet maintains insertion order.
+➤ Both prevent duplicates, but LinkedHashSet is order-preserving.
+
+
+❓Difference between HashMap and HashTable?
+Feature                 HashMap                           Hashtable
+-----------------------------------------------------------------------------------
+Thread-Safety           Not synchronized (not thread-safe) Synchronized (thread-safe)
+
+Performance             Faster (no sync overhead)          Slower (sync overhead)
+
+Null Keys/Values        Allows one null key and            Does not allow null key,
+                        multiple null values               does not allow null values
+
+Introduced In           JDK 1.2 (part of Collections)      JDK 1.0 (legacy class)
+
+Iteration Order         Unordered, unpredictable           Unordered, unpredictable
+
+Iterator Type           Iterator (fail-fast)               Enumerator + Iterator (fail-fast)
+
+Legacy Status           Modern, preferred choice           Legacy, mostly replaced by ConcurrentHashMap
+
+Use Cases               Best for single-threaded           Rarely used today, sometimes in
+                        applications requiring speed       legacy systems with multi-threaded needs
+
+➤ HashMap is unsynchronized and allows one null key, Hashtable is synchronized and doesn’t allow nulls.
+➤ Hashtable is legacy, HashMap is modern and preferred.
+
+⚡Follow-up trap questions:
+👉 “If HashMap is not thread-safe, how can you make it thread-safe?”
+Answer:
+Use Collections.synchronizedMap(new HashMap<>())
+Or use ConcurrentHashMap
+
+
+❓Difference between HashMap and LinkedHashMap?
+Feature                 HashMap                           LinkedHashMap
+-----------------------------------------------------------------------------------
+Order                   Does not maintain any order        Maintains insertion order
+                                                            (or access order if specified)
+
+Underlying DS           Hash table                         Hash table + Doubly Linked List
+
+Iteration Order         Unpredictable                      Predictable (in insertion order)
+
+Performance             Slightly faster (no order          Slightly slower (due to maintaining
+                        maintenance overhead)               linked list for order)
+
+Null Keys/Values        Allows one null key and            Allows one null key and
+                        multiple null values               multiple null values
+
+Introduced In           JDK 1.2                            JDK 1.4
+
+Use Cases               Best when order does not matter    Best when predictable iteration order
+                                                            is required (e.g., caches, LRU)
+
+
+➤ HashMap is unordered, LinkedHashMap maintains insertion order.
+➤ LinkedHashMap is slightly slower but useful for predictable iteration and cache design.
+
+⚡Pro Tip:
+👉 “How would you implement an LRU Cache in Java?
+Answer: Using LinkedHashMap with access-order set to true.
+
+
+❓Difference between Comparable and Comparator?
+Feature                 Comparable                        Comparator
+-----------------------------------------------------------------------------------
+Package                 java.lang                         java.util
+
+Interface Method        compareTo(Object o)               compare(Object o1, Object o2)
+
+Sorting Logic           Defines natural ordering          Defines custom ordering
+                        (only one sort sequence)          (multiple sort sequences possible)
+
+Implementation          Class implements Comparable        Separate class implements Comparator
+
+Modification            Sorting logic must be changed      No need to modify original class,
+                        inside the class                   can define multiple comparators externally
+
+Usage                   Used when default/natural          Used when we need different ways
+                        ordering is required               of sorting a class objects
+
+Null Handling           compareTo() may throw NPE          compare() must handle nulls explicitly
+
+Example (Use Case)      Sorting students by roll number    Sorting students by name, marks, age
+
+➤ Comparable provides natural order, Comparator provides custom order.
+➤ Comparable is in java.lang, Comparator is in java.util.
+
+✅ Code Example:
+import java.util.*;
+
+// Using Comparable (Natural order: Roll Number)
+class Student implements Comparable<Student> {
+    int roll;
+    String name;
+
+    Student(int roll, String name) {
+        this.roll = roll;
+        this.name = name;
+    }
+
+    @Override
+    public int compareTo(Student s) {
+        return this.roll - s.roll; // natural order
+    }
+}
+
+// Using Comparator (Custom order: Name)
+class NameComparator implements Comparator<Student> {
+    @Override
+    public int compare(Student s1, Student s2) {
+        return s1.name.compareTo(s2.name);
+    }
+}
+
+public class CompareDemo {
+    public static void main(String[] args) {
+        List<Student> list = new ArrayList<>();
+        list.add(new Student(3, "Charlie"));
+        list.add(new Student(1, "Alice"));
+        list.add(new Student(2, "Bob"));
+
+        // Using Comparable (Roll no)
+        Collections.sort(list);
+        System.out.println("Sorted by roll (Comparable):");
+        list.forEach(s -> System.out.println(s.roll + " " + s.name));
+
+        // Using Comparator (Name)
+        Collections.sort(list, new NameComparator());
+        System.out.println("\nSorted by name (Comparator):");
+        list.forEach(s -> System.out.println(s.roll + " " + s.name));
+    }
+}
+
+✅ Output:
+Sorted by roll (Comparable):
+1 Alice
+2 Bob
+3 Charlie
+
+Sorted by name (Comparator):
+1 Alice
+2 Bob
+3 Charlie
+
+⚡Pro Tip: In Java 8+, you can replace Comparator with lambda expressions:
+list.sort((s1, s2) -> s1.name.compareTo(s2.name));
+
+
+❓Difference between Iterator and Iterable?
+Feature                 Iterator                          Iterable
+-----------------------------------------------------------------------------------
+Definition              An object used to iterate          An interface that represents
+                        over a collection                  a collection that can be iterated
+
+Package                 java.util                          java.lang
+
+Interface / Class       Interface                         Interface
+
+Key Methods             hasNext(), next(), remove()        iterator() → returns an Iterator
+
+Usage                   Used to traverse elements          Any class implementing Iterable
+                        of a collection                    can be used in for-each loop
+
+for-each Support        Cannot be directly used in         Enables use of "for-each" loop
+                        for-each loop                      (because it provides iterator())
+
+Multiple Iterators      Represents one iteration           Can return multiple Iterator
+                        process only                       objects over the same collection
+
+Example Classes         Obtained from List, Set, Map       Collection framework classes
+                        (via iterator() method)            like List, Set, Queue implement Iterable
+
+➤ Iterable is the root interface for collections that can be iterated, Iterator is used to actually perform the iteration.
+➤ Iterable provides iterator(), Iterator provides traversal methods like hasNext() and next().
+
+✅ Code Example:
+import java.util.*;
+
+public class IteratorVsIterable {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+
+        // Iterable example: enables for-each loop
+        for (String s : list) {
+            System.out.println("For-each: " + s);
+        }
+
+        // Iterator example: manual traversal
+        Iterator<String> it = list.iterator();
+        while (it.hasNext()) {
+            System.out.println("Iterator: " + it.next());
+        }
+    }
+}
+
+✅ Output:
+For-each: A
+For-each: B
+For-each: C
+Iterator: A
+Iterator: B
+Iterator: C
+
+
+❓Difference between Collection and Collections?
+Feature                 Collection                        Collections
+-----------------------------------------------------------------------------------
+Definition              Root interface of Collection       Utility/helper class with
+                        Framework (represents a group      static methods for collection
+                        of objects)                        operations
+
+Type                    Interface                         Class (final)
+
+Package                 java.util                         java.util
+
+Contains                Abstract methods (like add,        Only static utility methods
+                        remove, size, iterator)            (like sort(), reverse(), min(), max())
+
+Implementation          Extended by List, Set, Queue       Works on objects of
+                        interfaces                        Collection classes (List, Set, Map, etc.)
+
+Object Creation         You cannot create object           You cannot create object
+                        of Collection (it’s an interface)  of Collections (constructor is private)
+
+Use Cases               Represents group of objects        Provides utility methods to
+                                                            operate on collections
+
+➤ Collection is an interface, Collections is a utility class.
+➤ Collection defines behavior of data structures, Collections provides helper methods like sort, reverse, etc
+
+✅ Code Example:
+import java.util.*;
+
+public class CollectionVsCollections {
+    public static void main(String[] args) {
+        // Collection example
+        Collection<String> collection = new ArrayList<>();
+        collection.add("C");
+        collection.add("A");
+        collection.add("B");
+        System.out.println("Collection: " + collection);
+
+        // Collections example (utility class)
+        List<String> list = new ArrayList<>(collection);
+        Collections.sort(list); // sorting using Collections class
+        System.out.println("Sorted using Collections: " + list);
+    }
+}
+
+✅ Output:
+Collection: [C, A, B]
+Sorted using Collections: [A, B, C]
+
+
+❓What is Collision?
+Collision occurs when two different keys generate the same hash code
+(or are mapped to the same bucket index) in a hash-based data structure
+like HashMap or HashSet.
+
+🧠Why Collisions Happen?
+➤ Hash function converts a key → integer (hash code).
+➤ Then hash % capacity decides the bucket index.
+➤ Different keys may result in the same bucket index.
+✅ Example:
+    ✔️ Suppose a HashMap has 10 buckets.
+    ✔️ Keys "CAT" and "DOG" may produce different hash codes but map to the same bucket (e.g., index 3).
+    ✔️ → This situation is a collision.
+
+🧠 How Java Handles Collisions?
+🌟 Chaining (Linked List / Tree)
+✔️ Each bucket stores multiple entries in a linked list (JDK 7 and earlier).
+✔️ In JDK 8+, if collisions in a bucket exceed a threshold (TREEIFY_THRESHOLD = 8),
+the linked list is converted to a balanced Red-Black Tree → improves performance from O(n) to O(log n).
+
+🌟 Open Addressing (not used in HashMap, but in general hashing)
+✔️ Finds another empty slot for the collided entry (like Linear Probing, Quadratic Probing).    
+
+⚡ Impact of Collision
+➤ Increases lookup time (from O(1) average to O(n) worst case in a bucket).
+➤ Too many collisions → performance degradation.
+
+➤ Collision occurs when multiple keys are mapped to the same bucket in a hash-based DS.
+➤ Java handles collisions using chaining (LinkedList or Red-Black Tree).
+
+
+❓How to iterate over a list?
+import java.util.*;
+
+public class IterateList {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+
+        // 1. Using for loop (index-based)
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println("For loop: " + list.get(i));
+        }
+
+        // 2. Using enhanced for loop
+        for (String s : list) {
+            System.out.println("For-each: " + s);
+        }
+
+        // 3. Using Iterator
+        Iterator<String> it = list.iterator();
+        while (it.hasNext()) {
+            System.out.println("Iterator: " + it.next());
+        }
+
+        // 4. Using ListIterator (can go both directions)
+        ListIterator<String> lit = list.listIterator();
+        while (lit.hasNext()) {
+            System.out.println("ListIterator forward: " + lit.next());
+        }
+
+        // 5. Using forEach with Lambda (Java 8+)
+        list.forEach(s -> System.out.println("Lambda: " + s));
+
+        // 6. Using Stream API (Java 8+)
+        list.stream().forEach(s -> System.out.println("Stream: " + s));
+    }
+}
+
+
+❓How to iterate over Map?
+import java.util.*;
+
+public class IterateMap {
+    public static void main(String[] args) {
+        Map<Integer, String> map = new HashMap<>();
+        map.put(1, "A");
+        map.put(2, "B");
+        map.put(3, "C");
+
+        // 1. Iterating over keys
+        for (Integer key : map.keySet()) {
+            System.out.println("Key: " + key + ", Value: " + map.get(key));
+        }
+
+        // 2. Iterating over values
+        for (String value : map.values()) {
+            System.out.println("Value: " + value);
+        }
+
+        // 3. Iterating over entrySet
+        for (Map.Entry<Integer, String> entry : map.entrySet()) {
+            System.out.println("Entry: " + entry.getKey() + " -> " + entry.getValue());
+        }
+
+        // 4. Using Iterator with entrySet
+        Iterator<Map.Entry<Integer, String>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Integer, String> entry = it.next();
+            System.out.println("Iterator: " + entry.getKey() + " -> " + entry.getValue());
+        }
+
+        // 5. Using forEach with Lambda (Java 8+)
+        map.forEach((key, value) -> System.out.println("Lambda: " + key + " -> " + value));
+
+        // 6. Using Stream API (Java 8+)
+        map.entrySet().stream().forEach(e ->
+                System.out.println("Stream: " + e.getKey() + " -> " + e.getValue()));
+    }
+}
+⚡Follow-up trap questions:
+🧠 Which is the fastest way to iterate a Map?
+Answer: “Iterating via entrySet() is the fastest because it avoids multiple lookups (get() calls).
+
+
+❓How to add only unique records in ArrayList?
+✅ 1. Using contains() check (simple way)
+import java.util.*;
+
+public class UniqueArrayList {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+
+        // Adding unique elements
+        addUnique(list, "A");
+        addUnique(list, "B");
+        addUnique(list, "A"); // Duplicate, will not be added
+
+        System.out.println(list); // [A, B]
+    }
+
+    public static void addUnique(List<String> list, String element) {
+        if (!list.contains(element)) {
+            list.add(element);
+        }
+    }
+}
+👉 Downside: contains() is O(n), so performance is poor for large lists.
+
+✅ 2. Using HashSet along with ArrayList
+import java.util.*;
+
+public class UniqueArrayList {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+
+        // Adding unique elements
+        if (set.add("A")) list.add("A");  // true → added
+        if (set.add("B")) list.add("B");  // true → added
+        if (set.add("A")) list.add("A");  // false → not added
+
+        System.out.println(list); // [A, B]
+    }
+}
+👉 This is efficient because HashSet provides O(1) lookup.
+
+✅ 3. Using Java 8 stream().distinct()
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class UniqueArrayList {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>(Arrays.asList("A", "B", "A", "C", "B"));
+
+        // Remove duplicates
+        List<String> uniqueList = list.stream()
+                                      .distinct()
+                                      .collect(Collectors.toList());
+
+        System.out.println(uniqueList); // [A, B, C]
+    }
+}
+👉 Very clean & concise, but creates a new list (not in-place).
+
+✅ 4. Using LinkedHashSet (Preserves Insertion Order + Unique)
+import java.util.*;
+
+public class UniqueArrayList {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>(Arrays.asList("A", "B", "A", "C", "B"));
+
+        // Convert to LinkedHashSet (removes duplicates + keeps order)
+        List<String> uniqueList = new ArrayList<>(new LinkedHashSet<>(list));
+
+        System.out.println(uniqueList); // [A, B, C]
+    }
+}
+
+⚡ Insights:
+➤ ArrayList itself allows duplicates. To enforce uniqueness, we combine it with Set.
+➤ Best approaches:
+    ✔️ Small data → contains() check.
+    ✔️ Large data → use a HashSet or LinkedHashSet.
+    ✔️ Clean Java 8 code → stream().distinct().
+
+
+❓What will happen if you don't override the hashCode() and equals() method?
+✅ Default Behavior (from Object class)
+➤ equals() (default in Object) → compares memory reference (i.e., two objects are equal only if they are the same instance).
+➤ hashCode() (default in Object) → generates a hash value based on the object’s memory address.    
+
+✅ Consequences if NOT overridden
+➤ Collections like HashMap, HashSet, HashTable won’t work as expected
+    ✔️ Even if two objects have the same data, they’ll be treated as different keys or different set elements.
+    ✔️ Because default equals() compares memory references, not object content.
+    ✔️ Default hashCode() will also be different for different objects.
+
+➤ Duplicates not handled correctly in Sets   
+import java.util.*;
+
+class Student {
+    int id;
+    String name;
+    Student(int id, String name) {
+        this.id = id; this.name = name;
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Set<Student> set = new HashSet<>();
+        set.add(new Student(1, "A"));
+        set.add(new Student(1, "A"));
+
+        System.out.println(set.size()); // ❌ Output: 2 (Expected: 1)
+    }
+}
+👉 Because equals() + hashCode() are not overridden, HashSet treats them as different objects.
+
+➤ HashMap keys won’t behave properly
+import java.util.*;
+
+class Student {
+    int id;
+    Student(int id) { this.id = id; }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Map<Student, String> map = new HashMap<>();
+        Student s1 = new Student(1);
+        Student s2 = new Student(1);
+
+        map.put(s1, "First");
+        map.put(s2, "Second");
+
+        System.out.println(map.size()); // ❌ Output: 2 (Expected: 1)
+    }
+}
+👉 Without overriding, two logically same students (id=1) are stored as different keys.
+
+✅ Correct Way → Override Both
+class Student {
+    int id;
+    String name;
+
+    Student(int id, String name) {
+        this.id = id; this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student)) return false;
+        Student s = (Student) o;
+        return this.id == s.id && this.name.equals(s.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+}
+
+➤ HashSet / HashMap treat logically equal objects as duplicates.
+➤ Correct output for previous examples: set.size() = 1 and map.size() = 1.
+
+⚡ Follow-up trap question:
+🧠 What happens if you override only equals() but not hashCode()?
+Answer: “HashSet/HashMap may still allow duplicates, because equal objects may return different hash codes and end up in different buckets.
+
+
+❓How to sort a collection? How many ways to sort a collection?
+1. Using Collections.sort() (Natural Order)
+    ✔️ Works on List (like ArrayList, LinkedList).
+    ✔️ Elements must implement Comparable (e.g., String, Integer).
+
+import java.util.*;
+public class SortExample1 {
+    public static void main(String[] args) {
+        List<Integer> list = new ArrayList<>(Arrays.asList(5, 1, 4, 2, 3));
+
+        Collections.sort(list); // Natural ordering (Ascending)
+        System.out.println(list); // [1, 2, 3, 4, 5]
+    }
+}
+
+2. Using Collections.sort() with Comparator (Custom Order)
+    ✔️ Pass a custom Comparator for sorting logic.
+
+import java.util.*;
+public class SortExample2 {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>(Arrays.asList("Banana", "Apple", "Cherry"));
+
+        Collections.sort(list, (a, b) -> b.compareTo(a)); // Descending order
+        System.out.println(list); // [Cherry, Banana, Apple]
+    }
+}
+
+3. Using List.sort() (Java 8+)
+
+Cleaner alternative to Collections.sort().
+list.sort(Comparator.naturalOrder());      // Ascending
+list.sort(Comparator.reverseOrder());      // Descending
+
+4. Using Stream.sorted() (Java 8+)
+Sorting while streaming.
+
+list.stream()
+    .sorted()
+    .forEach(System.out::println); // Ascending
+
+list.stream()
+    .sorted(Comparator.reverseOrder())
+    .forEach(System.out::println); // Descending
+
+5. Using TreeSet or TreeMap
+Automatically sorts elements in natural order (or custom Comparator).
+
+import java.util.*;
+public class SortExample5 {
+    public static void main(String[] args) {
+        Set<String> set = new TreeSet<>(Arrays.asList("Banana", "Apple", "Cherry"));
+        System.out.println(set); // [Apple, Banana, Cherry]
+    }
+}    
+
+6. Sorting Custom Objects (using Comparable or Comparator)
+
+(a) Implement Comparable (Natural Order by class field)
+
+class Student implements Comparable<Student> {
+    int id;
+    Student(int id) { this.id = id; }
+
+    public int compareTo(Student s) {
+        return this.id - s.id; // Ascending by id
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        List<Student> list = new ArrayList<>();
+        list.add(new Student(3));
+        list.add(new Student(1));
+        list.add(new Student(2));
+
+        Collections.sort(list);
+        list.forEach(s -> System.out.println(s.id)); // 1, 2, 3
+    }
+}
+
+
+(b) Use Comparator (Custom Order by class field)
+Collections.sort(list, (s1, s2) -> s2.id - s1.id); // Descending by id
+
+⚡ Ways to Sort a Collection
+1. Collections.sort(list)  → Natural order (Comparable)
+2. Collections.sort(list, Comparator) → Custom order
+3. list.sort(Comparator)   → Java 8+ method
+4. Stream API (sorted())   → Java 8+ streams
+5. TreeSet / TreeMap       → Sorted collections
+6. Comparable / Comparator → Sorting custom objects
+
+
+❓How to add a collection in another collection particular index?
+✅ Using addAll(int index, Collection c) (List Only)
+Works with List (ArrayList, LinkedList), because List supports indexing.
+
+Syntax:
+boolean addAll(int index, Collection<? extends E> c)
+
+✅ Example:
+import java.util.*;
+
+public class AddCollectionExample {
+    public static void main(String[] args) {
+        List<String> list1 = new ArrayList<>(Arrays.asList("A", "B", "C"));
+        List<String> list2 = new ArrayList<>(Arrays.asList("X", "Y", "Z"));
+
+        // Insert list2 into list1 at index 1
+        list1.addAll(1, list2);
+
+        System.out.println(list1); // [A, X, Y, Z, B, C]
+    }
+}
+👉 Here, "X", "Y", "Z" from list2 are inserted into list1 starting at index 1.
+
+✅ Important Notes:
+➤ addAll(int index, c) → Shifts existing elements to the right.
+➤ Works only for List (not for Set/Map because they don’t have index positions).
+➤ Returns true if collection was added.
+
+
+❓How to compare two collections?
+✅ 1. Using equals() (Exact Match)
+Checks if two collections have the same elements in the same order.
+
+import java.util.*;
+
+public class CompareCollections {
+    public static void main(String[] args) {
+        List<String> list1 = Arrays.asList("A", "B", "C");
+        List<String> list2 = Arrays.asList("A", "B", "C");
+        List<String> list3 = Arrays.asList("C", "B", "A");
+
+        System.out.println(list1.equals(list2)); // true
+        System.out.println(list1.equals(list3)); // false (order different)
+    }
+}
+👉 Works for List, Set, Map (Map uses equals() on key-value pairs).
+
+✅ 2. Using containsAll() (Subset / Ignoring Order)
+Checks if one collection contains all elements of another.
+
+List<String> list1 = Arrays.asList("A", "B", "C");
+List<String> list2 = Arrays.asList("C", "B", "A");
+
+System.out.println(list1.containsAll(list2)); // true
+System.out.println(list2.containsAll(list1)); // true
+
+
+✅ 3. Using Collections.sort() + equals() (Compare ignoring order)
+List<String> list1 = new ArrayList<>(Arrays.asList("A", "C", "B"));
+List<String> list2 = new ArrayList<>(Arrays.asList("B", "A", "C"));
+
+Collections.sort(list1);
+Collections.sort(list2);
+
+System.out.println(list1.equals(list2)); // true
+👉 Good for comparing Lists ignoring order.
+
+✅ 4. Using Set (Ignore Order + Remove Duplicates)
+List<String> list1 = Arrays.asList("A", "B", "C", "A");
+List<String> list2 = Arrays.asList("C", "B", "A");
+
+System.out.println(new HashSet<>(list1).equals(new HashSet<>(list2))); // true
+👉 Ignores order and duplicates.
+
+✅ 5. Using Collections.disjoint() (Check if they share nothing in common)
+List<String> list1 = Arrays.asList("A", "B", "C");
+List<String> list2 = Arrays.asList("X", "Y", "Z");
+
+System.out.println(Collections.disjoint(list1, list2)); // true (no common element)
+
+✅ 6. Using Java 8 Streams
+List<String> list1 = Arrays.asList("A", "B", "C");
+List<String> list2 = Arrays.asList("C", "B", "A");
+
+boolean isEqual = list1.size() == list2.size() &&
+                  list1.containsAll(list2);
+
+System.out.println(isEqual); // true
+
+Method                       Checks
+---------------------------------------------------------------
+equals()                     Same elements in same order
+containsAll()                All elements present (ignores order)
+sort + equals()              Same elements ignoring order
+Convert to Set                Same unique elements ignoring order
+Collections.disjoint()        Check if two collections share nothing
+Streams (Java 8)              Custom comparisons
+
+✔️ Two collections can be compared using equals() for exact match, containsAll() for subset check, or by converting to Set/sorting for ignoring order. Use Collections.disjoint() to check if they have nothing in common
