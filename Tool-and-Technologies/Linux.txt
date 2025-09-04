@@ -603,4 +603,301 @@ rest 9 characters will be divided into three groups: rwx,rwx,rwx
 ➤ third set of 3 characters → other permissions
 
 
-🔷 Changing the Permissions chmod command
+🔷 Changing Permissions with chmod
+✅ Syntax: chmod [options] [permissions] [files...]
+
+🔹 Permission Categories
+✔️ u → user (owner)
+✔️ g → group
+✔️ o → others
+✔️ a → all (user + group + others)
+
+🔹 Operators
+✔️ + → add permission
+✔️ - → remove permission
+✔️ = → set exact permission (overwrites existing)
+
+🔹 Permission Types
+✔️ r → read
+✔️ w → write
+✔️ x → execute
+
+🔹 Common Options
+✔️ -R → recursive (apply to directories + contents)
+✔️ -v → verbose (show changes)
+✔️ -f → force (suppress errors)
+
+🔹 Symbolic Method Examples
+🔗 chmod u+x sample.txt     # add execute for user
+🔗 chmod g-w sample.txt     # remove write from group
+🔗 chmod o=r sample.txt     # others only read
+🔗 chmod a+x sample.txt     # all users get execute
+🔗 chmod u=rwx,g=rx,o=      # explicit overwrite
+
+🔹 Octal (Numeric) Method
+
+Permission values:
+r = 4, w = 2, x = 1
+Calculate sum for each group:
+7 = rwx
+6 = rw-
+5 = r-x
+4 = r--
+0 = ---
+
+✅ Examples:
+🔗 chmod 755 sample.txt    # rwx r-x r-x
+🔗 chmod 644 sample.txt    # rw- r-- r--
+🔗 chmod 700 sample.txt    # rwx --- ---
+🔗 chmod 777 sample.txt    # rwx rwx rwx (full access to everyone ❌ not recommended)
+
+🔹 Special Cases
+➤ Directories → need x to enter (cd).
+➤ Scripts/Programs → need x to execute.
+
+✅ Recursive Example:
+🔗 chmod -R 755 project/
+
+🎯 Interview Insights
+➤ chmod works in symbolic and octal forms.
+➤ Use octal when setting multiple permissions at once.
+➤ Directories without x → you can list files but not enter them.
+➤ 777 permissions are insecure (everyone can read/write/execute).
+
+
+🔷 Su command in Linux
+✅ Purpose: 
+👉 su = substitute user or switch user.
+👉 It allows you to switch to another user account within the same terminal session.
+👉 By default, it switches to the root user (superuser).
+
+whoami → show current user
+su - username → switch to username
+
+
+🔷 Mastering Linux Groups
+🔹 Viewing Groups
+🔗 groups → lists groups of the current user
+🔗 groups username → lists groups of a specific user
+
+🔹 Creating Groups
+🔗 addgroup groupname → create a new group
+(on some distros: groupadd groupname)
+
+🔹 Adding Users to Groups
+🔗 adduser username groupname → add user to group
+(alternative: usermod -aG groupname username → safer, adds without removing from other groups)
+
+🔹 Removing Users from Groups
+🔗 deluser username groupname → remove user from a group
+(alternative: gpasswd -d username groupname)
+
+🔹 Deleting Groups
+🔗 delgroup groupname → delete a group
+(alternative: groupdel groupname)
+
+🔹 Switching Groups
+🔗 newgrp groupname → switch current shell to the specified group
+
+🔹 File Permissions with Groups
+Every file has: owner, group, others
+If user belongs to file’s group → group permissions apply
+
+✅ Example:
+chgrp groupname filename   # change group ownership of a file
+
+🎯 Interview / Notes Insights
+➤ Groups help in role-based access control.
+➤ primary group → assigned at user creation (default group).
+➤ secondary groups → additional groups user can belong to.
+➤ Best practice: Use groups instead of giving everyone root access.
+
+
+🔷 Sudo Command in Linux
+➤ sudo → SuperUser DO
+➤ Allows permitted users to execute commands as root or another user (as defined in /etc/sudoers).
+➤ Safer than logging in directly as root.
+
+🔹 Usage: sudo command
+
+✅ Example:
+🔗 sudo mkdir meals   # create a directory as root
+🔗 sudo apt update    # update package list
+🔗 sudo cat /etc/shadow   # view restricted file
+
+🔹 Authentication Behavior
+➤ First time sudo is used in a session → password required.
+➤ After successful authentication → no password needed for 15 minutes (default).
+➤ Timeout can be changed in /etc/sudoers file (using visudo).
+
+🔹 Running as Different User
+🔗 sudo -u username command
+
+✅ Example:
+sudo -u postgres psql   # run as postgres user
+
+🔹 Common Options
+✔️ -u user → run as specific user
+✔️ -k → invalidate timestamp immediately (next sudo needs password)
+✔️ -v → extend sudo timeout without running command
+✔️ -l → list allowed commands for current user
+✔️ -s → open a shell as root (without login shell)
+✔️ -i → simulate root login shell
+
+🔹 Notes & Interview Insights
+➤ sudo access is controlled via /etc/sudoers (edit with visudo).
+➤ NOPASSWD: directive allows passwordless sudo for specific commands.
+➤ Root login is often disabled for security; sudo is preferred.
+
+
+🔷Bashrc in Linux
+🔗 source .bashrc   # run commands from .bashrc file automatically to restart the terminal
+
+➤ .bashrc is a shell script file executed whenever a new interactive non-login shell is started.
+➤ Location:
+    ✔️ User-specific: ~/.bashrc (inside home directory).
+    ✔️ Global: /etc/bash.bashrc (applies to all users).
+➤ It customizes the bash shell environment for the user.
+
+🔹 When is it executed?
+➤ Every time you open a new terminal window/tab.
+➤ Not executed for login shells (those read ~/.bash_profile, ~/.profile, or /etc/profile).
+
+🔹 Common Uses
+➤ Setting environment variables
+➤ Adding aliases (shortcuts for commands)
+➤ Customizing prompt (PS1)
+➤ Running startup scripts
+➤ Adding functions
+
+✅ Example:
+# ~/.bashrc
+alias ll='ls -lh'
+alias gs='git status'
+export PATH=$PATH:~/scripts
+PS1='\u@\h:\w$ '   # Custom prompt
+
+🔹 Reload .bashrc without restarting terminal
+source ~/.bashrc
+# or
+. ~/.bashrc
+
+🔹 Interview Insights
+➤ .bashrc → for interactive non-login shells.
+➤ .bash_profile or .profile → for login shells.
+➤ Often .bash_profile calls .bashrc inside it to unify configs.
+
+
+🔷 Using chown command in Linux
+➤ chown (change owner) is used to change the ownership of files and directories.
+➤ Every file/directory in Linux has:
+    ✔️ Owner (user)
+    ✔️ Group
+
+🔹 Syntax
+chown [OPTIONS] USER[:GROUP] FILE...
+
+🔹 Common Usage
+
+➤ Change file ownership to a specific user
+🔗 sudo chown username filename
+
+➤ Change file’s group only
+🔗 sudo chown :groupname filename
+
+➤ Change both user and group
+🔗 sudo chown username:groupname filename
+
+➤ Change ownership recursively (directory + subfiles)
+🔗 sudo chown -R username:groupname dirName
+
+🔹 Useful Options
+✔️ -R → recursive (apply to all subfiles and directories)
+✔️ -c → report changes made
+✔️ -v → verbose (show details for every file changed)
+✔️ -f → suppress errors
+
+✅ Ownership + Permissions Example
+sudo chown ankur:developers project.txt   # give file to user "ankur" and group "developers"
+sudo chmod g+w project.txt                # allow group members to write
+
+🔹 Interview Insights
+➤ Ownership (chown) and permissions (chmod) work together.
+➤ ls -l → shows both owner and group.
+➤ Difference:
+    ✔️ chown → changes ownership (user/group).
+    ✔️ chmod → changes permission (r/w/x).
+➤ Root (or sudo) privileges are required for chown.
+
+
+🔷 Sessions in Linux
+➤ A session in Linux = an instance of a running shell (bash, zsh, etc.).
+➤ Each session has its own process ID (PID).
+➤ Sessions can be nested inside each other.
+
+🔹 Commands
+➤ Get current session ID (PID of the shell)
+🔗 echo $$
+
+➤ Start a new nested session
+🔗 bash
+👉 This creates a new shell session inside the current one.
+👉 Each new session has a different PID.
+
+➤ Exit a nested session
+🔗 exit
+(or Ctrl+D) → returns to the parent session.
+
+✅ Session Chain Example
+echo $$       # prints 1234 (current session PID)
+bash          # start new nested session
+echo $$       # prints 5678 (new session PID)
+exit          # return to previous session
+echo $$       # back to 1234
+
+🔹 Insights (Interview Traps)
+➤ Each terminal window/tab = a separate session.
+➤ Sessions are processes, visible in ps -ef or pstree.
+➤ Environment variables are session-specific (not shared unless exported to child processes).
+➤ If you start a session inside another, you’re essentially running bash inside bash.
+
+
+🔷 Linux Environment variables
+➤ Environment variables are key-value pairs maintained by the shell.
+➤ They define system-wide or session-specific settings (e.g., PATH, HOME, USER).
+➤ They are inherited by child processes.
+
+🔹 Commands
+➤ List all environment variables
+🔗 printenv
+
+➤ Get value of a specific variable
+🔗 printenv VAR_NAME
+🔗 echo $VAR_NAME
+
+➤ Set an environment variable (session only)
+🔗 export VAR_NAME=value
+
+➤ Unset/remove an environment variable
+🔗 unset VAR_NAME
+
+🔹 Persistence of Variables
+➤ By default, variables set using export exist only for the current session.
+➤ To make them permanent, add to:
+    ✔️ ~/.bashrc (for user-specific, non-login shells)
+    ✔️ ~/.profile or ~/.bash_profile (for login shells)
+    ✔️ /etc/environment (system-wide)
+
+🔹 Useful Environment Variables (Common in Interviews)
+➤ PATH → directories searched for executables.
+➤ HOME → current user’s home directory.
+➤ USER → logged-in username.
+➤ SHELL → current shell.
+➤ PWD → current working directory.
+
+🔹 Insights (Interview Angle)
+Difference between local variable vs environment variable:
+    ✔️ Local → exists only in current shell.
+    ✔️ Environment → exported and available to child processes.
+To temporarily modify PATH:
+    ✔️ export PATH=$PATH:/new/dir
