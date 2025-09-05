@@ -901,3 +901,241 @@ Difference between local variable vs environment variable:
     ✔️ Environment → exported and available to child processes.
 To temporarily modify PATH:
     ✔️ export PATH=$PATH:/new/dir
+
+
+🔷Understanding Alias Commands for Efficiency
+➤ An alias in Linux is a shortcut for a command or group of commands.
+➤ Saves time and reduces repetitive typing.
+➤ Aliases exist only in the current shell session unless added to configuration files (~/.bashrc, ~/.zshrc).
+
+🔹 Check Command Type
+🔗 type commandName
+➤ Shows whether the command is:
+    ✔️ builtin → part of the shell itself.
+    ✔️ hashed → external command stored in memory for faster lookup.
+    ✔️ aliased → customized alias of another command.
+
+✅ Examples:
+🔗 type pwd   # pwd is a shell builtin
+🔗 type cat   # cat is hashed (/usr/bin/cat)
+🔗 type ls    # ls is aliased to 'ls --color=auto'
+
+🔹 Create an Alias
+alias aliasName='commandName arguments'
+
+✅ Examples:
+🔗 alias ll='ls -alh'     # quick way to list files with details
+🔗 alias grep='grep --color=auto'  # color highlight search
+🔗 alias cls='clear'      # alias cls to clear terminal
+
+🔹 Remove an Alias
+🔗 unalias aliasName
+
+🔹 View All Aliases
+🔗 alias
+
+🔹 Making Aliases Permanent
+➤ Add them to:
+    ✔️ ~/.bashrc or ~/.zshrc for user-specific aliases.
+    ✔️ /etc/bash.bashrc for system-wide aliases.
+➤ Reload file after editing:
+source ~/.bashrc
+
+🔹 Interview Insights
+➤ Aliases override system commands (e.g., ls often aliased to ls --color=auto).
+➤ If you want to bypass an alias → use command keyword:
+🔗 command ls
+👉 Runs the original ls, ignoring alias.
+➤ Good to mention: Aliases are shell features, not kernel-level.
+
+
+🔷 Mastering Bash in Linux
+A shell is a command-line interface(CLI) that allows users to interact with an operating system by typing commands.
+
+There are several types of shells, and they can be broadly categorized into two main groups:
+➤ Unix-like shells
+➤ Windows shells
+
+🌟 Unix-like shells
+👉 Bourne Shell (sh): The Bourne Shell was one of the earliest Unix shells and served as the basis for many subsequent shells. It provides basic functionality and is often used for scripting.
+
+👉 Bash(Bourne Again Shell): Bash is the default shell in many Unix-like Operating systems, including Linux and macOS. It extends the capabilities of the original Bourne Shell and incorporates features from other shells like the Korn Shell and the C Shell.
+
+👉 Korn Shell (ksh): Korn Shell was developed by David Korn as enhancement to the Bourne Shell. It includes features from both the Bourne Shell and the C Shell, making it a powerful and user-friendly shell.
+
+👉 C Shell (csh): The C Shell has a syntax that is somewhat C-like and was developed to provide interactive features not present in the original Bourne shell. Its successors, tcsh, is an improved version with additional features.
+
+👉 Zsh (Z Shell): Zsh is a shell that incorporates features from bash, ksh, and tcsh. It includes advanced scripting abilities and interactive for users.
+
+🌟 Windows Shell
+👉 Command Prompt(cmd.exe): The Command Prompt is the traditional command-line interface for windows. While it lacks some advanced features found in Unix-like shells, it provides a basic command-line environment.
+
+👉 Powershell: Powershell is a more recent and powerful shell for windows. It is designed for automation and task scripting, with a focus on managing system components through command-line interface.
+
+
+🔷$PATH in Bash
+➤ $PATH is an environment variable in Linux/Unix shells.
+➤ It contains a colon-separated list of directories.
+➤ When a command is run, the shell searches these directories (in order) to find the executable.
+
+✅ Example:
+🔗 echo $PATH
+# /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+🔹 Locate Executable for a Command
+🔗 which ls
+👉 Returns the full path of the command’s executable (/bin/ls).
+
+🔹 Adding Directories to $PATH
+➤ Temporary (session only):
+🔗 export PATH=$PATH:/path/to/directory
+
+➤ Permanent (user-specific):
+Add the line to ~/.bashrc or ~/.zshrc:
+🔗 PATH=$PATH:/path/to/directory
+
+Reload file:
+🔗 source ~/.bashrc
+
+➤ Permanent (system-wide):
+Add directory to /etc/environment.
+
+🔹 Insights 
+➤ The shell searches directories in $PATH sequentially; first match is executed.
+➤ If two commands with the same name exist, the one earlier in $PATH takes priority.
+➤ $PATH can be modified by scripts, installers, or user configs.
+➤ To reset PATH to default:
+🔗 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+⚡ Common Trap Question
+🧠 “If you create a script called ls in your current directory, why might it not run when you type ls?”
+👉 Because current directory (.) is usually not in $PATH. You’d need to run ./ls or add . to $PATH.
+
+
+🔷 Mastering Linux Scripts
+❓What is Script?
+In Linux, a script is a series of commands written in a scripting language(like Bash) that can be executed by the shell.
+
+Bash is both a command-line interpreter(shell) and a scripting language.
+
+
+Creating a Simple Script
+#!/bin/bash
+echo "Hello, Linux scripting!"
+
+When you execute a script, the system typically relies on the shebang(the #!/bin/bash line at the beginning of the script) to determine the interpreter that should be used, regardless of the file extension. This allows you to name your scripts with or without a .sh extension.
+
+❓How to execute a Script
+✔️ bash fileNName: This explicitly tells the Bash shell to execute the script. It's commonly used in Bash Scripts.
+
+✔️ sh fileName: This instructs the system to use the default shell (usually /bin/sh) to execute the script.
+
+⚡Note: Above two commands runs the script in the new subshell which does not affect the current shell environment.
+
+✔️ source fileName: This runs the script in the current shell session instead of spawning a new process. It's often used to execute the scripts that modify the environment, such as setting environment variables.
+
+✔️ ./fileName:Returns the script to be made executable
+If the file is found and has execute permission, the shell executes it using the appropriate interpreter specified in the shebang line.
+
+
+❗What if you wat to run a script as if it were a command, without specifying the path of the script every time
+➤ Add the script to a Directory in the PATH.
+
+
+🔷Mastering Linux Corn Jobs
+➤ Cron is a Linux utility to schedule repetitive tasks at specific times/dates.
+➤ Managed by the cron daemon (crond).
+➤ Each user can define their own cron jobs using crontab.
+
+🔹 Basic Commands
+🔗 crontab -e   # edit crontab file (default editor: nano if selected)
+🔗 crontab -l   # list current user’s cron jobs
+🔗 crontab -r   # remove all cron jobs for current user
+🔗 crontab -k   # kill the cron daemon
+
+🔹 Crontab Syntax
+* * * * * command_to_be_executed
+│ │ │ │ │
+│ │ │ │ └── Day of week (0-6, Sunday=0)
+│ │ │ └──── Month (1-12)
+│ │ └────── Day of month (1-31)
+│ └──────── Hour (0-23)
+└────────── Minute (0-59)
+
+✅ Examples
+✔️ 30 3 * * *     # Every day at 3:30 AM
+✔️ 15 13 * * 1    # Every Monday at 1:15 PM
+✔️ 45 4 * 1,2 0   # On Sundays in Jan & Feb at 4:45 AM
+✔️ 30 8 * * 1-5   # Weekdays (Mon–Fri) at 8:30 AM
+✔️ */5 * * * *    # Every 5 minutes
+✔️ 0 */6 * * *    # Every 6 hours
+
+Special Characters
+👉 * → any value (wildcard)
+👉 , → list of values (1,15 → 1st and 15th)
+👉 - → range (1-5 → Mon to Fri)
+👉 / → step values (*/10 → every 10 units)
+
+🌟 Special Keywords (Shortcuts)
+🔗 @reboot     # Run once, at startup
+🔗 @yearly     # Once a year (0 0 1 1 *)
+🔗 @monthly    # Once a month (0 0 1 * *)
+🔗 @weekly     # Once a week (0 0 * * 0)
+🔗 @daily      # Once a day (0 0 * * *)
+🔗 @hourly     # Once an hour (0 * * * *)
+
+➤ Output & Logging
+By default, cron mails output to the user (if mail is configured).
+To log output:
+* * * * * /path/script.sh >> /var/log/cron.log 2>&1
+
+🧠 Insights
+⚡ Difference between cron and at command:
+➤ cron → schedules repetitive tasks.
+➤ at → schedules a one-time task.
+
+⚡ Crontab file location:
+➤ User-specific: /var/spool/cron/username
+➤ System-wide: /etc/crontab, /etc/cron.* directories.
+
+
+🔷 History Command
+➤ The history command shows the list of recently executed commands in the shell
+➤ Useful for re-executing, searching, and managing past commands.
+
+🔹 Basic Usage
+🔗 history            # list all recent commands
+🔗 history 10         # show last 10 commands
+🔗 !!                 # run last command
+🔗 !n                 # run the nth command from history
+🔗 !string            # run the most recent command starting with "string"
+
+🔄 Managing History
+🔗 history -c         # clear history for current session
+🔗 history -d N       # delete the Nth command from history
+🔗 history -a         # append current session’s commands to history file (~/.bash_history)
+
+🔄History Variables
+✔️ $HISTSIZE → number of commands stored in memory (default: 1000).
+🔗 echo $HISTSIZE
+
+✔️ $HISTFILESIZE → max number of lines stored in history file (~/.bash_history) (default: 2000).
+🔗 echo $HISTFILESIZE
+
+🔄 Searching History
+Interactive reverse search:
+Ctrl + r    # search backward in history
+Ctrl + s    # search forward (if enabled)
+
+Exit reverse search → Ctrl + c or Ctrl + g.
+
+🧠 Insights (Interview Angle)
+➤ History is stored per user in ~/.bash_history.
+➤ Sensitive commands (like passwords in CLI) can get stored — security risk.
+➤ Can disable history logging temporarily:
+🔗 HISTSIZE=0
+
+➤ Use !$ to reference last argument of previous command.
+cat file.txt
+vim !$
+👉 Opens the same file.txt in vim.

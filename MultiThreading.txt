@@ -103,3 +103,6 @@ The lifecycle of a thread is as follows:
 3. Running: The thread is in this state when it is executing.
 4. Blocked/Waiting: A thread is in this state when it is  waiting for a resource or for another thread to perform an action.
 5. Terminated: The thread has completed its execution.
+
+
+🔷 Thread Methods
