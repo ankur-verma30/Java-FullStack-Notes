@@ -1,3 +1,19 @@
+Linux Operating System (OS)?
+👉 Linux is a community-driven OS, not owned by any single company.
+👉 Linux is free and open-source, allowing customization and flexibility.
+👉 Linux is highly secure, eliminating the need for antivirus software.
+👉 Linux is primarily CLI-based (Command Line Interface), offering powerful control over the system.
+👉 Linux is widely used in businesses for efficient server management and enterprise solutions.
+
+Different Types of Linux Distributions:
+➤ Amazon Linux​
+➤ Ubuntu​
+➤ Red Hat​
+➤ Debian​
+➤ Kali​
+➤ Fedora​
+➤ CentOS​
+
 🐧 Linux Commands 
 🔄 1. Structure of a Linux Command
 Format: command [options] [arguments]
@@ -104,6 +120,10 @@ we have a directory in which we have a file named food.txt.
 🔗 rm folderName1 folderName2 folderName3 → remove multiple directories (empty only)
 🔗 rm -r folderName1 folderName2 folderName3 → remove multiple directories recursively (including their contents)
 🔗 mkdir -p folderName1/folderName2/folderName3 → create nested directories (parent dirs auto-created if missing)
+🔗 rmdir foldername → Used to remove (delete) empty directory.
+🔗 rmdir folder1 folder2 → Used to remove (delete) empty directories.
+🔗 rmdir -p a/b/c → remove nested empty directories (removes c, then b, then a if empty)
+
 
 💡 Interview Tip: rm -r is destructive. Always mention caution when using it.
 
@@ -179,7 +199,6 @@ touch 'a b' → create a file with spaces in the name (quotes escape special cha
 ➤ Ctrl + q → exit without saving
 
 🔷 File Operations
-
 👉 Removing the files
 ➤ rm fileName → remove a file
 ➤ rm -d dirName → remove only the empty directory
