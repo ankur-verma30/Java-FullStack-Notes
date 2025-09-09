@@ -914,3 +914,452 @@ One-Liner
 🧠If asked "But aren’t references in Java like pointers?" 
 ✅ Answer:
 "Yes, references are somewhat like pointers, but they don’t allow pointer arithmetic or direct memory access, making them safer and JVM-controlled."
+
+
+❓Functional Interface and Lambda Expression. How these two are related to each other?
+✔️Answer:
+➤ Functional interface that has exactly one abstract method.
+➤ Can have:
+    👉One abstract method
+    👉Any number of default and static methods
+➤ Annotated with @FunctionalInterface (optional, but good practice).
+
+✅ Examples from JDK:
+1. Runnable (run())
+2. Callable (call())
+3. Comparator (compare())
+4. Predicate<T> (test())
+5. Function<T, R> (apply())
+
+⚡ Code Example:
+@FunctionalInterface
+interface MyFunctionalInterface {
+    void sayHello();
+}
+
+✅ Lambda Expression
+short-cut way of writing an anonymous implementation of a functional interface.
+❗ Syntax: (parameters) -> expression_or_block
+
+⚡Code Example:
+public class Test {
+    public static void main(String[] args) {
+        // Traditional Anonymous Class
+        MyFunctionalInterface obj1 = new MyFunctionalInterface() {
+            public void sayHello() {
+                System.out.println("Hello World");
+            }
+        };
+
+        // Using Lambda Expression
+        MyFunctionalInterface obj2 = () -> System.out.println("Hello World");
+
+        obj1.sayHello();
+        obj2.sayHello();
+    }
+}
+
+✅ Output:
+Hello World
+Hello World
+
+✅ Relationship Between Them
+➤ Lambda expressions can only be used with functional interfaces.
+➤ The functional interface provides the target type for the lambda.
+➤ ompiler maps the lambda expression → single abstract method of the functional interface.
+
+👉 Example:
+Runnable r = () -> System.out.println("Running...");  
+// Here Runnable is functional interface, lambda implements run()
+
+🔄 Why Introduced?
+To support functional programming style in Java 8.
+Makes code shorter, cleaner, and more readable (especially in Streams API).
+
+
+❓Use of Marker Interfaces?
+✔️ Answer: 
+A Marker Interface is an interface with no methods or fields.
+Also called tagging interfaces.
+Purpose: to mark/tag a class so that JVM or frameworks can give it special behavior.
+
+👉 Examples in JDK:
+1. Serializable
+2. Cloneable
+3. Remote
+
+🔄 Use of Marker Interfaces
+✔️ Provide Metadata to JVM / Compiler
+    ➤ Marker interfaces act as tags for classes.
+    ✅ Example: If a class implements Serializable, JVM knows objects of this class can be serialized.
+
+✔️ Enable Special Behavior at Runtime
+JVM / frameworks check with instanceof to see if a class is marked.
+✅ Example:
+if(obj instanceof Serializable) {
+    // JVM will allow serialization
+}
+
+✔️ Provide Strong Type Checking
+    ➤ Marker interface is part of type system.
+    ➤ Compiler ensures only tagged classes are passed where required.
+
+✔️ Used in Frameworks / Libraries
+Many frameworks (Hibernate, Spring, etc.) use marker interfaces for configuration and behavior control.
+
+✅ Code Example:
+import java.io.*;
+
+class Student implements Serializable {   // Marker interface
+    int id;
+    String name;
+    Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+public class MarkerDemo {
+    public static void main(String[] args) throws Exception {
+        Student s = new Student(1, "Ankur");
+
+        // Serialize object
+        FileOutputStream fos = new FileOutputStream("data.ser");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(s);  // Works only because Student implements Serializable
+        oos.close();
+
+        System.out.println("Object serialized successfully!");
+    }
+}
+
+✅ Output:
+Object serialized successfully!
+
+❗ If Student did not implement Serializable, above code would throw NotSerializableException.
+
+⚡ Follow-up Trap Question:
+👉 “Since Java 5 introduced annotations, are Marker Interfaces still useful?”
+Answer: “Annotations are now preferred for metadata, but marker interfaces still provide type safety and are widely used in legacy code.”
+
+
+❓What is object class and which methods are present in the object class.
+✔️ Answer:
+➤ Object is the parent/base class of all classes in Java.
+➤ Every class in Java directly or indirectly inherits from Object.
+➤ It is present in java.lang package.
+➤ Provides common methods that every Java class gets by default.
+
+👉 Example:
+class Student {
+    int id;
+    String name;
+}
+
+➤ Even though we didn’t extend anything, Student extends Object internally.
+
+✅ Methods Present in Object Class
+| **Method**                                     | **Description / Use**                                                        |
+| ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| `public String toString()`                     | Returns string representation of object (default: className\@hashCode).      |
+| `public boolean equals(Object obj)`            | Compares two objects for equality (default: reference equality).             |
+| `public int hashCode()`                        | Returns hash code of object (used in HashMap, HashSet, etc.).                |
+| `protected Object clone()`                     | Creates and returns a copy of the object (class must implement `Cloneable`). |
+| `protected void finalize()`                    | Called by GC before object is destroyed (deprecated in Java 9).              |
+| `public final Class<?> getClass()`             | Returns runtime class (reflection).                                          |
+| `protected void wait()`                        | Causes current thread to wait until notified.                                |
+| `protected void wait(long timeout)`            | Wait with timeout.                                                           |
+| `protected void wait(long timeout, int nanos)` | Wait with timeout + nanos.                                                   |
+| `public final void notify()`                   | Wakes up one waiting thread on object’s monitor.                             |
+| `public final void notifyAll()`                | Wakes up all waiting threads on object’s monitor.                            |
+
+
+✅ Example Usage
+class Student {
+    int id;
+    String name;
+
+    Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    // Override toString()
+    public String toString() {
+        return "Student[id=" + id + ", name=" + name + "]";
+    }
+}
+
+public class ObjectDemo {
+    public static void main(String[] args) {
+        Student s1 = new Student(1, "Ankur");
+        Student s2 = new Student(1, "Ankur");
+
+        // toString()
+        System.out.println(s1);  // Student[id=1, name=Ankur]
+
+        // equals()
+        System.out.println(s1.equals(s2));  // false (unless overridden)
+
+        // hashCode()
+        System.out.println(s1.hashCode());
+    }
+}
+
+⚡ Follow-up (commonly asked):
+👉 “Why should we override equals() and hashCode() together?”
+
+
+❓What is Exception Handling and Explain Exception handling hierarchy.
+✔️ Answer:
+Exception Handling in Java is a mechanism to handle runtime errors (like divide by zero, null pointer, array index out of bound, etc.) so the program continues execution without crashing.
+
+🔄 Purpose:
+    ➤ Ensure normal flow of the application.
+    ➤ Provide meaningful messages instead of abrupt termination.
+    ➤ Makes code robust and maintainable.
+
+🔄 Key keywords used in Java Exception Handling:
+    ➤ try → Code that might throw an exception.
+    ➤ catch → Block to handle the exception.
+    ➤ finally → Always executed (cleanup code).
+    ➤ throw → Used to throw an exception.
+    ➤ throws → Declares exceptions a method might throw.
+
+👉 Example:
+public class ExceptionDemo {
+    public static void main(String[] args) {
+        try {
+            int a = 10 / 0; // ArithmeticException
+        } catch (ArithmeticException e) {
+            System.out.println("Can't divide by zero!");
+        } finally {
+            System.out.println("Finally block always executes.");
+        }
+    }
+}
+
+
+✅ Exception Handling Hierarchy
+
+Java divides exceptions into Checked and Unchecked.
+Here’s the hierarchy (interviewers love this diagram 👇):
+                Throwable
+                   |
+     --------------------------------
+     |                              |
+  Exception                      Error
+     |
+  ----------------------------
+  |                          |
+Checked Exception       Unchecked Exception
+(IOException,           (RuntimeException,
+SQLException, etc.)     NullPointerException,
+                        ArithmeticException,
+                        ArrayIndexOutOfBounds, etc.)
+
+
+🔹 Explanation of Hierarchy
+🔄 Throwable
+    ➤ The root class for all errors and exceptions.
+    ➤ Has two main subclasses: Exception and Error.
+
+🔄 Error
+    ➤ Represents serious issues that are beyond the control of the program.
+    ➤ Example: OutOfMemoryError, StackOverflowError.
+    ➤ Should NOT be handled in normal application flow.
+
+🔄 Exception
+Represents conditions the program can catch and handle.
+
+👉 Types:
+🔄 Checked Exceptions (Compile-time exceptions)
+    ➤ Checked by the compiler.
+    ➤ Must be either caught or declared with throws.
+    ➤ Examples: IOException, SQLException, ClassNotFoundException.
+
+🔄 Unchecked Exceptions (Runtime exceptions)
+    ➤ Occur at runtime. Compiler does not force handling.
+    ➤ Subclasses of RuntimeException.
+    ➤ Examples: NullPointerException, ArithmeticException, ArrayIndexOutOfBoundsException.
+
+⚡ Common Interview Follow-up:
+👉 “Can we catch Error in Java?”
+✔️ Answer: Yes, Error is a subclass of Throwable, so we can catch it in the same way we catch Exception.
+
+
+❓Difference between throw and throws keywords in Java
+Difference between throw and throws in Java
+
+Aspect                 throw                                  throws
+-----------------------------------------------------------------------------------------
+Definition             Used to explicitly throw an            Used in method declaration 
+                       exception object.                      to declare exceptions.
+
+Usage Place            Inside a method or block.              In method signature.
+
+Number of Exceptions   Can throw only one exception           Can declare multiple 
+                       at a time.                             exceptions separated by commas.
+
+Execution Time         Actually throws the exception          Just declares that the method 
+                       object at runtime.                     might throw exceptions.
+
+Checked/Unchecked      Can throw both checked and             Generally used for checked 
+                       unchecked exceptions.                  exceptions.
+
+Syntax                 throw new ExceptionType("msg");        returnType methodName() 
+                                                              throws Exception1, Exception2
+
+Example                void demo() {                          void readFile() throws IOException {
+                       throw new ArithmeticException(); }     FileReader fr = new FileReader("abc.txt"); }
+
+✅ Example with Both
+import java.io.*;
+
+class ThrowThrowsDemo {
+
+    // using throws
+    void readFile() throws IOException {
+        FileReader fr = new FileReader("abc.txt"); // may throw IOException
+    }
+
+    // using throw
+    void divide() {
+        throw new ArithmeticException("Divide by zero not allowed!");
+    }
+
+    public static void main(String[] args) {
+        ThrowThrowsDemo obj = new ThrowThrowsDemo();
+
+        try {
+            obj.readFile();
+        } catch (IOException e) {
+            System.out.println("Handled IOException: " + e);
+        }
+
+        obj.divide(); // will throw ArithmeticException
+    }
+}
+
+
+❓What is serialization and deserialization in Java?
+✔️ Answer:
+Serialization is the process of converting an object into a byte stream so that it can be saved to a file, sent over a network, or stored in a database.
+
+Key Points:
+    ➤ Implemented using java.io.Serializable interface (marker interface).
+    ➤ Translates object → byte stream.
+    ➤ ObjectOutputStream is used to perform serialization.
+
+⚡Code Example:
+import java.io.*;
+
+class Student implements Serializable {
+    int id;
+    String name;
+
+    Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+public class SerializationDemo {
+    public static void main(String[] args) throws Exception {
+        Student s = new Student(1, "Ankur");
+
+        FileOutputStream fos = new FileOutputStream("student.txt");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+        oos.writeObject(s); // Serialization
+        oos.close();
+        System.out.println("Object Serialized");
+    }
+}
+
+Deserialization is the reverse process of serialization where the byte stream is converted back into the original object.
+
+Key Points:
+    ➤ Performed using ObjectInputStream.
+    ➤ Object is restored with its state.
+
+⚡Code Example:
+import java.io.*;
+
+public class DeserializationDemo {
+    public static void main(String[] args) throws Exception {
+        FileInputStream fis = new FileInputStream("student.txt");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+
+        Student s = (Student) ois.readObject(); // Deserialization
+        ois.close();
+
+        System.out.println("Object Deserialized: " + s.id + " " + s.name);
+    }
+}
+
+⚡Key Points:
+✔️ Transient keyword: Used to skip some fields from serialization.
+✔️ Static fields: Not serialized because they belong to class, not object.
+✔️ serialVersionUID:
+    ➤ Unique ID used during deserialization to verify sender and receiver are compatible.
+    ➤ If not declared explicitly, JVM generates one.
+    ➤ Best practice: always declare private static final long serialVersionUID = 1L;.
+
+
+❓Use of super and this keywords in Java
+✔️ Answer:
+📝Use of this Keyword in Java
+Refers to the current object of the class.
+
+🔄 Uses:
+    ➤ To differentiate instance variables from local variables (when same name).
+    ➤ To invoke current class methods.
+    ➤ To call one constructor from another in the same class (this() → constructor chaining).
+    ➤ To return current class object.
+
+⚡Code Example:
+class Student {
+    int id;
+    String name;
+
+    Student(int id, String name) {
+        this.id = id;       // differentiate instance and local
+        this.name = name;
+    }
+
+    void print() {
+        System.out.println(this.name); // current object reference
+    }
+}
+
+📝 Use of super keyword in Java
+Refers to the immediate parent class object.
+
+🔄 Uses:
+    ➤ To access parent class variables (when hidden by child class variables).
+    ➤ To invoke parent class methods (when overridden).
+    ➤ To invoke parent class constructor (super() → must be first statement in constructor).
+
+⚡Code Example:
+class Person {
+    String name = "Parent";
+
+    void display() {
+        System.out.println("Person Display");
+    }
+}
+
+class Student extends Person {
+    String name = "Child";
+
+    Student() {
+        super(); // call parent constructor
+    }
+
+    void display() {
+        super.display(); // call parent method
+        System.out.println(super.name); // access parent variable
+    }
+}
+
