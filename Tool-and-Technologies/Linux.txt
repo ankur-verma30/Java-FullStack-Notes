@@ -326,7 +326,6 @@ file temp.mp4
 👉 Shows Linux doesn’t rely on extensions — it inspects file content.
 
 💡 Traps & Tips
-
 ❓Q: If I rename a .txt file to .mp4, will Linux think it’s a video?
 ✅ No → Linux checks content, not extensions (file command confirms).
 
@@ -344,7 +343,7 @@ ctime (metadata change time) always updates when timestamps change.
 ✅ Uses magic numbers / content patterns in the file header (checked via file command).
 
 🔷 Working with Nano
-➤ Nano is a simle, easyto-use text editor that operates within a terminal window.
+➤ Nano is a simle, easy to-use text editor that operates within a terminal window.
 ➤ If a file is not there, it creates and open it.
 
 🔗 nano food.txt
@@ -377,8 +376,6 @@ ctime (metadata change time) always updates when timestamps change.
 🔷 File Operations
 👉 Removing the files
 ➤ rm fileName → remove a file
-➤ rm -d dirName → remove only the empty directory
-➤ rm -r dirName → remove a directory with its contents
 ➤ rm file1 file2 dirName → remove multiple files and directories
 
 👉 Moving and Copying

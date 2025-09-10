@@ -79,6 +79,28 @@ Iterator<T> iterator = someCollection.iterator();
     // ...
 }
 
+➤ Removal of elements is allowed while iterating.
+Iterator<Integer> itr=numbers.iterator();
+while(itr.hasNext()){
+    Integer i=itr.next();
+    if(i%2==0){
+        itr.remove();
+    }
+}
+
+➤ Use of ListIterator: ListIterator<E> listIterator();
+
+🔄 Core Methods:
+🔗 boolean hasNext();
+🔗 boolean hasPrevious();
+🔗 E next();
+🔗 E previous();
+🔗 int nextIndex();
+🔗 int previousIndex();
+🔗 void add(E e);
+🔗 void set(E e);
+🔗 void remove();
+
 ➤ Enables use of the enhanced for-each loop:
 ✔️ for (String s : someCollection) {
     // ...
@@ -2112,30 +2134,715 @@ public class PriorityQueueCustom {
 👉 The iterator of PriorityQueue does not guarantee sorted order → only the head follows priority.
 👉 If ordering is important when iterating, use poll() repeatedly or move to a TreeSet/TreeMap.
 
-🔷Deque
-Double Ended Queue
-Located in java.util package.
-Allows insertion and deletion of elements from both ends.
-versatile than regular queues and stacks because they support all the operations of both 
+🔷 Deque (Double Ended Queue)
+➤ A linear data structure that allows insertion & deletion at both ends (front & rear).
+➤ More versatile than Queue and Stack:
+    ✔️ Queue → Insert at rear, delete at front
+    ✔️ Stack → Insert & delete at same end (LIFO)
+    ✔️ Deque → Supports both behaviors.
 
-Insertion Methods
-➤ addFirst(E e): Inesrts the specified element in the front
-➤ addLast (E e): Inserts the specified element at the end
-➤ offerFirst(E e): Inserts the specified element in the front
-➤ offerLast(E e): Inserts the specified element at the end
+🔄 Implementations in Java
+Interface: Deque<E> (extends Queue<E> from java.util).
 
-Removal Methods
-removeFirst(): Removes and returns the first element
-removeLast(): Removes and returns the last element
-➤ They will give exception if the queue is empty
+🌟 Common Implementations:
+✔️ ArrayDeque<E> → Resizable circular array
+    ➤ Fast iteration, no null allowed, better cache locality
+    ➤ Preferred in most cases over LinkedList
 
-pollFirst(): Removes and returns the first element
-pollLast(): Removes and returns the last element
+✔️ LinkedList<E> → Doubly linked list
+    ➤ Allows null values, higher memory usage
+    ➤ Slower iteration than ArrayDeque
 
-Examination Methods:
-getFirst(): Retrieves, but does not remove, the first element
-getLast(): Retrieves, but does not remove, the last element
+🔄 Methods in Deque
+⚡ Insertion
+🔗 addFirst(E e) → Insert at front (throws exception if fails)
+🔗 addLast(E e) → Insert at end (throws exception if fails)
+🔗 offerFirst(E e) → Insert at front (returns false if fails)
+🔗 offerLast(E e) → Insert at end (returns false if fails)
 
-Peeking Methods:
-peekFirst(): Retrieves, but does not remove, the first element
-peekLast(): Retrieves, but does not remove, the last element
+⚡ Removal
+🔗 removeFirst() → Remove & return front (throws exception if empty)
+🔗 removLast() → Remove & return end (throws exception if empty)
+🔗 pollFirst() → Remove & return front (returns null if empty)
+🔗 pollLast() → Remove & return end (returns null if empty)
+
+⚡ Examination (Access without removal, exception if empty)
+🔗 getFirst() → Retrieve front element
+🔗 getLast() → Retrieve last element
+
+⚡ Peeking (Access without removal, safe)
+🔗 peekFirst() → Peek front element
+🔗 peekLast() → Peek last element
+
+⚡ Other Important Methods
+🔗 size() → Number of elements
+🔗 isEmpty() → Check if empty
+🔗 contains(Object o) → Check existence
+🔗 iterator() → Iterates from front → end
+🔗 descendingIterator() → Iterates from end → front
+
+4. Example (Using ArrayDeque)
+import java.util.*;
+
+public class DequeExample {
+    public static void main(String[] args) {
+        Deque<Integer> deque1 = new ArrayDeque<>(); 
+
+        // Insertions
+        deque1.addFirst(10);    // [10]
+        deque1.addLast(20);     // [10, 20]
+        deque1.offerFirst(30);  // [30, 10, 20]
+        deque1.offerLast(40);   // [30, 10, 20, 40]
+
+        System.out.println(deque1);  // [30, 10, 20, 40]
+
+        // Access elements
+        System.out.println(deque1.getFirst()); // 30
+        System.out.println(deque1.getLast());  // 40
+
+        // Removals
+        deque1.removeFirst();   // removes 30 → [10, 20, 40]
+        deque1.pollLast();      // removes 40 → [10, 20]
+
+        System.out.println(deque1);  // [10, 20]
+    }
+}
+
+🔄 Special Usages
+👉 As Queue → Only use addLast(), removeFirst()
+👉 As Stack → Use push(), pop(), peek()
+    ➤ Internally mapped as addFirst(), removeFirst(), peekFirst()
+
+✅ Example:
+Deque<Integer> stack = new ArrayDeque<>();
+stack.push(1);   // addFirst(1)
+stack.push(2);   // addFirst(2)
+System.out.println(stack.pop()); // removeFirst() → 2
+
+🔄 Key Differences Between Implementations
+✔️ ArrayDeque
+    ➤ Backed by resizable circular array
+    ➤ Doesn’t allow null
+    ➤ Faster than LinkedList (less memory, no node overhead)
+
+✔️ LinkedList
+    ➤ Doubly linked list
+    ➤ Allows null
+    ➤ More memory overhead
+
+🧠 Traps / Notes
+➤ add/remove methods → Throw exceptions on failure
+➤ offer/poll methods → Return special values (false / null) instead of exception
+➤ Prefer ArrayDeque unless null values are required
+➤ Iteration order:
+    ✔️ iterator() → head → tail
+    ✔️ descendingIterator() → tail → head
+
+
+🔷 BlockingQueue in Java
+➤ Interface in java.util.concurrent package.
+➤ A thread-safe queue designed for concurrent programming.
+➤ Unlike normal queues:
+    ✔️ Blocks when trying to add to a full queue.
+    ✔️ Blocks when trying to remove from an empty queue.
+➤ Simplifies classic concurrency problems like Producer–Consumer.
+
+🔄 Implementations
+👉 ArrayBlockingQueue → bounded, circular array-backed
+👉 LinkedBlockingQueue → optional capacity (unbounded by default), linked nodes
+👉 PriorityBlockingQueue → priority-based (like PriorityQueue, but thread-safe)
+👉 DelayQueue, SynchronousQueue, etc. (specialized cases)
+
+🔄 Core Methods
+⚡ Insertion
+🔗 put(E e) → Blocks if queue is full until space is available.
+🔗 offer(E e) → Immediately returns false if queue is full.
+🔗 offer(E e, long timeout, TimeUnit unit) → Waits up to timeout for space.
+
+⚡ Removal
+🔗 take() → Blocks if queue is empty until element is available.
+🔗 poll() → Returns null if queue is empty.
+🔗 poll(long timeout, TimeUnit unit) → Waits up to timeout for an element.
+
+⚡ Others
+🔗 peek() → Retrieves head without removing (null if empty).
+🔗 size() → Returns number of elements.
+🔗 remainingCapacity() → Available space before full.
+
+🔄 Key Difference with Normal Queue
+➤ Normal Queue: No waiting → add/remove fail immediately if full/empty.
+➤ BlockingQueue: Waits (blocks) until space or element becomes available.
+
+🌟 Using ArrayBlockingQueue
+➤ A bounded, blocking queue backed by a circular array.
+➤ Low memory overhead.
+➤ Uses a single lock for both Enqueue and Dequeue operations.
+➤ More threads can casuse contention on the lock.
+
+✅ Example: 
+import java.util.concurrent.*;
+
+public class BlockingQueueExample {
+    public static void main(String[] args) throws InterruptedException {
+        BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(5);
+
+        // Producer thread
+        Thread producer = new Thread(() -> {
+            try {
+                for (int i = 1; i <= 7; i++) {
+                    System.out.println("Producing: " + i);
+                    queue.put(i); // Blocks if full
+                    Thread.sleep(500); // simulate work
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        // Consumer thread
+        Thread consumer = new Thread(() -> {
+            try {
+                for (int i = 1; i <= 7; i++) {
+                    int item = queue.take(); // Blocks if empty
+                    System.out.println("Consuming: " + item);
+                    Thread.sleep(1000); // simulate work
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        producer.start();
+        consumer.start();
+
+        producer.join();
+        consumer.join();
+    }
+}
+
+🔹 Sample Output (Producer–Consumer)
+Producing: 1
+Consuming: 1
+Producing: 2
+Producing: 3
+Consuming: 2
+Producing: 4
+Producing: 5
+Producing: 6  // Producer blocks if queue is full
+Consuming: 3  // Consumer frees space → Producer resumes
+
+🧠 Traps & Notes
+➤ put() and take() are blocking, unlike normal queue ops.
+➤ Thread-safe: no need for manual synchronization.
+➤ Bounded queues (like ArrayBlockingQueue) prevent memory overflow.
+➤ Useful in multi-threading scenarios:
+    ✔️ Producer–Consumer problem
+    ✔️ Task scheduling systems
+    ✔️ Thread pools
+    ✔️ LinkedBlockingQueue
+
+
+🌟 LinkedBlockingQueue
+➤ A thread-safe blocking queue based on a linked list.
+➤ Optionally bounded:
+    ✔️ Default = unbounded (capacity = Integer.MAX_VALUE)
+    ✔️ Can be bounded at creation → safer (prevents memory issues).
+➤ Located in java.util.concurrent package.
+
+🔄 Characteristics
+➤ Unbounded by default → may cause OutOfMemoryError if producers are much faster than consumers.
+➤ Bounded form recommended → use constructor new LinkedBlockingQueue<>(capacity).
+➤ Backed by linked list → memory allocated per node.
+➤ Two separate locks:
+    ✔️ One for enqueue (put/offer)
+    ✔️ One for dequeue (take/poll)
+    ✔️ → Allows higher concurrency between producers and consumers.
+➤ Supports more threads compared to ArrayBlockingQueue due to reduced contention.
+
+🔄 Core Methods (Same as BlockingQueue)
+
+✅Code Example: Bounded LinkedBlockingQueue
+import java.util.concurrent.*;
+
+public class LinkedBlockingQueueExample {
+    public static void main(String[] args) throws InterruptedException {
+        BlockingQueue<Integer> queue = new LinkedBlockingQueue<>(3); // bounded
+
+        Thread producer = new Thread(() -> {
+            try {
+                for (int i = 1; i <= 6; i++) {
+                    System.out.println("Producing: " + i);
+                    queue.put(i); // blocks if full
+                    Thread.sleep(300);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        Thread consumer = new Thread(() -> {
+            try {
+                for (int i = 1; i <= 6; i++) {
+                    int item = queue.take(); // blocks if empty
+                    System.out.println("Consuming: " + item);
+                    Thread.sleep(800);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        producer.start();
+        consumer.start();
+
+        producer.join();
+        consumer.join();
+    }
+}
+
+LinkedBlockingQueue 🆚 ArrayBlockingQueue
+Feature                  LinkedBlockingQueue                      ArrayBlockingQueue
+------------------------------------------------------------------------------------------
+Capacity                 Unbounded by default / Can be bounded    Always bounded (fixed size)
+Backing                  Linked list (dynamic nodes)              Circular array
+Locks                    Two locks (enqueue & dequeue)            Single lock (both ops)
+Concurrency              Higher (better producer-consumer)        Lower (more contention)
+Throughput               Better in high-thread scenarios          Better in low contention
+Memory Usage             Higher (node overhead per element)       Lower (contiguous array)
+Null Allowed?            No                                       No
+
+🧠 Traps & Notes
+➤ Default is unbounded → may cause OutOfMemoryError. Always set capacity in real-world use.
+➤ Higher concurrency because producers and consumers don’t block each other as much (separate locks).
+➤ Preferred for high producer-consumer traffic.
+➤ ArrayBlockingQueue is preferred for predictable, bounded workloads with better memory efficiency.
+
+
+🌟 PriorityBlockingQueue
+➤,A thread-safe, unbounded blocking queue that orders elements based on:
+    ✔️ Natural ordering (Comparable) at head OR
+    ✔️ Custom Comparator provided at construction.
+➤ Default initial capacity = 11, grows dynamically (like PriorityQueue).
+➤ Implemented using a binary heap (array-backed).
+
+🔄 Characteristics
+➤ Unbounded → capacity can grow dynamically (but bounded by memory).
+➤ put() won’t block (unlike ArrayBlockingQueue or LinkedBlockingQueue) because the queue never becomes “full.”
+➤ take() will block if the queue is empty until an element is available.
+➤ Head = least element according to ordering.
+➤ Null elements not allowed.
+
+🔄 Core Methods (same as BlockingQueue)
+
+✅Code Example:
+import java.util.concurrent.*;
+
+public class PriorityBlockingQueueExample {
+    public static void main(String[] args) throws InterruptedException {
+        BlockingQueue<Integer> pq = new PriorityBlockingQueue<>();
+
+        // Producer
+        Thread producer = new Thread(() -> {
+            try {
+                int[] nums = {50, 10, 30, 20, 40};
+                for (int n : nums) {
+                    System.out.println("Producing: " + n);
+                    pq.put(n);  // never blocks
+                    Thread.sleep(300);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        // Consumer
+        Thread consumer = new Thread(() -> {
+            try {
+                for (int i = 0; i < 5; i++) {
+                    int item = pq.take(); // retrieves in natural order
+                    System.out.println("Consuming: " + item);
+                    Thread.sleep(700);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        producer.start();
+        consumer.start();
+
+        producer.join();
+        consumer.join();
+    }
+}
+
+✅Output:
+Producing: 50
+Producing: 10
+Consuming: 10   // smallest first
+Producing: 30
+Producing: 20
+Consuming: 20
+Producing: 40
+Consuming: 30
+Consuming: 40
+Consuming: 50
+
+🧠 Traps / Notes
+➤ Difference from other BlockingQueues:
+    ✔️ put() never blocks because it’s unbounded.
+    ✔️ Only take() blocks when queue is empty.
+➤ Ordering:
+    ✔️ Natural (via Comparable) OR custom (via Comparator).
+    ✔️ No FIFO guarantee for same-priority elements.
+➤ Use cases:
+    ✔️ Task scheduling (e.g., priority-based job execution).
+    ✔️ Message prioritization systems.
+
+🌟 SynchronousQueue
+➤ A special type of BlockingQueue in java.util.concurrent.
+➤ Capacity = 0 (or conceptually 1) → it cannot hold elements.
+➤ Each put() must wait for a take() by another thread (and vice versa).
+➤ Think of it as a handoff queue between threads.
+
+🔄 Characteristics
+➤ No element storage → acts as a direct handoff.
+➤ Producer and consumer must rendezvous (meet) for an element transfer.
+➤ Good for scenarios like thread pools, work handoff, or when tasks should not be queued.
+➤ Has two modes internally:
+    ✔️ Fair mode (FIFO order, true constructor flag)
+    ✔️ Non-fair mode (default, higher throughput, not strictly ordered)
+
+
+🔄Methods Behavior
+➤ put(E e) → Blocks until another thread calls take().
+➤ take() → Blocks until another thread calls put().
+➤ offer(E e, timeout, unit) → Waits for a consumer within timeout, else fails.
+➤ poll(timeout, unit) → Waits for a producer within timeout, else returns null.
+    
+✅Code Example:
+import java.util.concurrent.*;
+
+public class SynchronousQueueExample {
+    public static void main(String[] args) {
+        BlockingQueue<String> queue = new SynchronousQueue<>();
+
+        // Producer
+        new Thread(() -> {
+            try {
+                System.out.println("Producer: trying to put A");
+                queue.put("A");
+                System.out.println("Producer: put A successfully");
+
+                System.out.println("Producer: trying to put B");
+                queue.put("B");
+                System.out.println("Producer: put B successfully");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // Consumer
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000); // Delay to show blocking
+                System.out.println("Consumer: took " + queue.take());
+
+                Thread.sleep(1000);
+                System.out.println("Consumer: took " + queue.take());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+}
+
+✅Output:
+Producer: trying to put A
+(Producer blocks until Consumer takes)
+Consumer: took A
+Producer: put A successfully
+Producer: trying to put B
+(Producer blocks again)
+Consumer: took B
+Producer: put B successfully
+
+
+🔄 Interview Traps / Notes
+➤ Unlike ArrayBlockingQueue or LinkedBlockingQueue, it does not store data.
+➤ Ensures direct synchronization between producer and consumer.
+➤ Use case:
+    ✔️ Task handoff in thread pools (Executors.newCachedThreadPool() uses it internally).
+    ✔️ Workflows where queueing is undesirable.
+➤ Constructor: new SynchronousQueue<>(true) → fair mode (FIFO order).
+
+
+🌟 DelayQueue
+➤ A thread-safe, unbounded blocking queue in java.util.concurrent.
+➤ Stores elements that implement the Delayed interface.
+➤ Elements can be retrieved only when their delay has expired.
+➤ Internally backed by a priority queue (ordered by remaining delay).
+
+Characteristics
+➤ Unbounded → grows dynamically (bounded by memory).
+➤ Ordering → element with the least remaining delay is at the head.
+➤ Blocking behavior:
+    ✔️ take() → waits until head element’s delay has expired.
+    ✔️ poll() → returns element if delay expired, else null.
+➤ Cannot contain null elements.
+➤ Useful for task scheduling, caching with timeouts, rate limiting.
+
+🔄 Core Methods
+➤ put(E e) → Inserts element (no blocking since unbounded).
+➤ take() → Blocks until an element with expired delay is available.
+➤ poll() → Returns head if delay expired, else null.
+➤ peek() → Returns head (even if delay not expired), does not remove.
+
+🔄 Implementing Delayed Elements
+To use DelayQueue, elements must implement:
+    ✔️ getDelay(TimeUnit unit) → Remaining delay.
+    ✔️ compareTo(Delayed other) → Ordering (usually based on delay expiry time).
+
+✅Code Example: DelayQueue with Delayed Tasks    
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+class DelayedTask implements Delayed {
+    private final long startTime;
+    private final String taskName;
+
+    public DelayedTask(String taskName, long delayMillis) {
+        this.taskName = taskName;
+        this.startTime = System.currentTimeMillis() + delayMillis;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+        long diff = startTime - System.currentTimeMillis();
+        return unit.convert(diff, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public int compareTo(Delayed other) {
+        return Long.compare(this.startTime, ((DelayedTask) other).startTime);
+    }
+
+    @Override
+    public String toString() {
+        return taskName;
+    }
+}
+
+public class DelayQueueExample {
+    public static void main(String[] args) throws InterruptedException {
+        DelayQueue<DelayedTask> queue = new DelayQueue<>();
+
+        queue.put(new DelayedTask("Task-1", 2000)); // 2 sec delay
+        queue.put(new DelayedTask("Task-2", 1000)); // 1 sec delay
+        queue.put(new DelayedTask("Task-3", 3000)); // 3 sec delay
+
+        for (int i = 0; i < 3; i++) {
+            DelayedTask task = queue.take(); // blocks until delay expires
+            System.out.println("Executed: " + task + " at " + System.currentTimeMillis());
+        }
+    }
+}
+
+✅Output:
+Executed: Task-2 at 1001
+Executed: Task-1 at 2002
+Executed: Task-3 at 3003
+(Execution order depends on delay expiry, not insertion order).
+
+
+🔄 Interview Traps / Notes
+➤ Unlike PriorityBlockingQueue, an element is not available immediately — it must expire first.
+➤ Always unbounded → possible memory issues if too many delayed tasks are queued.
+➤ Common use cases:
+    ✔️ Scheduling tasks after a delay.
+    ✔️ Implementing retry mechanisms.
+    ✔️ Session timeouts / cache eviction.
+
+🌟 ConcurrentLinkedQueue
+➤ A lock-free, thread-safe implementation of Queue interface.
+➤ Located in java.util.concurrent.
+➤ Based on non-blocking algorithms (uses CAS – Compare-And-Swap) instead of locks.
+➤ Suitable for high-concurrency scenarios where blocking is undesirable.
+
+🔄 Characteristics
+➤ Unbounded → grows dynamically (bounded by memory).
+➤ Non-blocking:
+    ✔️ If empty → poll() returns null (does not wait).
+    ✔️ If full (theoretically never, since unbounded) → inserts always succeed.
+➤ FIFO order maintained.
+➤ Better scalability than synchronized collections (Vector, Collections.synchronizedList).
+➤ Null elements not allowed.
+
+🔄 Core Methods
+🔗 add(E e) → Inserts element at tail (same as offer()).
+🔗 offer(E e) → Inserts element at tail.
+🔗 poll() → Retrieves & removes head, returns null if empty.
+🔗 peek() → Retrieves head without removing, returns null if empty.
+🔗 size() → Returns current size (but not constant-time, may be expensive).
+🔗 isEmpty() → Check if queue is empty.
+
+✅Code Example:Task Submission System
+import java.util.concurrent.*;
+
+class Task implements Runnable {
+    private final String taskName;
+
+    public Task(String name) {
+        this.taskName = name;
+    }
+
+    @Override
+    public void run() {
+        System.out.println(Thread.currentThread().getName() + " executing " + taskName);
+    }
+}
+
+public class ConcurrentLinkedQueueExample {
+    public static void main(String[] args) throws InterruptedException {
+        ConcurrentLinkedQueue<Task> taskQueue = new ConcurrentLinkedQueue<>();
+
+        // Producer threads (submitting tasks)
+        Thread producer1 = new Thread(() -> {
+            for (int i = 1; i <= 5; i++) {
+                Task t = new Task("Task-P1-" + i);
+                taskQueue.offer(t);
+                System.out.println("Producer1 submitted " + t);
+            }
+        });
+
+        Thread producer2 = new Thread(() -> {
+            for (int i = 1; i <= 5; i++) {
+                Task t = new Task("Task-P2-" + i);
+                taskQueue.offer(t);
+                System.out.println("Producer2 submitted " + t);
+            }
+        });
+
+        // Consumer thread (executing tasks)
+        Thread consumer = new Thread(() -> {
+            while (true) {
+                Task t = taskQueue.poll();
+                if (t != null) {
+                    t.run();
+                } else {
+                    break; // exit when no tasks left
+                }
+            }
+        });
+
+        producer1.start();
+        producer2.start();
+        producer1.join();
+        producer2.join();
+
+        consumer.start();
+        consumer.join();
+    }
+}
+
+✅Output:
+Producer1 submitted Task-P1-1
+Producer2 submitted Task-P2-1
+Producer1 submitted Task-P1-2
+Producer2 submitted Task-P2-2
+Thread-2 executing Task-P1-1
+Thread-2 executing Task-P2-1
+Thread-2 executing Task-P1-2
+Thread-2 executing Task-P2-2
+...
+
+🧠 Traps & Notes
+➤ Non-blocking: no put() / take() like BlockingQueue.
+➤ CAS (Compare-And-Swap) ensures atomic updates without locks → high throughput.
+➤ Best for message passing systems, task submission, event queues where blocking is not needed.
+➤ size() is not constant time → avoid in performance-critical code.
+
+🌟 ConcurrentLinkedDeque
+➤ A non-blocking, thread-safe, double-ended queue (Deque).
+➤ Located in java.util.concurrent.
+➤ Backed by lock-free, linked nodes with CAS (Compare-And-Swap) operations.
+➤ Allows concurrent insertions and removals at both ends.
+
+🔄 Characteristics
+➤ Unbounded → grows dynamically (limited by memory).
+➤ Non-blocking:
+    ✔️ No waiting (unlike BlockingDeque).
+    ✔️ If empty → retrieval methods return null.
+➤ Thread-safe → multiple producers/consumers can work simultaneously.
+➤ Maintains FIFO order when used as a queue, or LIFO order when used as a stack.
+➤ Null elements not allowed.
+
+🔄 Core Methods (Same as Deque, but thread-safe & lock-free)
+➤ Insertion
+🔗  addFirst(E e) / offerFirst(E e) → Insert at head.
+🔗  addLast(E e) / offerLast(E e) → Insert at tail.
+
+➤ Removal
+🔗  pollFirst() / removeFirst() → Retrieve & remove head.
+🔗  pollLast() / removeLast() → Retrieve & remove tail.
+
+➤ Access (no removal)
+🔗  peekFirst() → Head element, or null if empty.
+🔗  peekLast() → Tail element, or null if empty.
+
+✅Code Example: Concurrent Task Queue
+import java.util.concurrent.*;
+
+public class ConcurrentLinkedDequeExample {
+    public static void main(String[] args) throws InterruptedException {
+        ConcurrentLinkedDeque<String> deque = new ConcurrentLinkedDeque<>();
+
+        // Producer thread adds tasks at both ends
+        Thread producer = new Thread(() -> {
+            for (int i = 1; i <= 5; i++) {
+                deque.addLast("Task-" + i);
+                System.out.println("Produced Task-" + i);
+            }
+        });
+
+        // Consumer thread processes tasks from the front
+        Thread consumer = new Thread(() -> {
+            while (true) {
+                String task = deque.pollFirst();
+                if (task != null) {
+                    System.out.println("Consumed " + task);
+                } else {
+                    break;
+                }
+            }
+        });
+
+        producer.start();
+        producer.join();
+
+        consumer.start();
+        consumer.join();
+    }
+}
+
+✅Output:
+Produced Task-1
+Produced Task-2
+Produced Task-3
+Produced Task-4
+Produced Task-5
+Consumed Task-1
+Consumed Task-2
+Consumed Task-3
+Consumed Task-4
+Consumed Task-5
+
+
+🧠 Traps & Notes
+➤ Difference from BlockingDeque:
+    ✔️ ConcurrentLinkedDeque → non-blocking (returns null if empty).
+    ✔️ BlockingDeque → blocking (take() waits if empty).
+➤ Best for highly concurrent producer-consumer systems where waiting is not required.
+➤ Often used in work-stealing algorithms (threads can take tasks from both ends).
+➤ Provides lock-free scalability for multiple threads.
+
