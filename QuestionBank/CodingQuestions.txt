@@ -1,4 +1,4 @@
-1. Surfing the Array: (Usually means iterating/traversing and printing values)
+❓1. Surfing the Array: (Usually means iterating/traversing and printing values)
 
 public class SurfArray {
     public static void main(String[] args) {
@@ -12,7 +12,7 @@ public class SurfArray {
 }
 ✅ Interview Twist: Be ready to explain for-each loop vs normal for loop.
 
-2. Palindrome Check
+❓2. Palindrome Check
 (a) String Palindrome
 public class StringPalindrome {
     public static void main(String[] args) {
@@ -27,7 +27,7 @@ public class StringPalindrome {
     }
 }
 
-(b) Integer Palindrome
+❓(b) Integer Palindrome
 public class IntegerPalindrome {
     public static void main(String[] args) {
         int num = 121, temp = num, reversed = 0;
@@ -46,7 +46,7 @@ public class IntegerPalindrome {
     }
 }
 
-3. Largest Element in an Array
+❓3. Largest Element in an Array
 public class LargestElement {
     public static void main(String[] args) {
         int[] arr = {5, 12, 3, 19, 1};
@@ -62,7 +62,7 @@ public class LargestElement {
     }
 }
 
-4. Occurrence of Each Character in a String
+❓4. Occurrence of Each Character in a String
 import java.util.HashMap;
 
 public class CharOccurrence {
@@ -81,7 +81,7 @@ public class CharOccurrence {
     }
 }
 
-5. Collection Programs
+❓5. Collection Programs
 (a) Add elements & iterate (using ArrayList)
 import java.util.*;
 
@@ -105,7 +105,7 @@ public class CollectionExample {
     }
 }
 
-(b) Using HashSet
+❓(b) Using HashSet
 import java.util.*;
 
 public class SetExample {
@@ -123,7 +123,7 @@ public class SetExample {
     }
 }
 
-6. Count Number of Words in a String
+❓6. Count Number of Words in a String
 public class WordCount {
     public static void main(String[] args) {
         String sentence = "Java is a powerful language";
@@ -143,3 +143,276 @@ Always explain time complexity in coding rounds.
 ➤ Array traversal → O(n)
 ➤ HashMap for frequency → O(n) average
 ➤ Palindrome check → O(n)
+
+❓Write a Program to print a character with max consecutive occurrences.
+🔗 Sample Input:  aaabbccccddee  
+🔗 Sample Output: c (occurs 4 times consecutively)
+
+🔹 Method 1: Simple Iteration
+import java.util.Scanner;
+
+public class MaxConsecutiveChar {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a string: ");
+        String str = sc.nextLine();
+
+        char maxChar = str.charAt(0);
+        int maxCount = 1;
+
+        int count = 1;
+        for (int i = 1; i < str.length(); i++) {
+            if (str.charAt(i) == str.charAt(i - 1)) {
+                count++;
+            } else {
+                count = 1;
+            }
+
+            if (count > maxCount) {
+                maxCount = count;
+                maxChar = str.charAt(i);
+            }
+        }
+
+        System.out.println("Character with max consecutive occurrence: " + maxChar + " (" + maxCount + ")");
+    }
+}
+
+⏱ Time Complexity: O(n)
+📦 Space Complexity: O(1)
+
+🔹 Method 2: Using StringBuilder (Cleaner Logic)
+import java.util.Scanner;
+
+public class MaxConsecutiveCharSB {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a string: ");
+        String str = sc.nextLine();
+
+        char maxChar = str.charAt(0);
+        int maxCount = 1, count = 1;
+
+        StringBuilder sb = new StringBuilder(str);
+        for (int i = 1; i < sb.length(); i++) {
+            if (sb.charAt(i) == sb.charAt(i - 1)) {
+                count++;
+            } else {
+                count = 1;
+            }
+
+            if (count > maxCount) {
+                maxCount = count;
+                maxChar = sb.charAt(i);
+            }
+        }
+
+        System.out.println("Character with max consecutive occurrence: " + maxChar + " (" + maxCount + ")");
+    }
+}
+⏱ Time Complexity: O(n)
+📦 Space Complexity: O(n) (due to StringBuilder copy)
+
+🔹 Method 3: Using Recursion (Less Practical, More Conceptual)
+import java.util.Scanner;
+
+public class MaxConsecutiveCharRec {
+    static char maxChar;
+    static int maxCount;
+
+    public static void findMax(String str, int index, int count) {
+        if (index == str.length()) return;
+
+        if (index > 0 && str.charAt(index) == str.charAt(index - 1)) {
+            count++;
+        } else {
+            count = 1;
+        }
+
+        if (count > maxCount) {
+            maxCount = count;
+            maxChar = str.charAt(index);
+        }
+
+        findMax(str, index + 1, count);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a string: ");
+        String str = sc.nextLine();
+
+        maxChar = str.charAt(0);
+        maxCount = 1;
+
+        findMax(str, 1, 1);
+
+        System.out.println("Character with max consecutive occurrence: " + maxChar + " (" + maxCount + ")");
+    }
+}
+⏱ Time Complexity: O(n)
+📦 Space Complexity: O(n) (due to recursion stack)
+
+
+❓Armstrong Number
+An Armstrong number (also known as Narcissistic number / Pluperfect Digital Invariant (PPDI)) is a number that is equal to the sum of its own digits each raised to the power of the number of digits.
+
+✅ Example:
+153 → (1³ + 5³ + 3³ = 153) ✅ Armstrong
+9474 → (9⁴ + 4⁴ + 7⁴ + 4⁴ = 9474) ✅ Armstrong
+123 → (1³ + 2³ + 3³ = 36 ≠ 123) ❌ Not Armstrong
+
+✅Code:
+🔹 Program 1: Check if a number is Armstrong
+import java.util.Scanner;
+
+public class ArmstrongNumber {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a number: ");
+        int num = sc.nextInt();
+
+        int original = num;
+        int n = String.valueOf(num).length(); // number of digits
+        int sum = 0;
+
+        while (num > 0) {
+            int digit = num % 10;
+            sum += Math.pow(digit, n);
+            num /= 10;
+        }
+
+        if (sum == original) {
+            System.out.println(original + " is an Armstrong number.");
+        } else {
+            System.out.println(original + " is NOT an Armstrong number.");
+        }
+    }
+}
+⏱ Time Complexity: O(d) → where d = number of digits
+📦 Space Complexity: O(1)
+
+🔹 Program 2: Using Function (Clean Reusable Code)
+import java.util.Scanner;
+
+public class ArmstrongCheck {
+    static boolean isArmstrong(int num) {
+        int original = num;
+        int n = String.valueOf(num).length();
+        int sum = 0;
+
+        while (num > 0) {
+            int digit = num % 10;
+            sum += Math.pow(digit, n);
+            num /= 10;
+        }
+        return sum == original;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a number: ");
+        int num = sc.nextInt();
+
+        if (isArmstrong(num)) {
+            System.out.println(num + " is an Armstrong number.");
+        } else {
+            System.out.println(num + " is NOT an Armstrong number.");
+        }
+    }
+}
+
+❓Remove Duplicates from the String
+✅Example:
+
+Input:  programming  
+Output: progamin
+
+🔹 Method 1: Using LinkedHashSet (Preserves Order)
+import java.util.*;
+
+public class RemoveDuplicatesSet {
+    public static void main(String[] args) {
+        String str = "programming";
+
+        LinkedHashSet<Character> set = new LinkedHashSet<>();
+        for (char ch : str.toCharArray()) {
+            set.add(ch);
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (char ch : set) {
+            result.append(ch);
+        }
+
+        System.out.println("After removing duplicates: " + result);
+    }
+}
+👉 Output: progamin
+⏱ Time Complexity: O(n)
+📦 Space Complexity: O(n)
+
+🔹 Method 2: Using Boolean Array (Efficient for ASCII)
+public class RemoveDuplicatesBoolean {
+    public static void main(String[] args) {
+        String str = "programming";
+        boolean[] seen = new boolean[256]; // ASCII size
+        StringBuilder result = new StringBuilder();
+
+        for (char ch : str.toCharArray()) {
+            if (!seen[ch]) {
+                seen[ch] = true;
+                result.append(ch);
+            }
+        }
+
+        System.out.println("After removing duplicates: " + result);
+    }
+}
+👉 Output: progamin
+⏱ Time Complexity: O(n)
+📦 Space Complexity: O(1) (constant 256 array)
+
+🔹 Method 3: Using Java 8 Streams (One-liner, Modern Approach)
+import java.util.stream.Collectors;
+
+public class RemoveDuplicatesStream {
+    public static void main(String[] args) {
+        String str = "programming";
+
+        String result = str.chars()
+                           .distinct()
+                           .mapToObj(c -> String.valueOf((char)c))
+                           .collect(Collectors.joining());
+
+        System.out.println("After removing duplicates: " + result);
+    }
+}
+👉 Output: progamin
+⏱ Time Complexity: O(n)
+📦 Space Complexity: O(n)
+
+🔹 Method 4: Without Extra Data Structures (Brute Force)
+public class RemoveDuplicatesBruteForce {
+    public static void main(String[] args) {
+        String str = "programming";
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (result.indexOf(String.valueOf(ch)) == -1) {
+                result.append(ch);
+            }
+        }
+
+        System.out.println("After removing duplicates: " + result);
+    }
+}
+👉 Output: progamin
+⏱ Time Complexity: O(n²) (because of indexOf inside loop)
+📦 Space Complexity: O(n)
+
+📌 Quick Revision Notes
+➤ Best method → LinkedHashSet or Boolean Array.
+➤ Java 8 Streams → good for modern coding style.
+➤ Brute force → not efficient but sometimes asked.

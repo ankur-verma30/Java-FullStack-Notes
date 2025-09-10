@@ -927,13 +927,525 @@ class Demo1ApplicationTests {
 When you run the test class, JUnit will call methods in the following order:
 
 >>> Before All - Runs only once before all tests
-
 >>> Before Each - Runs before every test case
 >>> Executing Test 1
 >>> After Each - Runs after every test case
-
 >>> Before Each - Runs before every test case
 >>> Executing Test 2
 >>> After Each - Runs after every test case
-
 >>> After All - Runs only once after all tests
+
+
+✅ What is SessionFactory in Hibernate?
+➤ SessionFactory is a core interface in Hibernate.
+➤ It is responsible for establishing database connections and creating Session objects.
+➤ It is thread-safe (can be shared across threads) and is usually created once per application.
+
+🔑 Key Responsibilities of SessionFactory
+➤ Database Connection Management
+✔️ Reads the configuration (hibernate.cfg.xml or persistence.xml).
+✔️ Creates a connection pool internally.
+
+➤ Session Creation
+Creates Session objects, which are lightweight, non-thread-safe objects used for CRUD operations.
+
+➤ Caching
+Provides first-level cache (Session) and optional second-level cache (SessionFactory scope).
+
+➤ Metadata Storage
+Stores mapping metadata of entities (@Entity classes ↔ DB tables).
+
+🔷Difference between Session and SessionFactory
+| Feature       | SessionFactory                         | Session                       |
+| ------------- | -------------------------------------- | ----------------------------- |
+| Creation Cost | Heavyweight (expensive to create)      | Lightweight                   |
+| Thread-Safe   | ✅ Yes                                  | ❌ No                          |
+| Lifetime      | Application-level (one per DB)         | Request/transaction level     |
+| Purpose       | Manages connections + creates sessions | Performs CRUD operations      |
+| Caching Scope | 2nd level cache (shared)               | 1st level cache (per session) |
+
+🧠 If asked "How many SessionFactory objects should an application have?" Answer: Only one per database (singleton).
+Because it is a heavyweight object and creating multiple instances can slow down performance.
+
+
+🔷 Optional Class
+➤ Optional<T> is a container object introduced in Java 8.
+➤ It may or may not contain a non-null value.
+➤ It is an alternative to null checks and helps avoid NullPointerException (NPE).
+
+🔑 Why Optional?
+➤ Traditionally, developers used null values to represent "no result".
+➤ This often caused NullPointerExceptions if we forgot to check null.
+➤ Optional provides a safe, expressive, and functional way to represent an absent value.
+
+
+🛠 Common Methods in Optional
+👉 Creating Optional Objects
+✅Code Example: 
+Optional<String> emptyOpt = Optional.empty();              // Empty Optional
+Optional<String> valueOpt = Optional.of("Hello");          // Must not be null
+Optional<String> nullableOpt = Optional.ofNullable(null);  // Can be null
+
+👉 Checking Value
+✅Code Example: 
+if (valueOpt.isPresent()) {
+    System.out.println(valueOpt.get()); // Safe to call get()
+}
+
+👉 Default Value Handling
+✅Code Example: 
+String result = nullableOpt.orElse("Default Value");
+System.out.println(result);
+
+👉 Lazy Default Value
+✅Code Example: 
+String result = nullableOpt.orElseGet(() -> "Generated Default");
+
+👉 Throw Exception if Empty
+✅Code Example: 
+String result = nullableOpt.orElseThrow(() -> new RuntimeException("Value not present"));
+
+👉 Functional Style (map, filter, ifPresent)
+✅Code Example: 
+Optional<String> nameOpt = Optional.of("Ankur");
+
+nameOpt
+    .filter(name -> name.startsWith("A"))
+    .map(String::toUpperCase)
+    .ifPresent(System.out::println); // Output: ANKUR
+
+⚡ Example Use Case in Repository Layer (Spring Boot)
+❌ Instead of:
+User user = userRepository.findById(1);
+if (user != null) {
+    System.out.println(user.getName());
+}
+
+✅ We use:
+Optional<User> userOpt = userRepository.findById(1);
+userOpt.ifPresent(user -> System.out.println(user.getName()));
+➤ This avoids NullPointerException if the user is not found.   
+
+🆚 Key Difference: null vs Optional
+| Feature     | null                                  | Optional                            |
+| ----------- | ------------------------------------- | ----------------------------------- |
+| Meaning     | Absence of value                      | Explicit container for absent value |
+| Safety      | Prone to NPE                          | Safe API methods                    |
+| Readability | Requires many `if (x != null)` checks | Cleaner, expressive                 |
+| Usage       | Legacy style                          | Modern (Java 8+)                    |
+
+
+💡 Tip:
+If asked "Is Optional a replacement for null?"
+Say:
+👉 No, it’s not a complete replacement. It is a wrapper to handle null values safely in functional style, especially useful in APIs and return types.
+
+
+
+🔷 Perform CRUD Operation using Hibernate in Spring Boot
+
+🟢 Step 1: Database Configuration (application.properties)
+spring.datasource.url=jdbc:mysql://localhost:3306/database_name (use snake casing for the DB name)
+spring.datasource.username=root (username)
+spring.datasource.password=test (password)
+
+➤ Hibernate DDL (Data Definition Language) options:
+  ✔️ create  → Drops table if exists, creates a new one every time project restarts
+  ✔️ update  → Creates table if not exists, else updates schema without dropping data
+spring.jpa.hibernate.ddl-auto=update
+
+🟢 Step 2: Entity Class Explanation (Hibernate + Spring Boot)
+package com.democrud.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="employees")
+public class Employee {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
+	private long id;
+	
+	@Column(name = "first_name", nullable = false, length = 45)
+	private String firstName;
+	
+	@Column(name = "last_name", nullable = false, length = 45)
+	private String lastName;
+	
+	@Column(name = "email_id", nullable = false, length = 256, unique = true)
+	private String emailId;
+	
+	@Column(name="mobile", nullable = false, unique = true)
+	private String mobile;
+
+    // Getters & Setters ...
+}
+
+🔄 Annotations
+🔗 @Entity
+➤ Marks this class as an Entity → Hibernate will map it to a database table.
+➤ Without this, Hibernate will ignore the class.
+
+🔗 @Table(name="employees")
+➤ Specifies the table name in the database.
+➤ If you don’t use it → Hibernate will create a table with default name = class name (Employee).
+➤ Here, it will create/use a table called employees.
+
+🔗 @Id
+➤ Defines the Primary Key of the entity.
+➤ Every entity must have one @Id field.
+
+🔗 @GeneratedValue(strategy = GenerationType.IDENTITY)
+➤ Tells Hibernate how to generate the primary key values.
+➤ IDENTITY → Database will auto-generate the ID using auto-increment (common in MySQL, PostgreSQL).
+
+Alternative strategies:
+➤ AUTO → Hibernate chooses best strategy automatically.
+➤ SEQUENCE → Uses DB sequence (common in Oracle).
+➤ TABLE → Uses a special table to generate IDs.
+
+🔗 @Column
+➤ Maps a class field to a specific column in the DB.
+➤ Attributes:
+  ✔️ name → Column name in DB (different from field name).
+  ✔️ nullable = false → Cannot be NULL in DB.
+  ✔️ length → Defines max length of VARCHAR.
+  ✔️ unique = true → Makes column values unique.
+
+✅ Examples here:
+➤ firstName → first_name VARCHAR(45) NOT NULL
+➤ lastName → last_name VARCHAR(45) NOT NULL
+➤ emailId → email_id VARCHAR(256) UNIQUE NOT NULL
+➤ mobile → mobile VARCHAR(?) UNIQUE NOT NULL
+
+
+🟢 Step 3: Repository Layer Explanation
+package com.democrud.repository;
+
+import org.springframework.data.repository.CrudRepository;
+import com.democrud.entity.Employee;
+
+public interface EmployeeRepository extends CrudRepository<Employee, Long> {
+}
+
+🔎 Breakdown:
+⚡ EmployeeRepository
+➤ An interface, not a class.
+➤ Extends CrudRepository<Employee, Long>
+
+⚡ CrudRepository<T, ID>
+➤ A Spring Data JPA interface that provides ready-made CRUD methods.
+➤ Here:
+  ✔️ T = Employee → Entity type
+  ✔️ ID = Long → Primary key type
+
+⚡ No need to implement methods
+➤ Spring Data JPA automatically generates implementations for you at runtime.
+➤ So you don’t have to write SQL/JPQL manually for basic operations.
+
+
+🟢 Step 4: Service Layer Explanation (Performing Unit Test)
+package com.democrud;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.democrud.entity.Employee;
+import com.democrud.repository.EmployeeRepository;
+
+@SpringBootTest
+class DemocrudApplicationTests {
+	
+	
+	@Autowired
+	private EmployeeRepository employeeRepository;
+
+	@Test
+	void saveRecord() {
+		Employee emp = new Employee();
+		emp.setFirstName("adam");
+		emp.setLastName("a");
+		emp.setEmailId("adam@gmail.com");
+		emp.setMobile("9632629455");
+		employeeRepository.save(emp);
+	}
+
+➤ Creates a new Employee object.
+➤ Calls save().
+📌 Hibernate generates:
+🔗 INSERT INTO employees (first_name, last_name, email_id, mobile) 
+VALUES ('adam', 'a', 'adam@gmail.com', '9632629455');
+
+	@Test
+	void deleteRecord() {
+		employeeRepository.deleteById(3L);
+	}
+
+➤ Deletes row with ID = 3.
+📌 Hibernate generates:
+🔗 DELETE FROM employees WHERE id = 3;
+
+	@Test
+	void getRecordById() {
+		Optional<Employee> opEmp = employeeRepository.findById(1L);
+		if(opEmp.isPresent()) {
+			Employee employee = opEmp.get();
+			System.out.println(employee.getId());
+			System.out.println(employee.getFirstName());
+			System.out.println(employee.getLastName());
+			System.out.println(employee.getEmailId());
+		}else {
+			System.out.println("No record Found");
+		}
+	}
+
+➤ Fetches record with ID = 1.
+➤ Uses Optional to avoid NullPointerException.
+📌 Hibernate generates:
+🔗 SELECT * FROM employees WHERE id = 1;
+	
+	@Test
+	void getRecords() {
+		Iterable<Employee> itrEmp = employeeRepository.findAll();
+		for (Employee employee: itrEmp) {
+			System.out.println(employee.getId());
+			System.out.println(employee.getFirstName());
+			System.out.println(employee.getLastName());
+			System.out.println(employee.getEmailId());
+		}
+	}
+
+➤ Fetches all employees.
+📌 Hibernate generates:
+🔗 SELECT * FROM employees;
+	
+	
+	@Test
+	void countRecords() {
+		long count = employeeRepository.count();
+		System.out.println(count);
+	}
+}
+
+➤ Counts total rows in table.
+📌 Hibernate generates:
+🔗 SELECT COUNT(*) FROM employees;
+
+✅ What This Unit Test Class Does
+➤ This class (DemocrudApplicationTests) is testing your repository layer using Spring Boot + JUnit.
+➤ @SpringBootTest → Boots the entire Spring context, loads beans (EmployeeRepository) so you can use dependency injection.
+➤ @Autowired EmployeeRepository → Injects repository so tests can directly call CRUD methods.
+
+👉 Pro tip: If you want to actually see SQL queries in the console, add this to your application.properties:
+✔️ spring.jpa.show-sql=true
+✔️ spring.jpa.properties.hibernate.format_sql=true
+
+
+🔷 Finder Methods in Hibernate (Spring Data JPA)
+➤ Finder methods are custom query methods that you define inside your repository interface.
+➤ They allow you to fetch data based on specific conditions without writing SQL or JPQL manually.
+➤ Spring Data JPA derives the query automatically by analyzing the method name.
+
+✅ How Hibernate Works Behind the Scenes
+➤ For each finder method:
+  ✔️ Spring Data JPA parses the method name.
+  ✔️ Converts it into a JPQL query.
+  ✔️ Hibernate translates JPQL → SQL and executes it.
+
+✅ Why Finder Methods are Useful
+➤ No need to write SQL / JPQL queries manually.
+➤ Easy to read and maintain.
+➤ Spring Data JPA + Hibernate auto-generates queries → saves development time.
+➤ Makes your repository layer clean and declarative.  
+
+📌 Rules & Keywords for Writing Finder Methods in Spring Data JPA
+⚡ Start with a Recognized Prefix
+➤ Every finder method must start with one of these prefixes:
+🔗 findBy... → fetch data
+🔗 readBy... → alias of findBy
+🔗 queryBy... → alias of findBy
+🔗 getBy... → alias of findBy
+🔗 countBy... → count records matching condition
+🔗 existsBy... → check if record exists
+🔗 deleteBy... / removeBy... → delete records
+
+✅Example:
+Optional<Employee> findByEmailId(String email);
+long countByLastName(String lastName);
+boolean existsByMobile(String mobile);
+
+⚡ Use Property Names Exactly
+➤ After the prefix, write your entity field name (case-sensitive with camelCase).
+➤ Must match the Java property in the Entity, not the column name in DB.
+
+✅ Example (Entity field = firstName)
+List<Employee> findByFirstName(String firstName);
+❌ Wrong: findByfirst_name (uses DB column name).
+
+⚡ Combine Multiple Conditions with Keywords
+You can combine fields with:
+  ✔️  And
+  ✔️  Or
+
+✅ Examples:
+List<Employee> findByFirstNameAndLastName(String first, String last);
+List<Employee> findByFirstNameOrLastName(String first, String last);
+
+👉 Generated JPQL:
+SELECT e FROM Employee e WHERE e.firstName = ? AND e.lastName = ?;
+
+⚡ Use Comparison Keywords
+➤ Spring Data JPA supports many keywords after field names:
+🔗 Is, Equals → exact match
+🔗 Not → not equal
+🔗 LessThan, GreaterThan, Between → comparisons
+🔗 Like, Containing, StartingWith, EndingWith → pattern matching
+🔗 In → matches in a list
+🔗 True, False → for boolean fields
+
+✅Example:
+List<Employee> findBySalaryGreaterThan(double salary);
+List<Employee> findByFirstNameContaining(String keyword);
+List<Employee> findByFirstNameStartingWith(String prefix);
+List<Employee> findByFirstNameEndingWith(String suffix);
+List<Employee> findByIdIn(List<Long> ids);
+List<Employee> findByActiveTrue();   // only active employees
+
+⚡ Order the Results
+➤ Add OrderBy keyword followed by field name + direction (Asc / Desc).
+
+✅ Example:
+List<Employee> findByLastNameOrderByFirstNameAsc(String lastName);
+
+👉 SQL:
+SELECT * FROM employees WHERE last_name=? ORDER BY first_name ASC;
+
+🔄 Return Types
+➤ Finder methods can return:
+  ✔️ Single entity (Employee)
+  ✔️ Optional<Employee> (preferred for safety)
+  ✔️ List/Collection (List<Employee>)
+  ✔️ Page<Employee> or Slice<Employee> (for pagination)
+  ✔️ Stream<Employee>
+
+✅ Repository (Updated)  
+package com.democrud.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.democrud.entity.Employee;
+
+public interface EmployeeRepository extends CrudRepository<Employee, Long> {
+
+    // Exact matches
+    Optional<Employee> findByEmailId(String email);
+    Optional<Employee> findByMobile(String mobile);
+
+    // Existence checks
+    boolean existsByEmailId(String email);
+    boolean existsByMobile(String mobile);
+
+    // Count records
+    long countByEmailId(String email);
+
+    // Pattern matching
+    List<Employee> findByFirstNameContaining(String keyword);   // anywhere
+    List<Employee> findByFirstNameStartingWith(String prefix);  // starts with
+    List<Employee> findByFirstNameEndingWith(String suffix);    // ends with
+
+    // You can add more if needed:
+    List<Employee> findByFirstNameAndLastName(String firstName, String lastName);
+    List<Employee> findByEmailIdIn(List<String> emails);
+    List<Employee> findByFirstNameOrderByLastNameAsc(String firstName);
+}
+
+✅ Test Class
+package com.democrud;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.democrud.entity.Employee;
+import com.democrud.repository.EmployeeRepository;
+
+@SpringBootTest
+class DemocrudApplicationTests {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Test
+    void findByEmail() {
+        employeeRepository.findByEmailId("adam@gmail.com").ifPresentOrElse(
+            emp -> System.out.println("Found: " + emp.getFirstName()),
+            () -> System.out.println("No record Found")
+        );
+    }
+
+    @Test
+    void findByMobile() {
+        employeeRepository.findByMobile("9632629455").ifPresentOrElse(
+            emp -> System.out.println("Found: " + emp.getFirstName()),
+            () -> System.out.println("No record Found")
+        );
+    }
+
+    @Test
+    void existsByEmail() {
+        System.out.println(employeeRepository.existsByEmailId("adam1@gmail.com")
+            ? "Record exists" : "No record Found");
+    }
+
+    @Test
+    void existsByMobile() {
+        System.out.println(employeeRepository.existsByMobile("9632629455")
+            ? "Record exists" : "No record Found");
+    }
+
+    @Test
+    void countByEmail() {
+        System.out.println("Count: " + employeeRepository.countByEmailId("adam@gmail.com"));
+    }
+
+    @Test
+    void containingLetter() {
+        List<Employee> employees = employeeRepository.findByFirstNameContaining("m");
+        employees.forEach(e -> System.out.println(e.getFirstName()));
+    }
+
+    @Test
+    void startingLetter() {
+        List<Employee> employees = employeeRepository.findByFirstNameStartingWith("A");
+        employees.forEach(e -> System.out.println(e.getFirstName()));
+    }
+
+    @Test
+    void endingLetter() {
+        List<Employee> employees = employeeRepository.findByFirstNameEndingWith("m");
+        employees.forEach(e -> System.out.println(e.getFirstName()));
+    }
+}
+
+
+⚡ Key Improvements made:
+✅ Used ifPresentOrElse() (Java 9+) for cleaner Optional handling.
+✅ Added System.out.println("...") confirmations after save/delete for clarity.
+✅ Consistent method naming (startingLetter, not StaringLetter).
+✅ Used lambda expressions for cleaner iteration.
+✅ Added extra useful finder methods (And, In, OrderBy).
