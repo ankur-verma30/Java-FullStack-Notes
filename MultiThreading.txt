@@ -105,4 +105,90 @@ The lifecycle of a thread is as follows:
 5. Terminated: The thread has completed its execution.
 
 
-🔷 Thread Methods
+🔷 Thread Methods in Java
+🔄 start()
+➤ Used to start a new thread of execution.
+➤ Internally calls the run() method in a new call stack.
+➤ Cannot call start() on the same thread object more than once → throws IllegalThreadStateException.
+
+t1.start();  // starts execution of thread
+
+🔄 run()
+➤ Contains the code that will be executed by the thread.
+➤ If run() is called directly (without start()), it will behave like a normal method → no new thread is created.
+
+@Override
+public void run() {
+    System.out.println("Thread is running...");
+}
+
+🔄 sleep(milliseconds)
+➤ ➤ Causes the currently executing thread to pause temporarily for a given time.
+➤ ➤ Throws InterruptedException if another thread interrupts the sleeping one.
+➤ ➤ Static method → belongs to the class, not an object.
+
+Thread.sleep(1000);  // pauses current thread for 1 second
+
+🔄 join()
+➤ Allows one thread to wait for another thread to finish execution before continuing.
+➤ Ensures sequential execution when required.
+➤ Overloads:
+    ✔️ join() → waits until thread finishes.
+    ✔️ join(long millis) → waits for max specified time.
+
+t1.join();  // main thread waits until t1 finishes
+
+🔄 setPriority(int priority)
+➤ Used to set priority of a thread.
+➤ Range: 1 (MIN_PRIORITY) → 10 (MAX_PRIORITY), default = 5 (NORM_PRIORITY).
+➤ Just a hint to the scheduler (not guaranteed).
+
+t1.setPriority(Thread.MAX_PRIORITY);
+
+🔄 interrupt()
+➤ Used to interrupt a thread that is sleeping, waiting, or blocked.
+➤ Sets the interrupt status flag of the thread.
+➤ If the thread is in sleep() or join(), it will throw InterruptedException.
+
+t1.interrupt();
+
+🔷 Extra Content from Your Code
+👉 Naming Threads
+A thread can be given a name by passing it in the constructor:
+
+ThreadMethodDemo t1 = new ThreadMethodDemo("FirstThread");
+System.out.println(t1.getName());  // prints: FirstThread
+
+✅ Example with Priority + Name
+package p1;
+
+public class ThreadMethodDemo extends Thread {
+    public ThreadMethodDemo(String name) {
+        super(name);  // assigning thread name
+    }
+
+    public static void main(String[] args) {
+        ThreadMethodDemo t1 = new ThreadMethodDemo("FirstThread");
+        t1.setPriority(Thread.NORM_PRIORITY); // setting priority
+        t1.start();
+    }
+
+    @Override
+    public void run() {
+        for(int i=1; i<=5; i++) {
+            System.out.println(Thread.currentThread().getName() + 
+                               " Priority: " + Thread.currentThread().getPriority() +
+                               " Value: " + i);
+        }
+    }
+}
+
+📝 Notes
+➤ start() → creates a new thread and calls run().
+➤ run() → thread’s task logic.
+➤ sleep() → pauses execution (can throw InterruptedException).
+➤ join() → makes one thread wait for another.
+➤ setPriority() → changes thread priority (1–10).
+➤ interrupt() → signals thread interruption.
+➤ Threads can be named (super(name) in constructor).
+➤ Thread priorities are scheduler hints, not guarantees.
