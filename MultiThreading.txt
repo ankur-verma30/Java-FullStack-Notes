@@ -145,14 +145,6 @@ t1.join();  // main thread waits until t1 finishes
 
 t1.setPriority(Thread.MAX_PRIORITY);
 
-🔄 interrupt()
-➤ Used to interrupt a thread that is sleeping, waiting, or blocked.
-➤ Sets the interrupt status flag of the thread.
-➤ If the thread is in sleep() or join(), it will throw InterruptedException.
-
-t1.interrupt();
-
-🔷 Extra Content from Your Code
 👉 Naming Threads
 A thread can be given a name by passing it in the constructor:
 
@@ -183,12 +175,51 @@ public class ThreadMethodDemo extends Thread {
     }
 }
 
-📝 Notes
-➤ start() → creates a new thread and calls run().
-➤ run() → thread’s task logic.
-➤ sleep() → pauses execution (can throw InterruptedException).
-➤ join() → makes one thread wait for another.
-➤ setPriority() → changes thread priority (1–10).
-➤ interrupt() → signals thread interruption.
-➤ Threads can be named (super(name) in constructor).
-➤ Thread priorities are scheduler hints, not guarantees.
+🔄 interrupt()
+➤ Used to interrupt a thread that is sleeping, waiting, or blocked.
+➤ Sets the interrupt status flag of the thread.
+➤ If the thread is in sleep() or join(), it will throw InterruptedException.
+
+🔗 Method: t1.interrupt();
+
+✅ Code Example:
+package p1;
+
+public class ThreadMethodDemo extends Thread {
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(1000);   // thread goes to sleep for 1 second
+            System.out.println("Thread is running...");
+        } catch (Exception e) {
+            System.out.println("Thread interrupted: " + e);
+        }
+    }
+
+    public static void main(String[] args) {
+        ThreadMethodDemo t1 = new ThreadMethodDemo();
+        t1.start();       // starts the thread → calls run() in separate stack
+        t1.interrupt();   // interrupts t1 immediately
+    }
+}
+
+🔷 What Happens at Runtime?
+➤ t1.start() → new thread is created, run() starts execution.
+➤ Inside run(), thread executes → Thread.sleep(1000).
+    ✔️ This puts the thread into TIMED_WAITING state.
+➤ Meanwhile, the main thread calls t1.interrupt().
+    ✔️ This sets the interrupt flag for t1.
+    ✔️ Since t1 is currently sleeping, it immediately throws an InterruptedException.
+➤ The exception is caught in the catch block →
+Thread interrupted: java.lang.InterruptedException: sleep interrupted
+
+🔷 Key Notes for Interview
+➤ interrupt()
+    ✔️ If a thread is sleeping, waiting, or blocked → InterruptedException is thrown.
+    ✔️ If a thread is running normally (not in sleep/wait) → just sets interrupt flag, no exception.
+➤ sleep() always needs to be inside a try-catch because it throws InterruptedException.
+➤ Execution flow here:
+start() → run() → sleep() → interrupt() → exception thrown → handled in catch.
+
+🔄 Yield Method
+A hint to the scheduler that the current thread is willing to yield its current use of a processor.

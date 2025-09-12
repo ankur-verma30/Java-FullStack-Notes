@@ -1337,7 +1337,7 @@ SELECT * FROM employees WHERE last_name=? ORDER BY first_name ASC;
   ✔️ Page<Employee> or Slice<Employee> (for pagination)
   ✔️ Stream<Employee>
 
-✅ Repository (Updated)  
+✅ Repository 
 package com.democrud.repository;
 
 import java.util.List;
@@ -1365,10 +1365,6 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     List<Employee> findByFirstNameStartingWith(String prefix);  // starts with
     List<Employee> findByFirstNameEndingWith(String suffix);    // ends with
 
-    // You can add more if needed:
-    List<Employee> findByFirstNameAndLastName(String firstName, String lastName);
-    List<Employee> findByEmailIdIn(List<String> emails);
-    List<Employee> findByFirstNameOrderByLastNameAsc(String firstName);
 }
 
 ✅ Test Class
@@ -1442,10 +1438,461 @@ class DemocrudApplicationTests {
     }
 }
 
-
 ⚡ Key Improvements made:
 ✅ Used ifPresentOrElse() (Java 9+) for cleaner Optional handling.
 ✅ Added System.out.println("...") confirmations after save/delete for clarity.
 ✅ Consistent method naming (startingLetter, not StaringLetter).
 ✅ Used lambda expressions for cleaner iteration.
 ✅ Added extra useful finder methods (And, In, OrderBy).
+
+
+🔷 JPQL (Java Persistence Query Language)
+➤ It is a object-oriented query language defined by JPA.
+➤ It looks like SQL but operatres on entity classes and their properites, not on DB tables/columns.
+
+✅ Example:
+SELECT e FROM Employee e WHERE e.emailId = :emailId;
+👉 Employee is the entity name and the emailId is the Java/property, not the table/column.
+
+➤ The JPA provide(Hibernate) translates JPQL -> SQL using entity metadata and the configured SQL dialect, then executes it via JDBC.
+
+🌟 @Query in Spring Data JPA uses JPQL
+When you put @Query("...JPQL...") on a repository method, Spring Data:
+  ✔️ Parses the JPQL string.
+  ✔️ Builds a javax.persistence.Query/TypedQuery.
+  ✔️ Binds parameters you provide (@Param or positional).
+  ✔️ Lets Hibernate turn JPQL into SQL and run it.
+This means your repository method runs a provider-generated query (no manual SQL needed).
+
+✅Code Implementation:
+public interface EmployeeRepository extends CrudRepository<Employee, Long> {
+
+    @Query("select e from Employee e where e.emailId = :x")
+    Optional<Employee> searchByEmail(@Param("x") String email);
+
+    @Query("select e from Employee e where e.mobile = :m")
+    Optional<Employee> searchByMobile(@Param("m") String mobile);
+
+    // IMPORTANT: annotate both params or use positional parameters (?1, ?2)
+    @Query("select e from Employee e where e.emailId = :x and e.mobile = :m")
+    Optional<Employee> searchByEmailAndMobile(@Param("x") String email, @Param("m") String mobile);
+
+    @Query("select e from Employee e where e.emailId = :x or e.mobile = :m")
+    List<Employee> searchByEmailIdOrMobile(@Param("x") String email, @Param("m") String mobile);
+}
+
+
+⚡ JUnit Test on these methods
+package com.democrud;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.democrud.entity.Employee;
+import com.democrud.repository.EmployeeRepository;
+
+@SpringBootTest
+class DemocrudApplicationTests {
+
+  @Autowired
+	private EmployeeRepository employeeRepository;
+
+
+  @Test
+void searchByEmail() {
+    employeeRepository.searchByEmail("adam@gmail.com")
+        .ifPresentOrElse(
+            e -> printEmployee(e),
+            () -> System.out.println("No record Found")
+        );
+}
+
+@Test
+void searchByMobile() {
+    employeeRepository.searchByMobile("9632629455")
+        .ifPresentOrElse(
+            e -> printEmployee(e),
+            () -> System.out.println("No record Found")
+        );
+}
+
+@Test
+void getByEmailAndMobile() {
+    employeeRepository.searchByEmailAndMobile("adam@gmail.com", "9632629455")
+        .ifPresentOrElse(
+            e -> printEmployee(e),
+            () -> System.out.println("No record Found")
+        );
+}
+
+@Test
+void getByEmailOrMobile() {
+    employeeRepository.searchByEmailIdOrMobile("adam@gmail.com", "9632629155")
+        .stream()
+        .map(Employee::getFirstName)
+        .forEach(System.out::println);
+}
+
+// ✅ Helper method to avoid repetition
+private void printEmployee(Employee e) {
+    System.out.println(e.getId());
+    System.out.println(e.getFirstName());
+    System.out.println(e.getLastName());
+    System.out.println(e.getEmailId());
+}
+}
+
+🔑 Improvements:
+➤ Replaced manual if(opEmp.isPresent()) with ifPresentOrElse.
+➤ Used method reference + lambda for clean printing.
+➤ Extracted duplicate print logic into printEmployee(Employee e).
+➤ Used stream().map().forEach() for list iteration.
+
+🌟 Method-by-method explanation
+🔗 @Query("select e from Employee e where e.emailId = :x")
+  ✔️ JPQL returns Employee entities where emailId equals :x.
+  ✔️ Spring Data maps the result rows to Employee objects.
+  ✔️ Return type = Optional<Employee>:
+      ⚡ If no row → Optional.empty().
+      ⚡ If exactly one row → Optional.of(entity).
+      ⚡ If more than one row → exception (IncorrectResultSizeDataAccessException), because a single-result mapping is expected.
+
+➤ searchByMobile(...) — same as above but checks mobile.
+➤ searchByEmailAndMobile(...)
+  ✔️ Matches both conditions (AND).
+  ✔️ Use this when you expect at most one match (unique constraints ensure single result).
+
+➤ searchByEmailIdOrMobile(...)
+  ✔️ Uses OR and returns List<Employee>.
+  ✔️ If zero results → empty list; if many → list of entities.
+
+🌟 Named parameters vs positional
+👉 Named: :x, :m + @Param("x") map method param to JPQL param. Preferred for readability.
+👉 Positional: ?1, ?2 and method parameters are bound by index.
+👉 Important: If you use named params, annotate method parameters with @Param (or ensure Java compiler parameter names are retained and Spring can detect them — but explicit @Param is safer).
+
+🌟 JPQL → SQL mapping (example)
+👉 JPQL:
+select e from Employee e where e.emailId = :x
+
+👉 Hibernate might generate SQL (approx):
+select id, first_name, last_name, email_id, mobile
+from employees
+where email_id = ?
+
+➤ Hibernate uses the entity → table and property → column mappings to produce proper SQL.
+
+🌟 Return types and behavior
+➤ Optional<T>: expect single or zero results.
+➤ T (entity): expect exactly one result (exception if zero or many).
+➤ List<T>: can return 0..N results (safe for multi-row results).
+➤ Page<T> / Slice<T>: used with Pageable for pagination (JPQL works with pagination via Spring Data).
+
+⚡ Safety & SQL injection
+Parameter binding (:x, ?1) prevents SQL injection because parameters are bound, not concatenated.
+
+
+📝 Using @Moodifying Annotation
+UPDATE / DELETE JPQL: You can write bulk JPQL updates/deletes (requires @Modifying on the repo method when using Spring Data).
+
+✅ Example:
+@Modifying
+@Query("update Employee e set e.lastName = :lname where e.id = :id")
+int updateLastName(@Param("id") Long id, @Param("lname") String lname);
+
+❗Common Pitfalls and Fixes
+➤ Missing @Param when using named params → runtime error or wrong binding. Always annotate when using :name.
+➤ Expecting single result but query returns many → exception. Use List<T> if multiple possible.
+➤ Using column names in JPQL → wrong. Use entity property names.
+➤ Entity name mismatch if @Entity(name="X") used — use that name in JPQL.
+
+🆚 SQL VS JPQL Syntax
+➤ In SQL, you query tables and columns:
+
+SELECT * FROM employees WHERE email_id = ?;
+
+✔️ * → means “all columns”.
+✔️ employees → table name.
+✔️ email_id → column name.
+
+➤ In JPQL, you query entities and fields/properties:
+
+SELECT e FROM Employee e WHERE e.emailId = :emailId
+
+➤ Employee → entity class name, not a table.
+➤ e → alias (like emp in SQL: SELECT * FROM employees emp).
+➤ emailId → property name in the Employee class, not the DB column.
+
+❓Why not SELECT * in JPQL?
+➤ JPQL doesn’t deal with columns.
+➤ It deals with objects (entities).
+➤ So, instead of “all columns”, we fetch the whole entity object.
+➤ SELECT e → fetch the entire Employee entity (all mapped fields).
+
+➤ If you want only specific fields, you can write:
+
+🔗 SELECT e.firstName, e.lastName FROM Employee e WHERE e.emailId = :emailId
+
+➤ But then the result won’t be Employee objects; it’ll be an Object[] because we fetch only specific fields not the complete entity.
+
+
+❓Why do we use alias e?
+Aliases make queries shorter and cleaner.
+
+✅ Example with alias:
+🔗 SELECT e FROM Employee e WHERE e.emailId = :emailId
+
+✅ Example without alias (legal but verbose):
+🔗 SELECT Employee FROM Employee WHERE Employee.emailId = :emailId
+
+In practice, we almost always use an alias (e, emp, etc.) like in SQL.
+
+
+🔷 Native SQL Queries in Spring Data JPA
+
+❓Why use Native SQL?
+➤ JPQL works with entity objects and properties, not with actual table/column names.
+➤ Sometimes you need database-specific functions or very complex queries → then nativeQuery = true is used.
+➤ Here, Hibernate will run your raw SQL directly on the DB.
+
+
+✅Code Implementation
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+
+    // ✅ Native query by email
+    @Query(value = "SELECT * FROM employees WHERE email_id = ?1", nativeQuery = true)
+    Optional<Employee> findByEmailUsingSQl(String email);
+
+    // ✅ Native query by mobile
+    @Query(value = "SELECT * FROM employees WHERE mobile = ?1", nativeQuery = true)
+    Optional<Employee> findByMobileUsingSQl(String mobile);
+
+    // ✅ Native query by email + mobile
+    @Query(value = "SELECT * FROM employees WHERE email_id = ?1 AND mobile = ?2", nativeQuery = true)
+    Optional<Employee> findByEmailandMobileUsingSQl(String email, String mobile);
+}
+
+
+🔑 Key Points
+nativeQuery = true → Tells Spring Data JPA that the query is raw SQL (not JPQL).
+Table name (employees) and column names (email_id, mobile) must match your DB schema, not your entity fields.
+Positional parameters → ?1, ?2 correspond to method arguments in order.
+Can also use named parameters (safer & cleaner):
+
+✅Code Implementation
+@Query(value = "SELECT * FROM employees WHERE email_id = :email AND mobile = :mobile", nativeQuery = true)
+Optional<Employee> findByEmailandMobileUsingSQL(@Param("email") String email, @Param("mobile") String mobile);
+
+
+🔷 OneToMany Mapping
+
+🔄 Post.java
+@Entity
+public class Post {
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private String title;
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "post_id")     // foreign key will be added to comment table
+  private List<Comment> comments = new ArrayList<>();
+  ...
+}
+
+🔄 Comment.java
+
+@Entity
+public class Comment {
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private String content;
+  ...
+}
+
+❓What JPA/Hibernate maps to the DB 
+Because of annotations Hibernate will create two tables (approx):
+
+CREATE TABLE post (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255)
+);
+
+CREATE TABLE comment (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  content VARCHAR(255),
+  post_id BIGINT,                 -- FK column created because of @JoinColumn
+  CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES post(id)
+);
+
+⚡Notes:
+@JoinColumn(name="post_id) instructs JPA to add a post_id column to the comment table.
+
+❓Who is the owning side? (important)
+➤ In this unidirectional mapping Post → Comment with @JoinColumn on Post, JPA treats the association as owned by Post (even though the FK is physically in comment table).
+
+➤ Practically: to set the FK (comment.post_id) you must manipulate the Post side (i.e., add Comment to post.getComments() and save Post).
+
+➤ Because Comment has no post field, you cannot set the relationship by saving Comment directly.
+
+✅ JUnit Code Example
+@SpringBootTest
+class BlogappApplicationTests {
+	
+	@Autowired
+	private PostRepository postRepository;
+	
+	@Autowired
+	private CommentRepository commentRepository;
+
+	@Test
+	void savePost() {
+		Post post = new Post();
+		post.setTitle("Hello");
+		postRepository.save(post);
+	}
+
+  ✅Explanation of savePost Method:
+  When you do:
+
+  Post post = new Post();
+  post.setTitle("Hello");
+  postRepository.save(post);
+
+  ➤ Hibernate generates:
+
+  🔗 INSERT INTO post (title) VALUES ('Hello');
+
+👉 No comment rows created.
+👉 post.id is generated (IDENTITY) and populated on the entity after the insert.
+	✅ Method 2
+	@Test
+	void addCommentToExistingPost() {
+	    Long postId = 1L; // Replace with actual saved post ID
+	    Post post = postRepository.findById(postId).orElseThrow();
+
+	    Comment comment = new Comment();
+	    comment.setContent("This is a comment after the post was created");
+
+	    post.getComments().add(comment);
+	    postRepository.save(post);
+	}
+
+}
+
+❓What happens when you add a comment and postRepository.save(post) again
+Sequence in addCommentToExistingPost():
+
+1. You loaded Post (findById) — because fetch = EAGER comments would be loaded immediately (empty now).
+2. You create Comment comment = new Comment() and post.getComments().add(comment).
+3. postRepository.save(post) with CascadeType.ALL causes Hibernate to persist the new Comment as well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+When to use JPQL vs native queries
+Use JPQL when you want entity-centric queries and portability across DBs.
+Use native queries (@Query(value = "SELECT * FROM employees WHERE ...", nativeQuery = true)) when:
+You need DB-specific constructs (window functions, vendor-specific features).
+Performance-tuned SQL is required.
+Prefer JPQL for maintainability unless you have a clear reason.

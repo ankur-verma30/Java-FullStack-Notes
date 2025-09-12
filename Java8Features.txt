@@ -135,7 +135,7 @@ public class LambdaMathOperation {
 ➤ A functional interface in java.util.function.
 ➤ Represents a boolean-valued function of one argument.
 ➤ Contains one abstract method:
-
+🔗 boolean test(T t);
 
 🔄 Common Usage
 ➤ Filtering collections (Stream.filter()).
