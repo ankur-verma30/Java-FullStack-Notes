@@ -1,0 +1,44 @@
+1️⃣ Filtering Even Numbers
+Given a list of integers, use Streams to filter only even numbers and collect them into a list.
+
+👉 Input: [1, 2, 3, 4, 5, 6]
+👉 Output: [2, 4, 6]
+
+✅ Solution: 
+list.stream()
+    .filter(x -> x % 2 == 0)
+    .forEach(System.out::println);
+
+2️⃣ Convert Strings to Uppercase
+Given a list of strings, convert each string to uppercase using Streams.
+
+👉 Input: ["java", "stream", "exercise"]
+👉 Output: ["JAVA", "STREAM", "EXERCISE"]
+
+✅ Solution:
+list1.stream()
+    .map(String::toUpperCase)
+    .forEach(System.out::println);
+
+3️⃣Square and Collect
+Given a list of integers, square each number and collect them into a set (to remove duplicates).
+
+👉 Input: [1, 2, 2, 3]
+👉 Output: [1, 4, 9]
+
+✅ Solution 1:
+Set<Integer> squares = numbers.stream()
+                              .map(x -> x * x)
+                              .collect(Collectors.toSet());
+
+✅ Solution 2:If order matters (e.g., interviewer asks for sorted unique squares), you can collect into a TreeSet:
+Set<Integer> squares = numbers.stream()
+                              .map(x -> x * x)
+                              .collect(Collectors.toCollection(TreeSet::new));
+
+✅ Solution 3: If dealing with large numbers, use mapToInt for efficiency:
+Set<Integer> squares = numbers.stream()
+                              .mapToInt(x -> x * x)
+                              .boxed()
+                              .collect(Collectors.toSet());
+

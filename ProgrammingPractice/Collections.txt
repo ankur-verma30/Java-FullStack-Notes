@@ -1,0 +1,113 @@
+1️⃣Write a program to store 10 integers in an ArrayList, remove all even numbers, and print the final list.
+
+👉 Input: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+👉 Output: [1, 3, 5, 7, 9]
+✅ Solution:1. Use an Iterator
+package collections;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Program1 {
+    public static void main(String[] args) {
+        List<Integer> list = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9,10));
+
+        Iterator<Integer> it = list.iterator();
+        while (it.hasNext()) {
+            if (it.next() % 2 == 0) {
+                it.remove(); // safe removal
+            }
+        }
+
+        for (int num : list) {
+            System.out.println(num);
+        }
+    }
+}
+
+✅ Solution 2. Use removeIf (Clean & Modern)
+package collections;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Program1 {
+    public static void main(String[] args) {
+        List<Integer> list = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9,10));
+
+        list.removeIf(x -> x % 2 == 0);
+
+        list.forEach(System.out::println);
+    }
+}
+
+2️⃣Write a program to accept a list of names (with duplicates), store them in a HashSet, and print only the unique names in sorted order.
+
+👉 Input: ["John", "Alice", "Bob", "John", "Alice"]
+👉 Output: ["Alice", "Bob", "John"]
+✅ Solution:
+package collections;
+
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+public class Program2 {
+    public static void main(String[] args) {
+        List<String> names = List.of("Alice","John","Bob","John","Alice");
+
+        Set<String> uniqueNames = new TreeSet<>(names);
+
+        System.out.println(uniqueNames);
+    }
+}
+
+3️⃣ Given a sentence, count the frequency of each word using a HashMap and print the word with the highest frequency.
+👉 Input: "this is a very big sentence and this sentence is for counting words in a hashmap"
+👉 Output: this: 2
+
+package collections;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Program1 {
+
+    public static void main(String[] args) {
+        String sentence = "this is a very big sentence and this sentence is "
+                + "for counting words in a hashmap";
+
+        // Map to store frequency of each word
+        Map<String, Integer> freq = new HashMap<>();
+
+        // Split sentence into words
+        String[] words = sentence.toLowerCase().split("\\W+");
+
+        // Count frequencies
+        for (String word : words) {
+            freq.put(word, freq.getOrDefault(word, 0) + 1);
+        }
+
+        // Find maximum frequency
+        int maxFreq = 0;
+        for (int value : freq.values()) {
+            if (value > maxFreq) {
+                maxFreq = value;
+            }
+        }
+
+        // Print all words with maximum frequency
+        System.out.println("Most frequent word(s):");
+        for (Map.Entry<String, Integer> entry : freq.entrySet()) {
+            if (entry.getValue() == maxFreq) {
+                System.out.println(entry.getKey() + " : " + entry.getValue());
+            }
+        }
+    }
+}
+✅Output:
+Most frequent word(s):
+this : 2
+is : 2
+sentence : 2
