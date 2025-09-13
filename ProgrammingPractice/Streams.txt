@@ -42,3 +42,71 @@ Set<Integer> squares = numbers.stream()
                               .boxed()
                               .collect(Collectors.toSet());
 
+
+4️⃣Distinct & Sorted Words
+Given a list of words, print all distinct words in sorted order using streams.
+
+👉 Input: ["java", "code", "java", "stream", "code"]
+👉 Output: ["code", "java", "stream"]
+
+✅ Solution 1:
+Set<String> str = list.stream()
+                      .collect(Collectors.toCollection(TreeSet::new));
+
+✅ Solution 2:
+Set<String> distinct = list.stream()
+                           .distinct()
+                           .sorted()
+                           .collect(Collectors.toSet());
+
+✅ Solution 3:💡 For case-insensitive sorting, you can supply a comparator:
+Set<String> str = list.stream()
+                      .map(String::toLowerCase)
+                      .collect(Collectors.toCollection(() -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)));
+
+5️⃣Sum of Squares of Odd Numbers
+Given a list of integers, use streams to compute the sum of squares of only odd numbers.
+
+👉 Input: [1, 2, 3, 4, 5]
+👉 Output: 35 (1^2 + 3^2 + 5^2 = 35)
+
+✅ Solution:
+int sum = numbers.stream()
+                 .filter(x -> x % 2 != 0)
+                 .map(x -> x * x)
+                 .reduce(0, Integer::sum);
+
+✅ Solution 2:
+int sum = list.stream()
+              .filter(x -> x % 2 != 0)
+              .map(x -> x * x)
+              .collect(Collectors.summingInt(Integer::intValue));
+
+✅ Solution 3:
+int sum = list.stream()
+              .filter(x -> x % 2 != 0)
+              .mapToInt(x -> x * x)
+              .sum();
+
+
+6️⃣Find the Longest String
+Given a list of strings, use streams to find the longest string.
+(If multiple strings have the same length, return any one of them.)
+
+👉 Input: ["java", "stream", "exercise", "api"]
+👉 Output: "exercise"
+
+✅ Solution 1:
+String longest = list.stream()
+                      .max(Comparator.comparing(String::length))
+                      .orElse(null);
+
+✅ Solution 2:To get all string of maxLength
+int maxLength = list.stream()
+                    .mapToInt(String::length)
+                    .max()
+                    .orElse(0);
+
+List<String> longestStrings = list.stream()
+                                  .filter(s -> s.length() == maxLength)
+                                  .toList();
