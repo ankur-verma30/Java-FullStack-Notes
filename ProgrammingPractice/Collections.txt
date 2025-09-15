@@ -111,3 +111,78 @@ Most frequent word(s):
 this : 2
 is : 2
 sentence : 2
+
+
+4️⃣ Given a list of integers, sort them in descending order using Collections.sort() or Comparator.
+✅ Solution 1: 
+list.sort((Integer a, Integer b) -> b - a);
+
+➤ Uses lambda expression.
+➤ Works fine for small integers.
+⚠️ Risk: For very large integers, b - a can cause integer overflow.
+Safer version is: list.sort((a, b) -> Integer.compare(b, a));
+
+✅ Solution 2: 
+Collections.sort(list, Comparator.reverseOrder());
+
+➤ Clean and recommended.
+➤ Uses built-in comparator → no overflow issues.
+➤ Works with any type that implements Comparable (not just Integer).
+
+
+5️⃣ Write a program to find the intersection of two sets of integers.
+Example: {1,2,3,4} and {3,4,5,6} → Output: {3,4}
+
+✅ Solution 1 – Using retainAll() (Best for Sets)
+Set<Integer> list1 = new HashSet<>(Arrays.asList(1, 2, 3, 4));
+Set<Integer> list2 = new HashSet<>(Arrays.asList(3, 4, 5, 6));
+
+list1.retainAll(list2); // modifies list1 to keep only common elements
+
+➤ Very concise.
+➤ Directly gives the intersection.
+⚡ But note → list1 gets modified.
+
+✅ Solution 2 – Keep Original Sets Intact
+Set<Integer> list1 = new HashSet<>(Arrays.asList(1, 2, 3, 4));
+Set<Integer> list2 = new HashSet<>(Arrays.asList(3, 4, 5, 6));
+
+Set<Integer> ans = new HashSet<>(list1);
+ans.retainAll(list2);
+
+Keeps the original sets safe.
+Recommended in practice.
+
+6️⃣ Given a string, count the frequency of each character (ignore spaces) using a HashMap and print the result.
+
+✅ Solution:
+HashMap<Character, Integer> freq = new HashMap<>();
+
+for (int i = 0; i < str.length(); i++) {
+    freq.put(str.charAt(i), freq.getOrDefault(str.charAt(i), 0) + 1);
+}
+
+
+7️⃣ Given a list of strings, reverse the order using Collections.reverse()
+Example: ["A", "B", "C"] → ["C", "B", "A"]
+
+✅ Solution: Collections.reverse(str);
+
+8️⃣ Given two sets of words, find the union (all unique words from both sets).
+
+✅ Solution 1: set1.addAll(set2); //modify set1
+
+✅ Solution 2:
+Set<String> union = new HashSet<>(set1);
+union.addAll(set2);
+
+
+9️⃣Given a map of country → population, sort the map by keys (alphabetical order of countries) and print it.
+
+✅ Solution 1: Map<String, Integer> isSorted = new TreeMap<>();➤ 
+➤ TreeMap maintains natural sorted order of keys (alphabetical for Strings, ascending for numbers).
+
+✅ Solution 2: Alternative (If we had a HashMap and needed to sort manually)
+Map<String, Integer> sortedMap = new TreeMap<>(map);
+
+
