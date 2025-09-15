@@ -2469,7 +2469,7 @@ interface MyOperation {
 MyOperation op = () -> System.out.println("Hello");
 op.perform();
 
-Question 1. Why does this work without new?
+❓ Why does this work without new?
 ✔️ Yes — a lambda expression automatically creates an instance of the functional interface.
 🔧 But technically: It’s not creating an anonymous class; it creates a synthetic implementation of the interface using invokedynamic bytecode — more lightweight and efficient than anonymous inner classes.
 
@@ -2483,9 +2483,9 @@ MyOperation op = new MyOperation() {
 };
 
 But the lambda version is shorter, cleaner, and faster.
-Note: Functional Programming defines you to say "what you want, not how to do it step-by-step"
+⚡ Note: Functional Programming defines you to say "what you want, not how to do it step-by-step"
 
-Example 1:
+✅ Example 1:
 package p1;
 @FunctionalInterface
 public interface A {
@@ -2501,7 +2501,7 @@ public class B{
 	}
 }
 
-Example 2:
+✅ Example 2:
 package p1;
 @FunctionalInterface
 public interface A {
@@ -2528,7 +2528,7 @@ public class B{
 | `private`        | Other default methods | Helps share common logic internally |
 | `private static` | Other static methods  | Helps static methods reuse logic    |
 
-🧪 Example: Private Methods in Interface
+✅ Example: Private Methods in Interface
 interface MyInterface {
     default void greet() {
         log("Hello from default method");
@@ -2546,7 +2546,7 @@ interface MyInterface {
     }
 }
 
-Usage:
+👉 Usage:
 public class Test implements MyInterface {
     public static void main(String[] args) {
         Test t = new Test();
@@ -2564,22 +2564,14 @@ STATIC LOG: Hello from static method
 ➤ Encapsulation: Keeps helper methods hidden from implementing classes.
 ➤ Cleaner design: Interfaces can now follow DRY (Don't Repeat Yourself) more cleanly.
 
-Can private interface methods be accessed outside the interface?
+❓ Can private interface methods be accessed outside the interface?
 ❌ No, only accessible within the interface for reuse by default/static methods.
 
-Can we override private interface methods?
+❓ Can we override private interface methods?
 ❌ No, private methods cannot be inherited or overridden.
 
-Are private methods mandatory in interfaces?
+❓ Are private methods mandatory in interfaces?
 ❌ No, they are optional—use them to clean up repeated logic.
-
-4. Stream API
-Note: to learn Stream API, complete the following first
-a. Collection (Data Structure)
-b. Functional Programming
-
-5. Optional class - We have to learn the exception concept in Java first
-
 
 🔷 Marker interface 
 ➤ An empty interface is called a marker interface
@@ -2593,7 +2585,7 @@ Example:
 An abstract class in Java is a class that is declared with the abstract keyword. It cannot be instantiated directly and is typically used to provide a partial implementation that its subclasses must complete.
 
 🔹 Key Features of Abstract Class
-1. ✅ Can Have Both Complete and Incomplete Methods
+1️⃣ Can Have Both Complete and Incomplete Methods
 An abstract class can contain:
 ➤ Complete methods (methods with body)
 ➤ Incomplete methods (methods without a body)
@@ -2606,7 +2598,7 @@ abstract class Shape {
     }
 }
 
-2. ✅ Can Have Both Static and Non-Static Members
+2️⃣ Can Have Both Static and Non-Static Members
 You can define:
 ➤ Static variables and methods
 ➤ Non-static variables and methods
@@ -2619,9 +2611,9 @@ abstract class Demo {
     }
 }
 
-3. ✅ Static Methods Must Be Complete
+3️⃣ Static Methods Must Be Complete
 You cannot define abstract static methods.
-➤Because static methods belong to the class, and abstract methods must be overridden, this contradicts the purpose.
+➤ Because static methods belong to the class, and abstract methods must be overridden, this contradicts the purpose.
 
 abstract class Test {
     // abstract static void display(); ❌ Not allowed
@@ -2630,8 +2622,8 @@ abstract class Test {
     }
 }
 
-4. ✅ Can Have main() Method
-➤An abstract class can contain the main() method and be used as the entry point of a Java program.
+4️⃣ Can Have main() Method
+➤ An abstract class can contain the main() method and be used as the entry point of a Java program.
 
 abstract class Launcher {
     public static void main(String[] args) {
@@ -2639,9 +2631,9 @@ abstract class Launcher {
     }
 }
 
-5. ❌ Cannot Instantiate an Abstract Class
+5️⃣ ❌ Cannot Instantiate an Abstract Class
 ➤ You cannot create an object of an abstract class directly.
-It may contain incomplete methods, so Java doesn’t allow creating an object of something that’s not fully defined.
+➤ It may contain incomplete methods, so Java doesn’t allow creating an object of something that’s not fully defined.
 
 abstract class Animal {
     abstract void makeSound();
@@ -2649,7 +2641,7 @@ abstract class Animal {
 
 // Animal a = new Animal(); // ❌ Compile-time error
 
-6. ❌ Does Not Support Multiple Inheritance with Classes
+6️⃣ Does Not Support Multiple Inheritance with Classes
 ➤ Java does not allow multiple inheritance with classes (i.e., a class cannot extend more than one class, abstract or not).
 ➤ This is to avoid ambiguity and diamond problems.
 
@@ -2664,7 +2656,7 @@ abstract class B {
 // class C extends A, B { } // ❌ Not allowed
 Java solves this limitation using interfaces, which do support multiple inheritance.
 
-Example 1:
+✅ Example 1:
 package p1;
 abstract public class A {
 	public void test1() {}
@@ -2676,7 +2668,7 @@ abstract public class A {
 	}
 }
 
-Example 2: Error because multiple inheritance cannot be done
+✅ Example 2: Error because multiple inheritance cannot be done
 package p1;
 abstract public class A {}
 package p1;
@@ -2699,7 +2691,7 @@ public abstract class C extends A,B{//❌ Error
 | Interface      | RemoteControl: defines buttons (on/off) — any brand can follow              |
 | Abstract class | SamsungRemote: provides partial button logic, common to all Samsung remotes |
 
-Example 1:
+✅ Example 1:
 package p1;
 abstract public class A {
 	static int x = 10;
@@ -2712,7 +2704,7 @@ abstract public class A {
 	}
 }
 
-Example 2:
+✅ Example 2:
 package p1;
 abstract public class A {
 	int x = 10;
@@ -2729,7 +2721,7 @@ public class B extends A {
 	}
 }
 
-Example: Inheritance from interface-->abstract class-->class
+✅ Example: Inheritance from interface-->abstract class-->class
 package p1;
 public interface A {
 	public void test1();
@@ -2757,9 +2749,9 @@ public class C extends B{
 	}
 }
 
-Note: In Java 8, we can develop complete static methods & main method in an interface
+⚡ Note: In Java 8, we can develop complete static methods & main method in an interface
 
-Example:
+✅ Example:
 package p1;
 public interface A {
 	static int x = 100;
