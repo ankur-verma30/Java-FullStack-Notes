@@ -158,3 +158,86 @@ Character mostFrequent = input.chars() // IntStream of Unicode values
             .map(Map.Entry::getKey)            // extract the character
             .orElse(null);                     // handle empty string case
 
+1️⃣0️⃣ Given a list of strings, join them into a single comma-separated string using streams.
+👉 Input: ["apple", "banana", "orange"]
+👉 Output: "apple, banana, orange"
+
+✅ Solution:
+String joinedFruits = fruits.stream()
+                   .collect(Collectors.joining(", "));
+
+
+1️⃣1️⃣ Given a list of names, group them based on their length.
+👉 Input: ["Tom", "Jerry", "John", "Alex", "Bob"]
+👉 Output: {3=[Tom, Bob], 4=[John, Alex], 5=[Jerry]}
+
+✅ Solution:
+Map<Integer, List<String>> ans = persons.stream()
+                                        .collect(Collectors.groupingBy(String::length));
+
+👉 Improvement (only if you want sorted keys):
+Map<Integer, List<String>> ans = persons.stream()
+    .collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.toList()));
+
+1️⃣2️⃣ You have a list of students with their subject and score. Use streams to find the top scorer per subject.
+👉 Input (Student class with name, subject, score):
+[("Alice", "Math", 90), 
+ ("Bob", "Math", 85), 
+ ("Charlie", "Science", 95), 
+ ("David", "Science", 80)]
+
+👉 Output:{Math=Alice, Science=Charlie}
+
+✅ Solution:
+package stream;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class Student {
+ String name;
+ String subject;
+ int marks;
+
+ public Student(String name, String subject, int marks) {
+	this.name = name;
+	this.subject = subject;
+	this.marks = marks;
+}
+
+public String getName() {
+	return name;
+}
+ public void setName(String name) {
+	this.name = name;
+ }
+ public String getSubject() {
+	return subject;
+ }
+ public void setSubject(String subject) {
+	this.subject = subject;
+ }
+ public int getMarks() {
+	return marks;
+ }
+ public void setMarks(int marks) {
+	this.marks = marks;
+ }
+
+public static void main(String[] args) {
+List<Student>student=new ArrayList<>();
+student.add(new Student("Alice","Math",90));
+student.add(new Student("Bob","Math",85));
+student.add(new Student("Charlie","Science",95));
+student.add(new Student("David","Science",80));
+
+Map<String, List<Student>> collect = student.stream()
+.collect(Collectors.groupingBy(Student::getSubject)).entrySet().stream().collect(Collectors.maxBy());
+System.out.println(collect);
+}
+}
+
+
