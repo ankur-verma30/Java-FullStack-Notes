@@ -234,10 +234,231 @@ student.add(new Student("Bob","Math",85));
 student.add(new Student("Charlie","Science",95));
 student.add(new Student("David","Science",80));
 
-Map<String, List<Student>> collect = student.stream()
-.collect(Collectors.groupingBy(Student::getSubject)).entrySet().stream().collect(Collectors.maxBy());
-System.out.println(collect);
+Map<String, Student> topStudentBySubject = student.stream()
+    .collect(Collectors.groupingBy(
+        Student::getSubject,
+        Collectors.collectingAndThen(
+            Collectors.maxBy(Comparator.comparingInt(Student::getMarks)),
+            Optional::get
+        )
+    ));
+
+System.out.println(topStudentBySubject);
 }
 }
 
 
+1️⃣3️⃣Top Performer by Marks
+➤ You are given a list of Student objects (name, subject, marks).
+➤ Find the student with the highest marks overall.
+
+✅ Solution:
+package stream;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+public class Student{
+	String name;
+	String subject;
+	int marks;
+	
+	public Student(String name, String subject, int marks) {
+		super();
+		this.name = name;
+		this.subject = subject;
+		this.marks = marks;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public static void main(String[] args) {
+		List<Student> student=new ArrayList<>();
+		student.add(new Student("Ankur","Maths",99));
+		student.add(new Student("Deepak","CS",100));
+		student.add(new Student("Isha","Chemistry",101));
+		
+		Optional<Student> topStudent = student.stream().collect(Collectors.maxBy((Student s1,Student s2)->s1.getMarks()-s2.getMarks()));
+		if(topStudent.isPresent()) {
+			System.out.println(topStudent.get().getName());
+		}
+		
+    }
+}
+
+🔄 Possible Improvements
+👉 Use Comparator.comparingInt → makes code more readable and less error-prone (avoids subtraction overflow in general).
+
+Optional<Student> topStudent = student.stream()
+        .collect(Collectors.maxBy(
+            java.util.Comparator.comparingInt(Student::getMarks)
+        ));
+
+👉 Print directly with ifPresent (avoids explicit isPresent + get()):
+topStudent.ifPresent(s -> System.out.println(s.getName()));
+
+
+1️⃣4️⃣Top Student in Each Subject
+➤ From the same Student list, find the student with the maximum marks in each subject.
+➤ (Basically what you attempted yesterday, but now you’ll write the clean final solution).
+
+✅ Solution:
+package stream;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Student{
+	String name;
+	String subject;
+	int marks;
+	
+	public Student(String name, String subject, int marks) {
+		this.name = name;
+		this.subject = subject;
+		this.marks = marks;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public static void main(String[] args) {
+		List<Student> student=new ArrayList<>();
+		student.add(new Student("Ankur","Maths",99));
+		student.add(new Student("Deepak","CS",100));
+		student.add(new Student("Isha","Chemistry",101));
+		
+		Map<String, Student> topStudent = student.stream().
+		collect(Collectors.groupingBy(Student::getSubject,Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparingInt(Student::getMarks)), Optional::get))
+				);
+		
+		for(Entry<String, Student>s :topStudent.entrySet()) {
+			System.out.println("Subject is "+s.getKey() +" marks is "+s.getValue().getMarks());
+		}	
+	}
+}
+
+🔄 Improvements
+✔️ Instead of a for loop, you could also use forEach on the map for cleaner code:
+
+topStudent.forEach((subject, stud) -> 
+    System.out.println("Subject: " + subject + ", Topper: " + stud.getName() + " with marks " + stud.getMarks())
+);
+
+✔️ If you ever want to make it null-safe (in case of empty student list), you could avoid Optional::get and handle Optional<Student> directly
+
+1️⃣5️⃣Average Marks by Subject
+➤ Group students by subject and compute the average marks for each subject.
+
+✅ Solution:
+package stream;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Student{
+	String name;
+	String subject;
+	int marks;
+	
+	public Student(String name, String subject, int marks) {
+		super();
+		this.name = name;
+		this.subject = subject;
+		this.marks = marks;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public static void main(String[] args) {
+		List<Student> student=new ArrayList<>();
+		student.add(new Student("Ankur","Maths",99));
+		student.add(new Student("Deepak","CS",100));
+		student.add(new Student("Isha","Chemistry",101));
+		
+		Map<String, Double> topStudent = student.stream().
+		collect(Collectors.groupingBy(Student::getSubject,Collectors.averagingInt(Student::getMarks)));
+		for(Entry<String, Double> s :topStudent.entrySet()) {
+			System.out.println("Subject is "+s.getKey() +" marks is "+s.getValue());
+		}	
+    }	
+}
