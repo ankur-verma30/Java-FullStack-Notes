@@ -2817,9 +2817,9 @@ There are two types of exceptions in Java:
 ➤ Runtime / Unchecked Exception - These exceptions will occur when we run a .class file. That is during runtime
 
 🔷 Runtime / unchecked Exceptions
-1. ArithmeticException: This exception will occur when invalid mathematical operations are performed
+1️⃣ ArithmeticException: This exception will occur when invalid mathematical operations are performed
 
-Example:
+✅ Example:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -2834,12 +2834,12 @@ public class A {
 		System.out.println("Welcome");
 	}
 }
-Output:
+✅ Output:
 java.lang.ArithmeticException: / by zero
 Welcome
 
-2. Null Pointer Exception: This exception will occur when with null reference variable we try to access non-static members of the class
-Example 1:
+2️⃣ Null Pointer Exception: This exception will occur when with null reference variable we try to access non-static members of the class
+✅ Example 1:
 package p1;
 public class A {
 	int x = 10;
@@ -2853,11 +2853,11 @@ public class A {
 		System.out.println("Welcome");
 	}
 }
-Output:
+✅ Output:
 java.lang.NullPointerException: Cannot read field "x" because "a1" is null
 Welcome
 
-Example 2: Can access static members without the object creation
+✅ Example 2: Can access static members without the object creation
 package p1;
 public class A {
 	static int x = 10;
@@ -2874,13 +2874,10 @@ public class A {
 
 
 
-Unary Operators in Java
-##############################
-
-1. Increment Operator
-   1.1 Post-Increment: Increment the value of the variable next time you see the same variable
-Example 1:
-----------
+🔷 Unary Operators in Java
+1️⃣ Increment Operator
+   ✔️  Post-Increment: Increment the value of the variable next time you see the same variable
+✅ Example 1:
 package p1;
 
 public class A {
@@ -2895,9 +2892,8 @@ public class A {
 		System.out.println(l);// Output: 33
 	} 
 }
-   1.2 Pre-Increment: Increment the value of the variable in the same step
-Example 1:
------------
+   ✔️ Pre-Increment: Increment the value of the variable in the same step
+✅ Example 1:
 package p1;
 
 public class A {
@@ -2912,10 +2908,10 @@ public class A {
 		System.out.println(l);// Output: 36
 	} 	
 }
-2. Decrement Operator
-   2.1 Post Decrement: Here we decrement the value of i by 1 when we next time see the same variable:
+2️⃣ Decrement Operator
+   ✔️ Post Decrement: Here we decrement the value of i by 1 when we next time see the same variable:
 
-Example:
+✅ Example:
 package p1;
 
 public class A {
@@ -2930,10 +2926,9 @@ public class A {
         System.out.println(y); //Output: 38
     }
 }
-   2.2 Pre Decrement: Here we decrement the value of the variable in the same step by 1
+   ✔️ Pre Decrement: Here we decrement the value of the variable in the same step by 1
 
-Example 1:
-----------
+✅ Example 1:
 package p1;
 
 public class A {
@@ -2951,36 +2946,36 @@ In Java, type casting is used to convert a variable of one data type into anothe
 🔄 1. Type Casting Between Primitive Data Types
 There are two types:
 
-✅ a) Widening Casting (Implicit & Upcasting)
-➤Smaller type → Larger type
-➤Safe, automatic, without any loss of data
+1️⃣ Widening Casting (Implicit & Upcasting)
+➤ Smaller type → Larger type
+➤ Safe, automatic, without any loss of data
 
 byte → short → int → long → float → double
 
-🧪 Example:
+✅ Example:
 int a = 10;
 double b = a;  // int to double (widening)
 double x=10.3d;
 long y=x; // Larger -> Smaller, there is a loss of data so it will give an error.
 
-✅ b) Narrowing Casting (Explicit & Downcasting)
- ➤Larger type → Smaller type
-➤Risky, must be done manually using cast () 
-➤Loss of data can take place
+2️⃣ Narrowing Casting (Explicit & Downcasting)
+➤ Larger type → Smaller type
+➤ Risky, must be done manually using cast () 
+➤ Loss of data can take place
 
 double → float → long → int → short → byte
 
-🧪 Example:
+✅ Example:
 double x = 10.99;
 long i=10;
-int y = (int) x;  //output: 10 double to int (narrowing)
-byte j=i; // ----------> Throws error
+int y = (int) x;  // output: 10 double to int (narrowing)
+byte j=i; // ----------> ❌ Throws error
 
-🧪 Example:
+✅ Example:
 long i=100;
 byte j=(byte)(int)i; //multiple downcasting is possible
 
-🧪 Example:
+✅ Example:
 int i=100;
 long j=(long)i; // No error
 
@@ -2988,22 +2983,21 @@ long j=(long)i; // No error
 Because type casting in Java is not only about memory size, but also about type compatibility and precision:
 
 ❗ float → long is narrowing because:
-➤You are going from floating-point to integer, which involves:
-➤Loss of precision (decimal part is truncated)
-➤Potential data loss if the value is too large
-➤Even if you're increasing memory size, you're going from a more complex representation (float) to a simpler one (integer).
+➤ You are going from floating-point to integer, which involves:
+➤ Loss of precision (decimal part is truncated)
+➤ Potential data loss if the value is too large
+➤ Even if you're increasing memory size, you're going from a more complex representation (float) to a simpler one (integer).
 
 Primitive    Wrapper Class
 byte		Byte
 short		Short
-int		Integer
+int			Integer
 long		Long
 float		Float
 double		Double
 char		Character
 
-Example 1: I want to convert a String to an Integer
-
+✅ Example 1: I want to convert a String to an Integer
 public class A {
 	public static void main(String[] args) {
 		String x = "100";
@@ -3012,14 +3006,13 @@ public class A {
 	}
 }
 
-Example 2:I want to convert a String to a Float
+✅ Example 2:I want to convert a String to a Float
 float  y = Float.parseFloat(x);
 
-Example 3:I want to convert a String to a Double
+✅ Example 3:I want to convert a String to a Double
 double  y = Double.parseDouble(x);
 
-Example 4:
------------
+✅ Example 4:
 package p1;
 
 public class A {
@@ -3035,18 +3028,16 @@ public class A {
 		
 	}
 }
-Output:
+✅ Output:
 java.lang.NumberFormatException: For input string: "10.3dasdsd"
 Welcome
 
-What is class upcasting?
-########################
-➤Here we store the child class object address into the parent class reference variable, so that the reference variable becomes reusable
+❓ What is class upcasting?
+➤ Here we store the child class object address into the parent class reference variable, so that the reference variable becomes reusable
 
-Example: Reusing a reference variable
+✅ Example: Reusing a reference variable
 
 public class A {}
-
 public class B extends A{}
 
 public class C extends A{
@@ -3058,8 +3049,7 @@ public class C extends A{
 	}
 }
 
-Example 2: How can we implement polymorphism for multiple child classes by using the same reference variable
-
+✅ Example 2: How can we implement polymorphism for multiple child classes by using the same reference variable
 public class A {
 	void display() {
         System.out.println("Inside class A");
@@ -3078,8 +3068,7 @@ public class C extends A{
 	    void display() {
 	        System.out.println("Inside class C");
 	    }
-	public static void main(String[] args) {
-				
+	public static void main(String[] args) {		
 		A a1 = new B();
 		a1.display();    // Calls B's version => "Inside class B"
 		a1 = new C();
@@ -3087,15 +3076,47 @@ public class C extends A{
 	}
 }
 
-🧠 Why do we do it?
-1. To reuse the parent class reference for multiple child class objects.
-2. To enable polymorphism on multiple child classes.
-3. To write generic, flexible code that works with different subclasses.
+❓ Why do we do it?
+➤ To reuse the parent class reference for multiple child class objects.
+➤ To enable polymorphism on multiple child classes.
+➤ To write generic, flexible code that works with different subclasses.
+
+✅Example:
+class A {
+    void display() {
+        System.out.println("Inside A");
+    }
+    void onlyInA() {
+        System.out.println("Method only in A");
+    }
+}
+
+class B extends A {
+    @Override
+    void display() {
+        System.out.println("Inside B");
+    }
+    void onlyInB() {
+        System.out.println("Method only in B");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        A a1 = new B();   // Reference of A, object of B
+
+        a1.display();   // ✅ Allowed, prints "Inside B" (runtime polymorphism)
+        a1.onlyInA();   // ✅ Allowed, prints "Method only in A"
+        
+        // a1.onlyInB(); // ❌ Compile-time error (reference type A doesn’t know B’s extra methods)
+    }
+}
+
 
 Note:
-instanceof - It will check which class object address is present inside the reference variable
+✔️ instanceof - It will check which class object address is present inside the reference variable
 
-Example:
+✅ Example:
 
 public class A {}
 
@@ -3110,11 +3131,9 @@ public class C extends A{
 }
 
 What is class downcasting?
-##########################
--> Here we store the parent class object address into the child class reference variable
--> To perform downcasting, first do upcasting and then perform downcasting
-Example:
----------
+➤ Here we store the parent class object address into the child class reference variable
+➤ To perform downcasting, first do upcasting and then perform downcasting
+✅ Example:
 public class A {}
 public class B extends A{}
 
@@ -3128,107 +3147,90 @@ public class C extends A{
 	}
 }
 
-Example:
---------
-public class A {
-	public void display() {
-		System.out.println("Inside class A");
-	}
+✅ Example:
+class Vehicle {
+    void start() {
+        System.out.println("Vehicle started");
+    }
 }
-public class B extends A{
-	public void showB() {
-        System.out.println("Inside class B");
+
+class Car extends Vehicle {
+    void openTrunk() {
+        System.out.println("Trunk is open");
+    }
+}
+
+class Bike extends Vehicle {
+    void kickStart() {
+        System.out.println("Bike started with a kick");
+    }
+}
+
+public class DowncastingDemo {
+    public static void main(String[] args) {
+        Vehicle v1 = new Car();   // Upcasting (Car → Vehicle)
+        Vehicle v2 = new Bike();  // Upcasting (Bike → Vehicle)
+
+        v1.start();  // Vehicle started
+        v2.start();  // Vehicle started
+
+        // ✅ Downcasting to access Car-specific method
+        if(v1 instanceof Car) {
+            Car c = (Car) v1;
+            c.openTrunk();   // "Trunk is open"
         }
-}
-public class C extends A {
-	public void showC() {
-		System.out.println("Inside class C");
-	}
-}
-public class MainClass {
-	public static void processObject(A obj) {
-        if (obj instanceof B) {
-            B b = (B) obj;  // Downcasting to B
-            b.showB();
-        } else if (obj instanceof C) {
-            C c = (C) obj;  // Downcasting to C
-            c.showC();
-        } else {
-            obj.display();
+
+        // ✅ Downcasting to access Bike-specific method
+        if(v2 instanceof Bike) {
+            Bike b = (Bike) v2;
+            b.kickStart();   // "Bike started with a kick"
         }
     }
-    public static void main(String[] args) {
-    	processObject(new B());
-	}
 }
 
 Note:
-➤Using upcasting, we can access only parent class members, you cannot access child class members
-➤After upcasting to access child class members, we have to perform downcasting
+➤ Using upcasting, we can access only parent class members, you cannot access child class members
+➤ After upcasting to access child class members, we have to perform downcasting
 
-Example:
----------
-package p1;
 
-public class A {
-	public void display() {
-		System.out.println("Inside class A");
-	}
-}
-public class B extends A{
-	public void showB() {
-       	 System.out.println("Inside class B");
-        }
-	public static void main(String[] args) {
-		A a1 = new B();
-		if(a1 instanceof B) {
-			B b1 = (B)a1;
-			b1.showB();
-		}
-	}
-}
+🔷 Arrays in Java
+🔄 Arrays Hold a Collection of Values
+➤ An array is a container object that can hold a fixed number of elements of the same data type.
+➤ Instead of creating multiple individual variables for related values (like 10 integers), we can store all of them in one array.
 
-✅ Arrays in Java
-----------------------
+🔄 Anything That Holds a Collection of Values is Called a Data Structure
+➤ Arrays are one of the simplest and most fundamental data structures.
+➤ A data structure is a way to organize and store data efficiently for easy access and modification.
+➤ Arrays serve as the base for many advanced data structures (like lists, stacks, queues, etc.).
 
-🔹 1. Arrays Hold a Collection of Values
-➤An array is a container object that can hold a fixed number of elements of the same data type.
-➤Instead of creating multiple individual variables for related values (like 10 integers), we can store all of them in one array.
+🔄 An array in Java is Treated as an Object
+➤ In Java, arrays are not primitive types (like int, char, etc.)—they are objects.
+➤ This means they are created using the new keyword internally.
+➤ Being objects, they:
+	✔️ Have a runtime class type
+	✔️ Inherit methods from the Object class
+	✔️ Have properties like .length to determine their size
 
-🔹 2. Anything That Holds a Collection of Values is Called a Data Structure
-➤Arrays are one of the simplest and most fundamental data structures.
-➤A data structure is a way to organize and store data efficiently for easy access and modification.
-➤Arrays serve as the base for many advanced data structures (like lists, stacks, queues, etc.).
+🔄 Arrays Start With Index Zero
+➤ Array indexing in Java is zero-based.
+➤ The first element is accessed with index 0, the second with 1, and so on.
+➤ So, for an array of size n, the last valid index is n-1.
 
-🔹 3. An array in Java is Treated as an Object
-➤In Java, arrays are not primitive types (like int, char, etc.)—they are objects.
-➤This means they are created using the new keyword internally.
-Being objects, they:
-Have a runtime class type
-Inherit methods from the Object class
-Have properties like .length to determine their size
+🔄 To Store and Read Values We Use: start_address + index × memory_size
+➤ Internally, the array elements are stored sequentially in memory.
+➤ The memory address of any element can be calculated using:
 
-🔹 4. Arrays Start With Index Zero
-➤Array indexing in Java is zero-based.
-➤The first element is accessed with index 0, the second with 1, and so on.
-➤So, for an array of size n, the last valid index is n-1.
+🔗 Address = Base Address + (Index×Size of Each Element)
+➤ This allows direct access to any element using its index in constant time O(1), which makes arrays efficient for random access.
 
-🔹 5. To Store and Read Values We Use: start_address + index × memory_size
-➤Internally, the array elements are stored sequentially in memory.
-➤The memory address of any element can be calculated using:
+🔄 Memory Allocation Happens in Sequence (Contiguous Allocation)
+➤ When an array is created, Java allocates a block of continuous memory locations to store its elements.
+➤ This contiguous allocation ensures that:
+	✔️ Each element is placed right after the previous one in memory.
+	✔️ Accessing any element is fast using index-based computation.
+	✔️ But the array size cannot change after creation (fixed size limitation).
 
-Address = Base Address + (Index×Size of Each Element)
-➤This allows direct access to any element using its index in constant time O(1), which makes arrays efficient for random access.
-
-🔹 6. Memory Allocation Happens in Sequence (Contiguous Allocation)
-➤When an array is created, Java allocates a block of continuous memory locations to store its elements.
-This contiguous allocation ensures that:
-Each element is placed right after the previous one in memory.
-Accessing any element is fast using index-based computation.
-But the array size cannot change after creation (fixed size limitation).
-
-Example 1:
-----------
+✅ Example 1:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3239,11 +3241,9 @@ public class A {
 		System.out.println(age[1]);
 	} 
 }
+➤ To find the size of an array dynamically, we will use the  public final field "length". When the array is created this variable will get initialized
 
-➤To find the size of an array dynamically, we will use the  public final field "length". When the array is created this variable will get initialized
-
-Example 2:
-----------
+✅ Example 2:
 package p1;
 
 public class A {
@@ -3253,11 +3253,9 @@ public class A {
 	} 
 }
 
-Scanner class - Is used to provide user input
-################
+🔷 Scanner class - Is used to provide user input
 
-Example 1:
-----------
+✅ Example 1:
 package p1;
 import java.util.Scanner;
 public class A {
@@ -3281,7 +3279,8 @@ public class A {
 	} 
 	
 }
-Output:
+
+✅ Output:
 Enter your name:
 mike
 Your name is Mike
@@ -3295,31 +3294,30 @@ Enter your Answer:
 true
 Your ans is true
 
-Example 2: How to read multiple String words using the nextLine() method
---------------------------------------------------------------------------
+✅ Example 2: How to read multiple String words using the nextLine() method
 package p1;
 import java.util.Scanner;
 public class A {
 	public static void main(String[] args) {	
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter your name:");
-		String name = scan.nextLine();//Can read Multiple String words
+		String name = scan.nextLine(); //Can read Multiple String words
 		System.out.println(name);
 		scan.close();
 	} 	
 }
 ⚠️ Note:
-➤Always close the scanner with sc.close() to free system resources.
-➤Use nextLine() carefully after nextInt() or next() due to newline issues.
+➤ Always close the scanner with sc.close() to free system resources.
+➤ Use nextLine() carefully after nextInt() or next() due to newline issues.
 
 ⚠️ Issue: nextLine() after nextInt() or next() doesn't behave as expected.
-✅ Root Cause:
-➤Methods like nextInt(), nextDouble(), and next() do not consume the newline character (\n) at the end of user input.
-➤But nextLine() does consume the full line, including the newline.
+⚠️ Root Cause:
+➤ Methods like nextInt(), nextDouble(), and next() do not consume the newline character (\n) at the end of user input.
+➤ But nextLine() does consume the full line, including the newline.
 
 So, if you call nextLine() immediately after nextInt() or next(), it may read the leftover newline from the previous input, resulting in an empty string.
 
-🔍 Example:
+✅ Example:
 Scanner sc = new Scanner(System.in);
 
 System.out.print("Enter age: ");
@@ -3331,7 +3329,7 @@ String name = sc.nextLine();  // reads leftover '\n' from above
 System.out.println("Age: " + age);
 System.out.println("Name: " + name);
 
-🔴 Output:
+✅ Output:
 Enter age: 25
 Enter name:
 Age: 25
@@ -3349,10 +3347,9 @@ System.out.print("Enter name: ");
 String name = sc.nextLine();
 
 🔷 IIB — Instance Initialization Block
-########################################
-It runs every time an object is created, before the constructor, and is used to initialize instance (non-static) data.
-You can think of an IIB as an anonymous constructor fragment that runs before the real constructor.
-
+➤ It runs every time an object is created, before the constructor, and is used to initialize instance (non-static) data.
+➤ You can think of an IIB as an anonymous constructor fragment that runs before the real constructor.
+✅Example:
 package p1;
 
 public class iiBTutorial {
@@ -3387,24 +3384,24 @@ public class iiBTutorial {
 }
 
 When you create an object, Java executes:
-1. Instance variable initializations
-2. IIB block(s) (in the order they appear)
-3. Constructor
+1️⃣ Instance variable initializations
+2️⃣ IIB block(s) (in the order they appear)
+3️⃣ Constructor
 
-➤Use Case: To initialize instance variables or logic common to all constructors.
-➤Runs whenever an object creation takes place.
-➤Every time a new object is created, IIB runs.
+➤ Use Case: To initialize instance variables or logic common to all constructors.
+➤ Runs whenever an object creation takes place.
+➤ Every time a new object is created, IIB runs.
 
 ✅ When to Use IIB?
-➤When all constructors need to run some common code.
-➤To reduce duplication across overloaded constructors.
+➤ When all constructors need to run some common code.
+➤ To reduce duplication across overloaded constructors.
 
 Note: A Static variable/method can be accessed inside the IIB
 
 🔷 SIB — Static Initialization Block
-#######################################
-It runs once when the class is loaded, before the main() method or any static method/variable is accessed.
+➤ It runs once when the class is loaded, before the main() method or any static method/variable is accessed.
 
+✅Example:
 package p1;
 public class SIBTutorial {
 	static int i;
@@ -3413,7 +3410,7 @@ public class SIBTutorial {
 		System.out.println("Static Initialization Block-1 called");
 		System.out.println("The value of i "+i);
 		i=20;
-		j=10;//cannot do that
+		j=10;//❌ cannot initialize instance variable inside SIB
 		System.out.println("The value of i "+i);	
 	}
 	static {
@@ -3423,16 +3420,16 @@ public class SIBTutorial {
 }
 
 Order of Execution:
-➤Static variable initializations
-➤SIB block(s) (in the order they appear)
-➤Main method
+➤ Static variable initializations
+➤ SIB block(s) (in the order they appear)
+➤ Main method
 
 🔥 Use Case:
-➤Initialize static variables
-➤Load configuration, logging, or static resources
-➤Run a one-time setup for the class
+➤ Initialize static variables
+➤ Load configuration, logging, or static resources
+➤ Run a one-time setup for the class
 
-Example 2: We can create an object inside SIB through which IIB and the constructor can be called.
+✅ Example 2: We can create an object inside SIB through which IIB and the constructor can be called.
 package p1;
 public class A {
 	{
@@ -3450,18 +3447,17 @@ public class A {
 	}
 }
 
-Output 
+✅ Output 
 IIB
 Constructor of A called
 SIB
 Entered Main
 
-Super in Java
-###############
-The super keyword is a reference variable used within a subclass to refer to its immediate parent class (superclass) members, including variables, methods, and constructors.
-It helps achieve proper inheritance behavior and overriding control.
+🔷 Super in Java
+➤ The super keyword is a reference variable used within a subclass to refer to its immediate parent class (superclass) members, including variables, methods, and constructors.
+➤ It helps achieve proper inheritance behavior and overriding control.
 
-✅ Uses of super in Java
+🔄 Uses of super in Java
 1️⃣ Access Parent Class Fields (Variables)
 When the subclass has a variable with the same name as the parent class, super helps distinguish the parent class version.
 It cannot access the private members of the super class.
