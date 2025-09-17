@@ -1689,7 +1689,6 @@ Optional<Employee> findByEmailandMobileUsingSQL(@Param("email") String email, @P
 
 
 🔷 OneToMany Mapping
-
 🔄 Post.java
 @Entity
 public class Post {

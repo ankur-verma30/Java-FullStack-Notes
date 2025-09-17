@@ -2765,11 +2765,11 @@ public interface A {
 }
 
 ✅ Exception and Exception Handling in Java
-🔹 What is an Exception?
+❓ What is an Exception?
 ➤ An exception is an unexpected event that occurs during the execution of a program.
 ➤ It disrupts the normal flow of the program and may cause it to terminate abruptly if not handled properly.
 
-🔹 Why Do Exceptions Occur?
+❓ Why Do Exceptions Occur?
 They occur due to unforeseen errors like:
 ➤ Invalid user input (e.g., dividing by zero)
 ➤ Trying to access a null object
@@ -2777,7 +2777,7 @@ They occur due to unforeseen errors like:
 ➤ Network failure
 ➤ They can happen at runtime, even if the code compiles successfully.
 
-Example 1:
+✅ Example 1:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -2788,14 +2788,14 @@ public class A {
 		System.out.println("Welcome");
 	}
 }
-Output:
+✅ Output:
 Exception in thread "main" java.lang.ArithmeticException: / by zero
 
 🔷 Exception handling
 ➤ To handle exceptions, we will use a "try & catch" block in Java
 ➤ When an exception occurs in the try block, it will create an exception object, and that object's address is given to the catch block. The catch block will suppress that exception, and further code will continue to execute
 
-Example:
+✅ Example:
 package p1;
 public class A {
 	public static void main(String[] args) {

@@ -31,7 +31,7 @@ Student st = s.get();
 🔹 Why Method Reference?
 ➤ Makes lambda shorter and cleaner.
 ➤ Avoids boilerplate (param) -> obj.method(param).
-➤ mproves readability in sorting, filtering, mapping, etc.
+➤ Improves readability in sorting, filtering, mapping, etc.
 
 🔹 Example: Sorting with Method Reference
 students.sort(Comparator.comparingInt(Student::getAge));
@@ -1150,6 +1150,31 @@ public class Example5 {
         // {apple=5, banana=6, cherry=6}
     }
 }
+
+🔄 Collectors: Two Contexts
+1️⃣ Normal Collector
+➤ A normal collector is directly applied to a whole stream.
+
+✅ Example:
+long count = list.stream().collect(Collectors.counting());
+int sum = list.stream().collect(Collectors.summingInt(x -> x));
+
+➤ Here, the collector is applied to the entire stream as a single group.
+
+2️⃣ Downstream Collector
+➤ A downstream collector is applied inside another collector (like groupingBy or partitioningBy).
+➤ It decides what to do with each subgroup after grouping.
+
+✅ Example:
+Map<String, Double> avgMarksBySubject = students.stream()
+    .collect(Collectors.groupingBy(
+        Student::getSubject,                  // key → subject
+        Collectors.averagingInt(Student::getMarks) // downstream collector
+    ));
+✔️ groupingBy splits students into subgroups by subject.
+✔️ Then averagingInt is applied as the downstream collector to each subgroup.
+✔️ Without downstream collectors, groupingBy would just give you a Map<String, List<Student>>.
+✔️ With downstream collectors, you can transform that into counts, sums, averages, max/min, etc.
 
 
 🔷 Primitive Streams
