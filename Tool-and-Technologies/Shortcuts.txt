@@ -1,0 +1,44 @@
+🔷 Important Shortcuts in Eclipse
+1. Ctrl + Space:⚡ Content Assist — suggests code completions.
+2. Ctrl + 1: 💡 Quick fix — suggests solutions for errors or warnings.
+3. Ctrl + O: 🧭 Quick outline — shows methods/fields of the current class.
+4. F3: 🔄 Go to the declaration of a variable, method, or class.
+5. Ctrl + . : ➡️ Jump to the next error or warning in the file.
+
+🔷 Important Shortcuts in IntelliJ IDEA
+🚀 Editing & Navigation
+Ctrl + Space → Code completion (basic).
+Alt + Enter → Quick fix / intention actions (e.g., import, generate).
+Ctrl + Q → Quick documentation for class/method.
+Ctrl + B (or Ctrl + Click) → Go to declaration.
+
+✨ Code Generation
+Ctrl + O → Override methods.
+Ctrl + I → Implement interface methods.
+psvm + Tab → Generate public static void main(String[] args).
+
+🛠 Refactoring
+Shift + F6 → Rename variable/method/class safely everywhere.
+Ctrl+D → Duplicate line
+Ctrl+Shift+A → Know about any command/actions
+
+🧭 Search & Navigation
+Ctrl + Shift+ F → Search everywhere (classes, files, symbols).
+Ctrl + Shift + N → Search file.
+Ctrl + F12 → File structure popup (methods in class).
+
+🖥 Running & Debugging
+Shift + F10 → Run.
+Shift + F9 → Debug.
+
+🎨 Code Formatting
+Ctrl + Alt + L → Reformat code.
+Ctrl+Alt+T → Surround code with anything(for, if-else, try-catch);
+Ctrl + Shift + Enter → Complete statement (auto adds ; or {}).
+Ctrl + / → Comment/uncomment line.
+Ctrl + Shift + / → Block comment/uncomment.
+
+📑 Multitasking
+Ctrl + Tab → Switch between open files.
+Alt + ← / → → Navigate back/forward in history.
+Ctrl + F4 → Close tab.
