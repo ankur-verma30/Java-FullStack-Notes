@@ -1688,210 +1688,409 @@ Can also use named parameters (safer & cleaner):
 Optional<Employee> findByEmailandMobileUsingSQL(@Param("email") String email, @Param("mobile") String mobile);
 
 
-🔷 OneToMany Mapping
-🔄 Post.java
+🔷 OneToMany Mapping and ManyToOne
+
+🌟Unidirectional Mapping
+🔹 Post.java
+package demo.crud.entity;
+
 @Entity
+@Table(name="posts")
 public class Post {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  private String title;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinColumn(name = "post_id")     // foreign key will be added to comment table
-  private List<Comment> comments = new ArrayList<>();
-  ...
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    // Unidirectional OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="post_id") // FK will be created in comments table
+    private List<Comment> comments = new ArrayList<>();
+
+    // getters and setters
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public List<Comment> getComments() {
+        return comments;
+    }
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
 }
 
-🔄 Comment.java
+🔹 Comment.java
+package demo.crud.entity;
 
 @Entity
+@Table(name="comments")
 public class Comment {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  private String content;
-  ...
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Long id;
+
+    private String content;
+
+    // No reference to Post (unidirectional)
+
+    // getters and setters
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getContent() {
+        return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
 
-❓What JPA/Hibernate maps to the DB 
-Because of annotations Hibernate will create two tables (approx):
+3️⃣ PostRepository.java(Same code in Bidirectional Mapping)
+package demo.crud.repository;
 
-CREATE TABLE post (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255)
-);
+import org.springframework.data.jpa.repository.JpaRepository;
+import demo.crud.entity.Post;
 
-CREATE TABLE comment (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  content VARCHAR(255),
-  post_id BIGINT,                 -- FK column created because of @JoinColumn
-  CONSTRAINT fk_comment_post FOREIGN KEY (post_id) REFERENCES post(id)
-);
+public interface PostRepository extends JpaRepository<Post, Long> {}
 
-⚡Notes:
-@JoinColumn(name="post_id) instructs JPA to add a post_id column to the comment table.
 
-❓Who is the owning side? (important)
-➤ In this unidirectional mapping Post → Comment with @JoinColumn on Post, JPA treats the association as owned by Post (even though the FK is physically in comment table).
+4️⃣ CommentRepository.java (Same code in Bidirectional Mapping)
+package demo.crud.repository;
 
-➤ Practically: to set the FK (comment.post_id) you must manipulate the Post side (i.e., add Comment to post.getComments() and save Post).
+import org.springframework.data.jpa.repository.JpaRepository;
+import demo.crud.entity.Post;
 
-➤ Because Comment has no post field, you cannot set the relationship by saving Comment directly.
+public interface PostRepository extends JpaRepository<Post, Long> {}
 
-✅ JUnit Code Example
-@SpringBootTest
-class BlogappApplicationTests {
-	
-	@Autowired
-	private PostRepository postRepository;
-	
-	@Autowired
-	private CommentRepository commentRepository;
+5️⃣ Unit Test (savePostWithComments)
+    @Autowired
+    private PostRepository postRepository;
 
+    @Test
+    void savePostWithComments() {
+        // Create a new Post
+        Post post = new Post();
+        post.setTitle("First post");
+
+        // Create comments
+        Comment c1 = new Comment();
+        c1.setContent("First Comment");
+
+        Comment c2 = new Comment();
+        c2.setContent("Second Comment");
+
+        // Add comments to post
+        post.getComments().add(c1);
+        post.getComments().add(c2);
+
+        // Save post (cascade will save comments)
+        postRepository.save(post);
+
+        // Fetch and print post and comments
+        Post savedPost = postRepository.findById(post.getId()).orElseThrow();
+        System.out.println("Post Title: " + savedPost.getTitle());
+
+        savedPost.getComments()
+                 .forEach(c -> System.out.println("Comment: " + c.getContent()));
+    }
+
+✅ Explanation:
+
+➤ Unidirectional OneToMany:
+  ✔️ Only Post knows about Comment.
+  ✔️ Comment has no reference to Post in Java.
+
+➤ @JoinColumn(name="post_id"):
+  ✔️ Creates post_id column in comments table as FK.
+  ✔️ Hibernate automatically sets it when saving comments via post.
+
+➤ FetchType.EAGER:
+  ✔️ When a post is fetched, all comments are fetched immediately.
+
+➤ Cascading:
+  ✔️ CascadeType.ALL ensures saving/deleting post will automatically save/delete associated comments.
+
+➤ Test method:
+  ✔️ Creates a post and 2 comments.
+  ✔️ Adds comments to post's list.
+  ✔️ Saves the post → comments saved automatically.
+  ✔️ Fetches post → prints title and all comments.
+
+🌟 Bidirectional Mapping
+➤ Post entity — parent (one post has many comments).
+➤ Comment entity — child (many comments belong to one post).
+➤ PostRepository and CommentRepository — Spring Data JPA repositories (CRUD).
+➤ JUnit test savePostwithComments() annotated with @Transactional that creates a Post, creates two Comments, links them, saves the Post, then fetches and prints post + comments.
+
+✅Code Example:
+
+🔄 Post.java
+package demo.crud.entity;
+
+@Entity
+@Table(name="posts")
+public class Post {
+@Id
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+private long id;
+
+private String title;
+
+@OneToMany(mappedBy="post", cascade=CascadeType.ALL, orphanRemoval = true,fetch=FetchType.LAZY)
+private List<Comment> comments=new ArrayList<>();
+
+
+public long getId() {
+	return id;
+}
+
+public void setId(long id) {
+	this.id = id;
+}
+
+public String getTitle() {
+	return title;
+}
+
+public void setTitle(String title) {
+	this.title = title;
+}
+
+public List<Comment> getComments() {
+	return comments;
+}
+
+public void setComments(List<Comment> comments) {
+	this.comments = comments;
+}
+}
+
+🔄 Comments.java
+package demo.crud.entity;
+
+@Entity
+@Table(name="comments")
+public class Comment {
+
+@Id
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+private long id;
+
+private String content;
+
+@ManyToOne(fetch=FetchType.LAZY)
+@JoinColumn(name="post_id", nullable=false) //FK in comments table
+private Post post;
+
+public long getId() {
+	return id;
+}
+
+public void setId(long id) {
+	this.id = id;
+}
+
+public String getContent() {
+	return content;
+}
+
+public void setContent(String content) {
+	this.content = content;
+}
+
+public Post getPost() {
+	return post;
+}
+
+public void setPost(Post post) {
+	this.post = post;
+}
+}
+
+🔄PostRepository Interface
+package demo.crud.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import demo.crud.entity.Post;
+
+public interface PostRepository extends JpaRepository<Post, Long> {}
+
+🔄 CommentRepository
+package demo.crud.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import demo.crud.entity.Comment;
+
+public interface CommentRepository extends JpaRepository<Comment, Long> {}
+
+🔄 Unit Testing
 	@Test
-	void savePost() {
-		Post post = new Post();
-		post.setTitle("Hello");
+  @Transactional
+	void savePostwithComments() {
+		Post post=new Post();
+		post.setTitle("First post");
+		
+		Comment c1=new Comment();
+		c1.setContent("First Comment");
+		c1.setPost(post);
+		
+		Comment c2 = new Comment();
+		c2.setContent("Second Comment");
+		c2.setPost(post);
+		
+		post.getComments().add(c1);
+		post.getComments().add(c2);
+		
 		postRepository.save(post);
+		
+		Post savedPost=postRepository.findById(post.getId()).orElseThrow();
+		System.out.println("Post Title:" + savedPost.getTitle());
+		
+		savedPost.getComments().forEach(c -> System.out.println("Comments:"+ c.getContent()));
 	}
 
-  ✅Explanation of savePost Method:
-  When you do:
+1️⃣ @Transactional Annotation
+➤ Starts a Spring-managed transaction for the duration of this test method.
 
-  Post post = new Post();
-  post.setTitle("Hello");
-  postRepository.save(post);
+➤ While the transaction is active, Spring keeps a JPA persistence context (Hibernate Session) open.
 
-  ➤ Hibernate generates:
+➤ Important for FetchType.LAZY — lazy associations can be loaded only while the session is open. Without @Transactional, accessing savedPost.getComments() would likely throw LazyInitializationException.
 
-  🔗 INSERT INTO post (title) VALUES ('Hello');
+➤ In Spring tests, by default the transaction is rolled back after the test finishes (so DB state is not permanently changed).
 
-👉 No comment rows created.
-👉 post.id is generated (IDENTITY) and populated on the entity after the insert.
-	✅ Method 2
-	@Test
-	void addCommentToExistingPost() {
-	    Long postId = 1L; // Replace with actual saved post ID
-	    Post post = postRepository.findById(postId).orElseThrow();
+2️⃣ Post post = new Post(); and post.setTitle("First post");
+➤ You create a new Java object. At this point the object is transient: not known to Hibernate/JPA, no DB row yet.
 
-	    Comment comment = new Comment();
-	    comment.setContent("This is a comment after the post was created");
+3️⃣ Create Comment objects and c.setPost(post);
+➤ Each Comment is transient after creation.
 
-	    post.getComments().add(comment);
-	    postRepository.save(post);
-	}
+➤ c.setPost(post) sets the Comment.post reference to the same Post object. This is crucial for a bidirectional relationship because the child must know which parent it belongs to (this will determine the post_id FK value).
 
-}
+4️⃣ post.getComments().add(c1); post.getComments().add(c2);
+➤ You add the comments to the Post collection. Now both sides are connected in memory:
+  ✔️ post.comments contains c1 and c2
+  ✔️ c1.post and c2.post point back to post
+➤ This consistency is required when you manage the relationship manually (no helper methods). If you omit one side, the DB FK may be left NULL or cause errors.
 
-❓What happens when you add a comment and postRepository.save(post) again
-Sequence in addCommentToExistingPost():
+5️⃣ postRepository.save(post);
+What happens under the hood:
+👉 Spring Data JPA calls EntityManager.persist(post) (because post.getId() is 0/null → new entity).
 
-1. You loaded Post (findById) — because fetch = EAGER comments would be loaded immediately (empty now).
-2. You create Comment comment = new Comment() and post.getComments().add(comment).
-3. postRepository.save(post) with CascadeType.ALL causes Hibernate to persist the new Comment as well.
+👉 Because Post.comments is configured with cascade = CascadeType.ALL, persist cascades to c1 and c2. So JPA will also persist the comments.
 
+👉 With GenerationType.IDENTITY:
 
+  ✔️ Hibernate must insert the post row first to let the database generate the post.id.
+  🔗 INSERT INTO posts (title) VALUES ('First post');
 
+  ➤ DB returns generated id (e.g., 1). Hibernate sets post.id = 1 on the Java object.
 
+  ✔️ Hibernate then inserts each comment and sets post_id to the just-generated post.id:
+  🔗 INSERT INTO comments (content, post_id) VALUES ('First Comment', 1);
+  🔗 INSERT INTO comments (content, post_id) VALUES ('Second Comment', 1);
 
+  ➤ All of this occurs inside the active transaction and the entities become persistent (managed) in the persistence context.
 
 
+6️⃣ Post savedPost = postRepository.findById(post.getId()).orElseThrow();
+➤ Since post is still in the same persistence context (we saved it and transaction is open), findById will typically return the same managed instance from the first-level cache rather than issuing a new SELECT.
 
+➤ If for some reason the entity wasn't in the context, findById would issue:
+🔗 SELECT * FROM posts WHERE id = 1;
+➤ orElseThrow() just makes sure we get an entity or fail the test if absent.
 
+7️⃣ System.out.println("Post Title:" + savedPost.getTitle());
+Reads a field from the managed Post instance — no DB call needed.
 
+8️⃣ savedPost.getComments().forEach(c -> System.out.println("Comments:"+ c.getContent()));
+➤ Because comments is FetchType.LAZY, the list is not loaded automatically when the Post was loaded. Accessing the collection triggers Hibernate to fetch the comments on demand, but this can only happen while the persistence context is open (which it is because of @Transactional).
 
+➤ The lazy fetch runs a SQL like:
+🔗 SELECT id, content, post_id FROM comments WHERE post_id = 1;
 
+➤ Then JPA maps those rows into Comment objects and you print their content.
 
+🔄 Persistence states summary (transient → persistent → detached)
+➤ Before save: post, c1, c2 are transient (plain Java objects).
+➤ After save and inside transaction: they become persistent (managed) — Hibernate tracks changes and they are associated with the persistence context.
+➤ After the test method ends (transaction rolled back & context closed), those objects become detached (no longer managed).
 
+❓ Why both c.setPost(post) and post.getComments().add(c)?
+➤ In a bidirectional mapping you must keep both sides consistent in memory.
+➤ c.setPost(post) ensures the owning side (Comment.post) is set — the owning side is what JPA uses to set the foreign key post_id in the DB.
+➤ post.getComments().add(c) updates the parent’s collection so your Java model is consistent and you can navigate from parent → child in memory.
+➤ If you only add to post.getComments() but do not set c.setPost(post), JPA may not set post_id when persisting, leading to NULL FKs or constraint violations. Always set both sides (either manually or via helper).
 
+🧠 Important configuration pieces that make this work
+👉 @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name="post_id", nullable=false) on Comment — establishes the foreign key column in comments table.
+👉 @OneToMany(mappedBy="post", cascade=CascadeType.ALL, orphanRemoval=true, fetch=FetchType.LAZY) on Post — tells JPA the relationship is bidirectional, child owns the FK, cascade persists/merges/removes children with parent, and orphanRemoval will delete children removed from the collection.
+👉 @Transactional around the test — keeps session open for lazy loading and groups DB operations into one atomic unit.
 
 
+❓Why use FetchType.LAZY and @Transactional?
+✔️ LAZY prevents loading large collections automatically — better performance and less memory use.
+✔️ @Transactional is required when you plan to access lazy associations inside the same method, because the persistence context (Hibernate session) must be open to perform the lazy query.
 
 
+❓Why cascade = CascadeType.ALL and orphanRemoval = true?
+✔️ cascade = ALL: saving or deleting the Post affects its Comment children automatically (no need to save comments separately).
+✔️ orphanRemoval = true: when you remove a Comment from post.getComments() and save, JPA will delete that comment row from DB.
 
 
+❗pitfalls & gotchas to watch for
+✔️ Forgetting to set both sides (c.setPost(post) and add to list) → broken FK or orphaned data.
+✔️ Not transactional + lazy fetch → LazyInitializationException.
+✔️ Eager on large collections → can cause performance problems (N+1 queries, high memory).
+✔️ Relying on post.getId() before save — it will be 0/null until the DB generates it at insert. After save, Hibernate populates it.
 
 
+🔑 Rule of Thumb
+➤ Owning side = the side that actually has the foreign key column in the database table.
 
+➤ Non-owning side (inverse side) = the side that just "maps" the relationship but does not have the foreign key column.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-When to use JPQL vs native queries
-Use JPQL when you want entity-centric queries and portability across DBs.
-Use native queries (@Query(value = "SELECT * FROM employees WHERE ...", nativeQuery = true)) when:
-You need DB-specific constructs (window functions, vendor-specific features).
-Performance-tuned SQL is required.
-Prefer JPQL for maintainability unless you have a clear reason.
+⚡ Owning side → the side with @JoinColumn (here: Comment). 
+⚡ Non-owning side → the side with mappedBy (here: Post).
+
+❓ How can comment be owning side because if there is no post there is no existance of comments?
+🔑 First, What Does Owning Side Mean in JPA?
+➤ In real life logic:
+  ✔️ You’re right 👉 A Comment cannot exist without a Post.
+  ✔️ So conceptually, the Post feels like the parent.
+
+➤ But in JPA technical terms:
+  ✔️ Owning side ≠ parent/child relationship in real-world logic.
+➤ It simply means:
+  👉 The entity that actually has the foreign key column in its table is the owning side.
+
+🧠 Final Understanding
+➤ Logical Parent (Business Sense): Post → because a post can exist without comments, but not vice versa.
+➤ Owning Side (JPA/DB Sense): Comment → because it holds the FK (post_id).
+➤ Non-Owning Side: Post → it just uses mappedBy to say “my comments are mapped by the post field in Comment”.
+
+🆚 Difference between Unidirectional and Bidirectional Mapping
+| Feature            | Unidirectional               | Bidirectional                          |
+| ------------------ | ---------------------------- | -------------------------------------- |
+| Navigation         | Only Post → Comments         | Post → Comments **and** Comment → Post |
+| Owning side        | Post (uses `@JoinColumn`)    | Comment (`@ManyToOne`)                 |
+| mappedBy           | Not used                     | Used on Post side                      |
+| Cascade operations | Works from Post side         | Works via owning side or both sides    |
+| Database FK        | `post_id` in Comment table   | `post_id` in Comment table             |
+| Java convenience   | Cannot get post from comment | Can get post from comment              |
