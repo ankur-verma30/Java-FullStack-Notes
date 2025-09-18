@@ -994,13 +994,6 @@ class Student extends Person {
 ✅ Must be the first statement in the constructor	
 ❌ Cannot mix this() and super() in the same constructor
 
-🔷 Important Shortcuts in Eclipse
-1. Ctrl + Space:⚡ Content Assist — suggests code completions.
-2. Ctrl + 1: 💡 Quick fix — suggests solutions for errors or warnings.
-3. Ctrl + O: 🧭 Quick outline — shows methods/fields of the current class.
-4. F3: 🔄 Go to the declaration of a variable, method, or class.
-5. Ctrl + . : ➡️ Jump to the next error or warning in the file.
-
 📦 Packages in Java
 A package in Java is a namespace that organizes classes and interfaces into a structured folder system, making code modular, reusable, and easy to manage.
 
@@ -2872,8 +2865,6 @@ public class A {
 	}
 }
 
-
-
 🔷 Unary Operators in Java
 1️⃣ Increment Operator
    ✔️  Post-Increment: Increment the value of the variable next time you see the same variable
@@ -3468,6 +3459,7 @@ Imagine super as saying:
 Just like a child might say:
 "I want to use my dad’s phone, not mine — because it's different."
 
+✅ Example:
 class A {
     int num = 10;
 }
@@ -3482,6 +3474,7 @@ class B extends A {
 2️⃣ Call Parent Class Methods
 If the child class overrides a method, but you still want to call the parent version, use super.methodName().
 
+✅ Example:
 public class A {
 	 int x = 10;
 	 static int y=20;
@@ -3494,7 +3487,6 @@ public class A {
 }
 
 public class B extends A {
-
 	public static void main(String[] args) {
 		B b1=new B();
 		b1.test();	
@@ -3507,22 +3499,21 @@ public class B extends A {
 }
 
 ✅ What This Means:
-➤Super is meant to refer to instance (non-static) members of a superclass.
-➤Even though it is technically possible to write super.staticMethod() in Java, it is discouraged, and Java treats it the same as ParentClass.staticMethod() internally.
-➤So, it's not a compiler error, but a bad practice.
+➤ Super is meant to refer to instance (non-static) members of a superclass.
+➤ Even though it is technically possible to write super.staticMethod() in Java, it is discouraged, and Java treats it the same as ParentClass.staticMethod() internally.
+➤ So, it's not a compiler error, but a bad practice.
 
 ✅ Best Practice:
 Always access static members using the class name, not super or this.
-// Good
-ParentClass.staticMethod();
-
-// Bad (misleading)
-super.staticMethod();
+🔗 ParentClass.staticMethod(); // Good
+🔗 super.staticMethod(); // Bad (misleading)
 
 3️⃣ Call Parent Class Constructor
-➤super() is used to call the constructor of the parent class from the child class constructor only.
-➤✅ This must be the first statement in the subclass constructor; Hence, super and this keyword cannot be used at the same time.
-➤If in the Child class constructor, this keyword is used, then in that constructor super keyword will not be automatically placed.
+➤ super() is used to call the constructor of the parent class from the child class constructor only.
+➤ This must be the first statement in the subclass constructor; Hence, super and this keyword cannot be used at the same time.
+➤ If in the Child class constructor, this keyword is used, then in that constructor super keyword will not be automatically placed.
+
+✅ Example:
 class A {
     A() {
         System.out.println("Constructor of A");
@@ -3534,20 +3525,21 @@ class B extends A {
         System.out.println("Constructor of B");
     }
 }
-📌 Output:
+✅ Output:
 Constructor of A
 Constructor of B
 
-Even though you didn’t write super() in class B, Java internally adds it:
-Even If we don't explicitly write the constructor, Java internally calls the constructor and add the super() keyword inside it(but only calls the default constructor of the parent class).
+➤ Even though you didn’t write super() in class B, Java internally adds it:
+	✔️ Even If we don't explicitly write the constructor, Java internally calls the constructor and add the super() keyword inside it(but only calls the default constructor of the parent class).
+
 B() {
     super(); // inserted automatically by compiler
     System.out.println("Constructor of B");
 }
 
 🎯 Why use it?
-➤To ensure proper construction of the inheritance chain
-➤To pass values to a parameterized parent constructor
+➤ To ensure proper construction of the inheritance chain
+➤ To pass values to a parameterized parent constructor
 
 4️⃣ Use with Parameterized Constructors
 class A {
@@ -3563,13 +3555,9 @@ class B extends A {
 }
 
 ❌ super is not allowed in static methods
-The super keyword refers to the current object’s superclass, but static methods belong to the class, not to any object.
+➤ The super keyword refers to the current object’s superclass, but static methods belong to the class, not to any object.
 
-🔍 Why This Causes an Error:
-➤Static methods do not have a this reference, because they can be called without creating an object.
-➤Since super is used to refer to the parent of this object, and this doesn't exist in a static context, super becomes invalid there.
-
-🧪 Example:
+✅ Example:
 class A {
     int x = 10;
     static void staticShow() {
@@ -3582,21 +3570,22 @@ class B extends A {
         // super.staticShow();          ❌ Compile-time error
     }
 }
-
 🚫 Both lines give:
 Cannot use 'super' in a static context
+
+❓ Why This Causes an Error❌
+➤ Static methods do not have a this reference, because they can be called without creating an object.
+➤ Since super is used to refer to the parent of this object, and this doesn't exist in a static context, super becomes invalid there.
 
 ✅ What You Can Do in Static Methods:
 If you need to access static members of the parent class in a static method:
 A.staticShow();  // ✅ Correct
 System.out.println(A.someStaticVariable);  // ✅ Correct
 
-Loops in Java
-##############
-1. for loop
+🔷 Loops in Java
+1️⃣ for loop
 
-Example 1;
----------
+✅ Example 1;
 public class A {
 	public static void main(String[] args) {
 		for (int i = 0; i < 4; i++) { //0 to 3
@@ -3604,18 +3593,19 @@ public class A {
 		}
 	} 
 }
-Example 2:
-a. The user will enter the PIN 1234
-b. If the entered PIN is valid, then the program should print Welcome and stop
-c. If the PIN is invalid, the user can attempt to enter it a maximum of three times.
-d. If all 3 times the PIN is invalid, then the card is blocked message we should get
 
-Code:
+🔄 break keyword
+➤ Can be used only inside loops and switch case statements
+➤ It stops the for loop execution
+
+✅ Example 2:
+➤ The user will enter the PIN 1234
+➤ If the entered PIN is valid, then the program should print Welcome and stop
+➤ If the PIN is invalid, the user can attempt to enter it a maximum of three times.
+➤ If all 3 times the PIN is invalid, then the card is blocked message we should get
+
 package p1;
 import java.util.Scanner;
-//break
-//1. Can be used only inside loops and switch case statements
-//2. It stops the for loop execution
 public class A {
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
@@ -3637,9 +3627,8 @@ public class A {
 	} 
 }
 
-2. while loop
-Example 1:
-----------
+2️⃣ while loop
+✅ Example 1:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3651,14 +3640,12 @@ public class A {
 	}	
 }
 
-Example 2:
---------
-a. Enter the amount, and we should get a message, please collect cash
-b. Then prompt a message: Do you want to continue(yes or no)
-c. If yes, again enter the amount, and we should get a message, please collect cash
-d. If no program is entered, it should stop
+✅ Example 2:
+➤ Enter the amount, and we should get a message, please collect cash
+➤ Then prompt a message: Do you want to continue(yes or no)
+➤ If yes, again enter the amount, and we should get a message, please collect cash
+➤ If no program is entered, it should stop
 
-Code:
 import java.util.Scanner;
 
 public class A {
@@ -3679,10 +3666,10 @@ public class A {
 	}
 }
 
-3. do while loop -  Will run first time without condition check. For the second iteration, the condition will be evaluated
+3️⃣ do while loop -  Will run first time without condition check. For the second iteration, the condition will be evaluated
 
-Example 1:
----------
+✅ Example 1:
+
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3694,8 +3681,7 @@ public class A {
 	}	
 }
 
-Example 2:
-----------
+✅ Example 2:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3707,12 +3693,12 @@ public class A {
 	}	
 }
 
-4. for each loop - 
--> Works only with a data structure
--> Can only read the value of the data structure one by one
--> The loop will run until all values are read in the given data structure
+4️⃣ for each loop - 
+➤ Works only with a data structure
+➤ Can only read the value of the data structure one by one
+➤ The loop will run until all values are read in the given data structure
 
-Example:
+✅ Example:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3727,11 +3713,8 @@ public class A {
 	}
 }
 
-Continuation of Arrays using Loops:
-######################
-
-Example 1:
-----------
+🔄 Continuation of Arrays using Loops:
+✅ Example 1:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3746,12 +3729,10 @@ public class A {
 	}
 }
 
-ArrayIndexOutOfBoundsException
-#####################################
-➤When we exceed the array size, we get this exception
+🔄 ArrayIndexOutOfBoundsException
+➤ When we exceed the array size, we get this exception
 
-Example:
-------
+✅ Example:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3768,14 +3749,14 @@ public class A {
 	}
 }
 
-Output:
+✅ Output:
 java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
 Welcome
 
-Continue Keyword in Java
-#####################
-The continue keyword is used inside loops (for, while, or do-while) to skip the current iteration and jump to the next one.
+🔄 Continue Keyword in Java
+➤ The continue keyword is used inside loops (for, while, or do-while) to skip the current iteration and jump to the next one.
 
+✅Example:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3788,20 +3769,18 @@ public class A {
 		}
 	}
 }
-Output:
+✅ Output:
 0
 1
 2
 4
 
-else-if ladder statement
-######################
--> If the user enters yes, it should print pass
--> If the user enters no, it should print fail
--> If the user enters something else, it should print invalid input
+🔄 else-if ladder statement
+➤ If the user enters yes, it should print pass
+➤ If the user enters no, it should print fail
+➤ If the user enters something else, it should print invalid input
 
-Example:
--------------
+✅ Example:
 package p1;
 
 import java.util.Scanner;
@@ -3821,9 +3800,8 @@ public class A {
 	}	
 }
 
-Switch Case
-############################
-
+🔄 Switch Case
+✅Example:
 package p1;
 
 import java.util.Scanner;
@@ -3850,9 +3828,9 @@ public class A {
 	}	
 }
 
-Removing Duplicate elements from an array
-###########################################
-➤For the below logic array should be sorted
+🔷 Coding Questions
+1️⃣ Removing Duplicate elements from an array
+➤ For the below logic array should be sorted
 
 Steps:
 1. Create a temp array which same size as that of x
@@ -3862,6 +3840,8 @@ int[] temp = new int[x.length];
 2. Compare i with i+1 of array x, if not equal copy the value from x[i] to temp[j] and increment j by 1
 
 3. When you reach last index of array x, copy that value directly to temp[j];
+
+🔗 Code:
 
 package p1;
 public class A {
@@ -3883,8 +3863,9 @@ public class A {
 	}
 }
 
-Logic For Swapping
-##########################
+2️⃣ Logic For Swapping
+
+🔗 Code:
 package p1;
 public class A {
 	public static void main(String[] args) {
@@ -3899,12 +3880,11 @@ public class A {
 	}
 }
 
-File Handling in Java
-#######################
-File handling allows Java programs to create, read, write, and delete files or directories stored on disk.
-➤Java uses the java.io, java.nio.file, and java.util packages for file operations.
+🔷 File Handling in Java
+➤ File handling allows Java programs to create, read, write, and delete files or directories stored on disk.
+➤ Java uses the java.io, java.nio.file, and java.util packages for file operations.
 
-Example:
+✅ Example:
 
 package p1;
 import java.io.File;
@@ -3929,25 +3909,24 @@ System.out.println(f);
 ➤ It checks whether the file exists in the given path.
 
 💡 Interview Insights
-Question: Does it check only files or also directories?
+❓ Does it check only files or also directories?
 ➤ It checks both files and directories.
 ➤ exists() does not distinguish between files and directories.
 ➤ Use isFile() or isDirectory() to differentiate.
 
-🧠 Code:
+🔗 Code:
 if (f.exists()) {
     if (f.isFile()) System.out.println("It's a file.");
     if (f.isDirectory()) System.out.println("It's a directory.");
 }
-
 ➤ If the file exists, it will return true, else false.
 
 🔍 Syntax
 File f = new File("path_to_file");
 boolean result = f.exists(); //if exist then true otherwise than false
 
-Example:
----------
+✅ Example:
+
 package p1;
 import java.io.File;
 public class A {
@@ -3969,11 +3948,11 @@ File f = new File("path_to_file");
 boolean result = f.delete();
 
 💡 Interview Insights
-Question: How can you delete a directory with files in it?
+❓ How can you delete a directory with files in it?
 You must recursively delete all contents before deleting the directory.
 
-Example:
---------
+✅ Example:
+
 package p1;
 import java.io.File;
 public class A {
@@ -3985,8 +3964,9 @@ public class A {
 }
 
 ⚙️ Interview Exercise
-How would you delete a non-empty folder in Java?
+❓ How would you delete a non-empty folder in Java?
 
+🔗 Code:
 public static void deleteDirectory(File dir) {
     if (dir.isDirectory()) {
         for (File file : dir.listFiles()) {
@@ -3997,10 +3977,9 @@ public static void deleteDirectory(File dir) {
 }
 
 ✅ mkdir() Method in Java
-
 ➤ It is a non-static method present inside the File class
 ➤ The return type of this method is boolean
-➤ It creates a folder  in the given path.
+➤ It creates a folder in the given path.
 ➤ If a folder is created, it will return true, else false
 ➤ It will neither replace the existing folder nor overwrite it.
 
@@ -4009,12 +3988,12 @@ File f = new File("path_to_directory");
 boolean created = f.mkdir();
 
 💡 Interview Insights
-Will mkdir() create parent folders if they don’t exist?
+❓ Will mkdir() create parent folders if they don’t exist?
 ❌ No. It will return false if the parent directory is missing.
 
-What’s the difference between mkdir() and mkdirs()?
-mkdir() → Creates only the last directory if the parent exists
-mkdirs() → Creates entire directory hierarchy if needed
+❓ What’s the difference between mkdir() and mkdirs()?
+➤ mkdir() → Creates only the last directory if the parent exists
+➤ mkdirs() → Creates entire directory hierarchy if needed
 
 🧠 Bonus Tip for Interviews
 If you want to create nested directories like G:\\april\\p2\\test\\demo, use:
@@ -4022,8 +4001,7 @@ If you want to create nested directories like G:\\april\\p2\\test\\demo, use:
 File f = new File("G:\\april\\p2\\test\\demo");
 f.mkdirs();  // creates all non-existing parent directories
 
-Example:
--------
+✅ Example:
 package p1;
 import java.io.File;
 public class A {
@@ -4035,16 +4013,16 @@ public class A {
 }
 
 ✅ Deleting Folders Using delete() in Java
-
 🔍 Syntax
 File f = new File("path_to_folder");
 boolean result = f.delete();
 
 💡 Interview Insights
-Q: What happens if the folder contains files/subfolders?
+❓ What happens if the folder contains files/subfolders?
 ❌ delete() will fail and return false.
-We have to use the recursive deletion method to delete a non-empty directory.
+➤ We have to use the recursive deletion method to delete a non-empty directory.
 
+🔗 Code:
 public class A {
 	public static void main(String[] args) {
 		File f = new File("G:\\april\\p2"); // p2 must be empty
@@ -4068,17 +4046,16 @@ File f = new File("path_to_file");
 long size = f.length();
 
 💡 Interview Insights
-Q: What if the file doesn't exist?
+❓ What if the file doesn't exist?
 ➤ Returns 0, doesn't throw an exception.
 
-Q: Can length() be used to measure file upload size?
+❓ Can length() be used to measure file upload size?
 ➤ Yes, if used carefully. But beware of file encoding differences.
 
-Q: Is length() affected by file encoding?
+❓ Is length() affected by file encoding?
 ➤ Yes — different encodings may change the byte count.
 
-Example:
---------
+✅ Example:
 package p1;
 import java.io.File;
 public class A {
@@ -4090,7 +4067,7 @@ public class A {
 }
 
 🧪 Bonus Tip: For Directory Size (Advanced)
-
+🔗 Code:
 public static long folderSize(File folder) {
     long total = 0;
     for (File f: folder.listFiles()) {
@@ -4102,9 +4079,7 @@ public static long folderSize(File folder) {
     return total;
 }
 
-Compile-time Exception/Checked Exception
-_____________________________________________
-
+🔷 Compile-time Exception/Checked Exception
 ➤ Checked Exceptions are exceptions that are checked at compile time.
 ➤ The Java compiler forces you to either handle them using try-catch or declare them using throws.
 ➤ These exceptions must be addressed in code; otherwise, the code will not compile.
