@@ -167,7 +167,6 @@ Predicate<Integer> isEvenAndPositive = isEven.and(isPositive);
 System.out.println(isEvenAndPositive.test(4));  // true
 System.out.println(isEvenAndPositive.test(-2)); // false
 
-
 👉 or() → Returns true if any one predicate is true.
 ✅Code Example:
 Predicate<Integer> isEven = x -> x % 2 == 0;
@@ -177,14 +176,12 @@ Predicate<Integer> isEvenOrNegative = isEven.or(isNegative);
 System.out.println(isEvenOrNegative.test(3));   // false
 System.out.println(isEvenOrNegative.test(-5));  // true
 
-
 👉 negate() → Returns the opposite of the predicate.
 ✅Code Example:
 Predicate<Integer> isEven = x -> x % 2 == 0;
 
 Predicate<Integer> isOdd = isEven.negate();
 System.out.println(isOdd.test(5));  // true
-
 
 👉 isEqual() → Static method, checks if an object is equal to another.
 ✅Code Example:
@@ -218,7 +215,7 @@ public class PredicateFilterExample {
 ✅ Can be combined using .and(), .or(), .negate().
 ❌ Null values: Predicate can throw NullPointerException if not handled.
 ❓ Trick Q: How is Predicate<T> different from Function<T, Boolean>?
-	✔️ Predicate<T> is specialized for boolean-returning conditions, while Function<T, Boolean> is generic.
+✔️ Predicate<T> is specialized for boolean-returning conditions, while Function<T, Boolean> is generic.
 
 
 🌟 Function

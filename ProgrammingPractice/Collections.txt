@@ -324,3 +324,159 @@ employees.sort(
 ➤ First sorts by salary (descending)
 ➤ Then by name (ascending) if salaries are equal
 ➤ Much shorter and idiomatic
+
+1️⃣3️⃣Given a Map<String, Integer> containing items and their quantities, write a program to merge the map with another map of the same type (same keys possible). If a key exists in both maps, the values should be added. Print the final merged map.
+
+✅ Solution:
+package collections;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+public class Program1{
+	public static void main(String[] args) {
+		Map<String, Integer> map1 = new HashMap<>();
+		map1.put("Apples", 10);
+		map1.put("Bananas", 5);
+		map1.put("Oranges", 7);
+
+		Map<String, Integer> map2 = new HashMap<>();
+		map2.put("Bananas", 3);
+		map2.put("Oranges", 8);
+		map2.put("Mangoes", 6);
+		
+		for(Entry<String, Integer> entry:map1.entrySet()) {
+			String key=entry.getKey();
+			int value=entry.getValue();
+			if(map2.containsKey(key)) {
+				int oldValue=map2.get(key);
+				map2.put(key, value+oldValue);
+			}
+			else {
+				map2.put(key, value);
+			}
+		}
+		
+		map2.entrySet()
+		.stream()
+		.forEach(x-> System.out.println
+				(x.getKey()+" "+ x.getValue()));
+
+	}
+}
+
+✅ Soluton 2: Cleaner Version using merge method
+package collections;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Program1 {
+    public static void main(String[] args) {
+        Map<String, Integer> map1 = new HashMap<>();
+        map1.put("Apples", 10);
+        map1.put("Bananas", 5);
+        map1.put("Oranges", 7);
+
+        Map<String, Integer> map2 = new HashMap<>();
+        map2.put("Bananas", 3);
+        map2.put("Oranges", 8);
+        map2.put("Mangoes", 6);
+
+        for (Map.Entry<String, Integer> entry : map1.entrySet()) {
+            map2.merge(entry.getKey(), entry.getValue(), Integer::sum);
+        }
+
+        map2.forEach((k, v) -> System.out.println(k + " " + v));
+    }
+}
+
+1️⃣4️⃣Given a List<Integer>, write a program to find the 3rd largest element using Collections utilities (not sorting manually with loops).
+
+✅ Solution:
+package collections;
+
+import java.util.*;
+
+public class Program1 {
+    public static void main(String[] args) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>(); // min-heap
+
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        for (int num : numbers) {
+            pq.add(num);
+            if (pq.size() > 3) {
+                pq.poll(); // remove smallest
+            }
+        }
+        System.out.println("3rd largest element = " + pq.peek());
+    }
+}
+
+
+1️⃣5️⃣Given a sentence string:
+"Java is great and Java is powerful"
+Write a program to count the frequency of each word and print it in a TreeMap (so that the words appear in sorted order).
+
+✅ Solution: Without using extra array to store individual strings
+package collections;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+public class Program1{
+	public static void main(String[] args) {
+	String str="Java is great and Java is powerful";
+	Map<String,Integer>map=new TreeMap<>();
+	
+	int index=-1,prevIndex=0;
+	for(int i=0;i<str.length();i++) {
+		if(str.charAt(i)==' ') {
+			prevIndex=index+1;
+			index=i;
+			String word=str.substring(prevIndex, index);
+			map.put(word,map.getOrDefault(word, 0)+1);
+		}
+		
+		
+	}
+	String lastWord=str.substring(index+1,str.length());
+	map.put(lastWord, map.getOrDefault(lastWord, 0)+1);
+	
+	System.out.println(map);
+	}	
+}
+
+✅ Solution 2: With the help of String array to store the individual strings
+
+package collections;
+
+import java.util.*;
+
+public class Program1 {
+    public static void main(String[] args) {
+        String str = "Java is great and Java is powerful";
+        Map<String, Integer> map = new TreeMap<>();
+
+        String[] words = str.split(" ");
+        for (String word : words) {
+            map.put(word, map.getOrDefault(word, 0) + 1);
+        }
+
+        System.out.println(map);
+    }
+}
+
+
+1️⃣6️⃣Given a List<Integer>, find the element that occurs the most number of times. If there are multiple, return the smallest one.
+
+1️⃣7️⃣Given a List<String> such as:
+["eat", "tea", "tan", "ate", "nat", "bat"]
+Group the words that are anagrams of each other and print them as List<List<String>>.
+(Hint: Collections + Map + Sorting strings inside logic)
+
+1️⃣8️⃣Design a simple LRU Cache with a fixed capacity using LinkedHashMap. It should support:
+get(key) → returns value if exists, else -1.
+put(key, value) → inserts or updates the key. If capacity is full, remove the least recently used entry.
