@@ -462,3 +462,86 @@ public class Student{
 		}	
     }	
 }
+
+1️⃣6️⃣You have a list of Student(name, subject, marks).
+Find the number of students in each subject.
+
+✅ Solution:
+package stream;
+
+public class Student {
+	String name;
+	String subject;
+	int marks;
+	public Student(String name, String subject, int marks) {
+		super();
+		this.name = name;
+		this.subject = subject;
+		this.marks = marks;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+	public int getMarks() {
+		return marks;
+	}
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+}
+
+public class Solution{
+	public static void main(String[] args) {
+		List<Student> students = new ArrayList<>();
+		students.add(new Student("Ankur", "Maths", 95));
+		students.add(new Student("Deepak", "CS", 88));
+		students.add(new Student("Isha", "Chemistry", 91));
+		students.add(new Student("Ravi", "Maths", 76));
+		students.add(new Student("Neha", "CS", 92));
+		students.add(new Student("Aman", "Physics", 85));
+		students.add(new Student("Pooja", "Chemistry", 99));
+		students.add(new Student("Karan", "Maths", 89));
+		students.add(new Student("Sneha", "Physics", 94));
+		students.add(new Student("Rahul", "CS", 97));
+		
+		Map<String, Long> studentWithCount = students.stream().collect(Collectors.groupingBy(Student::getSubject,Collectors.counting()));
+		
+		System.out.println(studentWithCount);
+	}
+}
+
+1️⃣7️⃣From the same list, group students by subject and collect only their names into a list.
+
+✅ Solution:
+Map<String, List<String>> namesBySubject = students.stream()
+        .collect(Collectors.groupingBy(
+            Student::getSubject,
+            Collectors.mapping(Student::getName, Collectors.toList())
+        ));
+
+
+1️⃣8️⃣Find the top 2 students with the highest marks overall (not grouped by subject).
+
+✅ Solution:
+List<String> top2Students = students.stream()
+				.sorted(java.util.Comparator.comparing(Student::getMarks)
+			    .reversed())
+				.limit(2).collect(Collectors.mapping(Student::getName, Collectors.toList()));
+
+✅Solution 2: Cleaner Code
+List<String> top2Students = students.stream()
+        .sorted(Comparator.comparingInt(Student::getMarks).reversed())
+        .limit(2)
+        .map(Student::getName) 
+        .collect(Collectors.toList());
+
+System.out.println(top2Students);
