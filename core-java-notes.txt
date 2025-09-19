@@ -4085,13 +4085,11 @@ public static long folderSize(File folder) {
 ➤ These exceptions must be addressed in code; otherwise, the code will not compile.
 
 ✅ createNewFile()
-
 ➤ createNewFile() is a non-static method in the java.io.File class.
 ➤ It attempts to create a new file in the specified path.
 ➤ If the file already exists, it does not replace it — instead, it returns false.
 
-Example:
-------
+✅ Example:
 package p1;
 import java.io.File;
 import java.io.IOException;
@@ -4107,15 +4105,14 @@ public class A {
 	}
 }
 
-
-🧠 Interview Insights
-Q: Will the file be created if the path doesn't exist?
+🧠 Insights
+❓ Will the file be created if the path doesn't exist?
 ❌ No, intermediate folders must already exist. Otherwise, it throws an exception.
 
-Q: Can createNewFile() create folders?
+❓ Can createNewFile() create folders?
 ❌ No, it is only for creating files, not directories. Use mkdir() for folders.
 
-IOException in Java
+🔷 IOException in Java
 ➤ IOException is a checked exception in Java.
 ➤ It is part of the java.io package.
 ➤ It is thrown when an Input/Output operation fails or is interrupted.
@@ -4124,18 +4121,15 @@ IOException in Java
 public class IOException extends Exception
 
 📂 Common Scenarios Where IOException Occurs
-| 🔍 Scenario            | 💡 Example                                            |
-| ---------------------- | ----------------------------------------------------- |
+| 🔍 Scenario            | 💡 Example                                           |
+| ----------------------  | -----------------------------------------------------|
 | 📁 File not found      | Reading a file that doesn't exist (`FileInputStream`) |
 | 🔒 File not readable   | Accessing a file without permission                   |
 | 🌐 Network I/O failure | Socket gets disconnected during data transfer         |
-| ❌ Stream closed        | Reading from or writing to a closed stream            |
+| ❌ Stream closed       | Reading from or writing to a closed stream            |
 | 💾 Full disk           | Writing to disk when no space is available            |
 
-
-
-6. list()-
--------------------
+✅ list() Method
 ➤ list() is a non-static method present in the java.io.File class.
 ➤ It returns a String[] array containing the names of files and directories in the current directory.
 ➤ It does not include absolute or full paths—just the names.
@@ -4144,8 +4138,7 @@ public class IOException extends Exception
 📌 Syntax
 public String[] list()
 
-Example:
--------
+✅ Example:
 package p1;
 import java.io.File;
 public class A {
@@ -4159,20 +4152,20 @@ public class A {
 	}
 }
 
-🧠 Interview Insights
-Q: What is returned if the file object is not a directory?
+🧠 Insights
+❓ What is returned if the file object is not a directory?
 ❌ null is returned, not an empty array — interview trap
 
 🧪 Common Mistakes (Interview Traps)
-| ❌ Mistake                                                 | ✅ Correct Understanding                                                 |
+| ❌ Mistake                                                | ✅ Correct Understanding                                               |
 | --------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Assuming `list()` works on files                          | `list()` **only works on directories**                                  |
-| Expecting full paths                                      | It returns **only names**, not full paths                               |
+| Assuming `list()` works on files                          | `list()` only works on directories                                      |
+| Expecting full paths                                      | It returns only names, not full paths                                   |
 | Not checking for `null`                                   | Always check if `list()` returns `null` to avoid `NullPointerException` |
-| Not handling security exceptions (e.g., read permissions) | `SecurityException` may occur — though it’s **unchecked**               |
+| Not handling security exceptions (e.g., read permissions) | `SecurityException` may occur — though it’s unchecked                   |
 
 
-2. FileReader:
+2️⃣ FileReader:
 ➤ FileReader is a class in the java.io package used to read character-based files.
 ➤ It is typically used for reading text files (e.g., .txt, .csv).
 ➤ Return type is int, but it returns Unicode/ASCII value, so we often cast it to char.
@@ -4182,8 +4175,7 @@ Q: What is returned if the file object is not a directory?
 🧱 Constructor Signature
 FileReader fr = new FileReader(String filePath);
 
-Example 1:
------------
+✅ Example 1:
 package app_java_3;
 import java.io.FileReader;
 
@@ -4198,8 +4190,7 @@ public class A {
 	}
 }
 
-Example 2:
-----------
+✅ Example 2:
 package app_java_3;
 import java.io.File;
 import java.io.FileReader;
@@ -4247,8 +4238,7 @@ char[] ch = new char[(int)f.length()];//type case to int because f.length return
 fr.read(ch);
 ➡️ It reads all the characters from the file into a character array and then prints them one by one.
 
-⚠️ Common Mistakes in Interviews
-
+⚠️ Common Mistakes 
 ❌ Assuming file length = number of characters
 char[] ch = new char[(int)f.length()]; // Problematic for UTF-8
 
@@ -4261,8 +4251,7 @@ for (int i = 0; i < len; i++) {
     System.out.print(ch[i]);
 }
 
-Example
--------
+✅ Example
 package app_java_3;
 import java.io.File;
 import java.io.FileReader;
@@ -4284,10 +4273,7 @@ public class A {
 	}
 }
 
-📝 FileWriter in Java
-########################
-
-🔹 FileWriter Class (java.io)
+3️⃣ FileWriter Class (java.io)
 ➤ Used to write character data to a file.
 ➤ Belongs to the java.io package.
 ➤ Can create a new file if it doesn’t exist.
@@ -4315,7 +4301,7 @@ close()
 ➤ Saves written content and closes the stream.
 ➤ Must be called to avoid data loss or resource leakage.
 
-❓Interviewer Trick: "What happens if the file does not exist?" → FileWriter will create it only if the directory structure already exists; otherwise, it will throw a FileNotFoundException.
+❓ "What happens if the file does not exist?" → FileWriter will create it only if the directory structure already exists; otherwise, it will throw a FileNotFoundException.
 
 ✅ Example 1 – Overwriting a file
 package app_java_3;
@@ -4356,29 +4342,20 @@ public class A {
 }
 
 📘 BufferedReader in Java
-#############################
 ➤ BufferedReader is used to read text from a character-input stream, buffering characters for efficient reading of characters, arrays, and lines.
 ➤ It significantly improves performance over using FileReader alone.
 ➤ Introduced in the java.io package.
 
-1. Improved Performance
-Uses a buffer (default size: 8192 characters) to read chunks of data at once, reducing disk I/O.
-
-2. Works with FileReader
-BufferedReader wraps FileReader. On its own, it cannot read files because it doesn’t handle files directly.
-
-3. readLine() Method
-Allows reading one full line (till \n) at a time. Returns null when EOF (End Of File) is reached.
-
-4. Supports Other Input Types
-Can wrap any Reader (e.g., InputStreamReader, StringReader), not just FileReader
+➤ Improved Performance → Uses a buffer (default size: 8192 characters) to read chunks of data at once, reducing disk I/O.
+➤ Works with FileReader → BufferedReader wraps FileReader. On its own, it cannot read files because it doesn’t handle files directly.
+➤ readLine() Method → Allows reading one full line (till \n) at a time. Returns null when EOF (End Of File) is reached.
+➤ Supports Other Input Types → Can wrap any Reader (e.g., InputStreamReader, StringReader), not just FileReader
 
 📌 Commonly Used Constructors
 BufferedReader br = new BufferedReader(new FileReader("path"));
 BufferedReader br = new BufferedReader(new FileReader("path"), bufferSize); // optional buffer size
 
-➤ Example 1: Reading one character
-
+✅ Example 1: Reading one character
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -4388,8 +4365,7 @@ System.out.println((char)br.read());  // Reads one character
 br.close();
 fr.close();
 
-➤ Example 2: Reading into a char array
-
+✅ Example 2: Reading into a char array
 FileReader fr = new FileReader("G://f1//t1.txt");
 BufferedReader br = new BufferedReader(fr);
 char[] ch = new char[4];
@@ -4400,8 +4376,7 @@ for(char c: ch) {
 br.close();
 fr.close();
 
-➤ Example 3: Reading multiple lines using readLine()
-
+✅ Example 3: Reading multiple lines using readLine()
 package p1;
 
 import java.io.BufferedReader;
@@ -4427,17 +4402,16 @@ public class A{
 🔥 Internal Working
 ➤ BufferedReader maintains an internal buffer (char[]).
 ➤ When read() or readLine() is called and the buffer is empty, it:
-➤ Pulls a block of characters from the underlying Reader (FileReader)
-➤ Stores them in the buffer
-➤ Serves future reads from this buffer until it's empty again.
-➤ This reduces the number of physical reads from disk, improving performance.
+	✔️ Pulls a block of characters from the underlying Reader (FileReader)
+	✔️ Stores them in the buffer
+	✔️ Serves future reads from this buffer until it's empty again.
+	✔️ This reduces the number of physical reads from disk, improving performance.
 
 🎯 Advantages
 ➤ Reduces file reading time, especially for large files.
 ➤ readLine() makes line-by-line processing much easier.
 
 📘 BufferedWriter in Java
-###########################
 ➤ BufferedWriter is a part of the java.io package.
 ➤ It is used to write text efficiently to character output streams by buffering characters.
 ➤ Improves performance by minimizing disk interaction (reducing write operations).
@@ -4449,10 +4423,10 @@ Can write:
 2. Single characters (write(int c))
 3. Character arrays (write(char[] cbuf))
 
-Supports newLine() to write platform-dependent line separator (\n, \r\n, etc.)
-Must be used with a Writer (e.g., FileWriter, OutputStreamWriter) — cannot directly write to files.
+➤ Supports newLine() to write platform-dependent line separator (\n, \r\n, etc.)
+➤ Must be used with a Writer (e.g., FileWriter, OutputStreamWriter) — cannot directly write to files.
 
-🧪 Code Example:
+✅ Code Example:
 FileWriter fw = new FileWriter("G://april//t1.txt", true); // true = append mode
 BufferedWriter bw = new BufferedWriter(fw);
 bw.write("mike");
@@ -4465,13 +4439,12 @@ bw.write(ch);
 bw.close(); // Always close in reverse order of creation
 fw.close();
 
-Q. When is the data written to the file?
-✅ When the buffer is full, or flush() / close() is called.
-Prefer flush() if writing in real-time or inside loops.
+❓ When is the data written to the file?
+➤ When the buffer is full, or flush() / close() is called.
+➤ Prefer flush() if writing in real-time or inside loops.
+
 
 💾 Serialization & Deserialization in Java
-############################################
-
 Serialization is the process of converting a Java object into a byte stream.
 This byte stream can be:
 1. Written to a file
