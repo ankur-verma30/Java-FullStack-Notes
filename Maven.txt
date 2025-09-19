@@ -1,0 +1,290 @@
+🔷 Maven
+Maven is a Build Automation and Project Management Tool for Java-based projects.
+
+1️⃣ Build Management:
+➤ Handles compiling, testing, packaging (JAR/WAR), and deploying code. 
+➤ Eliminates manual steps by automating the build lifecycle.
+  ✅ Example: Instead of running `javac`, then `jar`, then copying files manually → Maven does all of it in one command (`mvn package`).
+
+2️⃣ Dependency Management:
+➤ Automatically downloads and manages external libraries (JARs).
+➤ Resolves transitive dependencies (if you add Hibernate, it also brings in required JARs like ANTLR, Commons-logging, etc.).
+➤ Prevents “JAR hell” (multiple versions of the same library).
+
+3️⃣ Project Structure:
+➤ Enforces a standard directory structure.
+
+  ✅ Example:
+    src/main/java    → source code
+    src/main/resources → config files
+    src/test/java   → test classes
+    target/         → compiled output
+➤ Makes projects easy to understand for any developer.
+
+4️⃣ Repositories: Maven uses repositories to store and fetch dependencies.
+➤ Central Repository (default)
+➤ Remote Repository (team/company specific)
+➤ Local Repository (cached in `.m2` folder on your machine)
+
+5️⃣ Plugins:
+Small add-ons that provide specific functionalities.
+✅ Example: `maven-compiler-plugin` (compile code), `maven-surefire-plugin` (run tests), `maven-jar-plugin` (package into JAR).
+
+🔗 pom.xml (Project Object Model):
+➤ Central configuration file.
+➤ Contains: dependencies, plugins, build settings, repository info, project metadata.
+
+✅ Example snippet:
+    <project>
+      <modelVersion>4.0.0</modelVersion>
+      <groupId>com.example</groupId>
+      <artifactId>demo-app</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <dependencies>
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.13.2</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </project>
+
+
+🔷 Set up Maven in Local System
+👉 Step 1: Install JDK
+  ✔️ Install correct version (Maven 3.9+ requires Java 8 or higher).
+  ✔️ Verify using:  🔗 java -version
+
+👉 Step 2: Configure JAVA\_HOME and PATH
+  🔗 JAVA_HOME=C:\Program Files\Java\jdk-17 (without bin).
+  🔗 Path=C:\Program Files\Java\jdk-17\bin (with bin).
+
+👉 Step 3: Download Maven
+  ✔️ Download from [Maven official site](https://maven.apache.org).
+  ✔️ Extract zip to: `C:\apache-maven-3.9.9`.
+
+👉 Step 4: Configure MAVEN\_HOME and PATH
+  🔗 MAVEN_HOME=C:\apache-maven-3.9.9
+  🔗 Path=C:\apache-maven-3.9.9\bin
+
+👉 Step 5: Verify Installation
+  🔗 mvn -version
+  ✔️ Expected output shows Maven version, Java version, and environment info.
+
+
+🔷 Archetype
+➤ A project template generator.
+➤ Provides predefined structure → saves time.
+
+Common Archetypes: 
+  ✔️ maven-archetype-quickstart → Simple console application.
+  ✔️ maven-archetype-webapp → Web app with `WEB-INF`, JSP, Servlet folders.
+
+✅ Command Example:
+🔗 mvn archetype:generate -DgroupId=com.example -DartifactId=myapp -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+🔷 groupId
+➤ Uniquely identifies organization or project group.
+➤ Follows **reverse domain name convention**.
+
+✅ Examples:
+✔️ com.cisco
+✔️ in.amazon
+✔️ org.springframework
+
+❌ Wrong: groupId = projectname
+✅ Correct: groupId = organization/project
+
+
+🔷 Artifact
+➤ A file produced by Maven build (JAR, WAR, EAR).
+➤ Identified by GAV (GroupId, ArtifactId, Version).
+
+✅ Example in pom.xml:
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-core</artifactId>
+  <version>6.0.0</version>
+</dependency>
+
+🔄 Version Types:
+➤ SNAPSHOT → Development version, still changing.
+➤ RELEASE → Stable, production-ready.
+
+⚡ Note: Artifacts are stored in repositories (Maven Central, Nexus, JFrog).
+
+
+🔷 Types of Repositories
+
+1️⃣ Local Repository (.m2 folder)
+  ✔️ Default: `~/.m2/repository`
+  ✔️ Cache of downloaded dependencies.
+
+2️⃣ Central Repository
+  ✔️ Public repository managed by Apache.
+  ✔️ Default source of most dependencies.
+
+3️⃣ Remote/Private Repository
+  ✔️ Company/team-specific (e.g., Nexus, JFrog).
+  ✔️ Stores private libraries not in Maven Central.
+
+
+❓ If Maven cannot find a dependency in local repo, where does it look next?
+➤ First Local → then Remote (private if configured) → then Central.
+
+
+🔷 Maven Goals (Build Lifecycle)
+Goal = Task Maven executes.
+
+Common Goals:
+1. clean → Deletes `target/` directory.
+2. compile → Compiles source code.
+3. test → Runs unit tests (JUnit/TestNG).
+4. package → Creates JAR/WAR file inside `target/`.
+5. install → Copies artifact to local repository (`.m2`).
+6. deploy → Pushes artifact to remote repository.
+
+✅ Skip Tests Example:
+🔗 mvn clean package -DskipTests=true
+
+
+🆚 Difference between install and deploy
+➤ install: Saves artifact in local repo.
+➤ deploy: Uploads artifact to remote repo (e.g., Nexus).
+
+
+🔷 Dependency Exclusion
+❗Problem: Adding one dependency may bring unnecessary transitive dependencies.
+✅ Solution: Exclude unwanted ones to:
+  ✔️ Reduce project size.
+  ✔️ Avoid version conflicts.
+
+✅ Example: 
+🔁 Without exclusion
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-context</artifactId>
+  <version>6.2.0</version>
+</dependency>
+
+
+🔁 With exclusion:
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-context</artifactId>
+  <version>6.2.0</version>
+  <exclusions>
+    <exclusion>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+    </exclusion>
+  </exclusions>
+</dependency>
+
+
+🔷 Spring Boot Starters (Special Case in Maven)
+➤ Starter Dependencies: Bundles of related dependencies.
+➤ Simplifies configuration by avoiding manual inclusion.
+
+✅ Examples:
+spring-boot-starter-web → includes Spring MVC + Jackson + Tomcat.
+spring-boot-starter-data-jpa → includes Hibernate + JPA + HikariCP.
+spring-boot-starter-test → includes JUnit + Mockito + Hamcrest.
+
+🔄 Advantages:
+➤ No need to manually manage compatible versions.
+➤ Reduces complexity in `pom.xml`.
+
+
+⚠️ Trap Questions
+
+❓ If Maven Central is down, will your build fail?
+➤ No, because Maven first checks local repo, then remote, then central.
+
+❓ Can two dependencies bring different versions of the same library?
+➤ Yes → leads to dependency conflict (solved by dependency mediation or exclusion).
+
+❓ Is pom.xml mandatory?
+➤ Yes for Maven projects, but inherited POMs may reduce repetition.
+
+❓ You excluded a transitive dependency but it still appears. Why?
+➤ Another dependency brings it in; exclusions are per-dependency. 
+➤ Use mvn dependency:tree to locate the true origin.
+
+❓ Why does provided dependency work locally but fails in production? 
+➤ Because provided expects the runtime/container to supply it (e.g., servlet API). 
+➤ On standalone run you must include it or run in container.
+
+❓ mvn package vs mvn install — what changes?
+➤ package creates artifact in target/;
+➤ install also copies it to local repo (for other local projects to depend on).
+
+❓ Difference between dependencyManagement and dependencies?
+➤ dependencyManagement only defines versions/defaults — it does not add the dependency to the project unless declared in <dependencies> (useful in parent POMs).
+
+❓How to prevent plugin config propagation to children?
+➤ If you don’t want plugin configuration to be inherited, avoid putting it in parent POM or use profiles for selective activation.
+
+
+🧠 Interview Questions
+1️⃣ Explain POM coordinates (`groupId`, `artifactId`, `version`).
+✔️ Answer: 
+Unique coordinates identify artifacts. `groupId` usually reverse domain, `artifactId` project name, `version` artifact version (SNAPSHOT vs release).
+
+2️⃣ What are lifecycle, phases, goals?
+✔️ Answer: 
+Lifecycle = groups of phases (default/clean/site). Phases are ordered steps (compile/test/package). Goals are plugin tasks bound to phases. 
+
+3️⃣ How do you exclude a transitive dependency?
+✔️ Answer: 
+  Add `<exclusions>` under the direct `<dependency>`. Use `mvn dependency:tree` to detect origin. ([Apache Maven][7])
+
+4️⃣ What’s the difference between -DskipTests and -Dmaven.test.skip=true?
+✔️ Answer: 
+-DskipTests:  skips running tests (still compiles test classes);
+-Dmaven.test.skip=true:  skips compiling & running tests.
+
+5️⃣ What is a BOM and when to use it?
+✔️ Answer:
+Bill of Materials — POM with <dependencyManagement> that centralizes versions; import via scope=import to keep versions consistent across modules. 
+Use for frameworks (Spring Boot).
+
+6️⃣ Explain multi-module project / reactor.
+✔️ Answer:
+Aggregator POM lists modules; reactor computes build order and builds modules in correct order. 
+Parent POM can provide shared configuration.
+
+7️⃣ How to find why two versions of same library are present?
+✔️ Answer:
+mvn dependency:tree -Dverbose shows conflict resolution (nearest-wins). Then use exclusions or dependencyManagement to fix.
+
+8️⃣How to secure credentials for remote repo?
+✔️ Answer:
+Put server credentials in ~/.m2/settings.xml (not in POM), use Maven password encryption (settings-security.xml). 
+
+9️⃣ When to use pluginManagement vs plugins?
+✔️ Answer:
+pluginManagement in parent sets versions/config defaults;
+children declare plugins in <plugins> to execute them. Prevents version drift.
+
+1️⃣0️⃣ How to speed up slow Maven builds?
+✔️ Answer:
+Use Maven Wrapper for consistent version, use a repository manager (cache), enable parallel builds -T (careful).
+use incremental builds (avoid frequent clean), and prefer mvn -o offline when dependencies already cached.
+
+1️⃣1️⃣ What is effective-pom?
+✔️ Answer:
+The merged POM after inheritance and active profiles are applied; 
+Useful to debug what Maven actually uses (mvn help:effective-pom). 
+
+1️⃣2️⃣How to create a new project from an archetype?
+✔️ Answer:
+🔗 mvn archetype:generate -DgroupId=... -DartifactId=... 
+🔗 -DarchetypeArtifactId=maven-archetype-quickstart 
+🔗 -DinteractiveMode=false`. ([Apache Maven][19])
+
+1️⃣3️⃣ What's the difference between a plugin and a dependency?
+✔️ Answer:
+Plugins execute build-time tasks (goals bound to lifecycle phases). Dependencies are code libraries used by your app at compile/runtime/test.
+
