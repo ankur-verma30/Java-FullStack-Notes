@@ -2094,3 +2094,147 @@ Reads a field from the managed Post instance — no DB call needed.
 | Cascade operations | Works from Post side         | Works via owning side or both sides    |
 | Database FK        | `post_id` in Comment table   | `post_id` in Comment table             |
 | Java convenience   | Cannot get post from comment | Can get post from comment              |
+
+
+🔷 ManyToMany Mapping
+
+🔄 Bus entity
+@Entity
+@Table(name="bus")
+public class Bus {
+  @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+  private Long id;
+  private String busName;
+
+// Owning side of ManyToMany
+  @ManyToMany(fetch=FetchType.LAZY)
+  @JoinTable(
+    name = "bus_stop",
+    joinColumns = @JoinColumn(name = "bus_id"),  // FK column for Bus
+    inverseJoinColumns = @JoinColumn(name = "stop_id") // FK column for Stop
+  )
+  private List<Stop> stops = new ArrayList<>();
+  // getters/setters
+}
+
+➤ @Entity / @Table("bus"): maps the class to the bus table.
+➤ @Id @GeneratedValue(...): DB auto-generates the primary key when you insert a Bus.
+
+➤ @ManyToMany(fetch=FetchType.LAZY): a bus can be associated with many stops and stops with many buses. The association is lazy — related stops are fetched only when you access bus.getStops().
+
+➤ @JoinTable(...): defines the join table name (bus_stop) and the two FK columns:
+  ✔️ bus_id (points to bus.id) — created from joinColumns
+  ✔️ stop_id (points to stop.id) — created from inverseJoinColumns
+➤ Because @JoinTable is on Bus.stops, Bus is the owning side of the relationship.
+
+🔄 Stop entity
+@Entity
+@Table(name="stop")
+public class Stop {
+  @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+  private Long id;
+  private String stopName;
+
+ // Inverse side (non-owning)
+  @ManyToMany(mappedBy="stops")
+  private List<Bus> buses = new ArrayList<>();
+  // getters/setters
+}
+👉 mappedBy="stops": this tells JPA that Stop is the inverse side; the mapping is defined/owned by Bus.stops. Changes to the join table are driven by the owning side.
+
+🔄 Repositories
+public interface BusRepository extends JpaRepository<Bus, Long> {}
+public interface StopRepository extends JpaRepository<Stop, Long> {}
+➤ JpaRepository gives you CRUD, paging, sorting, and other convenience methods. No manual implementation needed.
+
+🔄 Unit Test
+Stop s1 = new Stop("Majestic"), s2 = new Stop("BTM"), s3 = new Stop("Electronic City");
+stopRepo.saveAll(Arrays.asList(s1,s2,s3));         // (A)
+
+Bus b1 = new Bus(); 
+b1.setBusName("Bus 101"); 
+b1.setStops(Arrays.asList(s1,s2));
+
+Bus b2 = new Bus(); 
+b2.setBusName("Bus 202"); 
+b2.setStops(Arrays.asList(s2,s3));
+busRepo.saveAll(Arrays.asList(b1,b2));             // (B)
+
+//display each bus and its stops
+ busRepo.findAll().forEach(bus -> {
+            System.out.println("Bus: " + bus.getBusName());
+            bus.getStops().forEach(stop ->
+                System.out.println("   Stop: " + stop.getStopName())
+            );
+        });
+
+Step-by-Step:
+1️⃣ stopRepo.saveAll(...) — persists stops first. SQL roughly:
+INSERT INTO stop (stop_name) VALUES ('Majestic');
+INSERT INTO stop (stop_name) VALUES ('BTM Layout');
+INSERT INTO stop (stop_name) VALUES ('Electronic City');
+👉 After these, s1, s2, s3 have DB-generated ids (are managed entities).
+
+2️⃣ Create buses and assign stops (b1.setStops(Arrays.asList(s1,s2)))
+  ✔️ You give the Bus objects references to the already persisted managed Stop entities. They are not transient.
+
+3️⃣ busRepo.saveAll(...) — saving the owning side (Bus). Hibernate will:
+  ✔️ Insert bus rows:
+INSERT INTO bus (bus_name) VALUES ('Bus 101');
+INSERT INTO bus (bus_name) VALUES ('Bus 202');
+👉 (DB assigns bus IDs)
+
+  ✔️ Insert rows into the join table bus_stop for each association:
+INSERT INTO bus_stop (bus_id, stop_id) VALUES (<b1_id>, <s1_id>);
+INSERT INTO bus_stop (bus_id, stop_id) VALUES (<b1_id>, <s2_id>);
+INSERT INTO bus_stop (bus_id, stop_id) VALUES (<b2_id>, <s2_id>);
+INSERT INTO bus_stop (bus_id, stop_id) VALUES (<b2_id>, <s3_id>);
+
+4️⃣ Fetch & print (busRepo.findAll())
+➤ findAll() loads Bus entities.
+➤ Because stops is LAZY, accessing bus.getStops() triggers a SELECT:
+
+SELECT s.* FROM stop s
+JOIN bus_stop bs ON s.id = bs.stop_id
+WHERE bs.bus_id = <bus_id>;
+👉 This occurs for each bus unless JPA optimizes with batch fetching or you use a fetch join.
+
+🔄 Owning side vs inverse — why Bus is the owner
+➤ The owning side is the side that JPA looks at to persist changes to the join table.
+➤ You placed @JoinTable(...) on Bus.stops, so Bus owns the mapping.
+➤ Stop uses mappedBy="stops", so it’s the inverse side. Changing stop.getBuses() alone does not update the join table — changes must be made on the owning side (bus.getStops()).
+
+🔄 Important JPA rules
+
+1️⃣ Persisting entities
+➤ If a Stop is transient (not saved) and you call busRepo.save(bus) without cascade, JPA throws an exception like TransientPropertyValueException.
+→ Either save stops first (stopRepo.save(...)) or add cascade = CascadeType.PERSIST on @ManyToMany if you want save to cascade from Bus to Stop.
+
+2️⃣ Transactions & LAZY
+➤ ManyToMany default fetch is LAZY. You used fetch=FetchType.LAZY. That means bus.getStops() will only load when called inside an open persistence context (transaction).
+
+➤ In tests, either annotate the test method with @Transactional (keeps session open), or use a fetch join query, or set fetch = EAGER (not recommended for many-to-many due to performance).
+
+3️⃣ Cascade REMOVE — be careful
+Do not set cascade = CascadeType.REMOVE on ManyToMany unless you want removing a Bus to delete Stop rows (shared entity) — usually undesirable because stops may be shared among buses.
+
+
+🔄 Improvements 
+➤ Prefer Set over List for many-to-many to avoid accidental duplicate link rows:
+🔗 private Set<Stop> stops = new HashSet<>();
+
+➤ Keep persistence consistent:
+  ✔️ Save Stops first or configure cascade = {PERSIST, MERGE} if you want to persist stops from bus.
+
+➤ Avoid CascadeType.REMOVE on ManyToMany — you don't want deleting one bus to delete shared stops
+➤ Keep collections in sync if you rely on in-memory reads before reload. Either:
+  ✔️ Use helper methods that update both sides:
+
+🔗 public void addStop(Stop s) { 
+  stops.add(s); 
+  s.getBuses().add(this);
+  }
+  ✔️ Or accept that the inverse side (stop.getBuses()) will be empty until reloaded from DB.
+
+➤ Be careful with JSON serialization (if later exposing entities via REST). Bidirectional relations cause infinite recursion — use DTOs or @JsonIgnore on one side.
+
