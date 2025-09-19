@@ -472,11 +472,211 @@ public class Program1 {
 
 1️⃣6️⃣Given a List<Integer>, find the element that occurs the most number of times. If there are multiple, return the smallest one.
 
+✅ Solution: package collections;
+
+import java.util.*;
+
+class Pair {
+    int freq;
+    int num;
+
+    Pair(int freq, int num) {
+        this.freq = freq;
+        this.num = num;
+    }
+}
+
+public class Program1 {
+    public static void main(String[] args) {
+        List<Integer> list1 = Arrays.asList(1,2,3,1,1,2,3,4,2,3,4,4,5,3);
+
+        Map<Integer, Integer> mp = new HashMap<>();
+        for (int num : list1) {
+            mp.put(num, mp.getOrDefault(num, 0) + 1);
+        }
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>((o1, o2) -> {
+            if (o1.freq == o2.freq) return o1.num - o2.num; // smaller number if tie
+            return o2.freq - o1.freq; // higher frequency first
+        });
+
+        for (Map.Entry<Integer, Integer> entry : mp.entrySet()) {
+            pq.add(new Pair(entry.getValue(), entry.getKey()));
+        }
+
+        System.out.println("Most frequent element: " + pq.peek().num);
+    }
+}
+
+
 1️⃣7️⃣Given a List<String> such as:
 ["eat", "tea", "tan", "ate", "nat", "bat"]
 Group the words that are anagrams of each other and print them as List<List<String>>.
-(Hint: Collections + Map + Sorting strings inside logic)
+
+✅ Solution:
+package collections;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+public class Program1 {
+	public static void main(String[] args) {
+		List<String> list = new ArrayList<>(Arrays.asList("eat", "tea", "tan", "ate", "nat", "bat"));
+		Map<String, List<String>> map = new HashMap<>();
+
+		for (String l : list) {
+			char[] ch = l.toCharArray();
+			Arrays.sort(ch);
+			String newStr = new String(ch);
+			if (!map.containsKey(newStr)) {
+				List<String> val = new ArrayList<>(Arrays.asList(l));
+				map.put(newStr, val);
+			} else {
+				map.get(newStr).add(l);
+			}
+		}
+
+		List<List<String>> ans = new ArrayList<>();
+
+		for (Entry<String, List<String>> entry : map.entrySet()) {
+			List<String> temp = entry.getValue();
+			if (!temp.isEmpty()) {
+				ans.add(temp);
+			}
+		}
+
+		System.out.println(ans);
+	}
+}
+
+✅ Solution 2:
+package collections;
+
+import java.util.*;
+
+public class Program1 {
+    public static void main(String[] args) {
+        List<String> list = Arrays.asList("eat", "tea", "tan", "ate", "nat", "bat");
+        Map<String, List<String>> map = new HashMap<>();
+
+        // Group words by their sorted character representation
+        for (String word : list) {
+            char[] ch = word.toCharArray();
+            Arrays.sort(ch); // sort characters
+            String key = new String(ch); // correct way (instead of ch.toString())
+
+            map.computeIfAbsent(key, k -> new ArrayList<>()).add(word);
+        }
+
+        // Collect grouped anagrams into result
+        List<List<String>> ans = new ArrayList<>(map.values());
+
+        System.out.println(ans);
+    }
+}
+
 
 1️⃣8️⃣Design a simple LRU Cache with a fixed capacity using LinkedHashMap. It should support:
 get(key) → returns value if exists, else -1.
 put(key, value) → inserts or updates the key. If capacity is full, remove the least recently used entry.
+
+✅ Solution:
+package collections;
+
+import java.util.*;
+
+class LRUCache<K, V> extends LinkedHashMap<K, V> {
+    private final int capacity;
+
+    public LRUCache(int capacity) {
+        // true = access-order (not insertion order)
+        super(capacity, 0.75f, true);
+        this.capacity = capacity;
+    }
+
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+        return size() > capacity;
+    }
+}
+
+public class Program3 {
+    public static void main(String[] args) {
+        LRUCache<Integer, String> cache = new LRUCache<>(3);
+
+        cache.put(1, "A");
+        cache.put(2, "B");
+        cache.put(3, "C");
+        System.out.println(cache); // {1=A, 2=B, 3=C}
+
+        cache.get(1);              // Access 1 -> makes it most recently used
+        cache.put(4, "D");         // Removes 2 (least recently used)
+        System.out.println(cache); // {3=C, 1=A, 4=D}
+
+        cache.put(5, "E");         // Removes 3
+        System.out.println(cache); // {1=A, 4=D, 5=E}
+    }
+}
+
+
+1️⃣9️⃣ Given an array of integers, find the 2 most frequent elements using a HashMap and a heap/priority queue.
+✅ Example:
+Input: [1,1,1,2,2,3]
+Output: [1,2]
+
+package collections;
+
+import java.util.*;
+
+class Pair {
+    int freq;
+    int num;
+
+    public Pair(int freq, int num) {
+        this.freq = freq;
+        this.num = num;
+    }
+}
+
+public class Program1 {
+    public static void main(String[] args) {
+        List<Integer> list1 = Arrays.asList(1, 1, 1, 2, 2, 3);
+
+        // Count frequencies
+        Map<Integer, Integer> freqMap = new HashMap<>();
+        for (int num : list1) {
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+        }
+
+        // Max-Heap based on frequency
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> b.freq - a.freq);
+
+        for (Map.Entry<Integer, Integer> entry : freqMap.entrySet()) {
+            pq.add(new Pair(entry.getValue(), entry.getKey()));
+        }
+
+        // Get most frequent
+        if (!pq.isEmpty()) {
+            System.out.println("Most frequent element: " + pq.peek().num);
+            pq.poll();
+        }
+
+        // Get second most frequent
+        if (!pq.isEmpty()) {
+            System.out.println("Second most frequent element: " + pq.peek().num);
+        }
+    }
+}
+
+
+2️⃣0️⃣ Given a list of Employee(id, name, age, salary) objects, sort them by:
+salary descending,
+if salary is same → age ascending,
+if age also same → name alphabetical.
+Print the sorted list.
+
+2️⃣1️⃣ Given a list of integers and a target K, find if there exists a subarray whose sum equals K.
+Example:
+
+Input: [1, 2, 3, 7, 5], K=12
+Output: true   (because 2+3+7 = 12)
