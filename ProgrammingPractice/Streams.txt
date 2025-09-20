@@ -545,3 +545,98 @@ List<String> top2Students = students.stream()
         .collect(Collectors.toList());
 
 System.out.println(top2Students);
+
+
+1️⃣9️⃣ Employees by Department
+➤ You have a list of Employee(name, department, salary).
+➤ Group employees by department and list all employee names in each department.
+
+✅ Solution:
+package stream;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+class Employee {
+    private String name;
+    private String department;
+    private double salary;
+
+    public Employee(String name, String department, double salary) {
+        this.name = name;
+        this.department = department;
+        this.salary = salary;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public String getDepartment() {
+        return department;
+    }
+    public double getSalary() {
+        return salary;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + department + ", " + salary + ")";
+    }
+}
+
+public class Solution{
+	public static void main(String[] args) {
+		List<Employee> employees = Arrays.asList(
+			    new Employee("Alice", "IT", 75000),
+			    new Employee("Bob", "IT", 82000),
+			    new Employee("Charlie", "HR", 60000),
+			    new Employee("David", "Finance", 90000),
+			    new Employee("Eva", "HR", 65000),
+			    new Employee("Frank", "Finance", 88000),
+			    new Employee("Grace", "IT", 95000),
+			    new Employee("Hannah", "Finance", 70000),
+			    new Employee("Ian", "HR", 72000),
+			    new Employee("Jack", "IT", 78000)
+			);
+			
+		 employees.stream().collect(Collectors
+				 .groupingBy(Employee::getDepartment))
+		 .entrySet().forEach(entry->{
+			 System.out.println("Department: "+ entry.getKey());
+			 entry.getValue().forEach(System.out::println);
+		        System.out.println();
+		 });	
+	}
+}
+
+2️⃣0️⃣ Highest Salary per Department
+➤ From the same list, find the employee with the maximum salary in each department.
+
+✅ Solution:
+employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::getDepartment,
+        Collectors.collectingAndThen(
+            Collectors.maxBy(Comparator.comparing(Employee::getSalary)),
+            Optional::get
+        )))
+    .forEach((dept, emp) -> {
+        System.out.println("Department: " + dept);
+        System.out.println("Highest Paid: " + emp.getName() + " with salary " + emp.getSalary());
+        System.out.println();
+    });
+
+
+2️⃣1️⃣ Department-wise Average Salary
+➤ Compute the average salary of employees in each department.
+
+✅ Solution:
+employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::getDepartment,
+        Collectors.averagingDouble(Employee::getSalary)
+    ))
+    .forEach((dept, avgSalary) -> {
+        System.out.println("Department: " + dept + ", Average Salary: " + avgSalary);
+    });
