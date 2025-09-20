@@ -2238,3 +2238,257 @@ Do not set cascade = CascadeType.REMOVE on ManyToMany unless you want removing a
 
 ➤ Be careful with JSON serialization (if later exposing entities via REST). Bidirectional relations cause infinite recursion — use DTOs or @JsonIgnore on one side.
 
+
+🔷 One To One Relationship
+One-to-One relationship: One entity is associated with exactly one instance of another entity.
+
+Bidirectional: Both entities have references to each other.
+
+🔄 User.Java
+package demo.crud.entity;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="user")
+public class User {
+@Id
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+private Long id;
+private String name;
+
+public User() {}
+public User(String name) {
+	this.name=name;
+}
+
+
+public Long getId() {
+	return id;
+}
+
+public String getName() {
+	return name;
+}
+public void setName(String name) {
+	this.name = name;
+}
+
+@OneToOne(cascade=CascadeType.ALL)
+@JoinColumn(name="profile_id", unique=true)
+private Profile profile;
+
+public Profile getProfile() {
+	return profile;
+}
+public void setProfile(Profile profile) {
+	this.profile = profile;
+}
+
+@Override
+public String toString() {
+	 return "User{id=" + id + ", name='" + name + '\'' + '}';
+}
+}
+
+🔄Profile.java
+package demo.crud.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "profiles")
+public class Profile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String bio;
+
+    @OneToOne(mappedBy = "profile")
+    private User user;
+
+    public Profile() {}
+    public Profile(String bio) { this.bio = bio; }
+
+    // Getters / setters
+    public Long getId() { return id; }
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+
+    @Override
+    public String toString() {
+        return "Profile{id=" + id + ", bio='" + bio + '\'' + '}';
+    }
+}
+
+🔄Repository
+import demo.crud.entity.User;
+public interface UserRepository extends JpaRepository<User, Long> {}
+
+import demo.crud.entity.Profile;
+public interface ProfileRepository extends JpaRepository<Profile, Long> {}
+
+🔄 Unit Test
+@Test
+	void saveUserWithProfile() {
+		Profile profile=new Profile("Java Developer");
+		User user=new User("Ankur");
+		
+		user.setProfile(profile);
+		userRepo.save(user);
+		
+		 userRepo.findById(user.getId()).ifPresent(u -> {
+	            System.out.println("Fetched user: " + u);
+	            System.out.println("Associated profile (via user): " + u.getProfile());
+	        });
+
+	        // Fetch via profile -> user should be accessible (inverse side)
+	        profileRepo.findById(profile.getId()).ifPresent(p -> {
+	            System.out.println("Fetched profile: " + p);
+	            System.out.println("Associated user (via profile): " + p.getUser());
+	        });
+	}
+
+🔄 Owning vs. Inverse Side
+➤ Owning Side: The entity that actually stores the foreign key column in its table.
+  ✔️ In your code → User is owning side because it has @JoinColumn(name="profile_id").
+
+➤ Inverse Side: Refers to the relationship but does not control it.
+  ✔️ In your code → Profile is inverse side because of mappedBy="profile".
+👉 Rule: Always perform save() on the owning side (here, User).  
+
+🔄 User Entity
+@OneToOne(cascade = CascadeType.ALL)
+@JoinColumn(name="profile_id", unique=true)  // FK stored in user table
+private Profile profile;
+
+➤ cascade = CascadeType.ALL: Persisting/deleting a User will also persist/delete the associated Profile.
+➤ @JoinColumn: Creates a foreign key column (profile_id) in user table.
+➤ unique=true: Ensures one User maps to one Profile.
+
+🔄 Profile Entity
+@OneToOne(mappedBy = "profile")
+private User user;
+
+➤ mappedBy: Indicates this is the inverse side, relationship is managed by User.profile.
+➤ No @JoinColumn here → avoids duplicate FK.
+
+🔄 Unit Test 
+Profile profile = new Profile("Java Developer");
+User user = new User("Ankur");
+
+user.setProfile(profile);
+userRepo.save(user);   // Saves both User + Profile (Cascade)
+
+✅ save(user) persists both because:
+  ➤ CascadeType.ALL is active.
+  ➤ User is owning side (so profile_id is inserted in user table)
+
+🔄 Fetch Type
+➤ Default for @OneToOne = EAGER (loads both entities together).
+➤ Can set fetch = FetchType.LAZY → loads proxy until accessed (requires @Transactional to avoid LazyInitializationException).
+
+🔄 Advantages
+➤ Simple relationship when one entity truly depends on another (e.g., User ↔ Profile, Passport ↔ Person).
+➤ Cascading simplifies persistence.
+
+🔄 Disadvantages
+➤ Tight coupling → both entities are dependent.
+➤ Unnecessary Eager fetching can lead to performance issues if not controlled.
+➤ Difficult to scale if relationship changes (e.g., one profile used by multiple users → must refactor to One-to-Many).
+
+🔄 Summary
+➤ User = owning side (FK).
+➤ Profile = inverse side (mappedBy).
+➤ CascadeType.ALL ensures both persist together.
+➤ Fetch strategy impacts performance (EAGER vs LAZY).
+➤ Best practice: keep @OneToOne unidirectional unless you really need both sides.
+
+
+🔷 Hibernate Cache
+➤ Hibernate cache = temporary in-memory storage used to reduce database round trips.
+➤ It stores objects/entities so Hibernate doesn’t repeatedly query the DB for the same data.
+➤ Goal = performance improvement → less SQL, lower latency, reduced DB load.
+
+1️⃣ First-Level Cache (L1 Cache)
+➤ Enabled by default – cannot be disabled.
+➤ Scope: per Session object (lives as long as the Hibernate Session exists).
+➤ Lifecycle: Cache is cleared once session is closed.
+➤ Data locality: Same session → Hibernate won’t hit DB twice for the same entity.
+
+✅Example:
+Session session = sessionFactory.openSession();
+
+User user1 = session.get(User.class, 1L);  // 🔴 Hits DB
+User user2 = session.get(User.class, 1L);  // ✅ Served from L1 cache, no DB call
+
+session.close();
+
+❓ What happens here?
+➤ First call → Hibernate queries DB (SELECT * FROM user WHERE id=1).
+➤ Second call → Hibernate checks L1 cache (inside the session), finds user1, and reuses it.
+
+⚡ Important: If you open a new session, cache is cleared → it will hit DB again.
+
+2️⃣ Second-Level Cache (L2 Cache)
+➤ Optional (must be enabled via configuration).
+➤ Scope: Shared across multiple Sessions (SessionFactory level).
+➤ Persists cached entities across different users and requests.
+➤ Works with external caching providers (Ehcache, Infinispan, Caffeine, Redis).
+
+✅Example:
+//Session 1
+Session session1 = sessionFactory.openSession();
+User user1 = session1.get(User.class, 1L);  // 🔴 Hits DB, stores in L2 cache
+session1.close();
+
+// Session 2
+Session session2 = sessionFactory.openSession();
+User user2 = session2.get(User.class, 1L);  // ✅ Served from L2 cache (no DB hit)
+session2.close();
+
+❓ What happens here?
+➤ First session queries DB and puts data in L2 cache.
+➤ Second session → Hibernate checks L2 cache, finds entity, and skips DB.
+
+📊 Key Differences: L1 vs L2 Cache
+| Feature       | First-Level Cache (L1)                    | Second-Level Cache (L2)                                   |
+| ------------- | ----------------------------------------- | --------------------------------------------------------- |
+| Default       | Always enabled                            | Optional (must configure)                                 |
+| Scope         | Per Session                               | Shared across Sessions                                    |
+| Lifetime      | Ends when Session closes                  | Ends when SessionFactory closes                           |
+| Use Case      | Prevent duplicate queries in same request | Prevent queries across multiple requests/users            |
+| Providers     | Built-in Hibernate                        | Requires providers (Ehcache, Infinispan, Redis, Caffeine) |
+
+
+⚙️ Configuring Second-Level Cache
+✅ Example (Ehcache):
+# application.properties
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+spring.jpa.properties.javax.persistence.sharedCache.mode=ALL
+
+
+🔄 Annotating entity for caching:
+@Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class User {
+    @Id
+    private Long id;
+    private String name;
+}
+
+🚀 Benefits of Hibernate Caching
+➤ Reduces DB load (fewer SQL queries).
+➤ Improves response time and scalability.
+➤ Especially helpful for read-heavy applications (profiles, product catalogs, dashboards).
+
+⚠️ Limitations / Caveats
+➤ Cache invalidation: Must keep cache in sync with DB (stale data risk).
+➤ Not useful for write-heavy apps (frequent updates reduce caching efficiency).
+➤ Needs careful configuration to avoid memory overhead.
