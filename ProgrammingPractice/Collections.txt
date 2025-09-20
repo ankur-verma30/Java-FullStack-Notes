@@ -675,8 +675,170 @@ if salary is same → age ascending,
 if age also same → name alphabetical.
 Print the sorted list.
 
+✅ Solution:
+package collections;
+
+import java.util.*;
+
+class Employee{
+	int id;
+	String name;
+	int age;
+	int  salary;
+	
+	public Employee(int id, String name, int age, int  salary) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.age = age;
+		this.salary = salary;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public int getSalary() {
+		return salary;
+	}
+
+	public void setSalary(int salary) {
+		this.salary = salary;
+	}
+
+	@Override
+	public String toString() {
+		return "Id "+this.getId()+" "+"Name:"+
+	this.getName()+" "+"Age is: "+this.getAge()+" "+
+				" Salary is: "+this.getSalary();
+	}
+	
+	
+}
+public class Program1 {
+    public static void main(String[] args) {
+    	List<Employee> employees = Arrays.asList(
+    		    new Employee(101, "Alice", 28, 70000),
+    		    new Employee(102, "Bob", 32, 85000),
+    		    new Employee(103, "Charlie", 26, 70000),
+    		    new Employee(104, "David", 35, 90000),
+    		    new Employee(105, "Eve", 30, 85000),
+    		    new Employee(106, "Frank", 29, 60000),
+    		    new Employee(107, "Grace", 40, 90000)
+    		);
+    	employees.sort((e1,e2)->{
+    		if(e1.getSalary()==e2.getSalary()) {
+    			if(e1.getAge()==e2.getAge()) {
+    				return e1.getName().compareTo(e2.getName());
+    			}
+    			return e1.getAge()-e2.getAge();
+    		}
+    		return e2.getSalary()-e1.getSalary();
+    	});
+    	
+    	employees.forEach(System.out::println);
+    }
+}
+
+⚡ Minor Improvement:
+✔️ Use Comparator chaining with Java 8+, which makes it cleaner:
+
+employees.sort(
+    Comparator.comparingInt(Employee::getSalary).reversed()
+              .thenComparingInt(Employee::getAge)
+              .thenComparing(Employee::getName)
+);
+✔️ This does exactly what your if-else chain is doing, but looks cleaner and is easier to extend
+
+
 2️⃣1️⃣ Given a list of integers and a target K, find if there exists a subarray whose sum equals K.
 Example:
 
 Input: [1, 2, 3, 7, 5], K=12
 Output: true   (because 2+3+7 = 12)
+
+✅ Solution:
+package collections;
+
+import java.util.*;
+
+public class Program1 {
+    public static void main(String[] args) {
+        List<Integer> list = Arrays.asList(1, 2, 3, 7, 5);
+        int k = 12;
+
+        Set<Integer> prefixSums = new HashSet<>();
+        int sum = 0;
+        boolean isFound = false;
+
+        for (int num : list) {
+            sum += num;
+
+            // Case 1: subarray starts from index 0
+            if (sum == k) {
+                isFound = true;
+                break;
+            }
+
+            // Case 2: subarray found in between
+            if (prefixSums.contains(sum - k)) {
+                isFound = true;
+                break;
+            }
+
+            // add prefix sum after check
+            prefixSums.add(sum);
+        }
+
+        if (isFound) {
+            System.out.println("Subarray Found");
+        } else {
+            System.out.println("Not Found");
+        }
+    }
+}
+
+2️⃣2️⃣ You are given a list of strings containing student names.
+👉 Group the students by the first letter of their name using a Map<Character, List<String>>.
+✅ Example:
+Input: ["Alice", "Ankur", "Bob", "Charlie", "Cathy"]
+Output:
+A -> [Alice, Ankur]  
+B -> [Bob]  
+C -> [Charlie, Cathy]
+
+
+2️⃣3️⃣ You are given a list of integers.
+👉 Find the longest consecutive subsequence (numbers appearing consecutively without gaps). Use a HashSet for efficient lookup.
+✅ Example:
+Input: [100, 4, 200, 1, 3, 2]
+Output: Longest consecutive subsequence length = 4 (because 1, 2, 3, 4 is longest)
+
+
+2️⃣4️⃣ Design a simple Leaderboard System using TreeMap<Integer, List<String>>, where the key is score and value is the list of player names with that score.
+➤ Insert some sample players with scores.
+➤ Print the leaderboard in descending order of scores.
+✅ Example:
+100 -> [Alice]  
+90  -> [Bob, Charlie]  
+80  -> [David]
