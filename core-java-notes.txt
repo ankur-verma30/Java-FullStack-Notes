@@ -4447,9 +4447,9 @@ fw.close();
 💾 Serialization & Deserialization in Java
 Serialization is the process of converting a Java object into a byte stream.
 This byte stream can be:
-1. Written to a file
-2. Transmitted over a network
-3. Saved to a database
+➤ Written to a file
+➤ Transmitted over a network
+➤ Saved to a database
 
 Deserialization is the reverse process: Converting a byte stream back into a Java object.
 
@@ -4466,8 +4466,7 @@ Deserialization is the reverse process: Converting a byte stream back into a Jav
 | `transient` keyword | Used to skip fields from serialization                              |
 | `serialVersionUID`  | Version control for the class — helps avoid `InvalidClassException` |
 
-Example:
---------
+✅ Example:
 package p1;
 import java.io.Serializable;
 
@@ -4476,18 +4475,16 @@ public class User implements Serializable {
     String username = "mike";
     transient String password = "secret123"; // Will not be serialized
 }
-
-
 ➤ transient: tells JVM to skip this field during serialization
 ➤ The password field will be null when deserialized
 
-🔐 transient Keyword – In Detail
+🔐 transient Keyword
 Prevents sensitive data (e.g., password, OTP) from being persisted
 Prevents circular references or unnecessarily heavy objects from being serialized
 
-Syntax:
-transient DataType fieldName;
+Syntax: transient DataType fieldName;
 
+✅ Example:
 package p1;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
@@ -4507,38 +4504,36 @@ public class B {
 }
 
 ⚠️ Bonus Trap: Changing Class After Serialization
-
 If you serialize an object and later modify the class (add/remove fields), deserialization can fail unless:
-serialVersionUID is unchanged
-Compatible changes are made (adding optional fields is safe)
+➤ serialVersionUID is unchanged
+➤ Compatible changes are made (adding optional fields is safe)
 
-🔹 Can serialVersionUID be anything?
+❓ Can serialVersionUID be anything?
 ✅ Yes, you can assign any long value as serialVersionUID.
 
 🔹 Example
 private static final long serialVersionUID = 42L;     // Valid
 private static final long serialVersionUID = 1234567890123456789L;  // Also valid
 
-💡 But Why Do We Use It?
+❓ But Why Do We Use It?
 serialVersionUID is used to verify that the sender and receiver of a serialized object have loaded classes for that object that are compatible concerning serialization.
 
-🔐 What happens without it?
+❓ What happens without it?
 If you don’t define serialVersionUID, the Java compiler automatically generates it based on class structure (fields, methods, modifiers, etc.).
-
 But the auto-generated value is not consistent across:
-Different compilers (javac vs Eclipse)
-Even minor changes in the class (adding/removing a method or variable)
+➤ Different compilers (javac vs Eclipse)
+➤ Even minor changes in the class (adding/removing a method or variable)
 
 🚨 Interview Trap
-Q: Can I remove or skip defining serialVersionUID if my class implements Serializable?
+❓ Can I remove or skip defining serialVersionUID if my class implements Serializable?
 ❌ Wrong Answer: Yes, it's optional
 ✅ Correct Answer: Technically optional, but highly recommended. Without it, even small changes in the class can cause InvalidClassException during deserialization.
 
 🧠 Best Practices
-Always manually declare serialVersionUID for Serializable classes.
-Choose any long value that’s meaningful to you (version number, timestamp, or arbitrary value).
+➤ Always manually declare serialVersionUID for Serializable classes.
+➤ Choose any long value that’s meaningful to you (version number, timestamp, or arbitrary value).
 
-👨‍💻 Example
+✅ Example: Deserialization
 package p1;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -4557,47 +4552,42 @@ public class C {
 	}
 }
 
-If class doesn’t implement Serializable	❌ NotSerializableException will be thrown at runtime
-Can static fields be serialized		❌ No. Static fields are class-level, not object-level, so not serialized.
+✔️ If class doesn’t implement Serializable	❌ NotSerializableException will be thrown at runtime
+✔️ Can static fields be serialized			❌ No. Static fields are class-level, not object-level, so not serialized.
 
-JDBC - Java Database Connectivity
-##########################################
--> Database: Here we store data in the form of tables permanently
--> Popular Databases: MySQL, PostgreSQL, Oracle, SQL Server, MongoDB, Derby, h2Database
--> Install MySQL Database
-Download from here: https://dev.mysql.com/downloads/windows/installer/8.0.html
--> When you download MySQL Workbench, you will get the following
-a. IDE - To Write SQL Query (Structured Query Language)
-(SQL query is used to interact with the database)
-b. MySQL Server
+
+🔷 JDBC - Java Database Connectivity
+➤ Database: Here we store data in the form of tables permanently
+➤ Popular Databases: MySQL, PostgreSQL, Oracle, SQL Server, MongoDB, Derby, h2Database
+➤ Install MySQL Database
+🔗 Download from here: https://dev.mysql.com/downloads/windows/installer/8.0.html
+➤  When you download MySQL Workbench, you will get the following: 
+	✔️ IDE - To Write SQL Query (SQL query is used to interact with the database)
+	✔️ MySQL Server
 
 Installation Doc: https://www.prowesstics.com/blogs/mysql-workbench-installation/
 
--> Launch MySQL Workbench
--> Create psaDB connection
--> Crate Database: Create Database psaDB
--> Connect to Database: use psaDB
--> Create Table Student: 
+✔️ Launch MySQL Workbench
+✔️ Create psaDB connection
+✔️ Create Database: Create Database psaDB
+✔️ Connect to Database: use psaDB
+✔️ Create Table Student: 
 Create table student(
 	name varchar(45),
     email varchar(128),
     mobile varchar(10)
 )
--> Read Table Content: Select * from student
--> Insert data to table: insert into student values('mike','mike@gmail.com','9632629033')
--> Read Table Content: Select * from student
+➤ Read Table Content: Select * from student
+➤ Insert data to table: insert into student values('mike','mike@gmail.com','9632629033')
+➤ Read Table Content: Select * from student
 
-Assignment: Complete SQL Recorded Classes. Access will be given in the PSA App. Nearly covered 250+ examples
+👉 After installing MySQL Workbench, we can now start with the JDBC Concept
+➤ Interacting with the database using Java program
+➤ Download Connector File for MySQL: https://dev.mysql.com/downloads/file/?id=538917
+➤ Create a folder with the name lib inside the root path of your Java project & paste the connector jar file inside it
+➤ Right click on project ---->> Go to properties ---->> select java build path ---->> click on libraries tab --->>Click on add jar ---->>navigate to lib folder and select mysql connector j jar ---->> click apply + close
 
-After installing MySQL Workbench, we can now start with the JDBC Concept
-------------------------------------------------------------------------
--> Interacting with the database using Java program
--> Download Connector File for MySQL: https://dev.mysql.com/downloads/file/?id=538917
--> Create a folder with the name lib inside the root path of your Java project & paste the connector jar file inside it
--> Right click on project>>Go to properties>>select java build path>> click on libraries tab>>Click on add jar>>navigate to lib folder and select mysql connector j jar>> click apply + close
-
-Example 1: JDBC code to insert data
------------------------------------
+✅ Example 1: JDBC code to insert data
 package jdbc_examples;
 
 import java.sql.Connection;
@@ -4607,8 +4597,7 @@ import java.sql.Statement;
 public class A {
 	public static void main(String[] args) {
 		try {
-//Connect to database - use psaDB (SQL)
-			
+//Connect to database - use psaDB (SQL)		
 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1","root","test");
 
 //Write & execute SQl query
@@ -4623,8 +4612,7 @@ con.close();
 }
 }
  
-Example 2: JDBC Code to delete a record
----------------------------------------
+✅ Example 2: JDBC Code to delete a record
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -4632,38 +4620,28 @@ import java.sql.Statement;
 public class B {
 	public static void main(String[] args) {
 		try {
-			//Connect to database - use psaDB (SQL)
-		Connection con = 
-					DriverManager.
-	getConnection("jdbc:mysql://localhost:3306/psadb1","root","test");
-					
-			//Write & execute SQl query
-			
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1","root","test");
 			Statement stmnt =  con.createStatement();
 			stmnt.executeUpdate("Delete from student where email='adam@gmail.com'");
-			//Close database connection
+
 			con.close();
-		} catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 }
 
-Example 3: JDBC Code to update a Record
--------------------------------------
+✅ Example 3: JDBC Code to update a Record
 import java.sql.*;
 
 public class C {
 	public static void main(String[] args) {
 		try {
-			//Step Connect to Database
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
 			
-			//Step 2: Execute SQL Query
 			Statement stmnt = con.createStatement();
 			stmnt.executeUpdate("Update student set mobile='9632882052' where email='mike@gmail.com'");
 			
-			//Step 3: Close Database Connection
 			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4671,8 +4649,7 @@ public class C {
 	}
 }
 
-Example 4: JDBC Code to read data from the database
------------------------------------------------
+✅ Example 4: JDBC Code to read data from the database
 package p1;
 
 import java.sql.*;
@@ -4683,7 +4660,6 @@ public class D {
 			//Step Connect to Database
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
 			
-			//Step 2: Execute SQl Query
 			Statement stmnt = con.createStatement();
 			ResultSet result = stmnt.executeQuery("Select * from student");
 			
@@ -4691,9 +4667,7 @@ public class D {
 				System.out.println(result.getString(1));
 				System.out.println(result.getString(2));
 				System.out.println(result.getString(3));
-			}
-			
-			//Step 3: Close Database Connection
+			}		
 			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4701,37 +4675,31 @@ public class D {
 	}
 }
 
-✅ Custom Exception in Java
-##############################
+🔷  Custom Exception in Java
 Custom exceptions are user-defined exceptions that extend either the Exception class (for checked exceptions) or the RuntimeException class (for unchecked exceptions).
 
 🔹 Syntax for Custom Exception
-✅ 1. Checked Exception (extends Exception)
-// Custom checked exception
+1️⃣ Checked Exception (extends Exception)
 public class MyCheckedException extends Exception {
     public MyCheckedException(String message) {
         super(message);
     }
 }
 
-✅ 2. Unchecked Exception (extends RuntimeException)
-// Custom unchecked exception
+2️⃣ Unchecked Exception (extends RuntimeException)
 public class MyUncheckedException extends RuntimeException {
     public MyUncheckedException(String message) {
         super(message);
     }
 }
 
-🔧 Example with Usage
-📌 Example: Creating and Using a Checked Exception
-// Custom exception class
+✅ Example: Creating and Using a Checked Exception
 class AgeInvalidException extends Exception {
     public AgeInvalidException(String message) {
         super(message);
     }
 }
 
-// Business logic
 public class CustomExceptionDemo {
     public static void validateAge(int age) throws AgeInvalidException {
         if (age < 18) {
@@ -4756,24 +4724,24 @@ public class CustomExceptionDemo {
 ➤ Use descriptive names (InvalidAgeException, UserNotFoundException).
 ➤ Don’t overuse — prefer standard exceptions when they fit.
 
-🧠 Interview Tips & Traps
-| ❓ Question                                             | ✅ Good Answer                                                 |
-| ------------------------------------------------------ | ------------------------------------------------------------- |
-| Should I extend `Throwable` directly?                  | ❌ No, use `Exception` or `RuntimeException`.                  |
-| Can I throw a custom exception without the `throws` keyword? | ✅ Yes, but only if it extends `RuntimeException` (unchecked). |
-| Why create custom exceptions?                          | To handle specific business logic and improve code clarity.   |
-| Can custom exceptions have multiple constructors?      | ✅ Yes, just like any class (with message, cause, etc.).       |
+🧠 Tips & Traps
+| ❓ Question                                                    | ✅ Good Answer                                                 |
+| ------------------------------------------------------         | -------------------------------------------------------------   |
+| Should I extend `Throwable` directly?                  		 | ❌ No, use `Exception` or `RuntimeException`.                  |
+| Can I throw a custom exception without the `throws` keyword?   | ✅ Yes, but only if it extends `RuntimeException` (unchecked). |
+| Why create custom exceptions?                          		 | To handle specific business logic and improve code clarity.     |
+| Can custom exceptions have multiple constructors?      	     | ✅ Yes, just like any class (with message, cause, etc.).       |
 
-✅ Difference between throw and throws in Java
-##################################################
+
+🆚 Difference between throw and throws in Java
 | Feature                  | `throw`                                       | `throws`                                                |
 | ------------------------ | --------------------------------------------- | ------------------------------------------------------- |
-| Purpose              | Used to explicitly throw an exception     | Used to declare exceptions a method might throw     |
-| Location             | Inside method or block                        | In method signature                                     |
-| Number of Exceptions | Can throw only one exception at a time    | Can declare multiple exceptions separated by commas |
-| Type                 | Followed by an object of `Throwable` type | Followed by one or more **exception class names       |
-| Usage                | Used for triggering exception                 | Used for declaring exception handling responsibility    |
-| Syntax               | `throw new ExceptionType("msg");`             | `public void method() throws IOException`               |
+| Purpose              	   | Used to explicitly throw an exception         | Used to declare exceptions a method might throw         |
+| Location             	   | Inside method or block                        | In method signature                                     |
+| Number of Exceptions     | Can throw only one exception at a time        | Can declare multiple exceptions separated by commas 	 |
+| Type                     | Followed by an object of `Throwable` type     | Followed by one or more **exception class names       	 |
+| Usage                    | Used for triggering exception                 | Used for declaring exception handling responsibility    |
+| Syntax                   | `throw new ExceptionType("msg");`             | `public void method() throws IOException`               |
 
 ✅ Syntax and Example
 🔹 throw keyword example (used inside method)
@@ -4791,7 +4759,6 @@ public class ThrowExample {
 import java.io.*;
 
 public class ThrowsExample {
-    // declaring that this method may throw IOException
     public static void readFile() throws IOException {
         FileReader fr = new FileReader("file.txt"); // may throw IOException
         BufferedReader br = new BufferedReader(fr);
@@ -4814,26 +4781,23 @@ public class ThrowsExample {
 ➤ Use throw to generate an exception during custom logic validation.
 ➤ Use throws to inform the caller method to handle the exception.
 
-⚠️ Common Interview Traps
-| ❓ Trap Question                                                        | ✅ Correct Clarification                                                  |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Can we use `throw` without creating exception object?                  | ❌ No, `throw` must be followed by a `Throwable` object.                  |
-| Can we write `throws` inside method body?                              | ❌ No, `throws` is only used in **method signature**.                     |
-| Can we throw multiple exceptions with `throw`?                         | ❌ No, only **one exception object** at a time.                           |
-| What happens if a method declares `throws` but doesn't actually throw? | ✅ That’s allowed — declaration is just a **promise**, not a requirement. |
+⚠️ Common Traps
+| ❓ Trap Question                                               | ✅ Correct  Clarification                                                  
+| Can we use `throw` without creating exception object?          | ❌ No, `throw` must be followed by a `Throwable` object.                  |
+| Can we write `throws` inside method body?                      | ❌ No, `throws` is only used in method signature**.                       |
+| Can we throw multiple exceptions with `throw`?                 | ❌ No, only one exception object at a time.                               |
+| What happens if method declares throws but doesn't actually throw?| ✅ That’s allowed — declaration is just a promise, not a requirement.  |
 
 ✅ Best Practices
 ➤ Use throws for checked exceptions that you don’t want to handle in the method.
 ➤ Use throw for custom exception logic or early exits.
 ➤ Always handle checked exceptions using try-catch or declare them using throws.
 
-Multi-catch blocks:
----------------------
-➤We can create multiple catch blocks.
-➤Always start with the  child exception class, followed by the parent exception class
+🔄 Multi-catch blocks:
+➤ We can create multiple catch blocks.
+➤ Always start with the  child exception class, followed by the parent exception class
 
-Example:
----------
+✅ Example:
 package p1;
 
 public class E {
@@ -4851,17 +4815,14 @@ public class E {
 		}catch (Exception e) {
 			System.out.println(3);
 		}
-		
 	}
 }
 
-Finally block in Java
-###########################
-➤ This isan  extension of try try-catch block
-➤The code that we write in the finally block will run 100%, regardless of the exception
+🔄 Finally block in Java
+➤ This is an  extension of try try-catch block
+➤ The code that we write in the finally block will run 100%, regardless of the exception
 
-Example:
---------
+✅ Example:
 public class E {
 	int x = 10;
 	public static void main(String[] args) {
@@ -4875,8 +4836,7 @@ public class E {
 	}
 }
 
-Example:
---------
+✅ Example:
 public class E {
 	int x = 10;
 	public static void main(String[] args) {
@@ -4891,8 +4851,7 @@ public class E {
 	}
 }
 
-Example: Can we write only a try-catch block: yes
---------
+✅ Example: Can we write only a try-finally block: yes
 public class E {
 	int x = 10;
 	public static void main(String[] args) {
@@ -4909,11 +4868,11 @@ Exception in thread "main" java.lang.ArithmeticException: / by zero
 	at jdbc_examples.E.main(E.java:7)
 
 
-Example where the finally block can be used?
-a. We can perform a database closing operation
-b. We can perform a file closing operation / Database closing Operation
+❓ where the finally block can be used?
+➤ We can perform a database closing operation
+➤ We can perform a file closing operation / Database closing Operation
 
-Example :
+✅ Example :
 package p1;
 
 import java.sql.*;
@@ -4922,18 +4881,13 @@ public class A {
 	public static void main(String[] args) {
 		Connection con = null;
 		try {
-			//Step Connect to Database
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
-			
-			//Step 2: Execute SQl Query
 			Statement stmnt = con.createStatement();
-			stmnt.executeUpdate("insert into student values('adam','adam@gmail.com','9632629455')");
-					
+			stmnt.executeUpdate("insert into student values('adam','adam@gmail.com','9632629455')");				
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
 			try {
-				//Step 3: Close Database Connection
 				con.close();
 			} catch (Exception e2) {
 				e2.printStackTrace();
@@ -4942,6 +4896,7 @@ public class A {
 	}
 }
 
+❗ Trap Question:
 public class Test {
     public static void main(String[] args) {
         System.out.println(test());
@@ -4957,27 +4912,25 @@ public class Test {
         }
     }
 }
-1. What is the output?
 ✅ Output is: 3
 
-2. Why does finally override the return in try?
-➤Because the finally block is always executed, and if it contains a return, it overrides any previous return values, even from try or catch.
-➤So even though try says return 1, and there's no exception, the finally block's return 3 overrides it.
+❓ Why does finally override the return in try?
+➤ Because the finally block is always executed, and if it contains a return, it overrides any previous return values, even from try or catch.
+➤ So even though try says return 1, and there's no exception, the finally block's return 3 overrides it.
 🧨 This is often called "return suppression".
 
-3. What if finally didn’t have a return?
+❓ What if finally didn’t have a return?
 Then the return from try (or catch, if an exception occurs) would go through as normal.
 
 So if finally it is:
 finally {
     System.out.println("Cleaning up");
 }
-
 Then the output would be:
-Cleaning up ---> Output from finally  
-1 ----> returned output from try-catch block
+Cleaning up 	----> Output from finally  
+1 				----> returned output from try-catch block
 
-Code Example 2:
+✅ Example 2:
 public class Main {
     public static void main(String[] args) {
         try {
@@ -4989,21 +4942,25 @@ public class Main {
         }
     }
 }
+✅ Output:
+A
+B
+
 And what if you remove the catch block — will it still print B? Why or why not?
 ✅ Output:B  
 Exception in thread "main" java.lang.ArithmeticException: / by zero.
 ✔️ Finally runs.
 Even when there's no catch, the finally block executes before the exception is thrown back to the JVM.
 
-final:
--> final makes variable constant
--> final prevents overriding
--> final on class stops inheritance
+🔄 final Keyword:
+➤ final makes variable constant
+➤ final prevents overriding
+➤ final on class stops inheritance
 
-finally:
+🔄 finally:
 ➤ This is an extension of a try-catch block.
 ➤ The code that we write in the finally block will run 100%, regardless of the exception.
 
-finalize():
+🔄 finalize():
 ➤ This is a method inside the Object class, and here, the Garbage collection logic is implemented.
 ➤ We can try calling the garbage collector using System.gc(). But it will not guarantee 100% execution.
