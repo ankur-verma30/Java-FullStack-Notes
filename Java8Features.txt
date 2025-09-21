@@ -548,7 +548,7 @@ list.stream()
     .forEach(System.out::println);
 ✅ Output: ALICE, BOB, CHARLIE
 
-⚡ Sorted sorted()
+⚡ sorted()
 ➤ Sorts stream elements.
 ➤ Default: natural ordering.
 ➤ Can pass custom comparator.
