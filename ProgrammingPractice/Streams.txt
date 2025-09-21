@@ -640,3 +640,103 @@ employees.stream()
     .forEach((dept, avgSalary) -> {
         System.out.println("Department: " + dept + ", Average Salary: " + avgSalary);
     });
+
+
+2️⃣2️⃣ Transaction Amounts by Type
+➤ You have a list of Transaction(id, type, amount) where type = "CREDIT" or "DEBIT".
+➤ Compute the total amount of CREDIT and DEBIT transactions separately.
+
+✅ Solution:
+transactions.stream()
+    .collect(Collectors.groupingBy(Transaction::getType,
+            Collectors.summingDouble(Transaction::getAmount)))
+    .forEach((type, amount) -> 
+        System.out.println("Type is: " + type + " Amount is: " + amount));
+
+
+2️⃣3️⃣ Top 3 Highest Transactions
+➤ Find the top 3 transactions by amount.
+
+✅ Solution:
+ transactions.stream()
+        .sorted(Comparator.comparingDouble(Transaction::getAmount)
+        		.reversed()).limit(3)
+        .forEach(e->System.out.println(e.getAmount()));;
+
+2️⃣4️⃣ Transactions Above a Threshold
+➤ Given a threshold (e.g., 5000), get the list of transaction IDs whose amount is greater than the threshold.
+
+✅ Solution:
+transactions.stream()
+    .filter(e -> e.getAmount() > 5000)                  // keep only transactions > 5000
+    .map(e -> e.getCustomerName())                      // extract customer names
+    .toList().stream()                                  // convert to list, then stream again ❌ (unnecessary step)
+    .distinct()                                         // remove duplicates
+    .forEach(System.out::println);                      // print unique customer names
+
+
+⚠️ Minor Improvement
+Don’t need .toList().stream(). You can directly chain distinct() after map().
+
+transactions.stream()
+    .filter(e -> e.getAmount() > 5000)
+    .map(Transaction::getCustomerName)
+    .distinct()
+    .forEach(System.out::println);
+
+
+2️⃣5️⃣ Employee Salary Raise
+Given a list of Employee objects (name, department, salary), create a new list of employees where each employee in the "IT" department gets a 10% salary hike, and print the updated list.
+
+✅ Solution:
+List<Employee> employees = Arrays.asList(
+    		    new Employee("Alice", "IT", 75000),
+    		    new Employee("Bob", "IT", 82000),
+    		    new Employee("Charlie", "HR", 60000),
+    		    new Employee("David", "Finance", 90000),
+    		    new Employee("Eva", "HR", 65000),
+    		    new Employee("Frank", "Finance", 88000),
+    		    new Employee("Grace", "IT", 95000),
+    		    new Employee("Hannah", "Finance", 70000),
+    		    new Employee("Ian", "HR", 72000),
+    		    new Employee("Jack", "IT", 78000)
+    		);
+
+       employees.stream()
+       .filter(e->e.getDepartment().contains("IT"))
+       .map(e->{
+    	   e.setSalary(e.getSalary()+0.1*e.getSalary());
+    	   return e;
+       }).forEach(System.out::println);  
+
+
+2️⃣6️⃣ Longest String in a List
+Given a list of strings, use streams to find the longest string in the list. If there are multiple with the same length, return any one of them.
+
+✅ Solution:
+String maxWord = words.stream()
+    			.collect(Collectors
+    					.maxBy(Comparator.comparing(String::length)))
+    			.get();
+
+➤ Collectors.maxBy(Comparator.comparing(String::length)) is valid.
+➤ .get() gives you the longest string.
+
+⚠️ Issues
+➤ .collect(Collectors.maxBy(...)) returns an Optional<String>, and you are calling .get() directly.
+➤ If the list is empty, .get() will throw NoSuchElementException.
+
+🔄 Minor Improvement
+String maxWord = words.stream()
+        .max(Comparator.comparing(String::length))
+        .orElse("No words found");
+
+
+2️⃣7️⃣ Transaction Analysis
+Given a list of Transaction objects (id, customerName, type, amount), find the average transaction amount for each transaction type.
+
+✅ Solution:
+  transactions.stream()
+        .collect(Collectors.groupingBy(Transaction::getType, Collectors.averagingDouble(Transaction::getAmount)))
+        .forEach((type,avgSalary)-> System.out.println("Type is: "+type+" Average Salary is: "+avgSalary));
+
