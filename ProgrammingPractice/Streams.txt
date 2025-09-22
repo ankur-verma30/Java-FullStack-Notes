@@ -740,3 +740,38 @@ Given a list of Transaction objects (id, customerName, type, amount), find the a
         .collect(Collectors.groupingBy(Transaction::getType, Collectors.averagingDouble(Transaction::getAmount)))
         .forEach((type,avgSalary)-> System.out.println("Type is: "+type+" Average Salary is: "+avgSalary));
 
+
+2️⃣8️⃣Employee Department Stats
+Given a list of Employee objects (name, department, salary), find the average salary per department, and print the result.
+
+✅ Solution:
+employees.stream()
+            .collect(Collectors.groupingBy(
+                Employee::getDepartment,
+                Collectors.averagingDouble(Employee::getSalary)
+            ))
+            .forEach((department, avgSalary) -> {
+                System.out.println("Department: " + department + " | Avg Salary: " + avgSalary);
+            });
+
+2️⃣9️⃣String Frequency (Sorted)
+Given a list of strings, count the frequency of each string and return the result sorted by frequency in descending order.
+
+✅ Solution:
+  	words.stream()
+        .collect(Collectors.groupingBy(word -> word, Collectors.counting())) // count frequency
+        .entrySet().stream()
+        .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())) 
+        .forEach(entry -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
+
+3️⃣0️⃣Top Customer by Transaction Amount
+Given a list of Transaction objects (id, customerName, type, amount), find the customer who spent the highest total amount (summing all their transactions).
+
+String key = transactions.stream()
+    .collect(Collectors.groupingBy(Transaction::getCustomerName, Collectors.summingDouble(Transaction::getAmount))) // total amount per customer
+    .entrySet().stream()
+    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort by total amount desc
+    .findFirst().get() // pick top customer
+    .getKey(); // extract customer name
+
+System.out.println(key);

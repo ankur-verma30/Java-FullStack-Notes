@@ -4462,9 +4462,9 @@ Deserialization is the reverse process: Converting a byte stream back into a Jav
 📘 Key Concepts
 | Concept             | Details                                                             |
 | ------------------- | ------------------------------------------------------------------- |
-| `Serializable`      | Marker interface (`java.io.Serializable`) that must be implemented  |
-| `transient` keyword | Used to skip fields from serialization                              |
-| `serialVersionUID`  | Version control for the class — helps avoid `InvalidClassException` |
+| Serializable        | Marker interface (java.io.Serializable) that must be implemented    |
+| transient keyword   | Used to skip fields from serialization                              |
+| serialVersionUID    | Version control for the class — helps avoid InvalidClassException   |
 
 ✅ Example:
 package p1;
@@ -4485,22 +4485,48 @@ Prevents circular references or unnecessarily heavy objects from being serialize
 Syntax: transient DataType fieldName;
 
 ✅ Example:
-package p1;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-public class B {
-	public static void main(String[] args) {
-		A a1 = new A();
-		try {
-			FileOutputStream fos = new FileOutputStream("G:\\april\\file.ser");
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(a1); // a1 is instance of A. The object a1 is converted to a byte stream and saved in a file.ser
-			oos.close();
-			fos.close();
-		} catch (Exception e) {	
-			e.printStackTrace();
-		}
-	}
+import java.io.*;
+
+class Employee implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    int id;
+    String name;
+    transient double salary; //will not be serialized
+
+    public Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{id=" + id + ", name='" + name + "', salary=" + salary + "}";
+    }
+}
+
+public class TransientDemo {
+    public static void main(String[] args) {
+        String filename = "employee.ser";
+
+        🔁 Serialization
+        Employee emp = new Employee(201, "Ankur", 75000.50);
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(emp);
+            System.out.println("Serialization successful: " + emp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        🔁 Deserialization
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            Employee deserializedEmp = (Employee) ois.readObject();
+            System.out.println("Deserialization successful: " + deserializedEmp);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 ⚠️ Bonus Trap: Changing Class After Serialization
@@ -4532,25 +4558,6 @@ But the auto-generated value is not consistent across:
 🧠 Best Practices
 ➤ Always manually declare serialVersionUID for Serializable classes.
 ➤ Choose any long value that’s meaningful to you (version number, timestamp, or arbitrary value).
-
-✅ Example: Deserialization
-package p1;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-public class C {
-	public static void main(String[] args) {
-		try {
-			FileInputStream fis = new FileInputStream("G:\\april\\file.ser");
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			A a1 = (A)ois.readObject();
-			System.out.println(a1.name);
-			System.out.println(a1.password); // The object is restored, but password will be null because it was marked transient
-			ois.close();	
-		} catch (Exception e) {	
-			e.printStackTrace();
-		}
-	}
-}
 
 ✔️ If class doesn’t implement Serializable	❌ NotSerializableException will be thrown at runtime
 ✔️ Can static fields be serialized			❌ No. Static fields are class-level, not object-level, so not serialized.
