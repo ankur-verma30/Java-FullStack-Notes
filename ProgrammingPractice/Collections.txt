@@ -920,27 +920,48 @@ class Solution {
 		}
 
 
-2️⃣5️⃣ Top K Frequent Words
-You are given a list of words.
-👉 Find the top K most frequent words using a HashMap (for frequency) and a PriorityQueue (for ordering).
-If two words have the same frequency, sort them lexicographically.
+2️⃣5️⃣ Frequency Counter (HashMap)
+👉 Given a list of words, count the frequency of each word and print them in any order.
 
-✅ Example:
-Input: ["i", "love", "leetcode", "i", "love", "coding"], K = 2
-Output: ["i", "love"]
+✅ Solution:
+        List<String> words = Arrays.asList(
+            "apple", "banana", "apple", "orange", "banana", "apple", "grape"
+        );
+        Map<String, Integer> map = new HashMap<>();
+        for (String word : words) {
+            map.put(word, map.getOrDefault(word, 0) + 1);
+        }
 
-2️⃣6️⃣ Sort Employees by Multiple Criteria
-You are given a list of Employee objects with fields: id, name, age, salary.
-👉 Sort them in the following order:
-Highest salary first
-If salary is same → youngest age first
-If both same → name alphabetically
+        for (Entry<String, Integer> entry : map.entrySet()) {
+            System.out.println("Word: " + entry.getKey() + " → Count: " + entry.getValue());
+        }
 
-2️⃣7️⃣ Find Duplicate Subarrays of Length K
-You are given an array of integers and a value K.
-👉 Find all subarrays of length K that occur more than once.
-Use a HashMap<String, Integer> to store subarray frequency (convert subarray to string as a key).
+2️⃣6️⃣ Unique Elements (HashSet)
+👉 Given a list of integers with duplicates, remove duplicates using HashSet and print the unique elements.
 
-✅ Example:
-Input: arr = [1,2,3,1,2,3,4], K = 3
-Output: [[1,2,3]]
+✅ Solution:
+List<Integer> numbers = Arrays.asList(
+			    10, 20, 10, 30, 40, 20, 50, 60, 50
+			);
+			Set<Integer>set=new HashSet<>(numbers);
+		
+		System.out.println(set);
+
+2️⃣7️⃣ Sorted Map of Students (TreeMap)
+👉 Create a TreeMap<Integer, String> where key = Roll Number, value = Student Name.
+Insert sample students and print them in sorted order of roll number.
+
+✅ Solution:
+ TreeMap<Integer, String> students = new TreeMap<>();
+
+        students.put(105, "Alice");
+        students.put(101, "Bob");
+        students.put(104, "Charlie");
+        students.put(103, "David");
+        students.put(102, "Eve");
+
+        System.out.println("Students sorted by ID:");
+        for (Map.Entry<Integer, String> entry : students.entrySet()) {
+            System.out.println("ID: " + entry.getKey() + " -> Name: " + entry.getValue());
+        }
+
