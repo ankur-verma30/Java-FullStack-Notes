@@ -775,3 +775,42 @@ String key = transactions.stream()
     .getKey(); // extract customer name
 
 System.out.println(key);
+
+3️⃣1️⃣ Partition Employees by Salary
+Given a list of employees, partition them into two groups:
+➤ Employees earning more than 80,000
+➤ Employees earning less than or equal to 80,000
+
+✅ Solution:
+employees.stream()
+                 .collect(Collectors.groupingBy(e -> e.getSalary() > 80000)).forEach((key, empList) -> {
+    System.out.println((key ? "High Salary (>80000)" : "Low Salary (<=80000)") + ":");
+    empList.forEach(System.out::println);
+    System.out.println();
+});
+
+3️⃣2️⃣ Most Common Word
+Given a list of strings, find the word that appears most frequently.
+
+✅ Solution:
+words.stream()
+        .collect(Collectors.groupingBy(word -> word, Collectors.counting()))
+        .entrySet().stream()
+        .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder()))
+        .map(Map.Entry::getKey)
+        .findFirst().ifPresent(word -> System.out.println("Most common word: " + word));
+
+
+3️⃣3️⃣ Customer Transaction Report
+Given a list of transactions (id, customerName, type, amount), generate a map of customerName → list of transaction types (no duplicates).
+👉 e.g., if Alice did "Credit", "Debit", "Credit", the result should be:
+Alice → [Credit, Debit]
+
+✅ Solution:
+  transactions.stream()
+                        .collect(Collectors.groupingBy(
+                                Transaction::getCustomerName,
+                                Collectors.mapping(Transaction::getType, Collectors.toSet())
+                        )).forEach((customer, types) ->
+                System.out.println(customer + " → " + types));
+
