@@ -1,3 +1,89 @@
+📒 Generics in Java
+1. What Are Generics?
+Generics in Java allow you to create classes, interfaces, and methods with type parameters.
+
+This makes your code:
+➤ Type-safe → detects wrong types at compile time.
+➤ Reusable → works with any data type without rewriting code.
+➤ Flexible → works for multiple data types while keeping strong type checks.
+
+2. Syntax
+We use angle brackets < > to define a generic type.
+class ClassName<T> {
+    // T is a type parameter
+}
+Here:
+➤ T → Type parameter (can be replaced by any object type when using the class).
+➤ You can have multiple parameters: <T, U, V>.
+
+3. Advantages of Generics
+✅ Type Safety – Avoids ClassCastException at runtime.
+✅ Code Reusability – One generic class works for different data types.
+✅ Compile-time Checking – Errors detected earlier.
+✅ Eliminates Typecasting – No need to cast objects explicitly.
+
+4. Example – Generic Class
+GenericsIntro.java
+package p1;
+
+public class GenericsIntro<T, U> {
+    public T name;
+    public U id;
+
+    public GenericsIntro(T name, U id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public U getId() {
+        return id;
+    }
+
+    public T getName() {
+        return name;
+    }
+}
+GenericsImpl.java
+package p1;
+
+public class GenericsImpl {
+    public static void main(String[] args) {
+        GenericsIntro<String, Integer> a1 = new GenericsIntro<>("Ankur", 120);
+        System.out.println(a1.getId());   // 120
+        System.out.println(a1.getName()); // Ankur
+    }
+}
+
+5. Wildcards in Generics (?)
+The wildcard ? is an unknown type.
+Used when the exact type parameter is not important.
+
+5.1 Unbounded Wildcard → <?>
+Means “any type”.
+public void printList(List<?> list) {
+    for (Object obj : list) {
+        System.out.println(obj);
+    }
+}
+
+5.2 Upper Bounded Wildcard → <? extends Type>
+Means “Type or any subclass of Type”.
+Use when: You want to read data but not modify it.
+public void processNumbers(List<? extends Number> list) {
+    for (Number num : list) {
+        System.out.println(num.doubleValue());
+    }
+}
+
+5.3 Lower Bounded Wildcard → <? super Type>
+Means “Type or any superclass of Type”.
+Use when: You want to write data.
+public void addIntegers(List<? super Integer> list) {
+    list.add(10);
+    list.add(20);
+}
+
+
 🔷 What is Collections?
 A collection is simly an Object that represents a group of objects, known as its elements.
 
@@ -2846,3 +2932,570 @@ Consumed Task-5
 ➤ Often used in work-stealing algorithms (threads can take tasks from both ends).
 ➤ Provides lock-free scalability for multiple threads.
 
+
+🔷 Enums in Java 
+Enum (short for enumeration) is a special data type in Java used to represent a fixed set of named constants.
+
+Introduced in Java 5.
+
+Syntax:
+enum EnumName {
+    CONSTANT1, CONSTANT2, CONSTANT3
+}
+
+🌟Characteristics
+➤ Each constant in an enum is public, static, and final by default.
+➤ Enum extends java.lang.Enum internally.
+➤ Cannot extend another class because enums already extend Enum.
+➤ Can implement interfaces.
+➤ Can have fields, constructors, and methods.
+➤ Enum constants are singleton objects.
+
+3. When to Use
+1. When you have a predefined set of related constants, such as:
+   ➤ Days of the week (MONDAY, TUESDAY, …)
+   ➤ States in a process (STARTED, IN_PROGRESS, COMPLETED)
+   ➤ Severity levels (MINOR, MAJOR, CRITICAL)
+2. Avoids "magic numbers" and string literals in code.
+
+🌟 Issues Without Enums (Your Current Code Problems)
+➤ Constants like MINOR=0, MAJOR=1 require manual mapping.
+➤ Risk of passing invalid values (e.g., 5 for severity).
+➤ Poor readability: You have to remember what 1 or 2 means.
+➤ No type safety — any int can be passed to methods.
+➤ Switching over raw numbers is error-prone.
+➤ Difficult to maintain — adding/removing constants requires editing multiple locations.
+
+🌟 Benefits of Using Enums
+✅ Type Safety — Compiler ensures only valid enum constants are used.
+✅ Readability — Constants have meaningful names.
+✅ No invalid values — Cannot pass unrelated numbers/strings.
+✅ Easy to maintain — Adding new constants is straightforward.
+✅ Can store data & behavior — Enums can have fields, constructors, and methods.
+
+❌ Code without Enums
+
+public class Severity{
+    final static int MINOR=0;
+    final static int MAJOR=1;
+    final static int CRITICAL=2;
+}
+
+public class Defect{
+    public static int getDefectFixingTime( int severity){
+        return switch(severity){
+            case 0 -> 1;
+            case 1->  3;
+            case 2 -> 5;
+            default -> thorw new IllegalArgumentException("Unexpected Value);
+        }
+    }
+}
+
+public class ReportDefect {
+public static void main(String[] args) {
+	int days=Defect.getDefectFixingTime(2);
+	System.out.println(days);
+}
+}
+
+✅ Rewritten Using Enums
+enum Severity {
+    MINOR(1), MAJOR(3), CRITICAL(5);
+
+    private final int fixingDays;
+
+    //by default private constructor
+    Severity(int fixingDays) {
+        this.fixingDays = fixingDays;
+    }
+
+    //getter method
+    public int getFixingDays() {
+        return fixingDays;
+    }
+}
+
+class Defect {
+
+    public static int getDefectFixingTime(Severity severity) {
+        return severity.getFixingDays();
+    }
+}
+
+public class ReportDefect {
+    public static void main(String[] args) {
+        int days = Defect.getDefectFixingTime(Severity.CRITICAL);
+        System.out.println(days);
+    }
+}
+
+🔄How This Works
+1. enum Severity:
+    ➤ Represents fixed constants MINOR, MAJOR, and CRITICAL.
+    ➤ Each constant stores an extra value (number of days) using a field.
+    ➤ Constructor assigns this value.
+    ➤ Method getFixingDays() retrieves it.
+
+Defect class:
+    ➤ Accepts only Severity type — prevents invalid arguments.
+
+ReportDefect class:
+    ➤ Calls method with an enum constant.
+    ➤ Output for Severity.CRITICAL → 5.
+
+🌟Key Enum Features Used Here
+➤ Parameterized Enums: Storing extra information (fixingDays).
+➤ Type-Safe Method Parameters: Accepting Severity instead of int.
+
+Built-in Enum Methods:
+    ➤ values() → Returns all constants.
+    ➤ valueOf(String name) → Returns constant by name.
+    ➤ ordinal() → Returns index of constant (0-based).
+
+Example:
+for (Severity s : Severity.values()) {
+    System.out.println(s + " takes " + s.getFixingDays() + " days");
+}
+
+🌟Enum Memory & Performance
+➤ Each enum constant is a singleton instance created at class load time.
+➤ Performance-friendly — Similar to using static final constants but safer and more maintainable.
+➤ No extra overhead for typical usage.
+
+🌟Tips
+➤ Enums in Java are class-like, not just constants.
+➤ They are more powerful than enums in languages like C/C++.
+➤ Can override methods for individual constants.
+➤ Cannot extend other classes but can implement interfaces.
+➤ Best practice: Use enums instead of int constants for fixed sets of values.    
+
+| Aspect             | Int Constants (final static)                                            Enums                                                                  |
+| Readability        | Less clear — values appear as numbers, meaning must be remembered or checked in code | Very clear — values have meaningful names               |
+| Type Safety        | None — any integer can be passed accidentally                       | Strong — only predefined enum constants can be used                      |
+| Maintainability    | Difficult — changing values may break multiple places silently      | Easy — changes are localized, compiler helps catch errors                |
+| Extensibility      | Limited — adding new constants requires careful changes everywhere  | Easy — just add new enum constants without affecting existing logic much |
+| Error Prevention   | Low — invalid integers may go unnoticed until runtime               | High — compile-time validation prevents most mistakes                    |
+| Debugging          | Hard — logs show numbers without context                            | Easy — logs show constant names directly                                 |
+| Refactoring Safety | Risky — renaming or reordering constants may cause logical issues   | Safe — compiler enforces correct usage                                   |
+| Performance        | Slightly better in raw speed (no object creation)                   | Negligible performance difference for most applications                  |
+| Business Risk      | Higher — more prone to bugs due to wrong values                     | Lower — safer to maintain and extend                                     |
+| Best Use Case      | When extreme performance or memory constraints demand               | When a fixed set of named values is needed                               |
+
+🔗Code using Built-in methods of Enums
+enum Severity {
+    LOW,
+    MEDIUM,
+    HIGH,
+    CRITICAL
+}
+
+public class EnumExample {
+    public static void main(String[] args) {
+
+        // values()
+        System.out.println("All constants:");
+        for (Severity s : Severity.values()) {
+            System.out.println(s);
+        }
+
+        // valueOf()
+        Severity sev = Severity.valueOf("HIGH");
+        System.out.println("\nValueOf(\"HIGH\") = " + sev);
+
+        // ordinal()
+        System.out.println("\nOrdinal positions:");
+        for (Severity s : Severity.values()) {
+            System.out.println(s + " -> " + s.ordinal());
+        }
+    }
+}
+
+✅Output:
+All constants:
+LOW
+MEDIUM
+HIGH
+CRITICAL
+
+ValueOf("HIGH") = HIGH
+
+Ordinal positions:
+LOW -> 0
+MEDIUM -> 1
+HIGH -> 2
+CRITICAL -> 3
+
+
+🔹 What is a String in Java?
+A String in Java is an object that represents a sequence of characters.
+Strings are immutable, meaning their value cannot be changed once created.
+
+✅ Ways to Create a String
+➤ Method 1: Using String Literal
+String x1 = "mike";
+Stored in String Pool (special area in heap memory).
+
+Reuses memory if the same literal already exists.
+
+➤ Method 2: Using new Keyword
+String x2 = new String("mike");
+Always creates a new object in heap memory, outside the String Pool.
+
+🧠 String Pool (String Constant Pool)
+A special memory region inside the heap that stores string literals.
+Benefit: Saves memory by reusing existing string literals instead of creating new ones.
+
+🔁 Reuse Example:
+String s1 = "mike";
+String s2 = "mike";
+System.out.println(s1 == s2); // true (same reference in pool)
+
+⚠️ When using new:
+String s3 = new String("mike");
+System.out.println(s1 == s3); // false (different memory locations)
+
+✍️ Important:
+Operations like == compare references, not values.
+Use .equals() to compare values of strings.
+
+🔎 Code Example: Comparing References vs Values
+String x1 = "mike";
+String x2 = "mike";
+String x3 = new String("mike");
+
+System.out.println(x1 == x2);        // true (same pool reference)
+System.out.println(x2 == x3);        // false (heap vs pool)
+System.out.println(x2.equals(x3));   // true (same content)
+
+String str1 = new String("Ankur");
+String str2 = new String("Ankur");
+
+System.out.println(str1 == str2);    // false
+System.out.println(str1.equals(str2)); // true
+
+💡 intern() Method
+Syntax:
+String interned = new String("mike").intern();
+
+What it does:
+➤ Checks if the value exists in the String Pool.
+➤ If yes, returns reference from the pool.
+➤ If no, adds the value to the pool and returns that reference.
+
+➤ Code Example:
+String x1 = "mike";
+String x3 = new String("mike").intern();
+
+System.out.println(x1 == x3);       // true
+System.out.println(x1.equals(x3));  // true
+
+📏 Check if a String is Empty or Null
+String str4 = null;
+String str5 = "";
+
+System.out.println(str5.length()); // 0
+System.out.println(str4.length()); // ❌ NullPointerException
+
+⚖️ Difference: Null vs Empty String
+| Property         | `null`                | `""` (Empty String)     |
+| ---------------- | --------------------- | ----------------------- |
+| Memory allocated | ❌ No                  | ✅ Yes                   |
+| Object created   | ❌ No                  | ✅ Yes                   |
+| `.length()`      | ❌ Throws Exception    | ✅ Returns 0             |
+| Usability        | Can't call any method | Can call String methods |
+
+
+🔍 How to Check if a String is Empty
+✅ Method 1: isEmpty()
+Checks if string length is 0.
+Returns: true if empty.
+
+Code Example:
+String x1 = "";
+System.out.println(x1.isEmpty()); // true
+
+✅ Method 2: length()
+You can manually check if the length is 0.
+System.out.println(x1.length() == 0); // true
+
+✅ Method 3: isBlank()
+Returns true if string is:
+Empty ("") or
+Contains only whitespaces (spaces, tabs, etc.)
+Code Example:
+String x2 = "   ";
+System.out.println(x2.isBlank()); // true
+🔸 isBlank() is available from Java 11 onwards.
+
+🧪 String Comparisons
+Strings are case-sensitive by default.
+
+✅ Using equals() method
+String str1 = "mike";
+String str2 = "mike";
+String str3 = "Mike";
+
+System.out.println(str1.equals(str2)); // true
+System.out.println(str1.equals(str3)); // false
+
+✅ Using equalsIgnoreCase() method
+Ignores case differences.
+System.out.println(str1.equalsIgnoreCase(str3)); // true
+
+📊 compareTo() Method
+Compares strings lexicographically.
+String str6 = "java";
+String str7 = "python";
+
+System.out.println(str6.compareTo(str7)); // -6
+
+➤ Output Meaning:
+0 → Both strings are equal.
+< 0 → First string is lexicographically smaller.
+> 0 → First string is lexicographically greater.
+
+🔄 String Case Conversion
+✅ toUpperCase()
+Converts all characters to uppercase.
+"java".toUpperCase(); // "JAVA"
+
+✅ toLowerCase()
+Converts all characters to lowercase.
+"JAVa".toLowerCase(); // "java"
+
+
+✂️ trim() Method
+Removes:
+Leading (front) and trailing (end) whitespaces.
+Does NOT remove spaces or special characters in between the string.
+String s = "   hello!@#   ";
+System.out.println(s.trim()); // "hello!@#"
+
+❌ trim() does not remove special characters.
+🔸 lTrim() and rTrim() are not built-in in Java. You must use regex or custom code to achieve that.
+
+🔤 charAt(index)
+Returns character at the given index.
+String x1 = "aabaacv";
+System.out.println(x1.charAt(2)); // 'b'
+
+✅ Example: Count frequency of a character
+String x1 = "aabaacv";
+int count = 0;
+
+for (int i = 0; i < x1.length(); i++) {
+    if (x1.charAt(i) == 'a') count++;
+}
+System.out.println(count); // 4
+
+🔹 startsWith() & endsWith() Methods
+✅ Definition:
+Both methods return boolean values.
+
+Used to check prefixes or suffixes of a string.
+
+➤ Syntax:
+str.startsWith("prefix");  // true if string starts with "prefix"
+str.endsWith("suffix");    // true if string ends with "suffix"
+
+✅ Code Example:
+String s = "Hello World!";
+System.out.println(s.startsWith("He"));     // true
+System.out.println(s.endsWith("!"));        // true
+System.out.println(s.endsWith("World"));    // false
+
+🔁 Convert Primitive Data Type to String
+✅ Method 1: Add Empty String
+int x = 10;
+String y = "" + x;
+System.out.println(y);                     // "10"
+System.out.println(y instanceof String);   // true
+
+✅ Method 2: Use String.valueOf()
+float z = 10.3f;
+String s1 = String.valueOf(z);
+System.out.println(s1); // "10.3"
+
+boolean b = true;
+String s2 = String.valueOf(b); // "true"
+
+char ch = 'z';
+String s3 = String.valueOf(ch); // "z"
+
+System.out.println(s2); // true
+System.out.println(s3); // z
+System.out.println(s2 instanceof String); // true
+System.out.println(s3 instanceof String); // true
+🔸 String.valueOf() works for all primitives: int, float, char, boolean, double, long, etc.
+
+🔍 Search in a String
+🔎 contains() Method
+➤ Checks whether a string contains a specific sequence of characters.
+➤ Returns: true or false
+➤ Case-sensitive
+
+String str = "My name is Ankur Veram";
+System.out.println(str.contains("name"));   // true
+System.out.println(str.contains("Name"));   // false
+
+🔢 indexOf() Method
+➤ Returns the index of first occurrence of a substring/character.
+➤ If not found, returns -1
+➤ Case-sensitive
+
+➤ Syntax:
+int index = str.indexOf("substring");
+
+✅ Code Example:
+String str = "My name is Ankur Veram";
+
+System.out.println(str.indexOf("name"));   // 3
+System.out.println(str.indexOf("Name"));   // -1
+System.out.println(str.indexOf(" Ankur")); // 11    
+
+If two parameter is given then it will start the search after the index of the second parameter.
+System.out.println(str.indexOf("e",8));    
+
+🔹 join() Method
+➤ Used to join elements of an array or any Iterable into a single string.
+➤ Requires a delimiter to separate the elements.
+
+Syntax:
+String result = String.join(delimiter, elements...);
+
+✅ Example:
+String[] words = {"Hello", "World", "Java", "Programming"};
+String result = String.join(" ", words);
+System.out.println(result); // Output: Hello World Java Programming
+🔸 join() is available from Java 8 onwards.
+
+🔁 replace() Method
+➤ Used to replace characters or substrings within a string.
+➤ Returns a new string with replacements applied (original string remains unchanged).
+
+✅ Method 1: Replace Substring
+String s = "Hello World with new Word";
+String str = s.replace("Word", "Duniya");
+System.out.println(str); // Output: Hello World with new Duniya
+
+✅ Method 2: Replace Character
+String str2 = s.replace('o', '*');
+System.out.println(str2); // Output: Hell* W*rld with new W*rd
+
+🔗 Ways of String Concatenation
+✅ Way 1: Using + Operator
+String s1 = "Hello";
+String s2 = "World";
+String result = s1 + " " + s2;
+System.out.println(result); // Hello World
+
+✅ Way 2: Using concat() Method
+String result = s1.concat(s2); // HelloWorld
+
+➕ Add whitespace between
+String result = s1.concat(" ").concat(s2); // Hello World
+What is Mutable and Immutable class
+
+🧠 Mutable vs Immutable Classes
+| Property        | Immutable Class                             | Mutable Class                             |
+| --------------- | ------------------------------------------- | ----------------------------------------- |
+| Definition      | Object **cannot be changed** after creation | Object **can be modified** after creation |
+| Example         | `String`                                    | `StringBuilder`, `StringBuffer`           |
+| Thread-safe?    | Yes (`String`)                              | Only `StringBuffer` is thread-safe        |
+| Performance     | Slower (new object on change)               | Faster for frequent modifications         |
+| Common Use Case | Constant values, keys in Map                | Dynamic strings in loops or editors       |
+
+🔐 How to Design Immutable Classes in Java
+An immutable class is one whose state cannot be changed after it is created.
+
+🧱 Design Principles:
+✅ Private and Final Fields
+Declare all class fields as private final.
+This ensures that fields are set only once and not modified later.
+private final String name;
+
+❌ No Setters
+Do not provide any setter methods.
+Prevents modification of field values after object creation.
+
+✅ Initialize via Constructor
+All fields must be initialized in the constructor.
+Ensures object is in a valid state when created.
+
+🛡️ Final Class (Optional but Recommended)
+Mark the class as final to prevent inheritance (which might introduce mutability).
+public final class Student { ... }
+
+🛡️ Defensive Copying (if using mutable fields like arrays, lists)
+If the class contains mutable objects (like List, Date, arrays), return a copy instead of the original in getters.
+
+✅ Example of an Immutable Class:
+public final class Student {
+    private final String name;
+    private final int rollNo;
+
+    public Student(String name, int rollNo) {
+        this.name = name;
+        this.rollNo = rollNo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRollNo() {
+        return rollNo;
+    }
+}
+
+🌟 Benefits of Immutable Classes
+✅ Thread-Safe: No synchronization needed; safe to use in multithreaded environments.
+✅ Reliable & Predictable: Once created, the object remains in the same state.
+✅ Caching & Reuse: Can be safely cached or reused without side effects.
+✅ HashCode Stability: Good for keys in hash-based collections (HashMap, HashSet).
+
+✂️ substring() Method in Java
+The substring() method is used to extract a part of the string.
+
+✅ Syntax Variants:
+substring(int start)
+Returns substring from start (inclusive) to the end of the string.
+String s = "JavaProgramming";
+System.out.println(s.substring(4)); // Output: Programming
+
+substring(int start, int end)
+Returns substring from start (inclusive) to end (exclusive).
+System.out.println(s.substring(0, 4)); // Output: Java
+
+🧠 Remember:
+Index starts from 0.
+end index is excluded.
+Throws StringIndexOutOfBoundsException if indices are invalid.
+
+🔹 Method 1: Using \n Escape Character
+You can insert line breaks using the newline character \n.
+String x = "Hi my name is\nAnkur\nVerma";
+System.out.println(x);
+
+⚠️ Limitation:
+➤ Becomes tedious and less readable when writing large multi-line strings.
+➤ Manual escaping needed for quotes, line breaks, and indentation.
+
+🔹 Method 2: Using Text Blocks (""")
+✅ Introduced in Java 13 (preview), Java 15+ (standard).
+
+Multiline string literal that maintains formatting and is easy to write.
+String x2 = """
+            Hi 
+            My 
+            Name 
+            is 
+            Ankur Verma
+            """;
+System.out.println(x2);
+✅ Benefits of Text Blocks:
+➤ Easy to write and maintain multiline text (like JSON, SQL, XML, HTML).
+➤ Preserves formatting and indentation.
+➤ No need to use \n for new lines.
+➤ Avoids escaping double quotes in many cases.

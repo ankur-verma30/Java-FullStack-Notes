@@ -1,0 +1,195 @@
+🔷 Architecture Types: Monolithic vs Microservices
+1️⃣ Monolithic Architecture
+A single unified codebase where all modules (UI, business logic, database access, etc.) are packaged and deployed together as one application.
+
+🔄 Characteristics:
+➤ Single codebase and build.
+➤ Runs as one process.
+➤ Tight coupling between components.
+➤ Shared database for the whole app.
+
+🔄 Advantages:
+➤ Simple to develop and deploy initially.
+➤ Easy debugging and testing since everything is in one place.
+➤ Performance can be faster due to in-process calls (no network latency).
+
+🔄 Disadvantages:
+➤ Scalability bottleneck → must scale the entire application even if only one module needs resources.
+➤ Hard to maintain and add new features as the codebase grows (becomes a “big ball of mud”).
+➤ Technology lock-in (all parts must use the same stack).
+➤ Fault isolation is poor → one bug can crash the entire system(Single Point of Failure).
+
+🔄 Use Cases:
+➤ Small-scale applications.
+➤ Early-stage startups with limited complexity.
+➤ Systems that won’t require frequent scaling or modularity.
+
+2️⃣ Microservices Architecture
+A collection of small, independent services that work together. Each service focuses on a single business capability and communicates via APIs (HTTP/gRPC, message queues, etc.).
+
+🔄 Characteristics:
+➤ Services are loosely coupled.
+➤ Independent deployment, scaling, and development.
+➤ Each microservice may have its own database (polyglot persistence).
+
+🔄 Advantages:
+➤ Scalability: Scale only the services that need extra resources.
+➤ Flexibility: Different services can use different tech stacks.
+➤ Faster development and deployment cycles (parallel teams working independently).
+➤ Better fault isolation: A failure in one service doesn’t necessarily bring down the whole system.
+
+🔄 Disadvantages:
+➤ Operational complexity → needs service discovery, API gateways, monitoring, logging, distributed tracing.
+➤ Network latency and data consistency issues (distributed system challenges).
+➤ More difficult testing (end-to-end across services).
+➤ Requires strong DevOps culture (CI/CD, containerization, orchestration like Kubernetes).
+
+🔄 Use Cases:
+➤ Large-scale applications (Amazon, Netflix, Uber).
+➤ Systems needing high scalability, flexibility, or frequent updates.
+➤ Teams spread across different domains who want autonomy.
+
+🔄 Comparison
+➤ Deployment: Monolithic → one unit | Microservices → many independent units
+➤ Scalability: Monolithic → entire app | Microservices → per service
+➤ Flexibility: Monolithic → one stack | Microservices → polyglot possible
+➤ Complexity: Monolithic → simple | Microservices → complex (network + ops)
+➤ Best for: Monolithic → small apps | Microservices → large, evolving systems
+
+
+🔷 API (Application Programming Interface)
+A set of rules and protocols that allows two software systems to communicate with each other.
+
+👉 Role: Acts as a bridge between different applications, hiding internal logic and exposing only necessary functionalities.
+✔️ Provides abstraction → only exposes endpoints, not implementation.
+✔️ Ensures interoperability → different platforms/languages can interact.
+✔️ Enables reusability → same service can be consumed by web, mobile, etc.
+✔️ Statelessness (in REST) → each request is independent.
+
+Types:
+➤ REST API (HTTP-based, widely used)
+➤ SOAP API (XML-based, older enterprise systems)
+➤ GraphQL (query-based, flexible data fetching)
+➤ gRPC (high-performance, binary protocol)
+
+✅ Real-World Example
+Google Maps API:
+    ✔️ Apps like Uber, Zomato, Ola don’t build maps themselves.
+    ✔️ They call Google Maps API to fetch location, directions, and distance.
+    ✔️ API request: Send coordinates → API response: Returns map data & routes.
+
+
+🔷 Spring Framework
+Spring Framework is called as Application Development Framework.
+By using spring we can develop end to end enterprise applications.
+It is an open-source framework.
+Spring developed in modular fashion.
+So we can use required modules as per our need.
+
+🔷 Spring Modules
+1️⃣ Spring Core: 
+➤ It is the fundamental module of the Spring framework. 
+➤ It  is all about managing dependencies among the classes with loosely coupling.
+➤ It provides the basic features of the Spring framework:
+    ✔️ Inversion of Control (IoC) 
+    ✔️ Dependency Injection (DI).
+    ✔️ Bean Life cycles
+    ✔️ Bean Scopes
+    ✔️ Autowiring etc..
+In project we will develop serveral classes. All those classes we can catergorize into 3 types:
+    📝 POJO (Plain Old Java Object) Classes: These classes will contain only properties and their getters and setters(ordinary java class).
+
+    📝 Java Bean Classes: Any class that follows bean specification rules.
+    🔄 Rules of bean specification:
+        👉 It should have a public no-argument constructor.
+        👉 Properties should be private with public getters and setters.
+        👉 It should be serializable (implements Serializable interface).
+        ⚡ Notes: 
+            1️⃣ All Java Beans are POJOs but all POJOs are not Java Beans.
+            2️⃣ Bean classes are used to write business logic and to store and retrieve data.
+
+    📝 Component Classes: Java class which contains business Classes logic and annotated with @Component annotation.
+        👉 It is a special type of bean class.
+        👉 It is used to define various layers of an application like Controller, Service, Repository etc..
+        👉 Controller classes will have logic to deal with request and response.
+        👉 Service classes will have business logic of out project.
+        👉 DAO classes will contain the logic to communicate with database.
+
+2️⃣ Spring Context
+➤ It is built on top of the Spring Core module.
+➤ It uses the concept of ApplicationContext which is a central interface to provide configuration for an application.
+➤ It provides support for internationalization (i18n), event propagation, resource loading, and application-layer specific contexts such as WebApplicationContext for web applications.
+
+
+3️⃣ Spring JDBC
+➤ It provides a simplified approach to interact with relational databases using JDBC (Java Database Connectivity).
+➤ It handles the creation and release of resources, which helps to avoid common errors such as forgetting to close database connections.
+➤ It provides a JdbcTemplate class that simplifies the execution of SQL queries, updates, and stored procedures.
+
+❌ Problems with JDBC:In java JDBC, developers often have to write a lot of boilerplate code for tasks like opening/closing connections, handling exceptions, and managing transactions. This can lead to repetitive and error-prone code. Spring JDBC addresses these issues by providing a higher-level abstraction that simplifies database interactions.
+
+
+4️⃣ Spring AOP (Aspect Oriented Programming)
+➤ It provides support for aspect-oriented programming, allowing the separation of cross-cutting concerns or secondary logic (like logging, security, and transaction management) from the main business logic.
+Example: Security, Logging, Transaction, Exception Handling etc..
+
+❌ Problems with AOP: If we combine business logic and cross-cutting concerns in the same class, it can lead to code that is hard to read and maintain. AOP helps to separate these concerns, making the code cleaner and more modular.
+
+
+5️⃣ Spring Web MVC
+➤ It provides a set of tools for building web applications and Distributed Applications using the Model-View-Controller (MVC) architectural pattern.
+    ✔️  Applications: Applications which are developed using web technologies like HTML, CSS, JavaScript etc.. and run on web browsers.For Example: Gmail, Facebook, Amazon etc..
+    ✔️ Distributed Applications: Applications which are developed in a distributed environment. For Example: IRCTC communicates with MakeMyTrip, Paytm etc.. to book tickets.
+➤ It supports RESTful web services and provides features like data binding, validation, and view resolution.
+
+
+6️⃣ Spring ORM
+➤ It provides integration with popular Object-Relational Mapping (ORM) frameworks like Hibernate, JPA (Java Persistence API), and MyBatis.
+➤ It simplifies the configuration and management of ORM frameworks, allowing developers to focus on writing business logic rather than boilerplate code. 
+
+Note: JDBC will represent data in text format whereases ORM will represent data in object format.
+
+7️⃣ Spring security
+➤ It provides a comprehensive security framework for Java applications, including authentication, authorization, and protection against common security threats.
+➤ It supports various authentication mechanisms, including form-based login, HTTP Basic authentication, and OAuth2.0
+
+
+8️⃣ Spring Social
+9️⃣ Spring Batch
+➤ It provides support for batch processing, allowing the execution of large volumes of data in a reliable and efficient manner.
+➤ It provides features like chunk-based processing, transaction management, and job scheduling.
+➤ It simplifies the development of batch applications, making it easier to handle complex data processing tasks.
+
+
+
+1️⃣0️⃣ Spring Test
+➤ It provides tools for testing Spring applications, including unit tests, integration tests, and end-to-end tests.
+➤ It supports various testing frameworks like JUnit, Mockito, and TestNG.
+
+
+1️⃣1️⃣ Spring Cloud
+➤ It provides tools for building cloud-native applications, including service discovery, load balancing, and distributed configuration management.
+➤ It simplifies the development of microservices-based architectures, making it easier to build and deploy scalable and resilient applications.
+➤ It provides monitoring facilities, circuit breakers, and retry mechanisms to handle failures gracefully. 
+➤ Distributed Messaging: It supports various messaging systems like RabbitMQ, Kafka, and ActiveMQ, allowing microservices to communicate asynchronously.
+➤ Routing and Load Balancing: It provides tools for routing requests to different microservices and load balancing traffic to ensure high availability and performance.
+
+👉 Spring is a flexible framework. It will not force to use all the modules. Based on requirements we can pickup particular modules and we can use it.
+👉 Spring is a versatile framework(Easily it can be integerated with other frameworks).
+
+🔷 Work Flow of Spring Framework
+➤ Developer will write the code using POJO classes, Bean classes and Component classes.
+➤ Spring Container will create the objects of POJO classes, Bean classes and Component classes.
+
+🔄 In a project multiple classes will be dependent on each other.
+✅ For Example:
+➤ Controller class is dependent on Service class.
+➤ Service class is dependent on DAO class.
+➤ DAO class is dependent on Database.
+
+🔄 In Java one class can communicate with another class in 2 ways:
+1. Inheritance(Is-A Relationship)
+2. Composition or Object Reference(Has-A Relationship)
+
+
+

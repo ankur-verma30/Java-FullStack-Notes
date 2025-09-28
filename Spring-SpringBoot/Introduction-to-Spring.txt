@@ -1,0 +1,1012 @@
+🌱 What is Spring?
+➤ Spring is a lightweight, open-source framework for building enterprise-level Java applications.
+➤ It mainly provides Infrastructure support so developers can focus on business logic instead of boilerplate code.
+
+📝 Another Definition:
+Spring is a framework for dependency-injection (It means outsourcing the task of object creation) which is a pattern that allows to build very decoupled systems.
+
+👉 Think of it as a toolbox that gives ready-made solutions for common problems in enterprise apps.
+
+❓ Why Spring? (Motivation)
+🔄 Before Spring:
+➤ Java EE (J2EE/EJB) was complex, heavy, and hard to configure.
+➤ Developers wrote lots of boilerplate code (factory classes, object creation, dependency management).
+
+Spring solved this by:
+➤ Providing Dependency Injection (DI) → reduces tight coupling.
+➤ Enabling Aspect-Oriented Programming (AOP) → for cross-cutting concerns (logging, security).
+➤ Offering modularity → use only what you need (not forced to use the whole framework).
+
+🔄 Key Features
+✔️ IoC Container → Handles object creation & wiring.
+✔️ Dependency Injection → Reduces coupling.
+✔️ AOP → Separates cross-cutting concerns.
+✔️ Transaction Management → Easy DB transaction handling.
+✔️ Integration → Works well with Hibernate, JPA, JDBC, JMS, etc.
+✔️ Testability → Beans are POJOs (Plain Old Java Objects), easy to test with JUnit/Mockito.
+
+✅ Advantages of Spring
+1️⃣ Loose Coupling → via DI.
+2️⃣ Lightweight → No heavy EJB containers.
+3️⃣ Productivity → Reduces boilerplate code.
+4️⃣ Flexibility → Modular architecture (choose only needed modules).
+5️⃣ Community Support → Widely used, rich ecosystem.
+
+👉 Interview Hack: If asked "What is Spring Boot?" — always start by explaining Spring, then contrast with Boot.
+
+⚡ Adding Spring to a Maven Project
+1️⃣ Required Dependencies
+➤ To start with basic Spring (IoC + DI + ApplicationContext), you need at least:
+➤ spring-core → contains fundamental classes (IoC, DI).
+➤ spring-context → builds on core, adds ApplicationContext, bean lifecycle, internationalization, etc.
+
+✅ Maven pom.xml Example
+
+<dependencies>
+    <!-- Spring Core -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>5.3.36</version> <!-- use latest stable -->
+    </dependency>
+
+    <!-- Spring Context -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>5.3.36</version>
+    </dependency>
+</dependencies>
+👉 If using Spring Boot, you don’t need to add these separately — just add spring-boot-starter and Boot manages versions.
+
+
+🔄 Spring IoC Container
+➤IoC (Inversion of Control) Container is the core of Spring Framework.
+➤It is responsible for:
+    ✔️ Creating objects (beans)
+    ✔️ Managing their lifecycle (init → use → destroy)
+    ✔️ Injecting dependencies (Dependency Injection)
+    ✔️ Configuring and wiring beans together
+
+👉 In short: IoC Container is the “factory” where all Spring-managed objects (beans) live.
+
+❓ How it Works
+➤ You define beans (via XML, annotations, or Java Config).
+➤ The IoC container reads the configuration and creates objects.
+➤ It also wires dependencies automatically (through DI).
+➤ Application code just uses beans instead of creating them manually.
+
+🔄 Types of IoC Containers in Spring
+1️⃣ BeanFactory (Interface)
+➤ Basic version of IoC container.
+    ✔️ Basic container → provides DI functionality.
+    ✔️ Lazy initialization (beans are created only when requested).
+    ✔️ Lightweight, good for simple applications or memory-constrained environments.
+
+2️⃣ ApplicationContext (Sub-interface of BeanFactory)
+➤ Advanced container → superset of BeanFactory.
+➤ Eager initialization (beans are created at startup by default).
+➤ Provides extra features:
+    ✔️ Event propagation
+    ✔️ Internationalization (i18n)
+    ✔️ Bean post-processors
+    ✔️ Easy integration with Spring AOP
+
+👉 In real-world Spring apps, we mostly use ApplicationContext.
+
+📝 Common Implementations
+➤ ClassPathXmlApplicationContext → Loads bean definitions from XML in classpath.
+➤ FileSystemXmlApplicationContext → Loads from XML in filesystem.
+➤ AnnotationConfigApplicationContext → Loads from Java-based configuration classes.
+
+
+🔷 Ways to Configure IoC Container in Spring
+The IoC Container (BeanFactory / ApplicationContext) needs to know what beans to create and how to wire them.
+We can configure it in 3 main ways:
+
+1️⃣ XML-Based Configuration 📝 (Old Style)
+Beans and dependencies are declared in an XML file (e.g., beans.xml).
+
+✅ Example:
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Bean Definition -->
+    <bean id="car" class="com.example.Car">
+        <!-- Setter Injection -->
+        <property name="engine" ref="engine"/>
+    </bean>
+
+    <bean id="engine" class="com.example.Engine"/>
+</beans>
+
+
+🔗 Java code:
+ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+Car car = context.getBean("car", Car.class);
+
+👉 Interview Angle: XML was common in older projects. Still seen in legacy systems.
+
+
+2️⃣ Annotation-Based Configuration 
+➤ Beans are detected using annotations like @Component, @Service, @Repository, @Controller.
+➤ Dependencies injected with @Autowired, @Qualifier, @Value.
+➤ Component scanning must be enabled in XML or Java config.
+
+✅ Example:
+@Component
+class Engine {}
+
+@Component
+class Car {
+    @Autowired
+    private Engine engine;
+}
+
+
+🔗 Java Config to enable scanning:
+@Configuration
+@ComponentScan("com.example")
+class AppConfig {}
+
+
+🔗 Java code:
+ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+Car car = context.getBean(Car.class);
+
+👉 Interview Tip: Most modern Spring apps use this approach.
+
+
+3️⃣ Java-Based Configuration (JavaConfig) ☕
+➤ Uses @Configuration and @Bean annotations (no XML required).
+➤ Beans are defined directly inside a config class.
+
+✅ Example:
+@Configuration
+class AppConfig {
+    @Bean
+    public Engine engine() {
+        return new Engine();
+    }
+
+    @Bean
+    public Car car() {
+        return new Car(engine());
+    }
+}
+
+
+🔗 Java code:
+ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+Car car = context.getBean(Car.class);
+
+👉 Interview Tip: JavaConfig is preferred in Spring Boot and modern projects because it’s type-safe, refactor-friendly, and avoids verbose XML.
+
+// Main Application to demonstrate Spring IoC and DI
+Vechile.java Interface
+public interface Vechile {
+    String getMilage();
+}
+
+Car.java Implementation
+public class Car implements Vechile {
+    public String getMilage() {
+        return "Car Milage is 30km/l";
+    }
+}
+
+Bus,java Implementation
+public class Bus implements Vechile {
+    public String getMilage() {
+        return "Bus Milage is 20km/l";
+    }
+}
+
+package vechiles;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MySpringApp {
+
+	public static void main(String[] args) {
+		//providing application context --> config.xml
+		ClassPathXmlApplicationContext context= new ClassPathXmlApplicationContext("config.xml");
+		Vechile vechile=context.getBean("myVechile", Vechile.class);
+		System.out.println(vechile.getMilage());
+	}
+
+}
+
+🔄 Step 1: Package & Imports
+package vechiles;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+➤ You’ve defined your classes under vechiles package.
+➤ ClassPathXmlApplicationContext → a type of ApplicationContext that loads bean definitions from an XML file located in the classpath.
+
+🔄 Step 2: Main Method
+ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("config.xml");
+ 
+➤ Here, Spring creates the IoC container (ApplicationContext) and reads the config.xml file.
+➤ What happens internally:
+    ✔️ Spring parses the XML.
+    ✔️ Creates all beans defined in the XML.
+    ✔️ Resolves and injects dependencies (setter, constructor, or autowired).
+➤ From this point, Spring is in control of all your beans.
+
+🔄 Step 3: Retrieving the Bean
+Vechile vechile = context.getBean("myVechile", Vechile.class);
+
+➤ getBean asks the IoC container: “Give me the bean with id myVechile and cast it to Vechile.”
+➤ Spring returns the singleton instance (default scope) of the bean.
+➤ Now vechile is a fully initialized object with all dependencies injected.
+
+🔄 Step 4: Using the Bean
+➤ Calls a method (getMilage()) on the Spring-managed object.
+➤ No need to new the object yourself; Spring already created and wired it.
+
+
+🔷 Dependency Injection (DI) in Spring
+➤ Dependency Injection (DI) is a design pattern in which an object receives its dependencies from an external source rather than creating them itself.
+➤ In Spring, the IoC Container is responsible for injecting these dependencies into beans.
+
+❓ Why DI is Useful
+➤ Loose Coupling → Classes don’t depend on concrete implementations.
+➤ Easier Testing → You can inject mock dependencies.
+➤ Reusability → Classes focus only on business logic.
+➤ Better Maintainability → Changes in one class don’t require changing all dependent classes.
+
+❓ How DI Works in Spring
+1️⃣ Define beans (objects) in XML, JavaConfig, or annotations.
+2️⃣ Spring IoC container creates beans.
+3️⃣ Spring injects the required dependencies (via constructor, setter, or field).
+4️⃣ Your code uses the beans without creating dependencies manually.
+
+⚡ Ways to Implement Dependency Injection (DI) in Spring
+➤ Dependency Injection (DI) = letting Spring provide the dependencies to your beans instead of creating them manually.
+
+➤ There are three main ways to do this:
+1️⃣ Constructor Injection
+➤ Spring injects dependencies via the class constructor.
+➤ Recommended for mandatory dependencies because the bean cannot be created without them.
+
+✅ Example:
+🔗 DiscountService.java
+Interface DiscountService {
+    String getDiscountMessage();
+}
+
+🔗 FestivalDiscountServiceImpl.java
+class FestivalDiscountServiceImpl implements DiscountService {
+    public String getDiscountMessage() {
+        return "Festival Discount Applied!";
+    }
+}
+
+🔗 Car.java
+class Car {
+    private DiscountService discountService;
+
+    // Constructor Injection
+    public Car(DiscountService discountService) {
+        this.discountService = discountService;
+    }
+}
+
+🔗 MySpringApp.java
+package vechiles;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MySpringApp {
+
+	public static void main(String[] args) {
+		//providing application context --> config.xml
+		ClassPathXmlApplicationContext context= new ClassPathXmlApplicationContext("config.xml");
+		Vechile vechile=context.getBean("myVechile", Vechile.class);
+		System.out.println(vechile.getMilage());
+		System.out.println(vechile.getDiscountMessage());
+	}
+
+}
+➤ Spring automatically finds the Engine bean and passes it to the Car constructor.
+
+📝 Works with XML:
+ <bean id="myVechile" class="vechiles.Car">
+    <constructor-arg ref="myDiscountService"></constructor-arg>
+    </bean>
+    <bean id="myDiscountService" class="vechiles.FestivalDiscountServiceImpl"></bean>
+
+
+2️⃣  Setter Injection
+➤ Spring injects dependencies via setter methods.
+➤ Good for optional dependencies or when you want to change dependencies after bean creation.
+
+✅ Example:
+@Component
+class Car {
+    private Engine engine;
+
+    // Setter Injection
+    @Autowired
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+}
+
+📝 XML equivalent:
+<bean id="car" class="vechiles.Car">
+    <property name="engine" ref="engine"/>
+</bean>
+<bean id="engine" class="vechiles.Engine"/>
+
+3️⃣  Field Injection
+➤ Spring injects dependencies directly into the field using @Autowired.
+➤ No constructor or setter needed.
+➤ Often used in Spring Boot projects for simplicity, but less testable than constructor injection.
+➤ Cannot be done through XML configuration.
+
+✅ Example:
+@Component
+class Car {
+    @Autowired
+    private Engine engine;
+}
+
+🌱 Bean Scope in Spring
+➤ Bean scope defines how many instances of a bean the Spring Container creates and how long they live inside the container.
+➤ It controls the lifecycle and visibility of a bean.
+➤ Declared using scope attribute (XML) or @Scope annotation.
+
+🌟 Types of Bean Scopes
+1️⃣ Singleton (Default)
+➤ Only one instance per Spring container.
+➤ All requests for this bean return the same object.
+➤ Best for stateless beans (services, DAOs).
+➤ Default scope if you don’t specify anything.
+
+🔗 Code Implementation in XML:
+<bean id="myBean" class="com.example.MyClass" scope="singleton"/>
+
+🔗 Using Annotation:
+@Component
+@Scope("singleton")
+public class MyService {}
+
+2️⃣ Prototype
+➤ New instance is created every time the bean is requested.
+➤ Best for stateful beans (objects holding user-specific data).
+➤ Spring does not manage full lifecycle → only initialization, no destroy callback.
+
+🔗 Code Implementation:
+<bean id="myBean" class="com.example.MyClass" scope="prototype"/>
+
+🔗 Using Annotation:
+@Component
+@Scope("prototype")
+public class MyService {}
+
+3️⃣ Request (Web-aware)
+➤One bean per HTTP request.
+➤Valid only in Spring Web Applications.
+➤Each HTTP request → new bean instance.
+
+🔗 Code Implementation:
+@Component
+@Scope("request")
+public class MyControllerBean {}
+
+4️⃣ Session (Web-aware)
+➤ One bean per HTTP Session.
+➤ Same user session → same bean.
+➤ Different sessions → different beans.
+
+🔗 Code Implementation:
+@Component
+@Scope("session")
+public class MySessionBean {}
+
+5️⃣ Application (Web-aware)
+➤ One bean instance per ServletContext
+➤ Shared across all requests and sessions.
+
+🔗 Code Implementation:
+@Component
+@Scope("application")
+public class MyAppBean {}
+
+6️⃣ WebSocket (Spring 4.0+)
+➤ One bean per WebSocket session.
+➤ Used in real-time messaging apps.
+
+🔗 Code Implementation:
+@Component
+@Scope("websocket")
+public class MyWebSocketBean {}
+
+
+🔷Java Annotation?
+➤ Java annotations are metadata (extra information) added to code (classes, methods, interface, fields etc.) that provide instructions to the compiler or the runtime (JVM/frameworks like Spring, Hibernate, JUnit, etc.).
+➤ They do not affect the execution of code directly but can be used by tools, frameworks, and compilers.
+➤ Introduced in: Java 5
+
+❓ Why Annotations?
+➤ To reduce XML configuration (esp. in frameworks like Spring, Hibernate).
+➤ To give hints to compiler (e.g., @Override).
+➤ To enable automatic processing (e.g., dependency injection, mapping).
+
+🔄 Spring @Component Annotation Implementation
+package com.tcs.vechiles;
+
+import org.springframework.stereotype.Component;
+
+@Component   // Marks this class as a Spring Bean
+public class Car implements Vechile { 
+
+	@Override
+	public String getMilage() {
+		return "30Kmpl";
+	}
+}
+1️⃣ @Component
+➤ This tells Spring: “Hey, this is a bean. Manage its lifecycle for me.”
+➤ By default, Spring will create a bean with the class name starting with a lowercase letter.
+    ✔️ Car → bean name = "car".
+➤ Instead of defining the bean in beans.xml, you just use @Component.
+
+✅ Example:
+@Component("myCar")  // Custom bean id
+public class Car implements Vechile { ... }
+
+2️⃣ Bean Creation
+➤ When Spring’s component scan runs, it looks for classes annotated with @Component (and other stereotypes like @Service, @Repository, @Controller).
+➤ It registers them as beans in the ApplicationContext.
+
+3️⃣ Interface
+public interface Vechile {
+    String getMilage();
+}
+👉 Since Car implements Vechile, you can inject it wherever a Vechile is required.
+
+✅ How to enable it?
+In your Spring config, you must enable component scanning:
+
+Using XML:
+<context:component-scan base-package="com.tcs.vechiles"/>
+
+Using Java Config:
+@Configuration
+@ComponentScan(basePackages = "com.tcs.vechiles")
+public class AppConfig { }
+
+
+🔄 Using the Bean
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Test {
+    public static void main(String[] args) {
+        ApplicationContext context =
+            new AnnotationConfigApplicationContext(AppConfig.class);
+
+        Vechile car = context.getBean(Car.class);
+        System.out.println(car.getMilage()); // Output: 30Kmpl
+    }
+}
+
+🔄 @Autowired Annotation
+➤ @Autowired is used for dependency injection.
+➤ It tells Spring: “Find a matching bean and inject it here automatically.”
+➤ Spring uses type-based injection by default (looks for a bean with the same type).
+
+🔷 Perfomring Dependency Injection
+⚡Vechile Interface
+package com.tcs.vechiles;
+
+public interface Vechile {
+public String getMilage();
+public String getDiscountMessage();
+}
+
+⚡DiscountService Interface
+package com.tcs.vechiles;
+
+public interface DiscountService {
+public String getDiscountMessage();
+}
+
+⚡ DiscountServiceImpl class
+package com.tcs.vechiles;
+import org.springframework.stereotype.Component;
+
+@Component
+public class discountServiceImpl implements DiscountService {
+public String getDiscountMessage() {
+return "Festival Discount Applied!";
+    }
+}
+
+⚡ Constructor implementations in Car class
+Class Car{
+Method 1️⃣: Using @Autowired on Field
+    @Autowired
+private DiscountService discountService;
+
+Method 2️⃣: Using @Autowired on Constructor
+@Autowired
+	public Car(DiscountService discountService) {
+		this.discountService=discountService;
+	}
+     @Override
+    public String getMilage() {
+        return "30Kmpl";
+    }
+    @Override
+    public String getDiscountMessage() {
+        return discountService.getDiscountMessage();
+    }
+
+Method 3️⃣: Using @Autowired on Setter Method
+  @Autowired
+	public void setDiscountService(DiscountService discountService) {
+		this.discountService = discountService;
+	}
+}
+
+⚡ Main Application
+public class MySpringApp {
+
+	public static void main(String[] args) {
+ClassPathXmlApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+	Vechile bean = context.getBean("car",Vechile.class);
+	System.out.println(bean.getMilage());
+	System.out.print(bean.getDiscountMessage());
+	}
+}
+
+🔷 @Qualifier Annotation
+➤ When there are multiple beans of the same type, Spring gets confused which one to inject.
+✅ Example: If you have both Car and Bike implementing Vechile, @Autowired alone will throw an exception.
+➤ @Qualifier tells Spring which bean to inject by bean name.
+➤ @Qualifier("beanName") works with:
+    ✔️ Field Injection
+    ✔️ Constructor Injection
+    ✔️ Setter Injection
+beanName is the name of the bean you want to inject. It can be the default name (class name with lowercase first letter) or a custom name set using @Component("customName") or in XML.
+
+🔄 Field Injection
+@Autowired
+@Qualifier("beanName")
+private Vechile vechile;
+
+🔄 Setter Injection
+@Autowired
+public void setVechile(@Qualifier("beanName") Vechile vechile) {
+    this.vechile = vechile;
+}
+
+🔄 Constructor Injection
+@Autowired
+public VehicleService(@Qualifier("beanName") Vechile vechile) {
+    this.vechile = vechile;
+}
+
+✅ Example:
+@Component("myCar")
+class Car implements Vechile { ... }
+
+@Component("myBike")
+class Bike implements Vechile { ... }
+
+@Component
+class VehicleService {
+    @Autowired
+    @Qualifier("myCar")  // Specify which bean to inject 
+    private Vechile vechile;
+}
+
+⚡ Note: 
+➤ If name of the bean is WWEDiscountServiceImpl then if we make @Qualifier("wWEDiscountServiceImpl") then it will throw an exception.
+➤ So if first letter and second letter is in uppercase then we the bean id remains same as class name.
+➤ So we have to use @Qualifier("WWEDiscountServiceImpl") to avoid exception.
+
+
+🔷 Working with application.properties in Spring and Spring Boot
+➤ application.properties is a configuration file in Spring Framework / Spring Boot projects.
+➤ It stores key–value pairs that define the external configuration of the application.
+➤ Instead of hardcoding values in Java code, we put them in application.properties so they can be easily changed without recompiling.
+➤ Spring automatically loads this file from the src/main/resources/ folder.
+
+1️⃣ Spring (without Boot)
+In Spring (core + context) projects, you need to explicitly load property files.
+
+✔️ Step 1: application.properties
+car.brand=Honda
+car.mileage=30
+car.price=850000
+
+✔️ Step 2: Enable property file in XML config
+<context:property-placeholder location="classpath:application.properties"/>
+
+✔️ Step 3: Use @Value in Java class
+package com.tcs.vechiles;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Car {
+
+    @Value("${car.brand}")
+    private String brand;
+
+    @Value("${car.mileage}")
+    private int mileage;
+
+    @Value("${car.price}")
+    private double price;
+
+    public void showDetails() {
+        System.out.println("Brand: " + brand);
+        System.out.println("Mileage: " + mileage + " kmpl");
+        System.out.println("Price: ₹" + price);
+    }
+}
+
+✔️ Step 4: Run from main class
+✅ Output:
+Brand: Honda
+Mileage: 30 kmpl
+Price: ₹850000.0
+
+2️⃣ Spring Boot (Recommended)
+In Spring Boot, application.properties is auto-loaded — no need for <context:property-placeholder>.
+
+✔️ Step 1: src/main/resources/application.properties
+car.brand=Toyota
+car.mileage=28
+car.price=1200000
+
+✔️ Step 2: Use @Value
+package com.tcs.vechiles;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+ 
+@Component
+public class Car {
+
+    @Value("${car.brand}")
+    private String brand;
+
+    @Value("${car.mileage}")
+    private int mileage;
+
+    @Value("${car.price}")
+    private double price;
+
+    public void showDetails() {
+        System.out.println("Brand: " + brand);
+        System.out.println("Mileage: " + mileage + " kmpl");
+        System.out.println("Price: ₹" + price);
+    }
+}
+
+✔️ Step 3: Run from @SpringBootApplication main class
+package com.tcs;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.tcs.vechiles.Car;
+
+@SpringBootApplication
+public class DemoApplication implements CommandLineRunner {
+
+    @Autowired
+    private Car car;
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        car.showDetails();
+    }
+}
+✅ Output (from Boot):
+Brand: Toyota
+Mileage: 28 kmpl
+Price: ₹1200000.0
+
+🔄 Use Case of Value Annotation
+➤ Externalize configuration (DB URLs, API keys, etc.)
+➤ Inject values from property files.
+
+
+🔷 @ComponentScan Annotation
+➤ Tells Spring where to look for components (@Component, @Service, @Repository, @Controller, etc.).
+
+➤ By default, Spring Boot scans the package where your @SpringBootApplication class is located and all its sub-packages.
+
+✅ Example
+@SpringBootApplication
+@ComponentScan(basePackages = {"com.tcs.vechiles", "com.tcs.services"})
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+➤ Without @ComponentScan, Spring Boot automatically scans the current package of DemoApplication and subpackages.
+➤ With @ComponentScan, you can override and specify custom packages.
+
+
+🔷 @Configuration in Spring
+➤ Marks a class as a source of bean definitions.
+➤ Typically used with @Bean methods to create and configure beans manually.
+➤ It replaces XML configuration in pure Java-based configuration.
+
+✅ Example
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan("com.tcs.vechiles")
+public class AppConfig {
+
+    @Bean
+    public Car myCar() {
+        return new Car("Honda", 30);
+    }
+
+    @Bean
+    public Bike myBike() {
+        return new Bike("Yamaha", 45);
+    }
+}
+
+public class MySpringApp {
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext
+     context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Car car = context.getBean(Car.class);
+        System.out.println(car.getDetails());
+    }
+}
+➤ Here AppConfig acts like a replacement of beans.xml.
+➤ Spring will scan @Configuration classes and register beans in the container.
+
+✅ Difference from @Component
+➤ @Component → used on a class to auto-detect and register it as a bean.
+➤ @Configuration → used on a class that explicitly defines beans using methods.
+
+
+🔷 @Bean Annotation
+➤ Declares a Spring bean explicitly inside a @Configuration class.
+➤ Alternative to XML <bean> definition.
+➤ Method annotated with @Bean → Spring will call it and register its return object as a bean in the container.
+
+✅ Example
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public Car car() {
+        return new Car("Honda", 30);  // bean name = "car"
+    }
+
+    @Bean(name = "bikeBean")   // custom bean name
+    public Bike bike() {
+        return new Bike("Yamaha", 45);
+    }
+}
+⚡Note: If you don’t specify a name, the method name is used as the bean id.
+
+✅ Usage
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class TestApp {
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        Car car = context.getBean(Car.class);
+        car.showDetails();
+
+        Bike bike = (Bike) context.getBean("bikeBean");
+        bike.showDetails();
+    }
+}
+
+🔷 @PropertySource Annotation in Spring
+Loads properties files into Spring’s Environment.
+Works with @Value to inject property values into beans.
+Alternative to XML <context:property-placeholder>.
+
+✅ Example
+application.properties (in src/main/resources)
+car.brand=Toyota
+car.mileage=25
+
+Config class
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Value;
+
+@Configuration
+@PropertySource("classpath:application.properties")
+public class AppConfig {
+
+    @Value("${car.brand}")
+    private String brand;
+
+    @Value("${car.mileage}")
+    private int mileage;
+
+    @Bean
+    public Car car() {
+        return new Car(brand, mileage);
+    }
+}
+
+🔗Bean class
+public class Car {
+    private String brand;
+    private int mileage;
+
+    public Car(String brand, int mileage) {
+        this.brand = brand;
+        this.mileage = mileage;
+    }
+
+    public void showDetails() {
+        System.out.println("Brand: " + brand + ", Mileage: " + mileage + " kmpl");
+    }
+}
+✅ Output:
+Brand: Toyota, Mileage: 25 kmpl
+
+
+🌿 Spring MVC (Model–View–Controller)
+➤ Spring MVC is a web framework provided by the Spring Framework to build web applications (both web pages & REST APIs).
+➤ It follows the Model–View–Controller (MVC) design pattern.
+
+🔑 Architecture of Spring MVC
+1️⃣ DispatcherServlet (Front Controller)
+➤ Entry point for all requests.
+➤ Delegates requests to appropriate controllers.
+
+2️⃣ Controller
+➤ Handles user requests.
+➤ Interacts with the service layer & returns Model + View.
+
+3️⃣ Model
+➤ Stores application data.
+➤ Acts as a container for objects to pass between Controller and View.
+
+4️⃣ View
+➤ Presents data (HTML, JSP, Thymeleaf, JSON, etc.)
+➤ Uses model data to render UI.
+
+⚙️ Spring MVC Flow
+➤ User sends request → DispatcherServlet.
+➤ DispatcherServlet → finds handler/controller using HandlerMapping.
+➤ Controller executes → returns ModelAndView (data + view).
+➤ DispatcherServlet → forwards to ViewResolver.
+➤ ViewResolver → selects view (e.g., JSP/Thymeleaf).
+➤ Response → sent back to the user.
+
+
+🔑  @RequestMapping?
+➤ It is an annotation used in Spring MVC and Spring Boot.
+➤ Maps HTTP requests (URL + Method type) to specific controller methods.
+➤ Works at class level (base URL) and method level (specific endpoints).
+
+✨ Basic Usage
+@Controller
+public class HomeController {
+
+    @RequestMapping("/hello")
+    public String sayHello(Model model) {
+        model.addAttribute("message", "Hello Spring!");
+        return "home"; // resolves to home.jsp or home.html
+    }
+}
+
+👉 Visiting http://localhost:8080/hello → calls sayHello().
+⚙️ Class-Level + Method-Level Mapping
+@Controller
+@RequestMapping("/api") // base path
+public class UserController {
+
+    @RequestMapping("/users")
+    public String getUsers(Model model) {
+        model.addAttribute("data", "All Users Data");
+        return "users";
+    }
+
+    @RequestMapping("/admins")
+    public String getAdmins(Model model) {
+        model.addAttribute("data", "All Admins Data");
+        return "admins";
+    }
+}
+👉 URLs will be:
+/api/users
+/api/admins
+
+
+🔷 @RequestParam?
+➤ Annotation used in Spring MVC (and Spring Boot).
+➤ Binds query parameters (from URL or form data) to method arguments.
+➤ Helps extract values like /search?q=laptop&page=2.
+
+✅ Example: 
+@Controller
+public class SearchController {
+
+    @RequestMapping("/search")
+    public String search(@RequestParam("q") String query, Model model) {
+        model.addAttribute("result", "You searched for: " + query);
+        return "searchResult";
+    }
+}
+➤ Model Attribute "result" will contain the search query.
+👉 URL: /search?q=laptop
+✔ query = "laptop"
+
+⚙️ Multiple Parameters
+@Controller
+@RequestMapping("/products")
+public class ProductController {
+
+    @RequestMapping("/filter")
+    public String filterProducts(@RequestParam("category") String category,
+                                 @RequestParam("price") int price,
+                                 Model model) {
+        model.addAttribute("result", "Category: " + category + ", Price: " + price);
+        return "filterResult";
+    }
+}
+👉 URL: /products/filter?category=mobile&price=20000
+✔ category = "mobile", price = 20000
+
+🔄 Optional Parameters (required=false)
+➤ By default, @RequestParam is required.
+➤ If parameter is missing → Spring throws error.
+
+@RequestMapping("/greet")
+public String greet(@RequestParam(value = "name", required = false) String anyName, Model model) {
+    if (name == null) name = "Guest";
+    model.addAttribute("msg", "Hello " + name);
+    return "greet";
+}
+👉 /greet → "Hello Guest"
+👉 /greet?name=Ankur → "Hello Ankur"
+
+🎯 Default Value
+@RequestMapping("/page")
+public String getPage(@RequestParam(value = "p", defaultValue = "1") int page, Model model) {
+    model.addAttribute("pageNumber", page);
+    return "pageView";
+}
+👉 /page → page = 1
+👉 /page?p=5 → page = 5
+
+📦 Handling Lists
+@RequestMapping("/ids")
+public String getIds(@RequestParam List<Integer> id, Model model) {
+    model.addAttribute("ids", id);
+    return "idView";
+}
+👉 /ids?id=10&id=20&id=30
+✔ id = [10, 20, 30]

@@ -1270,3 +1270,5 @@ intStream.forEach(System.out::println); // 1 2 3
 
 6️⃣ Parallel Processing
 Primitive streams also support .parallel()
+
+
