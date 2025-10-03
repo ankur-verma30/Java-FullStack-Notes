@@ -83,7 +83,7 @@ Spring solved this by:
     ✔️ Lazy initialization (beans are created only when requested).
     ✔️ Lightweight, good for simple applications or memory-constrained environments.
 
-2️⃣ ApplicationContext (Sub-interface of BeanFactory)
+2️⃣ ApplicationContext (Interface)
 ➤ Advanced container → superset of BeanFactory.
 ➤ Eager initialization (beans are created at startup by default).
 ➤ Provides extra features:
@@ -145,17 +145,14 @@ class Car {
     private Engine engine;
 }
 
-
 🔗 Java Config to enable scanning:
 @Configuration
 @ComponentScan("com.example")
 class AppConfig {}
 
-
 🔗 Java code:
 ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 Car car = context.getBean(Car.class);
-
 👉 Interview Tip: Most modern Spring apps use this approach.
 
 
@@ -177,15 +174,13 @@ class AppConfig {
     }
 }
 
-
 🔗 Java code:
 ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 Car car = context.getBean(Car.class);
 
 👉 Interview Tip: JavaConfig is preferred in Spring Boot and modern projects because it’s type-safe, refactor-friendly, and avoids verbose XML.
 
-// Main Application to demonstrate Spring IoC and DI
-Vechile.java Interface
+// Vechile.java Interface
 public interface Vechile {
     String getMilage();
 }
@@ -204,6 +199,7 @@ public class Bus implements Vechile {
     }
 }
 
+// Main Application to demonstrate Spring IoC and DI
 package vechiles;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -216,7 +212,6 @@ public class MySpringApp {
 		Vechile vechile=context.getBean("myVechile", Vechile.class);
 		System.out.println(vechile.getMilage());
 	}
-
 }
 
 🔄 Step 1: Package & Imports
@@ -632,10 +627,7 @@ car.price=850000
 <context:property-placeholder location="classpath:application.properties"/>
 
 ✔️ Step 3: Use @Value in Java class
-package com.tcs.vechiles;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+package com.tcs.vechiles ;
 
 @Component
 public class Car {
@@ -673,9 +665,6 @@ car.price=1200000
 ✔️ Step 2: Use @Value
 package com.tcs.vechiles;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
- 
 @Component
 public class Car {
 
@@ -696,12 +685,6 @@ public class Car {
 }
 
 ✔️ Step 3: Run from @SpringBootApplication main class
-package com.tcs;
-
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.tcs.vechiles.Car;
 
 @SpringBootApplication
@@ -720,7 +703,7 @@ public class DemoApplication implements CommandLineRunner {
     }
 }
 ✅ Output (from Boot):
-Brand: Toyota
+Brand: Toyota 
 Mileage: 28 kmpl
 Price: ₹1200000.0
 
@@ -730,12 +713,10 @@ Price: ₹1200000.0
 
 
 🔷 @ComponentScan Annotation
-➤ Tells Spring where to look for components (@Component, @Service, @Repository, @Controller, etc.).
-
+➤ Tells Spring where to look for components (@Component, @Service, @Repository, @Controller, etc.). 
 ➤ By default, Spring Boot scans the package where your @SpringBootApplication class is located and all its sub-packages.
 
 ✅ Example
-@SpringBootApplication
 @ComponentScan(basePackages = {"com.tcs.vechiles", "com.tcs.services"})
 public class DemoApplication {
     public static void main(String[] args) {

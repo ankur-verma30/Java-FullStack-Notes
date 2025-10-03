@@ -55,40 +55,8 @@ Format: command [options] [arguments]
 🔗 tac fileName → vertically invert the contents of the file by lineNumber other workings are same as cat command just in reverse
 🔗 rev fileName → reverse the content horizontally every line, vertical order is same 
 
-❗Same things can be achived through echo command
-Tip: cat is used for quick viewing, concatenating, or creating files.
-
 📌 Special Cases
 cat 'a b' → print the content of a file with spaces in the name (quotes escape special characters)
-
-🔶 Tricky Questions on cat
-🧠 Q: What happens if you run cat > file.txt?
-✔️ 👉 It will overwrite the file and wait for user input. Typing text followed by CTRL+D saves it. (If you press Enter multiple times, those newlines are also saved).
-
-🧠 Q: Difference between cat file1 > file2 and cat file1 >> file2?
-✔️ 👉 > overwrites file2 with contents of file1.
-👉 >> appends contents of file1 to file2.
-
-🧠 Q: Can cat be used to create an empty file?
-✔️ 👉 Yes:
-🔗 cat > empty.txt     # press CTRL+D immediately
-Or simply:
-🔗 > empty.txt   # preferred method
-
-🧠 Q: Explain the difference between cat file | less and less file.
-✔️ 👉 Functionally similar, but less file is directly efficient (less opens file itself).
-👉 cat file | less is a Useless Use of Cat (UUOC) 
-
-🧠 Q: How do you display line numbers only for non-empty lines using cat?
-✔️ 👉 🔗 cat -b file.txt
-
-🧠 Q: How can you display hidden characters (like tabs, end-of-line, non-printable)?
-✔️ 👉
-🔗 cat -T file.txt   # shows tabs
-🔗 cat -E file.txt   # shows end of lines
-🔗 cat -v file.txt   # shows non-printable chars
-
-💡 Interview Tip: cat is mainly for concatenating & small file viewing.
 
 🔄 3. Directory Listing: ls
 ls = list directory contents.
@@ -240,37 +208,20 @@ Seen with:
 ⚠️ Trap: ctime does NOT mean creation time (common interview trick).
 Linux does not store file creation time by default (though modern ext4 with statx may show it as "Birth").
 
-🧠 Trap Questions
-❓ Q1: Difference between mtime and ctime?
-✅ mtime: updated when file content changes.
-ctime: updated when metadata changes (permissions, ownership, etc.) or when mtime changes.
-
-❓ Q3: Can you see the creation time of a file in Linux?
-✅ Normally no → Linux stores only atime, mtime, ctime.
-But in newer kernels (ext4, btrfs), statx or tools like ls -l --time=birth may show "birth time".
-
-❓ Q4: If you run chmod 755 file.txt, which timestamp changes?
-👉 ctime only (metadata changed).
-
-❓ Q5: If you edit and save a file, which timestamps change?
-👉 Both mtime (content changed) and ctime (metadata updated to reflect change).
-
-
-🔷 File Management Commands in Linux
-📂 Directory Management
+🔷  Directory Management Commands in Linux
 🔄 Create Directories
 🔗 mkdir folderName                     # create a directory
 🔗 mkdir folder1 folder2 folder3        # create multiple directories
 🔗 mkdir -p folder1/folder2/folder3     # create nested directories (parents auto-created)
 
 🔄 Remove Directories
-📄 File Creation & Time Management
-🔗 rmdir folderName                # remove empty directory
-🔗 rmdir folder1 folder2           # remove multiple empty directories
-🔗 rmdir -p a/b/c                  # remove nested empty directories (removes c → b → a if empty)
-🔗 rm folderName                   # remove empty directory (alternative to rmdir)
-🔗 rm folder1 folder2              # remove multiple empty directories
-🔗 rm -r folder1 folder2 folder3   # recursively remove directories & contents
+rmdir folderName # remove empty directory
+🔗 rmdir folder1 folder2            # remove multiple empty directories
+🔗 rmdir -p a/b/c                   # remove nested empty directories (removes c → b → a if empty)
+🔗 rm -d folderName                 # remove empty directory (alternative to rmdir)
+🔗 rm -d folder1 folder2            # remove multiple empty directories
+🔗 rm -r folder1 folder2 folder3    # remove non-empty directories & their contents
+🔗 rm -rf folderName                # force remove directory & contents without confirmation
 
 🔹 Key Differences
 ✔️ rmdir → only removes empty directories.
@@ -278,10 +229,6 @@ But in newer kernels (ext4, btrfs), statx or tools like ls -l --time=birth may s
 ⚠️ rm -r is destructive and irreversible → use with caution.
 
 💡 Traps & Tips
-❓Q: Difference between rm -r and rmdir?
-rmdir → only deletes empty directories.
-rm -r → deletes directories even if they contain files/subdirectories.
-
 ❓Q: What happens if you run rmdir nonemptyDir?
 It will fail with:
 rmdir: failed to remove 'nonemptyDir': Directory not empty
@@ -537,6 +484,13 @@ Common usage:
 ✔️ -n → show line numbers of matches
 🔗 grep -in "error" logs.txt
 
+✔️ -v → invert match (show non-matches)
+🔗 grep -iv "error" logs.txt
+
+✔️ Show content from all files in a directory
+🔗 grep -i "pattern" *
+
+
 📖 Context Options
 ✔️ -B n → show n lines before match
 ✔️ -A n → show n lines after match
@@ -572,6 +526,12 @@ Search in all files under a directory:
 ⚡ Forgetting quotes → shell may expand special characters before grep sees them.
 ⚡ Case sensitivity → by default grep is case-sensitive.
 ⚡ Large log search → always combine with tail -f or less for efficiency.
+
+🔷 Counting of files
+🔗 wc fileName  → counting number of lines, words, character at once in a file
+🔗 wc -l fileName  → counting number of lines present in a file
+🔗 wc -w fileName  → counting number of words present in a file
+🔗 wc -m fileName  → counting number of characters present in a file
 
 🔷 Arithmetic Operations and Expressions in Linux
 🔗 $(command) → Command substitution (runs a command inside).
@@ -892,11 +852,29 @@ chgrp groupname filename   # change group ownership of a file
 ➤ Safer than logging in directly as root.
 
 🔹 Usage: sudo command
-
-✅ Example:
 🔗 sudo mkdir meals   # create a directory as root
 🔗 sudo apt update    # update package list
 🔗 sudo cat /etc/shadow   # view restricted file
+
+🔗 sudo useradd alice  # create user 'alice' as root
+🔗 sudo passwd alice  # set password for 'alice'
+🔗 cat /etc/passwd    # view user list
+🔗 su alice         # switch to user 'alice'
+🔗 sudo su -   # switch to root user
+
+✅Example: Work flow with sudo and su
+🔗 sudo useradd stallin  - create user stallin
+🔗 sudo passwd stallin  - set password for stallin also same command is used to change the password
+🔗 su stallin  - switch to user stallin
+🔗 ls   - gives permission denied error because stallin is not root user
+🔗 cd ~ - switch to stallin directory inside home directory
+🔗 ls   - works fine now because stallin is inside his home directory
+🔗 cd /root  - gives permission denied error because stallin is not root user
+exit - exit from stallin user and switch back to original user
+
+🔗 sudo userdel stallin  - delete user stallin but home directory will remain
+🔗 sudo userdel -r stallin  - delete user stallin and his home directory will also get deleted
+
 
 🔹 Authentication Behavior
 ➤ First time sudo is used in a session → password required.
@@ -1312,3 +1290,160 @@ Exit reverse search → Ctrl + c or Ctrl + g.
 cat file.txt
 vim !$
 👉 Opens the same file.txt in vim.
+
+
+🔷 VI Editor in Linux
+➤ vi = Visual Editor, default text editor on Unix/Linux.
+➤ Lightweight, always available.
+➤ Works in different modes.
+
+✅ Difference between vi and vim
+1. vi (Visual Editor)
+➤ The original text editor for Unix (1976).
+➤ Very lightweight, minimal features.
+➤ Always available in all Unix/Linux systems.
+➤ Limited functionality (no syntax highlighting, no plugins, etc.).
+
+2. vim (Vi IMproved)
+➤ Stands for Vi IMproved.
+➤ Enhanced version of vi, created in 1991.
+➤ Backward compatible → every vi command works in vim.
+➤ Adds many powerful features:
+    ✔️ Syntax highlighting (for coding)
+    ✔️ Undo/Redo multiple times
+    ✔️ Plugins & extensions
+    ✔️ Search highlighting
+    ✔️ Auto-indentation
+    ✔️ Command history
+    ✔️ Split windows & tabs
+    ✔️ Mouse support
+    ✔️ Clipboard integration
+
+🔄 Modes in vi
+1️⃣ Command Mode (default)
+➤ Used for navigation, editing commands.
+➤ Press Esc anytime to go back here.
+
+2️⃣ Insert Mode
+➤ For writing text.
+➤ Entered via commands like i, a, o.
+➤ Exit using Esc.
+
+3️⃣ Last Line Mode (Ex Mode)
+➤ For saving, quitting, searching, etc.
+➤ Access by typing : in command mode.    
+
+🔄 Basic Commands of vi/vim
+| Command       | Meaning                     |
+| ------------- | --------------------------- |
+| `i`           | Insert before cursor        |
+| `a`           | Append after cursor         |
+| `Esc`         | Exit insert mode            |
+| `:w`          | Save file                   |
+| `:q`          | Quit                        |
+| `:q!`         | Quit without saving         |
+| `:wq` or `ZZ` | Save & quit                 |
+| `:x`          | Save & quit (same as `:wq`) |
+ 
+🔄 Navigation
+| Command | Meaning                   |
+| ------- | ------------------------- |
+| `h`     | Move left                 |
+| `l`     | Move right                |
+| `k`     | Move up                   |
+| `j`     | Move down                 |
+| `0`     | Move to beginning of line |
+| `$`     | Move to end of line       |
+| `w`     | Jump to next word         |
+| `b`     | Jump to beginning of word |
+| `G`     | Go to last line           |
+| `gg`    | Go to first line          |
+| `:n`    | Go to line `n`            | 
+
+🔄 Copy & Paste (Yank & Put)
+| Command | Meaning            |
+| ------- | ------------------ |
+| `yy`    | Copy current line  |
+| `nyy`   | Copy `n` lines     |
+| `p`     | Paste below cursor |
+| `P`     | Paste above cursor |
+
+🔄 Search & Replace
+| Command         | Meaning                                 |
+| --------------- | --------------------------------------- |
+| `/word`         | Search forward for `word`               |
+| `?word`         | Search backward for `word`              |
+| `n`             | Next occurrence                         |
+| `N`             | Previous occurrence                     |
+| `:%s/old/new/g` | Replace all occurrences in file         |
+| `:s/old/new/g`  | Replace all occurrences in current line |
+
+🔄 File Operations
+| Command   | Meaning                               |
+| --------- | ------------------------------------- |
+| `:e file` | Open another file                     |
+| `:n`      | Go to next file                       |
+| `:rew`    | Rewind to first file                  |
+| `:r file` | Insert file content into current file |
+
+
+🔷 sed Command
+➤ sed = Stream EDitor
+➤ Command-line tool to:
+    ✔️ Search
+    ✔️ Find & Replace
+    ✔️ Insert
+    ✔️ Delete
+👉 text in a file or input stream.
+👉 Works line by line, doesn’t modify the file unless explicitly told (-i).
+
+🔄 Common sed Commands
+| Command        | Meaning                                        | Example                                                |
+| -------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| `p`            | Print matching lines                           | `sed -n '/error/p' logfile` → print lines with "error" |
+| `d`            | Delete lines                                   | `sed '2d' file` → delete line 2                        |
+| `nd`           | Delete line `n`                                | `sed '5d' file` → delete line 5                        |
+| `x,y d`        | Delete range                                   | `sed '2,4d' file` → delete lines 2 to 4                |
+| `s/old/new/`   | Substitute (replace first occurrence per line) | `sed 's/cat/dog/' file`                                |
+| `s/old/new/g`  | Replace all occurrences in each line           | `sed 's/cat/dog/g' file`                               |
+| `s/old/new/gi` | Replace all, case-insensitive                  | `sed 's/cat/dog/gi' file`                              |
+| `-i`           | Edit file in-place                             | `sed -i 's/cat/dog/g' file.txt`                        |
+| `n a text`     | Append text after line `n`                     | `sed '3 a This is new line' file`                      |
+| `n i text`     | Insert text before line `n`                    | `sed '2 i Inserted line' file`                         |
+| `n c text`     | Change line `n`                                | `sed '4 c This line is replaced' file`                 |
+
+
+✅ Examples
+🔁 Replace a word
+🔗 sed 's/Linux/Unix/' file.txt
+(Replaces first "Linux" with "Unix" in each line)
+
+🔁 Replace a word in a specific line
+🔗 sed 's/Linux/Unix/2' file.txt
+(Replaces 2nd "Linux" with "Unix" in all lines)
+
+🔁 Replace all occurrences
+🔗 sed 's/Linux/Unix/g' file.txt
+
+🔁 Delete a specific line
+🔗 sed '3d' file.txt
+(Deletes line 3)
+
+🔁 Delete a range of lines
+🔗 sed '5,10d' file.txt
+(Deletes lines 5–10)
+
+🔁 Delete last line
+🔗 sed '$d' file.txt
+(Deletes last line)
+
+🔁 Print only matching lines
+🔗 sed -n '/error/p' logfile.txt
+(Prints only lines containing "error")
+
+🔁 Insert text
+🔗 sed '2 i This is inserted line' file.txt
+
+🔁 Edit file in-place
+🔗 sed -i 's/old/new/g' file.txt
+(Saves changes directly in file)

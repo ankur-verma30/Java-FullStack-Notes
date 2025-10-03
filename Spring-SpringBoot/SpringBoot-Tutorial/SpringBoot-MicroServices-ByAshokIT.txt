@@ -192,4 +192,182 @@ Note: JDBC will represent data in text format whereases ORM will represent data 
 2. Composition or Object Reference(Has-A Relationship)
 
 
+📝 Java Reflection API
+➤ Reflection API in Java = Mechanism to inspect and manipulate classes, methods, fields, and constructors at runtime.
+➤ Part of java.lang.reflect package.
+➤ Lets you bypass compile-time checks and work dynamically.
+👉 In simple words: Reflection allows Java programs to analyze or modify runtime behavior of objects and classes.
 
+🔄 Key Features of Reflection
+✔️ Get class information at runtime (Class.forName, getClass()).
+✔️ Create objects dynamically (clazz.getDeclaredConstructor().newInstance()).
+✔️ Access private fields & methods (setAccessible(true)).
+✔️ Call methods dynamically (method.invoke()).
+✔️ Useful when class/method names are not known at compile-time.
+
+🔄 Use Cases of Reflection
+👉 Frameworks (Spring, Hibernate) use reflection to create and inject objects without new.
+👉 Dependency Injection (DI) → like assigning engine into Car dynamically.
+👉 Testing tools (JUnit, Mockito) → access private methods/fields.
+👉 Serialization libraries (Jackson, Gson) → inspect fields and methods.
+👉 Plugins / Runtime loading → load classes dynamically.
+
+✅Example: 
+import in.ankur.reflection.Car;
+import in.ankur.reflection.PetrolEngine;
+import java.lang.reflect.Field;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ➤ Loads Car class dynamically using its name (string).
+        ➤ We don’t user new Car() directly.
+        Class<?> clazz = Class.forName("in.ankur.reflection.Car");
+
+        ➤ Creates a Car object at runtime without using new Car().
+        Object object = clazz.getDeclaredConstructor().newInstance();
+        Car carObj = (Car) object;
+
+        ➤ Gets a reference to the private field engine.
+        Field engineField = clazz.getDeclaredField("engine");
+
+        ➤ Bypasses Java’s access modifier restrictions (private → accessible).
+        engineField.setAccessible(true);  // break encapsulation
+
+        ➤ Injects a PetrolEngine object into Car’s private engine field.
+        engineField.set(carObj, new PetrolEngine());
+
+        ➤ Now Car uses the injected engine to perform its logic.
+        carObj.drive();
+    }
+}
+
+
+🔷 Setter Injection using XML Configuration
+🔗 IEngine.java Interface
+package com.ankur;
+
+public interface IEngine {
+public int start();
+}
+
+✔️ Interface are used to pefrom loosely coupling between the classes so that dependency injection can be done.
+
+🔗 PetrolEngineImpl.java Class
+package com.ankur;
+
+public class PetrolEngineImpl implements IEngine {
+	
+public PetrolEngineImpl() {
+	System.out.println("PetrolEngine object created");
+}
+
+	@Override
+	public int start() {
+		System.out.println("Petrol Engine Started");
+		return 1;
+	}
+}
+✔️ Implementation of IEngine interface as PertrolEngineImpl class
+
+🔗 DieselEngineImpl.java Class
+package com.ankur;
+
+public class DieselEngineImpl implements IEngine {
+	
+	public DieselEngineImpl() {
+		System.out.println("DieselEngine object created");
+	}
+
+	@Override
+	public int start() {
+		System.out.println("Diesel Engine Started");
+		return 1;
+	}
+}
+✔️ Implementation of IEngine interface as DieselEngineImpl class
+
+🔗 Car.java Class
+package com.ankur;
+
+public class Car {
+	private IEngine iEngine;
+	
+	public Car() {
+		System.out.println("Car constructor");
+	}
+
+	//setter dependency engine
+	public void setIEngine(IEngine iEngine) {
+		System.out.println("Set Engine method called"+ iEngine);
+		this.iEngine = iEngine;
+	}
+
+	public void drive() {
+		int start = iEngine.start();
+		if (start == 1) {
+			System.out.println("Journey Started");
+		} else {
+			System.out.println("Engine Problem");
+		}
+	}
+}
+✔️ Car class is performing dependency injection of IEngine interface by setter method
+🌟 Note: If you are writing the setter then the paramters should be same as IEngine interface name in Car class and should follow the setter naming convention otherwise spring will not recognize the setter method.
+
+🔗 Beans.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    👉 Step 1
+    <bean id="petrolEng" class="com.ankur.PetrolEngineImpl"/>
+    <bean id="dieselEng" class="com.ankur.DieselEngineImpl"/>
+    
+    👉 Step2
+    <bean id="car" class="com.ankur.Car">
+    <!-- Property is used to perform setter injection -->
+    <property name="iEngine" ref="petrolEng"></property>
+   </bean>
+</beans>
+✔️ Define all the classes you want to make beans in the beans.xml file.
+✔️ Then add the <property> tag to the <bean> tag to perform setter injection as
+✔️ Property tag is used to perform the dependency injection
+✔️ ref attribute is used to give the ref of the class you want to inject into the property name.
+
+🔗 SpringStarterApp.java Class
+package com.main;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.ankur.Car;
+
+public class SpringStarterApp {
+
+	public static void main(String[] args) {
+		ApplicationContext context =
+                new ClassPathXmlApplicationContext("Beans.xml");
+		Car car=context.getBean("car",Car.class);
+		car.drive();
+	}
+}
+✔️ ApplicationContext is used to load the beans.xml file.
+✔️ Then get the Car class object by calling the getBean method of ApplicationContext.
+
+🔄 Use of Car.class:
+    ➤ In Java, every type has a corresponding Class object that represents its metadata at runtime.
+    ➤ Car.class is a class literal → it gives you the Class<Car> object that represents the Car type.
+
+    🔑 Why Spring needs it
+        👉 In context.getBean("car", Car.class):
+            →  "car" → the bean id from your Beans.xml.
+            →  Car.class → tells Spring what type you expect back.
+        👉 Spring will then:
+            →  Look up the bean with id "car".
+            →  Check if its actual type is assignable to Car.
+
+    ➤ Car.class is the runtime representation of the Car type, and in Spring it makes bean retrieval type-safe (no casting errors).
+✔️ Then call the drive method of Car class to perform the dependency injection.

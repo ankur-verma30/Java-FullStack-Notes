@@ -1,0 +1,526 @@
+🔷 SpringBoot
+➤ Spring Boot is a framework for building application in the Java programming language. 
+➤ It is built on top of the Spring framework and provides a simplified way to create stand-alone, production-grade Spring-based applications that can be easily deployed and run.
+➤ The core spring framework already reduces bolierplate code and provides a lot of helpful features for Java applications.
+➤ However, Spring Boot takes this convenience to the next level by focusing specifically on reducing the effort required to set up and configure Spring applications.
+➤ While Spring does simplify many tasks like creating web applications, working with databases, managing transactions and many more. But setting a spring project can still involve quite bit of manual configuration.
+
+Spring Boot provides:
+1. Auto-configuration
+2. Standaloene applications
+
+
+🔷 SpringBootApplication annotation
+➤ We use the @SpringBootApplication annotation on the main class. This single annotation replaces the need of setting up a manual Spring application context.
+➤ We use SpringApplication.run() method to start the application and Spring Boot takes care of configuring the embedded server and other necessary components.
+➤ The @SpringBootApplication annotation alone brings in a lot of pre-configured features, including automatic component scanning and embedded server configuration, which would have required more steps in a traditional Spring application.
+
+🔷 Use of Maven and its importance --- refer to Maven.txt file
+
+
+🔷 @SpringBootApplication?
+➤ It’s a meta-annotation introduced in Spring Boot.
+➤ Combines three important Spring annotations:
+    ✔️@Configuration → marks class as a source of bean definitions.
+    ✔️@EnableAutoConfiguration → tells Spring Boot to auto-configure beans based on classpath dependencies.
+    ✔️@ComponentScan → scans the package (and sub-packages) of the class for components (@Component, @Service, @Repository, @Controller, etc.).
+
+🟢 Working (Step-by-step)
+1️⃣ App starts → SpringApplication.run(...) is called.
+2️⃣ @SpringBootApplication kicks in:
+    ✔️ Loads configurations (@Configuration).
+    ✔️ Triggers auto-configuration (@EnableAutoConfiguration) → checks spring.factories for available configs.
+    ✔️ Starts component scanning from the package of the main class.
+3️⃣ Spring Context built → beans registered, dependencies injected.
+4️⃣ Embedded server (Tomcat/Jetty/Undertow) starts if it’s a web app.
+
+
+🔷 REST API
+➤ REST = Representational State Transfer → an architectural style for designing networked applications.
+➤ REST API = An API that follows REST principles → uses HTTP methods to perform operations on resources (data).
+➤ Resources are identified by URIs (Uniform Resource Identifiers) and exchanged in formats like JSON / XML.
+
+🔄 Core Principles of REST
+➤ Stateless → Each request is independent; server doesn’t store client state.
+➤ Client-Server → Separation of concerns (UI = client, data = server).
+➤ Interface → Standard way to access resources (URIs + HTTP verbs).
+➤ Resource-based → Everything is treated as a resource.
+➤ Representation → Resource can be represented in multiple formats (JSON, XML).
+
+🔄 HTTP Methods in REST
+GET → Retrieve data.
+POST → Create new resource.
+PUT → Update/replace resource.
+PATCH → Partially update resource.
+DELETE → Remove resource.
+
+✅ Example:
+Endpoint:
+GET /api/users/101
+
+Meaning → Fetch details of user with ID = 101.
+Response (JSON):
+{
+  "id": 101,
+  "name": "Ankur",
+  "email": "ankur@example.com"
+}
+
+
+🔷 ORM
+➤ ORM = Object-Relational Mapping
+➤ It’s a technique that lets developers interact with a database using objects instead of SQL queries.
+➤ ORM automatically maps classes ↔ database tables and objects ↔ rows.
+➤ It allows developers to work with databases using object-oriented programming concepts, making it easier to interact with relational databases.
+
+✅ For Example:
+✔️ Consider a Java class User and a database table users.
+✔️ ORM framework like Hibernate can map the fields in the User class to columns in the users table, making it easier to insert, update, retrieve, and delete records.
+
+
+🔷 JPA
+➤ JPA = Java Persistence API.
+➤ It’s a specification (interface) in Java for ORM (Object-Relational Mapping).
+➤ Defines how Java objects should be mapped to relational database tables.
+➤ To use JPA, you need a persistence provider. A persistence provider is a specific implementation of the JPA specification. 
+✅ Examples include Hibernate, EclipseLink, and OpenJPA.
+➤ This providers implement the JPA interfaces and provide the underlying functionality to interact with the database.
+
+🔄 Use case of JPA
+✔️ Standard way of ORM in Java (vendor-independent).
+✔️ Simplifies database interaction → reduces boilerplate JDBC code.
+✔️ Provides queries using JPQL (Java Persistence Query Language) instead of raw SQL.
+✔️ Supports transactions, relationships, and more.
+
+
+🔷 Spring Data JPA
+➤ Spring Data JPA is a Spring project that builds on top of JPA.
+➤ It makes working with databases even easier by removing boilerplate code (no need to write DAO classes manually).
+➤ Provides ready-made repository interfaces to perform CRUD without writing queries.
+
+🔄 Working of Spring Data JPA
+✔️ You define a repository interface extending JpaRepository / CrudRepository.
+✔️ Spring Data JPA creates implementation at runtime.
+✔️ You can use method naming conventions or @Query to define custom queries.
+
+⚡Note:
+
+❗ Problem:
+👉 JPA is primarily designed for working with relational databases, where data is stored in tables with a predefined schema. 
+👉 MongoDB, on the other hand, is a NOSQL database that uses a different data model, typically based on collections of documents, which are schema-less or having flexible schemas. 
+👉 This fundamental difference in data models means that JPA's ORM approach is not directly applicable to MongoDB.
+
+✅ Solution:
+👉 In case of MongoDB, you don't have a traditional JPA persistence provider. MongoDB is a NOSQL database and Spring Data MongoDB serves as the "persistence provider" for MongoDB.
+👉 It provides the necessary abstraction and implementations to work with MongoDB in a Spring application.
+
+🔄 Add dependency for Spring Data MongoDB in your Maven/Gradle configuration.
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-mongodb</artifactId>
+</dependency>
+
+🔄 Ways to Use Spring Data MongoDB
+➤ Query Method DSL and Criteria API are two different ways to interact with a database when using Spring Data JPA for relational databases and Spring Data MongoDB for MongoDB.
+  ✔️ Query Method DSL is a simple and convenient way to create queries based onn method naming conventions.
+  ✔️ Criteria API offers a more dynamic and programatic approach for building complex and custom queries.
+
+➤ Spring Data JPA is a part of Spring framework that simplifies data access in Java applications, while Spring Data MongoDB provides similar functionality for MongoDB.
+
+
+🔷 @ResponseEntity
+➤ ResponseEntity<T> → A Spring class used to represent the entire HTTP response (status, headers, body).
+➤ Commonly used in REST APIs for precise control.
+➤ It provides methods for setting the response status, headers, and body.
+➤ You can use it to return different types of data in your controller methods such as JSON, XML, or plain text. 
+➤ IT uses generics to specify the type of the response body.
+
+❗ Confusion Alert:
+➤ We often see things like:
+return ResponseEntity.ok("Hello");
+
+➤ And we also see annotations like @ResponseBody.
+➤ That’s why many think @ResponseEntity exists — but it does not.
+
+✅ Correction
+➤ ResponseEntity (class) → Used in method return type.
+➤ @ResponseBody (annotation) → Tells Spring to write the return object directly to HTTP response body (instead of resolving a view).
+➤ @RestController (annotation) → Combines @Controller + @ResponseBody.
+
+➤ An HTTP status code is a three-digit numeric code returned by a web server as parto of the response to an HTTP request made by a client.
+➤ These status codes are used to convey information about the result or status of the requested operation.
+➤ HTTP status codes are grouped into five categories based on the first digit of the code:
+1️⃣ 1xx (Informational): These status codes indicate that the request was received and understood, and the server is continuing to process it.
+These are typically used for informational purposes and are not commonly seen in everyday web interactions.
+
+2️⃣ 2xx (Successful): These status codes indicate that the request was successfully received, understood, and accepted by the server.
+  ✔️ 200 OK: The request has been successfully processed, and the server is returning the requested resource.
+  ✔️ 201 Created: The request has been fulfilled, resulting in the creation of a new resource.
+  ✔️ 204 No Content: The request has been fulfilled, but there is no response body(typically used for operation that don't return data, like a DELETE request).
+
+3️⃣ 3xx (Redirection): These status codes indicate that further action is needed to complete the request. These are used when the client needs to take additional steps to access the requested resource.
+  ✔️ 301 Moved Permanently: The requested resource has been permanently moved to a new URL.
+  ✔️ 302 Found: The requested resource is temporarily located at a different URL.When server sends a response with a 302 status code, it typically includes a Location header that specifies the new URL where the resource can be found. The client is expected to make a new request to this URL to access the resource.
+  ✔️ 304 Not Modified: The resource has not been modified since the last request. The client can use its cached version.
+
+4️⃣ 4xx (Client Error): It indicates that there was an error on the client's side, such as malformed request or authentication issues.
+  ✔️ 400 Bad Request: The server cannot process the request due to client error (e.g., malformed request syntax).
+  ✔️ 401 Unauthorized: Authentication is required and has failed or has not yet been provided.
+  ✔️ 403 Forbidden: The server understands the request but refuses to authorize it.
+  ✔️ 404 Not Found: The requested resource could not be found on the server.
+
+5️⃣ 5xx (Server Error): The server failed to fulfill a valid request.
+  ✔️ 500 Internal Server Error: A generic error message indicating that the server encountered an unexpected condition.
+  ✔️ 502 Bad Gateway: The server received an invalid response from an inbound server while acting as a gateway or proxy.
+  ✔️ 503 Service Unavailable: The server is currently unable to handle the request due to temporary overload or maintenance.
+
+
+🔷 Project Lombok
+➤ Lombok is a Java library that reduces boilerplate code by using annotations.
+➤ It generates common code like getters, setters, constructors, toString, equals, hashCode, builders, etc. at compile time.
+➤ Achieved via annotation processing → IDE & compiler insert the code for you.
+
+❓ Why use Lombok?
+➤ Saves time → no need to manually write getters/setters.
+➤ Makes code cleaner & readable.
+➤ Reduces errors in repetitive boilerplate code.
+
+🔄 Common Lombok Annotations
+✔️ @Getter / @Setter → Generates getters & setters.
+✔️ @ToString → Generates toString().
+✔️ @EqualsAndHashCode → Generates equals() & hashCode().
+✔️ @NoArgsConstructor / @AllArgsConstructor → Generates constructors.
+✔️ @Data → Combines @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor.
+✔️ @Builder → Provides builder pattern.
+✔️ @Slf4j → Provides a ready-to-use logger.
+
+✅ Example Without Lombok
+public class Student {
+    private int id;
+    private String name;
+
+    public Student() {}
+    public Student(int id, String name) { this.id = id; this.name = name; }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    @Override
+    public String toString() { return "Student{id=" + id + ", name='" + name + "'}"; }
+}
+
+✅ Example With Lombok
+import lombok.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Student {
+    private int id;
+    private String name;
+}
+✅ Generates all boilerplate automatically (getters, setters, constructors, toString, equals, hashCode).
+
+
+🔷 @Transactional Annotation
+➤ @Transactional in Spring marks a method (or class) so that database operations inside it run within a single transaction.
+➤ Either all succeed (commit) or all fail (rollback).
+➤ Ensures ACID properties (Atomicity, Consistency, Isolation, Durability).
+
+✅Example:
+@Service
+public class PaymentService {
+
+    @Autowired
+    private OrderRepository orderRepo;
+
+    @Autowired
+    private PaymentRepository paymentRepo;
+
+    @Transactional
+    public void processPayment(Order order, Payment payment) {
+        orderRepo.save(order);       // Step 1
+        paymentRepo.save(payment);   // Step 2
+
+        // If any exception occurs here, both saves will rollback
+    }
+}
+👉 Without @Transactional, if orderRepo.save() succeeds but paymentRepo.save() fails, you’d get inconsistent data. With @Transactional, both operations succeed or both rollback.
+
+It can be applied at:
+1️⃣ Method Level → Only that method runs in a transaction.
+2️⃣ Class Level → All public methods in the class run in transactions.
+
+Key Features
+
+1️⃣ Rollback Rules
+➤ By default, rolls back on unchecked exceptions (RuntimeException, Error).
+➤ Checked exceptions don’t trigger rollback unless configured.
+
+@Transactional(rollbackFor = Exception.class)
+public void doWork() { ... }
+
+2️⃣ Isolation Levels (how transactions interact with each other)
+✔️ READ_COMMITTED (default in most DBs)
+✔️ READ_UNCOMMITTED
+✔️ REPEATABLE_READ
+✔️ SERIALIZABLE
+
+✅ Example:
+@Transactional(isolation = Isolation.SERIALIZABLE)
+
+3️⃣ Propagation (what happens if a method with a transaction calls another transactional method)
+✔️ REQUIRED (default) → joins existing transaction or creates new one if none.
+✔️ REQUIRES_NEW → always starts a new transaction.
+✔️ MANDATORY → must run inside an existing transaction.
+✔️ SUPPORTS, NOT_SUPPORTED, NEVER, NESTED.
+
+✅ Example:
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+
+4️⃣ Read-Only Transactions
+Optimizes performance for queries.
+
+@Transactional(readOnly = true)
+
+
+🔷 Spring Security in Spring Boot
+Spring Security is a powerful and highly customizable authentication and access-control framework for Java applications, particularly those built using the Spring framework. 
+It provides a comprehensive set of features to secure applications against various threats, including authentication, authorization, and protection against common vulnerabilities.
+
+🔄 dependency for Spring Security in Maven/Gradle configuration.
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+➤ Once the dependency is added, Spring Boot automatically configures basic security settings for your application.
+➤ It includes authentication, authorization, and session management by default.
+➤ By default, Spring Security uses HTTP Basic Authentication it means that: 
+  ✔️ The client sends an authorization header Authorizaiton:Basic<endcoded-credentials>.
+  ✔️ The server decodes the string, extracts the username and password, and verifies them.
+  ✔️ If they're correct access is granted, otherwise a 401 Unauthorized response is returned.
+
+➤ Encoding Credentials are combined into a string like username:password and then encoded using Base64 encoding scheme.
+
+➤ By default, all endpoints will be secured, Spring Security will generate a default user with a random password, which is printed in the console when the application starts if no user is created in the database.
+
+➤ You can also configure username and password by setting properties in application.properties or application.yml file.
+🔗 spring.security.user.name=your-username
+🔗 spring.security.user.password=your-password
+➤ You can customize the security settings by creating a configuration class that extends WebSecurityConfigurerAdapter and overrides the configure methods.
+
+🔷 Code Implementation of Spring Security
+🔗 SpringSecurity.java
+package net.engineeringdigest.journalApp.config;
+
+@Configuration
+@EnableWebSecurity
+public class SpringSecurity {
+    //4. A configuration SecurityConfig to integrate everything with Spring Security.
+
+    @Autowired
+    private CustomUserDetailsServiceImpl userDetailsService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests()
+                .antMatchers("/journal/**", "/user/**").authenticated()
+                .anyRequest().permitAll()
+                .and()
+                .httpBasic();
+
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable();
+
+        return http.build();
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+    }
+}
+
+1️⃣ @Configuration
+👉 Marks this class as a Spring Configuration class.
+👉 Equivalent to an XML <beans> config file, but in Java-based configuration.
+👉 Spring looks at this class and registers its beans in the Spring Application Context.
+
+2️⃣ @EnableWebSecurity
+👉 Enables Spring Security’s web security support.
+👉 Without this, your configuration (HttpSecurity) would be ignored.
+👉 Internally imports security filters and tells Spring Boot:
+“Hey, use my custom security setup instead of defaults.”
+
+3️⃣ @Autowired private CustomUserDetailsServiceImpl userDetailsService;
+👉 Injects the CustomUserDetailsServiceImpl into the Spring Security configuration.
+🔗 CustomUserDetailsServiceImpl.java class
+
+@Component
+public class CustomUserDetailsServiceImpl implements UserDetailsService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUserName(username);
+        if (user != null) {
+            return org.springframework.security.core.userdetails.User.builder()
+                    .username(user.getUserName())
+                    .password(user.getPassword())
+                    .roles(user.getRoles().toArray(new String[0]))
+                    .build();
+        }
+        throw new UsernameNotFoundException("User not found with username: " + username);
+    }
+}
+➤ CustomUserDetailsServiceImpl is your custom class that implements UserDetailsService.
+⚡ Purpose:
+👉 When a user tries to log in, Spring Security calls this service to load user details (username, password, roles).
+✅ Example: you fetch user info from MongoDB / MySQL instead of in-memory users.
+
+❓ What is happening in this Implementation class?
+3️⃣.1️⃣ implements UserDetailsService
+➤ UserDetailsService is a Spring Security interface.
+➤ It has one method:
+🔗 UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+
+⚡ Purpose:
+➤ Spring Security calls this method whenever a user tries to log in.
+➤ You implement how the user is fetched (from DB, LDAP, API, etc.).
+➤ Without this, Spring wouldn’t know how to authenticate against your custom database.
+
+3️⃣.2️⃣ @Autowired private UserRepository userRepository;
+➤ Injects your UserRepository (likely a JpaRepository / MongoRepository).
+➤ Used to query the DB for a user by username.
+
+✅ For example:
+User user = userRepository.findByUserName(username);
+👉 Here findByUserName is a custom finder method in your repository.
+
+3️⃣.3️⃣ public UserDetails loadUserByUsername(String username)
+➤ This is the main method executed during authentication.
+
+⚡ Flow:
+✔️ Spring Security extracts the username from login request.
+✔️ Calls loadUserByUsername(username).
+✔️ You query the DB for that user.
+✔️ If found → build a UserDetails object and return.
+✔️ If not found → throw UsernameNotFoundException.
+
+3️⃣.4️⃣ User user = userRepository.findByUserName(username);
+➤ Queries DB for a User entity.
+➤ Your User entity probably looks something like:
+
+@Document("users")
+public class User {
+    private String userName;
+    private String password;
+    private Set<String> roles;
+}
+
+3️⃣.5️⃣ Building UserDetails
+return org.springframework.security.core.userdetails.User.builder()
+        .username(user.getUserName())
+        .password(user.getPassword())
+        .roles(user.getRoles().toArray(new String[0]))
+        .build();
+👉 Here:
+  ✔️ username(user.getUserName()) → sets the principal (login ID).
+  ✔️ password(user.getPassword()) → sets the password (should be encoded with PasswordEncoder).
+  ✔️ roles(user.getRoles()...) → converts your user’s roles into Spring Security authorities (like "ROLE_USER", "ROLE_ADMIN").
+  ✔️ .build() → returns a fully constructed UserDetails object.
+
+📌 Important:
+➤ Spring Security internally uses its own User object (org.springframework.security.core.userdetails.User), not your entity.
+➤ That’s why you map your entity → Spring Security UserDetails.
+
+3️⃣.6️⃣ If User Not Found
+➤ throw new UsernameNotFoundException("User not found with username: " + username);
+➤ Spring Security catches this exception.
+➤ It returns 401 Unauthorized to the client.
+
+🔄 Authentication Flow with This Service
+➤ Client calls /user API with HTTP Basic header (Authorization: Basic base64(username:password)).
+➤ Spring Security extracts the username.
+➤ Calls CustomUserDetailsServiceImpl.loadUserByUsername(username).
+➤ Your code queries DB → returns user if found.
+➤ Spring Security compares password (raw from request vs. encoded in DB).
+➤ If match → authentication succeeds, SecurityContext is updated with the user.
+➤ Now user can access protected endpoints.
+
+✅ Why Do We Need This?
+➤ Spring Security doesn’t know your DB structure.
+➤ By implementing UserDetailsService, you bridge the gap between your DB and Spring Security.
+➤ This allows you to:
+  ✔️ Fetch users from MongoDB/MySQL/Postgres.
+  ✔️ Support custom roles & permissions.
+  ✔️ Control authentication logic.
+
+4️⃣ @Autowired private PasswordEncoder passwordEncoder;
+➤ Spring Security never stores raw passwords.
+➤ PasswordEncoder (like BCryptPasswordEncoder) encodes passwords during registration and checks during login.
+➤ Without this, Spring would throw errors like “There is no PasswordEncoder mapped for the id 'null'”.
+
+👉 Example flow:
+✔️ User enters password 12345.
+✔️ Spring encodes it → $2a$10$skq...
+✔️ Compares encoded form with stored password in DB.
+
+5️⃣ @Bean public SecurityFilterChain securityFilterChain(HttpSecurity http)
+➤ This is the core of Spring Security config.
+➤ It defines rules for how incoming HTTP requests are authenticated/authorized.
+
+🔁.authorizeHttpRequests()
+✔️ Starts the authorization configuration.
+✔️ Decides which URL patterns need authentication.
+
+🔁 .antMatchers("/journal/**", "/user/**").authenticated()
+✔️ Any request to /journal/* or /user/* must be authenticated (user must log in).
+✔️ If not authenticated → Spring returns 401 Unauthorized.
+
+🔁 .anyRequest().permitAll()
+✔️ Any other request is allowed without login.
+✅ Example: /home, /about, /register → public pages.
+
+🔁 .and().httpBasic()
+✔️ Enables HTTP Basic Authentication:
+✔️ Browser shows a popup asking for username:password.
+✔️ Used mainly for APIs, not UI apps.
+✔️ If this was .formLogin(), then you’d get a login page.
+
+6️⃣ http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+➤ By default, Spring Security creates an HTTP session to store authentication state.
+➤ STATELESS means:
+  ✔️ No session is created.
+  ✔️ Every request must send credentials (good for REST APIs + JWT).
+  ✔️ Prevents storing anything in server memory → scalable microservice-style security.
+
+7️⃣ .csrf().disable()
+➤ CSRF = Cross-Site Request Forgery protection.
+➤ By default, Spring requires a CSRF token for POST/PUT/DELETE requests.
+➤ In APIs (especially with httpBasic or JWT), CSRF is usually disabled because:
+  ✔️ APIs don’t use forms and cookies like traditional web apps.
+  ✔️ Token-based security already prevents CSRF.
+⚠️ But if you’re making a web app with forms, don’t disable CSRF!
+
+8️⃣ @Autowired public void configureGlobal(AuthenticationManagerBuilder auth)
+➤ This configures AuthenticationManager with your UserDetailsService and PasswordEncoder.
+➤ Meaning:
+  ✔️ When a user logs in → Spring calls userDetailsService.loadUserByUsername().
+  ✔️ The password is checked using passwordEncoder.matches(raw, encoded).
+
+⚙️ Flow of What Happens
+➤ A user hits /user/update.
+➤ Spring Security sees /user/** → requires authentication.
+➤ If no login → return 401 Unauthorized.
+➤ If login provided → Spring calls CustomUserDetailsServiceImpl to load user.
+➤ Password is verified using PasswordEncoder.
+➤ If OK → access is granted.
+➤ If user is logged in but role-based restrictions exist → can also get 403 Forbidden.

@@ -223,3 +223,69 @@ start() → run() → sleep() → interrupt() → exception thrown → handled i
 
 🔄 Yield Method
 A hint to the scheduler that the current thread is willing to yield its current use of a processor.
+
+✅Example:
+public class MyThread extends Thread {
+    public MyThread(String name){
+        super(name);
+    }
+    public static void main(String[] args) throws InterruptedException {
+        MyThread  t1=new MyThread("First Thead");
+        MyThread t2=new MyThread("Second Thread");
+        t1.start();
+        t2.start();
+
+    }
+
+    @Override
+    public void run() {
+       for(int i=0;i<5;i++){
+           System.out.println(Thread.currentThread().getName()+ " is running");
+           Thread.yield(); // --> tells or hints to the scheduler to give chance to another thread also, although scheduler is free to ignore the request
+       }
+    }
+}
+
+🔄 setDameon() Method
+➤ This method is used to mark a thread as a daemon thread.
+➤ Daemon means a thread that runs in the background and does not prevent the JVM from shutting down.
+➤ By default, a thread is a user thread, which means it prevents the JVM from shutting down.
+➤ If a thread is a daemon thread, it will not prevent the JVM from shutting down.
+
+✅Example:
+public class MyThread extends Thread {
+    public MyThread(String name) {
+        super(name);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        MyThread t1 = new MyThread("First Thead"); //user thread for the business logic
+        t1.setDaemon(true);//daemon thread 
+        t1.start();
+        System.out.println("Main method execution completed");
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println("Hello World");
+        }
+    }
+}
+
+✅ Output:
+Main method execution completed
+Hello World
+Hello World 
+Hello World
+...print Hello World few time and then stops as daemon thread is set to true
+
+
+🔷 Synchronization
+➤ Synchronization is a mechanism that ensures that only one thread can access a shared resource at a time.
+➤ It is used to prevent concurrent access to a shared resource, such as a variable or object.
+➤ It is implemented using the synchronized keyword.
+➤ The synchronized keyword is used to define a block of code that is synchronized.
+➤ Only one thread can access the synchronized block at a time.
+➤ If multiple threads try to access the synchronized block at the same time, they will block until the first thread releases the lock.
+➤ This prevents concurrent access to the shared resource and ensures that only one thread can access it at a time.

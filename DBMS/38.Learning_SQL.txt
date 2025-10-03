@@ -288,23 +288,18 @@ Used to store numbers (integers or decimals).
 ➤ TINYINT – Smallest range of integers 1 Byte
 ➤ MEDIUMINT – Medium range of integers 3 Bytes
 ➤ BIGINT – Larger range of integers 8 Bytes
-➤ DECIMAL(p,s) – Fixed-point number with precision p and scale s (e.g., DECIMAL(5,2) → 123.45)- Variable Size
-➤ DOUBLE – Double-precision floating-point numbers (8-byte)
+
+➤ DECIMAL(p,s) – Fixed-point number with precision p and scale s (e.g., DECIMAL(5,2) → 123.45)- Variable Size limit of (p,s) is (65,30).
+➤ DOUBLE – Double-precision floating-point numbers (8-byte) (10,0) as precision and scale
 ➤ FLOAT – Approximate floating-point numbers (4-byte) (not always precise)
 
 By default all the numeric dataypes can have negative as well as positive values. This restrict the range so if we know there is only +ve values which is stored we use UNSIGNED attribute (0-255).
-✅Example: Salary can never be in negative or age also.
-
-Command:
-CREATE TABLE example1(
-    id INT UNSIGNED
-);
-
+ 
 ✅ 2. Character/String Data Types
 Used to store text.
 
 ➤ CHAR(n) – Fixed-length string range(0-255) (e.g., CHAR(10) stores exactly 10 characters)
-➤ VARCHAR(n) – Variable-length string range(0-255) (up to n characters)
+➤ VARCHAR(n) – Variable-length string range(65535 bytes) (up to n characters)
 ➤ TEXT – Large text blocks (no fixed limit like VARCHAR)
 
 ✅ 3. Date and Time Data Types
@@ -314,18 +309,34 @@ Used to store date/time values.
 ➤ TIME – Stores a time (HH:MM:SS)
 ➤ DATETIME – Stores both date and time
 ➤ TIMESTAMP – Similar to DATETIME, often used for auto-recording date/time of entry
+➤ YEAR - Stores a year (2-digit or 4-digit format)
 
 ✅ 4. Boolean Data Type
 Used for true/false values.
-
 BOOLEAN / BOOL – Stores TRUE or FALSE (internally stored as 1 or 0)
 
 ✅ 5. Binary Data Types
 Used to store binary data (e.g., images, files).
-
-➤ BINARY(n) – Fixed-length binary data
-➤ VARBINARY(n) – Variable-length binary data
+➤ BINARY(n) – Fixed-length binary data 255 bytes
+➤ VARBINARY(n) – Variable-length binary data 64KB
 ➤ BLOB – Binary Large Object, used to store large binary files like images or documents
+Categories of BLOB data types:
+    ➤ TINYBLOB (255 bytes)
+    ➤ BLOB (64KB)
+    ➤ MEDIUMBLOB (16MB)
+    ➤ LONGBLOB (4GB)
+
+✅ Enum Data Type
+➤ Used to store a set of predefined values.
+➤ Size is limited to 65535 members.
+➤ Single Seleection from a fixed list.
+✅Example: ENUM('active', 'inactive', 'deleted');
+
+✅ Set Data Type
+➤ Used to store a set of values.
+➤ Size is limited to 64 members.
+➤ Multiple Selection from a fixed list.
+✅Example: SET('A', 'B', 'C');
 
 📝 Tips for Interviews:
 ➤ Use VARCHAR over CHAR for variable-length strings to save space.

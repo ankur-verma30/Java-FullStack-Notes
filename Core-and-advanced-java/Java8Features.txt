@@ -973,7 +973,7 @@ numbers.parallelStream()
 ⚡ forEach() vs forEachOrdered()
 | Feature              | `forEach()`                                      | `forEachOrdered()`                                  |
 | -------------------- | ------------------------------------------------ | --------------------------------------------------- |
-| Ordering Guaranteed? | ❌ No (esp. in parallel)                          | ✅ Yes                                               |
+| Ordering Guaranteed? | ❌ No (esp. in parallel)                         | ✅ Yes                                              |
 | Performance          | Faster (no ordering overhead)                    | Slower (preserves order)                            |
 | Best Use Case        | When order doesn’t matter (e.g., logging, stats) | When order is critical (e.g., printing in sequence) |
 
