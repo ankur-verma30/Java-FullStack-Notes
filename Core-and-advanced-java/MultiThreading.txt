@@ -288,4 +288,183 @@ Hello World
 ➤ The synchronized keyword is used to define a block of code that is synchronized.
 ➤ Only one thread can access the synchronized block at a time.
 ➤ If multiple threads try to access the synchronized block at the same time, they will block until the first thread releases the lock.
-➤ This prevents concurrent access to the shared resource and ensures that only one thread can access it at a time.
+➤ This prevents concurrent access to the shared resource and prevent race conditions and ensures that only one thread can access it at a time and attain mutual exclusion.
+
+✅Example:
+Counter.java
+package com.corejava;
+
+public class Counter {
+    private int count = 0;
+
+    public synchronized void increment() { //critical section
+        Thread.yield(); 
+        count++;
+    }
+
+    public int getCount() {
+        return count;
+    }
+}
+
+MyThread.java
+package com.corejava;
+
+public class MyThread extends Thread {
+    private Counter counter;
+
+    public MyThread(Counter counter){
+        this.counter=counter;
+    }
+
+    @Override
+    public void run(){
+        for(int i=0;i<10000;i++){
+            counter.increment();
+        }
+    }
+}
+
+Test.java
+package com.corejava;
+
+public class Test {
+    public static void main(String[] args) {
+        Counter counter = new Counter();
+        MyThread myThread1=new MyThread(counter);
+        MyThread myThread2 =new MyThread(counter);
+        myThread1.start();
+        myThread2.start();
+        try{
+            myThread1.join();
+            myThread2.join();
+        }catch (InterruptedException e){
+           e.printStackTrace();
+            System.out.println("Exception occured: "+e);
+        }
+        System.out.println(counter.getCount()); //Expected output: 2000, actual output: <2000
+    }
+}
+
+➤ When you want to synchronized some part of the method not the whole method then use synchronized block instead of synchronized keyword on the method.
+✅Example:
+ public void increment() { 
+       synchronized (this){
+           Thread.yield();
+           count++;
+       }
+       // Other code logic is written
+    }
+
+
+🔷 Locks    
+Thread-safe mechanism that allows multiple threads to access a shared resource concurrently.
+
+❓ Why Use Locks Instead of synchronized?
+| Feature               | `synchronized`                                       | `Lock`                             |
+| --------------------- | ---------------------------------------------------- | ---------------------------------- |
+| Automatic release     | Yes (automatically released when method/block exits) | No (must manually call `unlock()`) |
+| Try to acquire        | No                                                   | Yes (`tryLock()`)                  |
+| Interruptible waiting | No                                                   | Yes (`lockInterruptibly()`)        |
+| Fairness policy       | No                                                   | Yes (can create **fair locks**)    |
+| Multiple conditions   | No                                                   | Yes (via `Condition` objects)      |
+
+🔄 There are two types of locks:
+    1️⃣ Intrinsic Locks (Monitor Locks):
+        ➤ Used internally by the synchronized keyword.
+        ➤ Every Java object has an intrinsic lock.
+        ➤ Only one thread can hold it at a time.
+        ➤ Automatically acquired and released.
+
+    ✅ Use Case: When you want simple synchronization — e.g., synchronize a method or block.
+
+    synchronized void print() {
+    // intrinsic lock acquired on this object
+    }
+
+    2️⃣ Explicit Locks (ReentrantLock)
+        ➤ Part of java.util.concurrent.locks package
+        ➤ Must manually acquire and release
+        ➤ More flexible than intrinsic locks
+        ➤ Provides methods like tryLock(), lockInterruptibly(), isHeldByCurrentThread().
+
+        ✅ Use Case:
+        ➤ When you need:
+        ➤ fair access to threads,
+        ➤ interruptible locks, or
+        ➤ timed waiting for a lock.
+
+public interface Lock {
+    void lock();
+    void unlock();
+    boolean tryLock();
+    void lockInterruptibly() throws InterruptedException;
+}
+
+🔄 Lock Interface Methods use Case:
+| Method                              | Description                                                         |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| `lock()`                            | Acquires the lock, waits indefinitely if not available.             |
+| `unlock()`                          | Releases the lock (should always be in `finally`).                  |
+| `tryLock()`                         | Attempts to acquire lock immediately; returns `true` if successful. |
+| `tryLock(long time, TimeUnit unit)` | Waits for the given time before giving up.                          |
+| `lockInterruptibly()`               | Acquires lock but allows interruption while waiting.                |
+| `isLocked()`                        | Checks if the lock is held by any thread.                           |
+
+    3️⃣ ReentrantLock 
+    🌟 Properties:
+        ✔️ A thread can acquire the same lock multiple times without being blocked (hence “reentrant”) and it maintains a count.
+        ✔️ Must call unlock() the same number of times it called lock(), every lock called must be paired with an unlock call.
+        ✔️ Can be fair or unfair:
+                ➤ Fair → threads acquire lock in order of request.
+                ➤ Unfair → scheduler decides (default).
+
+
+    4️⃣ ReentrantReadWriteLock
+    ➤ Provides two locks:
+        ✔️ Read Lock: can be held by multiple readers simultaneously if there’s no writer.
+        ✔️ Write Lock: exclusive lock; only one thread can write at a time.
+
+    ✅ Use Case: When reads are frequent and writes are rare → improves performance.
+
+    🔗 Code Snippet:
+    ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    Lock readLock = rwLock.readLock();
+    Lock writeLock = rwLock.writeLock();
+
+    readLock.lock();
+    try {
+       // multiple readers allowed
+    } finally {
+       readLock.unlock();
+    }
+
+    5️⃣ StampedLock (Java 8+)
+    ➤ Offers better performance in high-concurrency environments.
+    ➤ Provides three modes:
+        ✔️ Write Lock
+        ✔️ Read Lock
+        ✔️ Optimistic Read (non-blocking, fastest)
+
+    ➤ Returns a stamp (long value) used to unlock later.
+
+    ✅ Use Case: When you need fast, optimistic read operations with low write contention.
+
+    StampedLock lock = new StampedLock();
+    long stamp = lock.tryOptimisticRead();
+    if (!lock.validate(stamp)) {
+        stamp = lock.readLock();
+        try {
+            // protected read
+        } finally {
+            lock.unlockRead(stamp);
+        }
+    }    
+
+
+🔄 Best Practices
+✅ Always call unlock() in a finally block.
+✅ Prefer tryLock() to avoid deadlocks.
+✅ Use ReentrantReadWriteLock for high read concurrency.
+✅ Use StampedLock for performance-critical read-heavy systems.
+✅ Avoid mixing synchronized and Lock on same object.
