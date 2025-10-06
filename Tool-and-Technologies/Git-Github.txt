@@ -156,25 +156,24 @@ Similar to: 🔗 git reset HEAD <file>
 ✅Example: 🔗 git restore --source=HEAD~2 file.txt → Brings back file state from 2 commits ago.
 
 
-🗂️ Git Reset Commands – Notes
+🗂️ Git Reset Commands 
 ➤ Used to move HEAD (the current branch pointer) to another commit.
 ➤ Can also affect staging area (index) and working directory depending on mode.
 ➤ ⚠️ Dangerous if used carelessly (especially --hard), as it can permanently delete changes.
 
 🔄 Common Uses
 🌟 1. Unstage Changes
-
 🔗 git reset
 ➤ Unstages all staged files.
 ➤ Equivalent to: git restore --staged .
 
-🌟 2. Undo Last Commit (3 Modes)
+🌟 2. Undo Last Commit/commit-hash (3 Modes)
 🔗 git reset --soft HEAD~1
 ➤ Removes the last commit.
 ➤ Keeps all changes in staging area.
 ➤ Use when you want to redo the commit.
 
-🔗 git reset --mixed HEAD~1 (default)
+🔗 git reset --mixed <commit-hash> (default)
 ➤ Removes the last commit.
 ➤ Moves changes back to working directory (unstaged).
 ➤ Use when you want to edit files before recommitting.
@@ -184,21 +183,9 @@ Similar to: 🔗 git reset HEAD <file>
 ➤ Discards changes completely (irreversible).
 ➤ Use with caution 🚨.
 
-🌟 3. Reset to a Specific Commit
-🔗 git reset --soft <commit-hash>
-➤ Moves HEAD to that commit.
-➤ Keeps changes staged.
-
-🔗 git reset --mixed <commit-hash>
-➤ Moves HEAD to that commit.
-➤ Keeps changes in working directory (unstaged).
-
-🔗 git reset --hard <commit-hash>
-➤ Moves HEAD to that commit.
-➤ Discards everything after that commit (changes lost).
-
-| Mode      | HEAD moves | Staging Area (Index) | Working Directory |
-| --------- | ---------- | -------------------- | ----------------- |
+🔄 Modes:
+| Mode      | HEAD moves   | Staging Area (Index)  | Working Directory   |
+| --------- | ----------   | --------------------  | -----------------   |
 | `--soft`  | ✅ Yes      | ✅ Keeps staged       | ✅ Keeps changes   |
 | `--mixed` | ✅ Yes      | ❌ Unstaged           | ✅ Keeps changes   |
 | `--hard`  | ✅ Yes      | ❌ Cleared            | ❌ Cleared (lost)  |
@@ -206,8 +193,8 @@ Similar to: 🔗 git reset HEAD <file>
 🗂️ Git Revert Commands
 ➤ Safely undoes a commit by creating a new commit that reverses the changes.
 ➤ Unlike git reset, it does not delete history (safer for shared branches).
-🔗 git revert <commit-hash>→ Creates a new commit that undoes the changes introduced by <commit-hash>.
 
+🔗 git revert <commit-hash> → Creates a new commit that undoes the changes introduced by <commit-hash>.
 ✅ When to Use:
 ➤ When working in collaborative projects where you don’t want to rewrite history.
 ➤ To undo a buggy commit while keeping commit history intact.
