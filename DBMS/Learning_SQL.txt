@@ -197,7 +197,13 @@ SHOW DATABASES;
 ➤ You can only see databases for which you have access privileges.
 ➤ This is helpful when working on a shared server or verifying successful creation of a new database.
 
-🧠 Working with Tables
+🧠 Select Database
+✅ Command:
+SELECT DATABASE();
+
+➤ This command displays the currently active database for the current session.
+
+🔷 Working with Tables
 
 🧠 Creating a Table
 ➤ We use the CREATE TABLE statement to define a new table within a database.
@@ -210,12 +216,22 @@ CREATE TABLE table_name (
     column2 data_type2 constraint2,
     column3 data_type3 constraint3,
     ...
+    table_constraints
 );
 
 ✅Example:
-CREATE TABLE course(
-cid INT,
-cname VARCHAR(50)
+CREATE TABLE employees(
+employee_id int primary key auto_increment,
+first_name varchar(50) not null,
+last_name varchar(50) not null,
+email varchar(50) unique,
+hire_date date default (current_date()),
+phone_number varchar(20) unique,
+salary decimal(10,2) check (salary> 0.0),
+employment_status enum('active', 'on leave', 'terminated') default 'active',
+created_at timestamp default current_timestamp,
+updated_at timestamp default current_timestamp on update current_timestamp
+
 );
 
 📝 Explanation:
@@ -239,27 +255,62 @@ VALUES (value1, value2, ..., valueN);
 INSERT INTO table_name VALUES (value1, value2, ..., valueN);
 
 ✅Example:
-INSERT INTO course VALUES
-(1,"Ankur Verma"),
-(2,"Isha Kumari"),
-(3,"Deepak Yadav");
+insert into employees (first_name,last_name,email,phone_number,salary,employment_status) values ('John','Doe','2aLX0@example.com','1234567890',10000.00,'active');
 
 🧠 Viewing Data from a Table
 ➤ We use the SELECT command to retrieve data from one or more columns in a table.
 ➤ It is a DQL (Data Query Language) command.
 
-✅ Use Cases:
-🔹 To view specific columns:
+🔄Use Cases:
+1️⃣ To view specific columns:
 SELECT column_name1, column_name2 FROM table_name;
-Example:
-SELECT cid FROM course;
+
+✅ Example:
+🔗 SELECT cid FROM course;
 (This displays only the cid column from the course table.)
 
-🔹 To view all columns and all records:
-SELECT * FROM table_name;
-Example:
-SELECT * FROM course;
+2️⃣ To view all columns and all records:
+🔗 SELECT * FROM table_name;
+
+✅ Example:
+🔗 SELECT * FROM course;
 (This displays the entire table, including all columns and all rows.)
+
+3️⃣ To change the name of the columns in output for better readability
+🔗 SELECT column_name1 AS column_name1_alias, column_name2 AS column_name2_alias FROM table_name;
+
+✅ Example:
+🔗 SELECT cid AS course_id, cname AS course_name FROM course;
+
+4️⃣ To filter data based on conditions:
+🔗 Select * from employees where department="IT" order by salary desc  → Displays all employees in the IT department sorted by salary in descending order
+
+5️⃣ To limit the number of rows returned:
+🔗 Select * from employees where department="IT" order by salary desc limit 2  → Displays the top 2 employees in the IT department sorted by salary in descending order
+
+6️⃣ To display unique values:
+🔗 Select distinct department from employees;  → Displays unique departments from the employees table.
+
+7️⃣ To display calculated values:
+🔗 Select first_name, last_name, salary*1.1 as 'Salary After Raise' from employees;  → Displays first name, last name, and salary after a 10% raise.
+
+8️⃣ Working with built-in function:
+🔗 Select concat(first_name," ",last_name) as 'Full Name', YEAR(hire_date) as 'Year of Joining', Round(salary,1) from employees; 
+
+9️⃣ Working with subquery(Nested queries):
+🔗 Select * from employees where salary>(select avg(salary) from employees);
+
+1️⃣0️⃣ Working with union:
+🔗 Select first_name, last_name from employees where department="IT" union select first_name, last_name from employees where department="HR";
+
+1️⃣1️⃣ Working with group by:
+select count(*), department from employees group by department;
+
+1️⃣2️⃣ Evaluating expressions using select(used for debugging):
+🔗 select now() as 'time';
+🔗 select 5*2;
+🔗 select length('hello');
+🔗 select 5<3;
 
 📝 Note:
 ➤ * is a wildcard that means "all columns".
@@ -276,6 +327,42 @@ SHOW TABLES;
 ➤ You must first select a database using the USE database_name; command before running SHOW TABLES.
 ➤ Only tables within the currently active database will be shown.
 ➤ Useful for database exploration and management.
+
+🧠 Alter Table Command
+➤ We use the ALTER TABLE command to modify the structure of an existing table.
+➤ It is a DDL (Data Definition Language) command.
+
+✅ Use Cases:
+🔹 To add a new column:
+ALTER TABLE table_name ADD COLUMN new_column_name data_type;
+
+🔹 To modify an existing column:
+ALTER TABLE table_name MODIFY COLUMN column_name data_type;
+
+🔹 To delete a column:
+ALTER TABLE table_name DROP COLUMN column_name;
+
+🔹 To rename a table/column_name:
+ALTER TABLE table_name RENAME TO new_table_name;
+
+🔹 To add constraints:
+ALTER TABLE table_name ADD CONSTRAINT constraint_name CHECK (condition);
+
+✅Example:
+1️⃣ Alter table employees add column description text;
+
+2️⃣ ALTER TABLE employees 
+ADD COLUMN emergency_contact VARCHAR(100) 
+NOT NULL DEFAULT 'Name:0000000000'
+CHECK (emergency_contact REGEXP '^[A-Za-z]+:[0-9+-]+$');
+
+🧠 Drop table table_name
+➤ We use the DROP TABLE command to remove an existing table from the database.
+➤ It is a DDL (Data Definition Language) command.
+
+✅ Use Cases:
+🔹 To delete a table:
+DROP TABLE table_name if exists;
 
 🧠 Data Types in SQL
 SQL provides various data types to define the type of data that can be stored in each column of a table.
@@ -526,7 +613,7 @@ DELETE FROM baseTable WHERE baseId = 1;
 ⚠️ This will also delete the row in childTable where baseId = 1 because of ON DELETE CASCADE.
 
 
-
+🧠 Understanding Where clause in SQL
 
 
 
