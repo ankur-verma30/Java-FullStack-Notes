@@ -524,3 +524,601 @@ return org.springframework.security.core.userdetails.User.builder()
 ➤ Password is verified using PasswordEncoder.
 ➤ If OK → access is granted.
 ➤ If user is logged in but role-based restrictions exist → can also get 403 Forbidden.
+
+
+🔷 Properties | YAML | How to pass command line arguments in spring boot application ?
+
+1️⃣ application.properties
+In Spring Boot, you can configure values in application.properties:
+server.port=8081
+spring.datasource.url=jdbc:mysql://localhost:3306/mydb
+spring.datasource.username=root
+spring.datasource.password=1234
+
+2️⃣ YAML
+In Spring Boot, you can configure values in application.yml:
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mydb
+    username: root
+    password: 1234
+📌 Both properties and yml are supported by default. Spring Boot prefers application.yml if both are present.
+
+
+3️⃣ Passing Command Line Arguments
+Spring Boot allows overriding configuration from the command line.
+
+⚡ Syntax:
+🔗 java -jar myapp.jar --server.port=9090 --spring.datasource.username=ankur
+
+Here:
+🔗 --server.port=9090 → overrides server.port
+🔗 --spring.datasource.username=ankur → overrides username
+
+4️⃣ Accessing Values Inside Code
+You can fetch values in your beans with @Value or @ConfigurationProperties.
+
+Using @Value:
+@Value("${server.port}")
+private int port;
+
+Using @ConfigurationProperties:
+@Component
+@ConfigurationProperties(prefix = "spring.datasource")
+public class DBConfig {
+    private String url;
+    private String username;
+    private String password;
+
+    // getters & setters
+}
+
+
+🔷 JUnit 
+JUnit is a Java testing framework used to write and run unit tests — small tests that verify individual parts of your code (usually methods or classes) to ensure they work as expected.
+
+❓ Why JUnit?
+➤ Automates testing of Java code.
+➤ Ensures code works as intended after changes (Regression testing).
+➤ Encourages writing modular, maintainable code.
+➤ Integrates easily with build tools like Maven, Gradle, and CI/CD pipelines.
+
+Concepts of JUnit:
+1️⃣ @SpringBootTest
+➤ Used to load the full Spring ApplicationContext for integration tests.
+➤ It ensures all beans (@Service, @Repository, @Component, etc.) are available.
+➤ Best for testing when your service class interacts with real Spring components (like repositories).
+
+✅ Example:
+@SpringBootTest
+public class UserServiceTest {
+
+    @Autowired
+    private UserEntryService userEntryService;
+
+    @Test
+    void testSaveUser() {
+        User user = new User("ankur", "ankur@gmail.com", "1234");
+        boolean result = userEntryService.saveNewUser(user);
+        assertTrue(result);
+    }
+}
+
+2️⃣ Lifecycle Annotations
+These define when a method runs in relation to the test lifecycle.
+| Annotation    | Runs When             | Purpose                              |
+| ------------- | --------------------- | ------------------------------------ |
+| `@BeforeAll`  | Once before all tests | Set up shared resources              |
+| `@BeforeEach` | Before each test      | Re-initialize test data              |
+| `@AfterEach`  | After each test       | Clean up after a test                |
+| `@AfterAll`   | Once after all tests  | Close connections, release resources |
+
+✅Example:
+@BeforeAll
+static void initAll() {
+    System.out.println("Runs once before all tests");
+}
+
+@BeforeEach
+void init() {
+    System.out.println("Runs before each test");
+}
+
+@AfterEach
+void tearDown() {
+    System.out.println("Runs after each test");
+}
+
+@AfterAll
+static void tearDownAll() {
+    System.out.println("Runs once after all tests");
+}
+
+3️⃣ @ParameterizedTest
+➤ Allows you to run the same test with multiple inputs.
+➤ Replaces the need to write multiple similar test methods.
+➤ Works with several sources like @ValueSource, @CsvSource, @MethodSource, and @ArgumentsSource.
+
+⚡ Using @ValueSource
+Provides a single list of values (String, int, double, etc.)
+
+✅Example:
+@ParameterizedTest
+@ValueSource(strings = {"Ram", "Shyam", "Ankur"})
+void testFindByUserName(String name) {
+    assertNotNull(userRepository.findByUserName(name), "Failed for: " + name);
+}
+
+⚡ Using @CsvSource
+Provides a list of comma-separated values (String, int, double, etc.)
+
+✅Example:
+@ParameterizedTest
+@CsvSource({
+    "1,2,3",
+    "2,3,5",
+    "3,4,7"
+})
+void testAddition(int a, int b, int expected) {
+    assertEquals(expected, a + b);
+}
+➡️ Runs 3 times:
+testAddition(1, 2, 3)
+testAddition(2, 3, 5)
+testAddition(3, 4, 7)
+
+⚡ Using @ArgumentsSource
+➤ Used for complex or custom inputs (e.g., objects like User).
+➤ Requires a separate class implementing ArgumentsProvider.
+
+✅Example:
+@ParameterizedTest
+@ArgumentsSource(UserArgumentProvider.class)
+void testSaveNewUser(User user) {
+    assertTrue(userEntryService.saveNewUser(user));
+}
+
+👉 UserArgumentProvider example:
+
+public class UserArgumentProvider implements ArgumentsProvider {
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        return Stream.of(
+            Arguments.of(new User("ankur", "ankur@gmail.com", "1234")),
+            Arguments.of(new User("isha", "isha@gmail.com", "abcd"))
+        );
+    }
+}
+
+4️⃣ @Disabled
+➤ Used to temporarily skip a test without deleting it.
+➤ Helpful when a feature isn’t implemented yet or you want to ignore unstable tests.
+
+✅ Example:
+@Disabled("Disabled until bug #123 is fixed")
+@Test
+void testFeatureNotReady() {
+    fail("This feature is under development");
+}
+
+5️⃣ Assertions
+Assertions are used to verify the actual result against the expected result.
+| Method                           | Usage                     |
+| -------------------------------- | ------------------------- |
+| `assertEquals(expected, actual)` | Check equality            |
+| `assertTrue(condition)`          | Condition must be true    |
+| `assertFalse(condition)`         | Condition must be false   |
+| `assertNotNull(object)`          | Object should not be null |
+| `assertNull(object)`             | Object should be null     |
+| `assertThrows()`                 | Expected exception thrown |
+✅Example:
+@Test
+void testAssertions() {
+    assertEquals(4, 2 + 2);
+    assertTrue(5 > 3);
+    assertNotNull("Hello");
+}
+
+
+6️⃣ Test Naming & Organization
+➤ Tests are usually written in the same package structure as the main code.
+➤ Test class names typically end with Tests or Test.
+
+✅ Example:
+src/
+ ├── main/java/net/engineeringdigest/journalApp/service/UserEntryService.java
+ └── test/java/net/engineeringdigest/journalApp/service/UserServiceTests.java
+
+
+🔷 Mockito
+➤ Mockito is a mocking framework for Java used in unit testing to create fake (mock) objects that simulate the behavior of real objects.
+➤ It allows you to test a class in isolation, without actually calling the real dependencies (like databases, APIs, or external services).
+
+❓ Why Mockito is Needed
+➤ Without mocking:
+  ✔️ vUnit tests may depend on external systems like DB, APIs.
+  ✔️ vTests may fail due to external failures, not your logic.
+  ✔️ vTests become slow and hard to maintain.
+
+➤ With Mockito:
+  ✔️ vYou mock dependencies to test only your class logic.
+  ✔️ vYou control the dependency behavior (what it returns).
+  ✔️ vTests are fast, reliable, and isolated.
+
+
+🔷 Spring Profiles 
+➤ Spring Profiles allow you to activate or deactivate beans/configurations based on the current environment (like dev, test, prod).
+➤ You can control which beans load depending on the active profile.
+➤ You can create multiple versions of the same bean/class and Spring will only load the one matching the active profile.
+
+🔄 Set Active Profile in application.properties
+➤ You can specify the active profile directly in your main configuration file:
+# application.properties
+spring.profiles.active=dev
+
+➤ This tells Spring Boot to load all settings from application-dev.properties in addition to the default application.properties.
+
+🔄 Create Profile-Specific Property Files
+Each profile has its own file following this naming convention:
+application-{profile}.properties
+
+✅ Example:
+✔️ application-dev.properties
+server.port=8081
+spring.datasource.url=jdbc:mysql://localhost:3306/devdb
+spring.datasource.username=dev_user
+spring.datasource.password=dev123
+
+✔️ application-prod.properties
+server.port=8082
+spring.datasource.url=jdbc:mysql://localhost:3306/proddb
+spring.datasource.username=prod_user
+spring.datasource.password=prod123
+
+🔄 Activate Profile via Command Line
+You can override the profile at runtime using the command line:
+
+🔗 java -jar myapp.jar --spring.profiles.active=prod
+👉 This overrides whatever is set in application.properties.
+
+
+🔄 Using @Profile Annotation
+You can annotate beans, components, or configuration classes to load only when a specific profile is active.
+
+✅ Example: — Service Classes
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+@Service
+@Profile("dev")
+public class DevEmailService implements EmailService {
+    @Override
+    public void sendEmail(String msg) {
+        System.out.println("DEV: Sending mock email → " + msg);
+    }
+}
+
+@Service
+@Profile("prod")
+public class ProdEmailService implements EmailService {
+    @Override
+    public void sendEmail(String msg) {
+        System.out.println("PROD: Sending real email → " + msg);
+    }
+}
+👉 If spring.profiles.active=dev, then only DevEmailService will be loaded.
+👉 If spring.profiles.active=prod, then only ProdEmailService will load.
+
+🔄 Using @Profile in Configuration Classes
+You can also restrict entire configuration classes:
+
+@Configuration
+@Profile("test")
+public class TestDatabaseConfig {
+
+    @Bean
+    public DataSource dataSource() {
+        System.out.println("Using TEST database configuration");
+        return new HikariDataSource();
+    }
+}
+So when the active profile is test, this config will be used.
+
+🔄 Get Active Profile Programmatically
+You can access the active profile from the Spring Context’s Environment.
+
+✅ Example:
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ActiveProfileLogger {
+
+    @Autowired
+    private ApplicationContext context;
+
+    public void printActiveProfile() {
+        String[] profiles = context.getEnvironment().getActiveProfiles();
+        System.out.println("Active Profile: " + profiles[0]);
+    }
+}
+✅ Output:
+Active Profile: dev
+
+🔄 Use in Tests (JUnit + Profiles)
+You can set a profile for tests using @ActiveProfiles:
+
+@SpringBootTest
+@ActiveProfiles("test")
+public class UserServiceTest {
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    void checkProfile() {
+        System.out.println("Running under profile: "
+            + context.getEnvironment().getActiveProfiles()[0]);
+    }
+}
+✅ Output:
+Running under profile: test
+
+🔄 Multiple Profiles at Once
+You can activate more than one profile:
+👉 spring.profiles.active=dev,local
+Spring will load all beans matching either dev or local.
+
+You can also use logical negation:
+@Profile("!prod")   // load this bean in all profiles except prod
+
+🔄 Using Profiles with YAML
+You can define multiple profiles within a single YAML file using ---:
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8081
+
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 9090
+👉 Depending on which profile is active, the corresponding section will apply.
+
+🔄 Checking Active Profile in Console (Quick Check)
+In any Spring Boot class:
+System.out.println(context.getEnvironment().getActiveProfiles()[0]);
+👉 Prints the current active profile — very useful for debugging or verifying environment setup.
+
+
+🔷 Logging in Spring Boot: SLF4J
+➤ Logging is an essential aspect of the application development that allows developers to monitor and troubleshoot their applications.
+
+➤ Spring Boot supports various logging frameworks, such as Logback, Log4J2, and Java Util Logging (JUL) out of the box.
+
+🔄 understanding frameworks:
+1️⃣ Logback: A popular logging framework that serves as default in many SpringBoot applications. It offers a flexible configuration and good performance.
+
+2️⃣ Log4J2: A logging framework similar to Logback with features such as asynchronous logging and support various output formats.
+
+3️⃣ Java Util Logging (JUL): A logging framework that is a part of the Java platform. While it's less feature rich than some third-party frameworks, it is straightforward to use.
+
+✔️ Spring Boot uses Logback as the default logging framework provides a good balance between simplicity and performance.
+✔️ The default configuration is embedded within the Spring Boot libraries, and it may not be visible in your application's source code.
+✔️ If you want to customize the logging configuration, you can create your own logback-spring.xml or logback.xml file in the src/main/resources directory.
+✔️ When SpringBoot detects this file in your project, it will use it instead of the default configuration.
+
+🔄 Logging Levels
+Spring Boot supports the following logging levels:
+| Level     | Description             | Example                |
+| --------- | ----------------------- | ---------------------- |
+| TRACE     | Detailed debugging info | Fine-grained flow logs |
+| DEBUG     | Useful for debugging    | Dev-time logs          |
+| INFO      | General app flow        | Startup, shutdown      |
+| WARN      | Potential issues        | Deprecated method used |
+| ERROR     | Errors & exceptions     | DB connection failed   |
+| OFF       | Turns off logging       | —                      |
+
+We can set the desired logging levels for specific packages or classes, allowing them to control the amount of information logged at runtime.
+
+Spring Boot provides annotations like @Slf4j and @Log4j2 to help with logging, that can be used to automatically inject logger instance
+
+
+🔷 SLF4J
+➤ SLF4J (Simple Logging Facade for Java) is a logging abstraction layer.
+➤ It provides a common interface for various logging frameworks (Logback, Log4j2, JUL, etc.).
+➤ Spring Boot internally uses SLF4J + Logback by default.
+➤ Think of SLF4J as a “universal adapter” that lets you switch logging backends easily without changing your application code.
+
+❓ Why Use SLF4J 
+➤ Abstraction layer: decouples logging framework from code.
+➤ Better performance: lazy evaluation of log messages ({} placeholders).
+➤ Integration: widely supported in Spring, Hibernate, etc.
+➤ Flexibility: easily switch from Logback → Log4j2 without code changes.
+
+❓ How Logging Works in Spring Boot
+➤ By defaultSLF4J API is used in code.
+➤ Logback is the underlying implementation.
+➤ Configurations are auto-loaded from:
+  ✔️ application.properties or
+  ✔️ logback-spring.xml
+
+✅Example:
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    public void createUser(String name) {
+        logger.info("Creating user: {}", name); 
+        logger.debug("Debug info while creating user");
+        logger.warn("This is a warning message");
+        logger.error("Error occurred while creating user");
+    }
+}
+✅ Output:
+Creating user: Mike
+Debug info while creating user
+This is a warning message
+Error occurred while creating user
+
+🧠 Why {} ?
+Because SLF4J supports parameterized logging — efficient and avoids string concatenation.
+
+👉 We have to write:
+ private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+ to use this line of code for every class for logging in Spring Boot.
+ ⚡ We have to write log instead of logger in the code as well
+
+ instead of this we can use:
+ @Slf4j // annotation provided by lambok library
+ @Service
+ public class UserService {
+     public void createUser(String name) {
+         log.info("Creating user: {}", name);
+         log.debug("Debug info while creating user");
+         log.warn("This is a warning message");
+         log.error("Error occurred while creating user");
+     }
+ }
+
+🔄 Configure Logging in application.properties
+
+🔗 Code Example:
+# Root logging level
+logging.level.root=INFO 
+👉 this gives logs for all packages and classes of level info or severe than info i.e trace and debug will never get printed.
+
+# Package-specific level
+logging.level.net.engineeringdigest.journalApp=DEBUG
+
+# Log file output
+logging.file.name=app.log
+logging.file.path=logs/
+
+# Pattern for console output
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+
+🔄 Logging with Profiles
+You can set different logging levels for each Spring profile:
+
+🔗 Code Example:
+# application-dev.properties
+logging.level.root=DEBUG
+
+# application-prod.properties
+logging.level.root=ERROR
+
+And activate profile:
+spring.profiles.active=dev
+
+🔄  Access Logs in Code
+You can print the active profile in your logs:
+
+🔗 Code Example:
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Autowired
+private Environment env;
+
+@PostConstruct
+public void init() {
+    String activeProfile = env.getActiveProfiles()[0];
+    logger.info("Active profile: {}", activeProfile);
+}
+
+🔄 Configure in logback-spring.xml (Advanced)
+When we have application.properties, we should use logback-spring.xml for logging configuration specifically.
+
+🔗 Code Example:
+<configuration>
+
+👉 Console Appender 
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder> // encoder is a formatter for the output 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+👉 File appender
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <file>PAth_of_the_file</file>
+    </appender>
+
+👉 Set the root level and attach the console appender
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+👉 Set the log level for a specific package or classes
+    <logger name="net.engineeringdigest.journalApp" level="DEBUG"/>
+
+</configuration>
+
+Understanding structure:
+1️⃣ <configuration>
+<!-- Appender and Logger configuration go here -->
+</configuration>
+➤ The <configuration> elements is the root element of the logback.xml file. All logback configuration is enclosed within this element.
+
+🔄 Patter Syntax:
+  ✔️ %d{yyyy-MM-dd HH:mm:ss} - date and time
+  ✔️ [%thread] - thread name
+  ✔️ %-5level - logging level(left justified text with atmost 5 characters)
+  ✔️ %logger{36} - logger name upto 36 characters
+  ✔️ %msg  %n - message and new line
+
+🔄 Rolling FileAppender Based on Time
+✅Example:
+
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+</configuration>
+
+🔄 Rolling FileAppender Based on Size of File
+✅Example:
+
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeBasedRollingPolicy">
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+</configuration>
+👉 Rolling based of size and time can be used at the same time whatever happens first will make logs accordingly.
