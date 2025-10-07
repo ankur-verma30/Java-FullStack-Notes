@@ -250,7 +250,7 @@ Moves feature commits on top of main.
 🔗 git rebase --abort → Abort rebase and return to original branch state.
 🔗 git rebase --skip → Skip the commit causing conflict and move to next.
 
-🗂️ GitHub Workflow – Notes
+🗂️ GitHub Workflow
 🔄 What is GitHub?
 ➤ A web-based platform for hosting Git repositories.
 ➤ Provides:
@@ -329,13 +329,10 @@ Used for marking versions (important in deployment).
 
 🔄 Cherry-Pick (Selective Commit)
 Apply a specific commit from another branch:
-
-🔗 git cherry-pick <commit-hash> → Useful when you need only one fix/
-feature commit without merging entire branch.
+🔗 git cherry-pick <commit-hash> → Useful when you need only one fix/feature commit without merging entire branch.
 
 🔄 Squash Commits (in Merge)
 To keep history clean, multiple commits can be squashed into one:
-
 🔗 git merge --squash <branch>
 🔗 git commit -m "Squashed commit"
 
