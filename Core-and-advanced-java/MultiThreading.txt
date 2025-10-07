@@ -461,10 +461,325 @@ public interface Lock {
         }
     }    
 
-
 🔄 Best Practices
 ✅ Always call unlock() in a finally block.
 ✅ Prefer tryLock() to avoid deadlocks.
 ✅ Use ReentrantReadWriteLock for high read concurrency.
 ✅ Use StampedLock for performance-critical read-heavy systems.
 ✅ Avoid mixing synchronized and Lock on same object.
+
+
+🔷 Locks' Fairness: Prevent Deadlocks
+❓ What is Unfair Locking?
+➤ By default, ReentrantLock uses an unfair policy, meaning:
+➤ When multiple threads are waiting for the lock,
+a new thread may “cut in line” and acquire the lock even if others have been waiting longer.
+➤ The scheduler doesn’t strictly follow first come, first served (FCFS) order.
+➤ This can cause thread starvation, but improves performance in some cases.
+
+✅Example: Unfair Lock Demonstration
+package com.corejava;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class UnfairLockExample {
+    // Default constructor => unfair lock
+    private final Lock unfairLock = new ReentrantLock();
+
+    public void accessResource() {
+        unfairLock.lock();
+        try {
+            System.out.println(Thread.currentThread().getName() + " acquired the lock");
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            unfairLock.unlock();
+            System.out.println(Thread.currentThread().getName() + " released the lock");
+        }
+    }
+}
+
+package com.corejava;
+
+public class Main {
+    public static void main(String[] args) {
+        UnfairLockExample unfairLockExample = new UnfairLockExample();
+
+        Runnable task = () -> unfairLockExample.accessResource();
+
+        Thread t1 = new Thread(task, "Thread 1");
+        Thread t2 = new Thread(task, "Thread 2");
+        Thread t3 = new Thread(task, "Thread 3");
+
+        t1.start();
+        t2.start();
+        t3.start();
+    }
+}
+✅Expected Output(May vary in each run):
+Thread 2 acquired the lock
+Thread 2 released the lock
+Thread 3 acquired the lock
+Thread 3 released the lock
+Thread 1 acquired the lock
+Thread 1 released the lock
+
+👉 Next time when you run the code:
+Thread 1 acquired the lock
+Thread 1 released the lock
+Thread 3 acquired the lock
+Thread 3 released the lock
+Thread 2 acquired the lock
+Thread 2 released the lock
+
+👉 There’s no guaranteed order — threads acquire the lock randomly even though Thread 1 started first.
+👉 That’s the unfair behavior.
+
+🆚 Fair vs Unfair Lock
+If you want to make it fair, modify one line 👇
+
+private final Lock fairLock = new ReentrantLock(true); // true = fair
+
+✅Output with Fair Lock:
+Thread 1 acquired the lock
+Thread 2 acquired the lock
+Thread 1 released the lock
+Thread 2 released the lock
+Thread 3 acquired the lock
+Thread 3 released the lock
+👉 Now the output follows Thread 1 → Thread 2 → Thread 3 (the order in which they started waiting).
+
+➤ Thread 1 and Thread 2 both say “acquired the lock” before either released it.
+➤ That’s actually not possible if both lines refer to the same critical section protected by the same lock, because only one thread can hold a ReentrantLock at a time.
+
+➤ So, what really happens is:
+    ✔️ Thread 1 acquires the lock and prints.
+    ✔️ Before Thread 1 releases it, Thread 2 is blocked, waiting.
+    ✔️ Once Thread 1 releases the lock, Thread 2 then acquires and prints.
+    ✔️ But because of console I/O buffering, their print statements may appear out of strict order.
+➤ So don’t rely solely on print order — small thread scheduling variations can cause misleading console sequences.
+
+
+🔄 Disadvantages of synchronized in Java
+1️⃣ No Flexibility / Limited Control
+➤ Once a synchronized block or method starts, other threads must wait — no timeout, no try mechanism.
+➤ You cannot check if a lock is available before trying to acquire it.
+➤ Unlike ReentrantLock, you cannot interrupt a thread waiting for a synchronized lock.
+
+✅ Example:
+synchronized void print() { ... }  // waits indefinitely
+
+2️⃣ Automatic Locking — No Manual Release
+➤ Lock is automatically released when the method/block exits, even if you wanted to keep it longer.
+➤ You cannot manually unlock() early like you can with Lock objects.
+
+3️⃣ No Fairness Guarantee
+➤ Thread scheduling is not fair — JVM does not guarantee FIFO order of thread execution.
+➤ A thread that waits longer doesn’t necessarily get the lock next → can lead to thread starvation.
+
+4️⃣ Cannot Try for Lock (No tryLock Equivalent)
+➤ There’s no non-blocking attempt to acquire the lock.
+➤ Threads either block indefinitely or wait till lock is free.
+
+🆚 Compare with Lock API:
+if (lock.tryLock()) {
+   // proceed
+} else {
+   // do something else
+}
+
+5️⃣ Cannot Create Multiple Condition Variables
+➤ synchronized provides only one intrinsic lock per object.
+➤ You can use only one wait set per object (via wait(), notify(), notifyAll()).
+➤ With Lock, you can create multiple Condition objects for fine-grained control.
+
+6️⃣ No Timeout Option
+➤ There’s no way to specify how long a thread should wait to acquire the lock.
+➤ Threads can remain blocked indefinitely.
+
+7️⃣ Can Cause Deadlock Easily
+➤ If multiple synchronized blocks lock different objects in wrong order, threads can deadlock.
+➤ Because synchronization is implicit and uninterruptible, recovery is difficult.
+
+8️⃣ Lower Performance in High Contention
+➤ When many threads compete for the same lock, context switching and blocking overhead increases.
+➤ Modern alternatives (Lock, StampedLock, etc.) can be more scalable and non-blocking.
+
+9️⃣ No Explicit Lock Information
+➤ You can’t check:
+    ✔️ whether a thread currently holds a lock,
+    ✔️ how many times it has entered (no reentrancy info), or
+    ✔️ if another thread is waiting.
+➤ ReentrantLock provides such introspection methods (isLocked(), isHeldByCurrentThread(), etc.).
+
+1️⃣0️⃣ Difficult Debugging
+➤ Since locking and unlocking are automatic, it’s harder to trace where threads are blocking or waiting.
+➤ Deadlocks or long wait times are tough to identify without specialized tools.
+
+
+🔷 ReadWriteLock
+A ReadWriteLock is a special kind of lock that maintains two separate locks:
+👉 Read Lock – for read-only operations
+👉 Write Lock – for write/update operations
+
+❓ Why Use It:
+➤ In many systems, read operations are more frequent than writes.
+➤ If every thread used the same lock (like synchronized), even reads would block each other — reducing performance.
+
+✅ ReadWriteLock allows multiple threads to read simultaneously,
+🚫 but only one thread can write at a time, and no reader can read while a write is happening.
+
+🔄 Rule of Thumb:
+| Operation       | Can run in parallel? | Condition                            |
+| --------------- | -------------------- | ------------------------------------ |
+| Multiple Reads  | ✅ Yes                | As long as **no write** is happening |
+| Read + Write    | ❌ No                 | Write locks block readers            |
+| Multiple Writes | ❌ No                 | Only one writer at a time            |
+| Write + Write   | ❌ No                 | Only one writer                      |
+
+✅Example: ReadWriteCounter
+package com.corejava;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class ReadWriteCounter {
+    private int count=0;
+    private  final ReadWriteLock rwlock=new ReentrantReadWriteLock();
+
+    private final Lock readLock=rwlock.readLock();
+    private final Lock writeLock=rwlock.writeLock();
+
+    public void increment(){
+        writeLock.lock();
+        try{
+            System.out.println(Thread.currentThread().getName()+" incremented");
+            count++;
+        }finally {
+            writeLock.unlock();
+        }
+    }
+
+    public int getCount(){
+        readLock.lock();
+        try{
+            System.out.println("Count of the variable: "+count);
+        }finally {
+            readLock.unlock();
+        }
+        return count;
+    }
+}
+
+1️⃣ Class Setup
+➤ rwlock creates an object that provides two locks:
+    ✔️ readLock() – allows concurrent reads.
+    ✔️ writeLock() – exclusive lock for writing.
+➤ count → shared resource being read/written by threads.
+
+2️⃣ Write Operation (increment())
+➤ writeLock.lock() → acquires exclusive access to count.
+➤ While one thread holds the write lock:
+    ❌ No other write thread can enter.
+    ❌ No read thread can access count.
+➤ Ensures atomicity and data consistency during modification.
+➤ Finally block ensures unlock() always happens, even if an exception occurs.
+
+3️⃣ Read Operation (getCount())
+➤ readLock.lock() allows concurrent access to count if no write is active.
+➤ Multiple threads can hold readLock simultaneously.
+➤ When a write lock is requested, new readers must wait until the write finishes.
+
+package com.corejava;
+
+public class Main {
+    public static void main(String[] args) throws InterruptedException {
+
+        ReadWriteCounter counter=new ReadWriteCounter();
+        Runnable readTask = () -> {
+            for(int i=0;i<10;i++){
+                System.out.println(Thread.currentThread().getName()+" read: "+counter.getCount() );
+            }
+        };
+
+        Runnable writeTask= () -> {
+            for(int i=0;i<10;i++){
+                counter.increment();
+            }
+        };
+
+        Thread writeThread=new Thread(writeTask,"Thread write1");
+        Thread readThread1=new Thread(readTask,"Thread read1");
+        Thread readThread2=new Thread(readTask,"Thread read2");
+
+        writeThread.start();
+        readThread1.start();
+        readThread2.start();
+
+        try {
+            writeThread.join();
+            readThread1.join();
+            readThread2.join();
+        } catch (InterruptedException e) {
+           try {
+               writeThread.interrupt();
+               readThread1.interrupt();
+               readThread2.interrupt();
+           } catch (RuntimeException ex) {
+               throw new RuntimeException(ex);
+           }
+        }
+
+        System.out.println("Final count:"+ counter.getCount());
+    }
+}
+
+4️⃣ Main Class Logic
+➤ readTask → repeatedly reads the counter (10 times).
+➤ writeTask → increments the counter (10 times).
+
+5️⃣ Threads Creation
+One write thread and two read threads.
+
+6️⃣ Execution Flow
+writeThread.start();
+readThread1.start();
+readThread2.start();
+
+➤ All threads start together.
+➤ When the write thread holds writeLock, readers wait.
+➤ When write finishes, both read threads can read concurrently again.
+
+7️⃣ Final Output
+System.out.println("Final count:" + counter.getCount());
+👉 After all threads finish, the final count should be 10 (since one writer increments 10 times).
+
+❓ Why ReadWriteLock Is Better Here
+| Aspect                   | `synchronized`     | `ReadWriteLock` |
+| ------------------------ | ------------------ | --------------- |
+| Multiple readers         | ❌ Block each other | ✅ Allowed       |
+| Writer access            | Exclusive          | Exclusive       |
+| Performance (read-heavy) | Lower              | Higher          |
+| Fine-grained control     | Limited            | High            |
+
+
+🔄 Use ReadWriteLock When
+➤ Read operations are frequent.
+➤ Write operations are infrequent but must be exclusive.
+✅ Example scenarios:
+    ✔️ Caching systems
+    ✔️ Configuration reading
+    ✔️ File metadata readers
+    ✔️ In-memory database snapshots
+
+🔁 Insights
+✔️ Always unlock in finally block.
+✔️ Don’t acquire both read and write lock in same thread (can deadlock).
+✔️ Prefer ReentrantReadWriteLock for reentrancy (same thread can re-acquire lock safely).
+✔️ Readers block writers, and writers block readers — but readers can share the lock.
+
+
+🔷 Deadlock
