@@ -360,8 +360,8 @@ class Car {
 1️⃣ Singleton (Default)
 ➤ Only one instance per Spring container.
 ➤ All requests for this bean return the same object.
-➤ Best for stateless beans (services, DAOs).
-➤ Default scope if you don’t specify anything.
+➤ Best for stateless beans (services, DAOs, controllers, Rest Controllers etc).
+➤ Default scope if you don’t specify anything because to same memory of JVM.
 
 🔗 Code Implementation in XML:
 <bean id="myBean" class="com.example.MyClass" scope="singleton"/>
@@ -375,6 +375,7 @@ public class MyService {}
 ➤ New instance is created every time the bean is requested.
 ➤ Best for stateful beans (objects holding user-specific data).
 ➤ Spring does not manage full lifecycle → only initialization, no destroy callback.
+➤ Used for request-scoped beans such as (tickets, Orders etc).
 
 🔗 Code Implementation:
 <bean id="myBean" class="com.example.MyClass" scope="prototype"/>
@@ -491,13 +492,65 @@ public class Test {
         System.out.println(car.getMilage()); // Output: 30Kmpl
     }
 }
+🌟 Earlier we were doing manual wiring using property tag and constructor-agr tags for dependency injection
 
-🔄 @Autowired Annotation
-➤ @Autowired is used for dependency injection.
+🔄 auto-wire in XML/ @Autowired Annotation
+➤ Autowiring is applicable for only reference type not for primitive types.
 ➤ It tells Spring: “Find a matching bean and inject it here automatically.”
+
+🟢 auto-wire in Beans.XML file:
+➤ Autowiring will work based on these modes:
+    1️⃣ byName: Ioc will identify dependent bean object based on bean id or name
+    ✅Example:
+    📝 In Beans.xml:
+    <bean id="eng" class="com.tcs.vechiles.PertrolEngineImpl"/>
+    <bean id="car" class="com.tcs.vechiles.Car" autowire="byName/>
+
+    📝 In Car.java:
+    @Autowired
+    private Vechile eng; 
+
+    ⚡Note: In the above example car class variable name is matched with PertrolEngineImpl bean id hence pertrolEngineImpl will be injected.
+
+    2️⃣ byType: Ioc will identify dependent bean object based on data type.
+    ✅Example:
+    📝 In Beans.xml:
+    <bean id="eng" class="com.tcs.vechiles.PertrolEngineImpl"/>
+    <bea id="eng" class="com.tcs.vechiles.DieselEngineImpl">
+    <bean id="car" class="com.tcs.vechiles.Car" autowire="byType/>
+
+    ➤ Here there is two types of Implementation present for the same data type hence IOC will get confused so we have to use a property called autowire-candidate=true and make all rest as false.
+
+     <bean id="eng" class="com.tcs.vechiles.PertrolEngineImpl" autowire-candidate=true/>
+    <bean id="eng" class="com.tcs.vechiles.DieselEngineImpl" autowire-candidate=false/>
+
+    ➤ Or simply use keyword primary="true" for which you want to perform dependency injection.
+
+     <bean id="eng" class="com.tcs.vechiles.PertrolEngineImpl" primary=true/>
+    <bean id="eng" class="com.tcs.vechiles.DieselEngineImpl"/>
+    👉 So we do not have to mention false in rest of the class.
+
+    👉 Now IOC will get to know which implementation class object it has to make for the dependency injection.
+
+    📝 In Car.java:
+    @Autowired
+    private Vechile eng; // autowire byType then Spring will inject PertrolEngineImpl by matching type
+
+    ⚡Note: When we give type as byName and byType is uses default constructor for dependency injection under the hood so if not zero param constructor is present then it will give error
+
+    3️⃣ byConstructor: 
+    <bean id="eng" class="com.tcs.vechiles.PertrolEngineImpl" autowire-candidate=true/>
+    <bean id="eng" class="com.tcs.vechiles.DieselEngineImpl" autowire-candidate=false/>
+     <bean id="car" class="com.tcs.vechiles.Car" autowire="byConstructor/>
+
+    👉If no default constructor is present we use the autowire method as constructor and make the bean for which the autowire-candidate is true
+
+    4️⃣ no (default): Do not perform any Autowiring and it expects zero param constructor for creating the object and performing dependency injection like when we are using byName and byType method.
+
+🟢 Using Annotation Method
+🔷 Perfomring Dependency Injection
 ➤ Spring uses type-based injection by default (looks for a bean with the same type).
 
-🔷 Perfomring Dependency Injection
 ⚡Vechile Interface
 package com.tcs.vechiles;
 
