@@ -28,9 +28,9 @@ Format: command [options] [arguments]
 ➤ cat (short for concatenate) is one of the most frequently used commands in Linux.
 ➤ It is used to create, view, concatenate, and redirect files.
 
-🔹 Syntax: cat [options] [file...]
+🔄 Syntax: cat [options] [file...]
 
-🔹 Key Options
+🔄 Key Options
 ✔️ -n → Number all output lines
 ✔️ -b → Number only non-blank lines
 ✔️ -s → Squeeze (remove) repeated empty lines
@@ -61,7 +61,7 @@ cat 'a b' → print the content of a file with spaces in the name (quotes escape
 🔄 3. Directory Listing: ls
 ls = list directory contents.
 It shows files, directories, and metadata depending on the options provided.
-🔹 Common Variants
+🔄 Common Variants
 🔗 ls → list files & directories in the current working directory
 🔗 ls dirname → list contents of a specific directory in lexicographic sorted manner
 🔗 ls -a → show all files, including hidden (. prefix)
@@ -103,9 +103,9 @@ Better alternatives: 🔗 find . -maxdepth 1 -type f
 The man command = manual pages.
 It provides documentation for commands, system calls, library functions, configuration files, and more.
 
-🔹 Syntax: man [section] command
+🔄 Syntax: man [section] command
 
-🔹 Sections of man Pages
+🔄 Sections of man Pages
 ➤ Linux manual is divided into sections (numbered).
 Common ones:
 ✔️ User Commands (executables, like ls, cat, etc.)
@@ -120,14 +120,14 @@ Common ones:
 ✅ Example:
 man 2 open → Opens the manual for the system call open(), not the command.
 
-🔹 Navigation Inside man
+🔄 Navigation Inside man
 ➤ Space → next page
 ➤ b → previous page
 ➤ /word → search forward for a keyword
 ➤ n → repeat the last search
 ➤ q → quit
 
-🔹 Useful Options
+🔄 Useful Options
 🔗 man -k keyword → search man pages for a keyword (like a help search engine)
 ✅ Example: 
     🔗 man -k copy → lists all commands related to copying.
@@ -180,21 +180,21 @@ Ctrl + x + y → save and exit
 Every file in Linux has three important timestamps stored in the filesystem metadata (called inode).
 we have a directory in which we have a file named food.txt.
 
-🔹 1. Modification Time (mtime)
+🔄 1. Modification Time (mtime)
 Updated when: file content is modified.
 ✅ Example: adding, deleting, or editing text inside food.txt.
 Seen with:
 🔗 ls -l food.txt   # default shows mtime
 🔗 stat food.txt    # "Modify"
 
-🔹 2. Access Time (atime)
+🔄 2. Access Time (atime)
 Updated when: file is read (opened, viewed, cat, less, etc.).
 ✅ Example: cat food.txt updates access time.
 Seen with:
 🔗 ls -lu food.txt  # shows last access time
 🔗 stat food.txt    # "Access"
 
-🔹 3. Change Time (ctime)
+🔄 3. Change Time (ctime)
 Updated when: file metadata (inode info) changes, like:
     ✔️ Permissions changed (chmod)
     ✔️ Ownership changed (chown)
@@ -223,7 +223,7 @@ rmdir folderName # remove empty directory
 🔗 rm -r folder1 folder2 folder3    # remove non-empty directories & their contents
 🔗 rm -rf folderName                # force remove directory & contents without confirmation
 
-🔹 Key Differences
+🔄 Key Differences
 ✔️ rmdir → only removes empty directories.
 ✔️ rm -r → removes directories and their contents (files + subdirectories).
 ⚠️ rm -r is destructive and irreversible → use with caution.
@@ -244,7 +244,7 @@ No ❌ (unless backups/version control exist). Always double-check path before e
 🔄 touch Command
 Used to create empty files or update file timestamps.
 
-🔹 Usage
+🔄 Usage
 🔗 touch fileName             # create file if not exists; else update access & modification time
 🔗 touch -m fileName          # update modification time only
 🔗 touch -a fileName          # update access time only
@@ -258,7 +258,7 @@ Used to create empty files or update file timestamps.
 ➤ Used to identify file type and encoding.
 ➤ Checks the file content, not the extension
 
-🔹 Usage
+🔄 Usage
 🔗 file fileName
 
 ✅ Example 1: Normal Case
@@ -273,24 +273,11 @@ file temp.mp4
 👉 Shows Linux doesn’t rely on extensions — it inspects file content.
 
 💡 Traps & Tips
-❓Q: If I rename a .txt file to .mp4, will Linux think it’s a video?
-✅ No → Linux checks content, not extensions (file command confirms).
-
-❓Q: Difference between touch and cat > fileName?
-✅ touch → creates empty file (no content).
-cat > fileName → creates file and allows input from user (overwrites content).
-
-❓Q: What timestamps does touch update?
-✅ By default: access (atime) + modification (mtime).
-With -m: only modification.
-With -a: only access.
-ctime (metadata change time) always updates when timestamps change.
-
 ❓Q: How does Linux know file type without extension?
 ✅ Uses magic numbers / content patterns in the file header (checked via file command).
 
 🔷 Working with Nano
-➤ Nano is a simle, easy to-use text editor that operates within a terminal window.
+➤ Nano is a simple, easy to-use text editor that operates within a terminal window.
 ➤ If a file is not there, it creates and open it.
 
 🔗 nano food.txt
@@ -312,8 +299,10 @@ ctime (metadata change time) always updates when timestamps change.
 
 🌟 Searching/replace in nano
 ➤ Ctrl+W - Search for a string or a regular expression(case in-sensitive).
-➤ Ctrl+\ - Replace a string
+➤ Ctrl+\ - Replace a string or a regular expression(case in-sensitive).
+➤ Ctrl+R - Replace all occurrences of a string or a regular expression(case in-sensitive).
 
+🌟 Moving around in nano
 ➤ Ctrl + e → move cursor to end of line
 ➤ Ctrl + a → move cursor to beginning of line
 ➤ Ctrl + x → Close the current file buffer and exit the editor
@@ -321,10 +310,6 @@ ctime (metadata change time) always updates when timestamps change.
 ➤ Ctrl + q → exit without saving
 
 🔷 File Operations
-👉 Removing the files
-➤ rm fileName → remove a file
-➤ rm file1 file2 dirName → remove multiple files and directories
-
 👉 Moving and Copying
 ➤ cp fileName1 fileName2 → copy a file
 ➤ cp -r dirName1 dirName2 → copy a directory(copying recursively)
@@ -370,7 +355,6 @@ ctime (metadata change time) always updates when timestamps change.
 
 🔷 Standard Output (stdout) & Standard Error (stderr) in Linux
 📍 Basics
-
 ➤ Every command/program produces:
     ✔️ stdout (1) → normal output (default stream)
     ✔️ stderr (2) → error messages
@@ -392,11 +376,11 @@ So ls > a.txt ≡ ls 1> a.txt
 💡 2 explicitly denotes stderr.
 
 📖 Redirecting Both stdout and stderr
-➤ ls -z > output.txt 2> error.tx
-    ✔️ stdout → output.tx
-    ✔️ stderr → error.tx
-➤ ls -z >> output.txt 2>> error.tx
-    ✔️ append stdout → output.tx
+➤ ls -z > output.txt 2> error.txt
+    ✔️ stdout → output.txt
+    ✔️ stderr → error.txt
+➤ ls -z >> output.txt 2>> error.txt
+    ✔️ append stdout → output.txt
     ✔️ append stderr → error.txt
 
 🎯 Interview Insights
@@ -408,7 +392,6 @@ Default: > means 1> unless otherwise specified.
 
 🔷 sort Command in Linux
 The sort command is used to arrange lines of text in files or input streams.
-
 ⚡Syntax: sort [options] fileName
 
 📖 Common Options
@@ -464,8 +447,8 @@ Common usage:
 ➤ dmesg | less → scroll through logs
 ➤ cat file | wc -l → count lines in a file
 
-🔷 Searching in Linux – grep Command
 
+🔷 Searching in Linux – grep Command
 📍 Basic Usage: grep "pattern" fileName
 ➤ Searches pattern inside fileName.
 ➤ Case-sensitive by default.
@@ -504,7 +487,6 @@ Common usage:
 
 📖 Recursive Search
 Search in all files under a directory:
-
 🔗 grep -r "pattern" dirName
 🔗 grep -r "pattern"   # searches in current directory
 
@@ -557,18 +539,15 @@ a=10; b=3
 
 🔗 Command Substitution $( )
 Runs a command inside, not math:
-
 🔗 echo $(pwd)     # prints current directory
 🔗 echo $(date)    # prints current date
 
 🔗 Logical Chaining in Linux
-
 👉; → Always runs commands sequentially
-🔗 d Downloads/ ; ls
-
+🔗 cd Downloads/ ; ls
 👉 → Even if cd fails, ls runs.
-👉 && → Run second only if first succeeds
 
+👉 && → Run second only if first succeeds
 🔗 cd Downloads/ && ls → If cd works, then list contents.
 
 👉 || → Run second only if first fails 
@@ -652,15 +631,15 @@ Job Control (Ctrl + Z, fg, bg) is a hidden gem often asked in interviews.
 ✅ Examples:
 👉 🔗 find . -name "*.txt" → Find all text files in the current directory
 
-🔹 Search by Type
+🔄 Search by Type
 🔗 find /path -type f -name "*.txt"   # files
 🔗 find /path -type d -name "*.txt"   # directories
 
-🔹 Search by Size
+🔄 Search by Size
 🔗 find /path -type f -size +100k -size -200k   # files between 100KB–200KB
 🔗 find /path -type d -size +1M                 # directories > 1MB
 
-🔹 Search by Time
+🔄 Search by Time
 ✔️ -mmin / -mtime → Modified time
 ✔️ -amin / -atime → Accessed time
 ✔️ -cmin / -ctime → Metadata changed
@@ -672,26 +651,26 @@ Job Control (Ctrl + Z, fg, bg) is a hidden gem often asked in interviews.
 🔗 find /path -mtime 7     # modified exactly 7 days ago
 🔗 find /path -mmin -30    # modified in last 30 minutes
 
-🔹 Logical Operators
+🔄 Logical Operators
 🔗 find /path -type f -name "*.txt" -size +100k -mtime -7   # AND condition
 🔗 find /path \( -name "*.txt" -o -name "*.pdf" \)          # OR condition
 🔗 find /path ! -name "*.txt"   # NOT condition
 
-🔹 Empty Files/Directories
+🔄 Empty Files/Directories
 🔗 find /path -type f -empty    # empty files
 🔗 find /path -type d -empty    # empty directories
 
-🔹 Execute Commands on Results
+🔄 Execute Commands on Results
 🔗 find /path -name "*.txt" -exec cat {} \;    # run `cat` on each file
 🔗 find /path -empty -exec rm -rf {} \;        # delete empty files/dirs
 ✔️ {} → placeholder for current file
 ✔️ \; → end of exec command
 
-🔹 Using xargs
+🔄 Using xargs
 🔗 find . -name "*.log" | xargs rm     # delete all .log files
 🔗 find . | xargs file                 # run `file` command on each
 
-🔹 -exec vs xargs
+🔄 -exec vs xargs
 ➤ -exec → runs inside find, handles spaces/special chars safely
 ➤ xargs → more efficient for bulk operations, but may fail on files with spaces/newlines
 
@@ -739,35 +718,35 @@ rest 9 characters will be divided into three groups: rwx,rwx,rwx
 🔷 Changing Permissions with chmod
 ✅ Syntax: chmod [options] [permissions] [files...]
 
-🔹 Permission Categories
+🔄 Permission Categories
 ✔️ u → user (owner)
 ✔️ g → group
 ✔️ o → others
 ✔️ a → all (user + group + others)
 
-🔹 Operators
+🔄 Operators
 ✔️ + → add permission
 ✔️ - → remove permission
 ✔️ = → set exact permission (overwrites existing)
 
-🔹 Permission Types
+🔄 Permission Types
 ✔️ r → read
 ✔️ w → write
 ✔️ x → execute
 
-🔹 Common Options
+🔄 Common Options
 ✔️ -R → recursive (apply to directories + contents)
 ✔️ -v → verbose (show changes)
 ✔️ -f → force (suppress errors)
 
-🔹 Symbolic Method Examples
+🔄 Symbolic Method Examples
 🔗 chmod u+x sample.txt     # add execute for user
 🔗 chmod g-w sample.txt     # remove write from group
 🔗 chmod o=r sample.txt     # others only read
 🔗 chmod a+x sample.txt     # all users get execute
 🔗 chmod u=rwx,g=rx,o=      # explicit overwrite
 
-🔹 Octal (Numeric) Method
+🔄 Octal (Numeric) Method
 
 Permission values:
 r = 4, w = 2, x = 1
@@ -784,7 +763,7 @@ Calculate sum for each group:
 🔗 chmod 700 sample.txt    # rwx --- ---
 🔗 chmod 777 sample.txt    # rwx rwx rwx (full access to everyone ❌ not recommended)
 
-🔹 Special Cases
+🔄 Special Cases
 ➤ Directories → need x to enter (cd).
 ➤ Scripts/Programs → need x to execute.
 
@@ -809,30 +788,42 @@ su - username → switch to username
 
 
 🔷 Mastering Linux Groups
-🔹 Viewing Groups
+When a user is created, a corresponding group is automatically created with the same name. User groups help manage permissions efficiently.
+
+🔄 Viewing Groups
 🔗 groups → lists groups of the current user
+
+✅ Example:
+🔗 groups ec2-user
+ec2-user : ec2-user adm wheel systemd-journal
+✔️ ec2-user: The primary group for the user.
+✔️ adm: The group for administrators.
+✔️ wheel: The group for superusers, such as the abilities to use sudo.
+✔️ systemd-journal: The group for systemd journal users.
+
+
 🔗 groups username → lists groups of a specific user
 
-🔹 Creating Groups
+🔄 Creating Groups
 🔗 addgroup groupname → create a new group
 (on some distros: groupadd groupname)
 
-🔹 Adding Users to Groups
+🔄 Adding Users to Groups
 🔗 adduser username groupname → add user to group
 (alternative: usermod -aG groupname username → safer, adds without removing from other groups)
 
-🔹 Removing Users from Groups
+🔄 Removing Users from Groups
 🔗 deluser username groupname → remove user from a group
 (alternative: gpasswd -d username groupname)
 
-🔹 Deleting Groups
+🔄 Deleting Groups
 🔗 delgroup groupname → delete a group
 (alternative: groupdel groupname)
 
-🔹 Switching Groups
+🔄 Switching Groups
 🔗 newgrp groupname → switch current shell to the specified group
 
-🔹 File Permissions with Groups
+🔄 File Permissions with Groups
 Every file has: owner, group, others
 If user belongs to file’s group → group permissions apply
 
@@ -851,7 +842,7 @@ chgrp groupname filename   # change group ownership of a file
 ➤ Allows permitted users to execute commands as root or another user (as defined in /etc/sudoers).
 ➤ Safer than logging in directly as root.
 
-🔹 Usage: sudo command
+🔄 Usage: sudo command
 🔗 sudo mkdir meals   # create a directory as root
 🔗 sudo apt update    # update package list
 🔗 sudo cat /etc/shadow   # view restricted file
@@ -876,26 +867,23 @@ exit - exit from stallin user and switch back to original user
 🔗 sudo userdel -r stallin  - delete user stallin and his home directory will also get deleted
 
 
-🔹 Authentication Behavior
+🔄 Authentication Behavior
 ➤ First time sudo is used in a session → password required.
 ➤ After successful authentication → no password needed for 15 minutes (default).
 ➤ Timeout can be changed in /etc/sudoers file (using visudo).
 
-🔹 Running as Different User
-🔗 sudo -u username command
+🔗 sudo /etc/sudoers   # open sudoers file
+🔗 sudo visudo   # open sudoers file
+➤ Can add a new user to sudoers file using visudo to make it superuser
 
-✅ Example:
-sudo -u postgres psql   # run as postgres user
+🔗 sudo /ect/ssh/sshd_config   # open sshd_config file
+➤ With this file we can change the default timeout for sudo to 5 minutes or 10 minutes or 15 minutes.
+➤ We can also change the password Authentication required or not or we can allow empty passwords or not.
 
-🔹 Common Options
-✔️ -u user → run as specific user
-✔️ -k → invalidate timestamp immediately (next sudo needs password)
-✔️ -v → extend sudo timeout without running command
-✔️ -l → list allowed commands for current user
-✔️ -s → open a shell as root (without login shell)
-✔️ -i → simulate root login shell
+After modification of sshd_config file we need to restart the ssh service.
+🔗 sudo systemctl restart sshd
 
-🔹 Notes & Interview Insights
+⚡Insights
 ➤ sudo access is controlled via /etc/sudoers (edit with visudo).
 ➤ NOPASSWD: directive allows passwordless sudo for specific commands.
 ➤ Root login is often disabled for security; sudo is preferred.
@@ -910,11 +898,11 @@ sudo -u postgres psql   # run as postgres user
     ✔️ Global: /etc/bash.bashrc (applies to all users).
 ➤ It customizes the bash shell environment for the user.
 
-🔹 When is it executed?
+🔄 When is it executed?
 ➤ Every time you open a new terminal window/tab.
 ➤ Not executed for login shells (those read ~/.bash_profile, ~/.profile, or /etc/profile).
 
-🔹 Common Uses
+🔄 Common Uses
 ➤ Setting environment variables
 ➤ Adding aliases (shortcuts for commands)
 ➤ Customizing prompt (PS1)
@@ -928,12 +916,12 @@ alias gs='git status'
 export PATH=$PATH:~/scripts
 PS1='\u@\h:\w$ '   # Custom prompt
 
-🔹 Reload .bashrc without restarting terminal
+🔄 Reload .bashrc without restarting terminal
 source ~/.bashrc
 # or
 . ~/.bashrc
 
-🔹 Interview Insights
+🔄 Interview Insights
 ➤ .bashrc → for interactive non-login shells.
 ➤ .bash_profile or .profile → for login shells.
 ➤ Often .bash_profile calls .bashrc inside it to unify configs.
@@ -945,10 +933,10 @@ source ~/.bashrc
     ✔️ Owner (user)
     ✔️ Group
 
-🔹 Syntax
+🔄 Syntax
 chown [OPTIONS] USER[:GROUP] FILE...
 
-🔹 Common Usage
+🔄 Common Usage
 
 ➤ Change file ownership to a specific user
 🔗 sudo chown username filename
@@ -962,7 +950,7 @@ chown [OPTIONS] USER[:GROUP] FILE...
 ➤ Change ownership recursively (directory + subfiles)
 🔗 sudo chown -R username:groupname dirName
 
-🔹 Useful Options
+🔄 Useful Options
 ✔️ -R → recursive (apply to all subfiles and directories)
 ✔️ -c → report changes made
 ✔️ -v → verbose (show details for every file changed)
@@ -972,7 +960,7 @@ chown [OPTIONS] USER[:GROUP] FILE...
 sudo chown ankur:developers project.txt   # give file to user "ankur" and group "developers"
 sudo chmod g+w project.txt                # allow group members to write
 
-🔹 Interview Insights
+🔄 Interview Insights
 ➤ Ownership (chown) and permissions (chmod) work together.
 ➤ ls -l → shows both owner and group.
 ➤ Difference:
@@ -986,7 +974,7 @@ sudo chmod g+w project.txt                # allow group members to write
 ➤ Each session has its own process ID (PID).
 ➤ Sessions can be nested inside each other.
 
-🔹 Commands
+🔄 Commands
 ➤ Get current session ID (PID of the shell)
 🔗 echo $$
 
@@ -1006,7 +994,7 @@ echo $$       # prints 5678 (new session PID)
 exit          # return to previous session
 echo $$       # back to 1234
 
-🔹 Insights (Interview Traps)
+🔄 Insights (Interview Traps)
 ➤ Each terminal window/tab = a separate session.
 ➤ Sessions are processes, visible in ps -ef or pstree.
 ➤ Environment variables are session-specific (not shared unless exported to child processes).
@@ -1018,7 +1006,7 @@ echo $$       # back to 1234
 ➤ They define system-wide or session-specific settings (e.g., PATH, HOME, USER).
 ➤ They are inherited by child processes.
 
-🔹 Commands
+🔄 Commands
 ➤ List all environment variables
 🔗 printenv
 
@@ -1032,21 +1020,21 @@ echo $$       # back to 1234
 ➤ Unset/remove an environment variable
 🔗 unset VAR_NAME
 
-🔹 Persistence of Variables
+🔄 Persistence of Variables
 ➤ By default, variables set using export exist only for the current session.
 ➤ To make them permanent, add to:
     ✔️ ~/.bashrc (for user-specific, non-login shells)
     ✔️ ~/.profile or ~/.bash_profile (for login shells)
     ✔️ /etc/environment (system-wide)
 
-🔹 Useful Environment Variables (Common in Interviews)
+🔄 Useful Environment Variables (Common in Interviews)
 ➤ PATH → directories searched for executables.
 ➤ HOME → current user’s home directory.
 ➤ USER → logged-in username.
 ➤ SHELL → current shell.
 ➤ PWD → current working directory.
 
-🔹 Insights (Interview Angle)
+🔄 Insights (Interview Angle)
 Difference between local variable vs environment variable:
     ✔️ Local → exists only in current shell.
     ✔️ Environment → exported and available to child processes.
@@ -1059,7 +1047,7 @@ To temporarily modify PATH:
 ➤ Saves time and reduces repetitive typing.
 ➤ Aliases exist only in the current shell session unless added to configuration files (~/.bashrc, ~/.zshrc).
 
-🔹 Check Command Type
+🔄 Check Command Type
 🔗 type commandName
 ➤ Shows whether the command is:
     ✔️ builtin → part of the shell itself.
@@ -1071,7 +1059,7 @@ To temporarily modify PATH:
 🔗 type cat   # cat is hashed (/usr/bin/cat)
 🔗 type ls    # ls is aliased to 'ls --color=auto'
 
-🔹 Create an Alias
+🔄 Create an Alias
 alias aliasName='commandName arguments'
 
 ✅ Examples:
@@ -1079,20 +1067,20 @@ alias aliasName='commandName arguments'
 🔗 alias grep='grep --color=auto'  # color highlight search
 🔗 alias cls='clear'      # alias cls to clear terminal
 
-🔹 Remove an Alias
+🔄 Remove an Alias
 🔗 unalias aliasName
 
-🔹 View All Aliases
+🔄 View All Aliases
 🔗 alias
 
-🔹 Making Aliases Permanent
+🔄 Making Aliases Permanent
 ➤ Add them to:
     ✔️ ~/.bashrc or ~/.zshrc for user-specific aliases.
     ✔️ /etc/bash.bashrc for system-wide aliases.
 ➤ Reload file after editing:
 source ~/.bashrc
 
-🔹 Interview Insights
+🔄 Interview Insights
 ➤ Aliases override system commands (e.g., ls often aliased to ls --color=auto).
 ➤ If you want to bypass an alias → use command keyword:
 🔗 command ls
@@ -1133,11 +1121,11 @@ There are several types of shells, and they can be broadly categorized into two 
 🔗 echo $PATH
 # /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-🔹 Locate Executable for a Command
+🔄 Locate Executable for a Command
 🔗 which ls
 👉 Returns the full path of the command’s executable (/bin/ls).
 
-🔹 Adding Directories to $PATH
+🔄 Adding Directories to $PATH
 ➤ Temporary (session only):
 🔗 export PATH=$PATH:/path/to/directory
 
@@ -1151,7 +1139,7 @@ Reload file:
 ➤ Permanent (system-wide):
 Add directory to /etc/environment.
 
-🔹 Insights 
+🔄 Insights 
 ➤ The shell searches directories in $PATH sequentially; first match is executed.
 ➤ If two commands with the same name exist, the one earlier in $PATH takes priority.
 ➤ $PATH can be modified by scripts, installers, or user configs.
@@ -1198,13 +1186,13 @@ If the file is found and has execute permission, the shell executes it using the
 ➤ Managed by the cron daemon (crond).
 ➤ Each user can define their own cron jobs using crontab.
 
-🔹 Basic Commands
+🔄 Basic Commands
 🔗 crontab -e   # edit crontab file (default editor: nano if selected)
 🔗 crontab -l   # list current user’s cron jobs
 🔗 crontab -r   # remove all cron jobs for current user
 🔗 crontab -k   # kill the cron daemon
 
-🔹 Crontab Syntax
+🔄 Crontab Syntax
 * * * * * command_to_be_executed
 │ │ │ │ │
 │ │ │ │ └── Day of week (0-6, Sunday=0)
@@ -1254,7 +1242,7 @@ To log output:
 ➤ The history command shows the list of recently executed commands in the shell
 ➤ Useful for re-executing, searching, and managing past commands.
 
-🔹 Basic Usage
+🔄 Basic Usage
 🔗 history            # list all recent commands
 🔗 history 10         # show last 10 commands
 🔗 !!                 # run last command
@@ -1414,36 +1402,12 @@ vim !$
 
 
 ✅ Examples
-🔁 Replace a word
-🔗 sed 's/Linux/Unix/' file.txt
-(Replaces first "Linux" with "Unix" in each line)
-
-🔁 Replace a word in a specific line
-🔗 sed 's/Linux/Unix/2' file.txt
-(Replaces 2nd "Linux" with "Unix" in all lines)
-
-🔁 Replace all occurrences
-🔗 sed 's/Linux/Unix/g' file.txt
-
-🔁 Delete a specific line
-🔗 sed '3d' file.txt
-(Deletes line 3)
-
-🔁 Delete a range of lines
-🔗 sed '5,10d' file.txt
-(Deletes lines 5–10)
-
-🔁 Delete last line
-🔗 sed '$d' file.txt
-(Deletes last line)
-
-🔁 Print only matching lines
-🔗 sed -n '/error/p' logfile.txt
-(Prints only lines containing "error")
-
-🔁 Insert text
-🔗 sed '2 i This is inserted line' file.txt
-
-🔁 Edit file in-place
-🔗 sed -i 's/old/new/g' file.txt
-(Saves changes directly in file)
+🔗 sed 's/Linux/Unix/' file.txt    #(Replaces first "Linux" with "Unix" in each line)
+🔗 sed 's/Linux/Unix/2' file.txt    #(Replaces 2nd "Linux" with "Unix" in all lines)
+🔗 sed 's/Linux/Unix/g' file.txt    #Replace all occurrences
+🔗 sed '3d' file.txt        #(Deletes line 3)
+🔗 sed '5,10d' file.txt    #(Deletes lines 5–10)
+🔗 sed '$d' file.txt        #(Deletes last line)
+🔗 sed -n '/error/p' logfile.txt    #(Prints only lines containing "error")
+🔗 sed '2 i This is inserted line' file.txt #Insert text
+🔗 sed -i 's/old/new/g' file.txt    #(Saves changes directly in file)

@@ -783,3 +783,441 @@ System.out.println("Final count:" + counter.getCount());
 
 
 🔷 Deadlock
+➤ Deadlock is a situation when two or more threads are waiting for each other to release a lock.
+➤ This can happen when two threads hold locks in opposite order, or when a thread acquires a lock and then waits for another thread to release it.
+➤ In a deadlock, neither thread can proceed, and the program will be stuck in an infinite loop.
+
+Deadlock typically occurs when four conditions are met simultaneously:
+1️⃣ Mutal exclusion: Only one thread can access a shared resource at a time.
+2️⃣ Hold and wait: A thread holds a lock and then waits for another thread to release it.
+3️⃣ No preemption: A thread cannot be preempted by another thread.
+4️⃣ Circular wait: Two threads are waiting for each other to release a lock.
+👉 Deadlock can be prevented by ensuring that no thread holds a lock that another thread is waiting for.
+
+✅Example:
+package com.corejava;
+
+class Pen{
+    public synchronized void writeWithPenAndPaper(Paper paper){
+        System.out.println(Thread.currentThread().getName()+ " is using pen "+this+" and trying to get paper"+ paper);
+        paper.finishWriting();
+    }
+
+    public synchronized void finishWriting(){
+        System.out.println(Thread.currentThread().getName()+ " finished using paper "+this);
+    }
+}
+
+class Paper{
+    public synchronized void writeWithPenAndPaper(Pen pen){
+        System.out.println(Thread.currentThread().getName()+ " is using paper "+this+" and trying to get pen"+ pen);
+        pen.finishWriting();
+    }
+
+    public synchronized void finishWriting(){
+        System.out.println(Thread.currentThread().getName()+ " finished using paper "+this);
+    }
+}
+
+class Task1 implements Runnable{
+    private Pen pen;
+    private Paper paper;
+    public Task1(Pen pen,Paper paper){
+        this.pen=pen;
+        this.paper=paper;
+    }
+    @Override
+    public void run() {
+        pen.writeWithPenAndPaper(paper);
+    }
+}
+
+class Task2 implements Runnable{
+    private Pen pen;
+    private Paper paper;
+    public Task2(Pen pen,Paper paper){
+        this.pen=pen;
+        this.paper=paper;
+    }
+    @Override
+    public void run() {
+        paper.writeWithPenAndPaper(pen);
+    }
+}
+
+public class DeadLockExample {
+    public static void main(String[] args) {
+        Pen pen =new Pen();
+        Paper paper=new Paper();
+
+        Thread thread1=new Thread(new Task1(pen,paper),"Thread-1");
+        Thread thread2=new Thread(new Task2(pen,paper),"Thread-2");
+        thread1.start();
+        thread2.start();
+    }
+}
+🔒 Step-by-step:
+➤ Thread-1 locks Pen.
+➤ It tries to call paper.finishWriting() — a synchronized method.
+➤ To enter paper.finishWriting(), it must get Paper’s lock.
+➤ But what if Thread-2 already holds the Paper lock? → Then Thread-1 waits forever.
+
+➤ Thread-2 locks Paper.
+➤ Then tries to call pen.finishWriting().
+➤ To enter that method, it must acquire Pen’s lock.
+➤ But Pen’s lock is already held by Thread-1.
+
+To Resolve this problem, we need to ensure that no thread holds a lock that another thread is waiting for.
+
+✅ Solution:
+class Task2 implements Runnable{
+    private Pen pen;
+    private Paper paper;
+    public Task2(Pen pen,Paper paper){
+        this.pen=pen;
+        this.paper=paper;
+    }
+    @Override
+    public void run() {
+        synchronized(pen){
+        paper.writeWithPenAndPaper(pen);
+        }
+    }
+}
+
+
+🔷 Thread Communication
+➤ In a multithreaded environment, threads can communicate with each other to accomplish a task.
+➤ Without proper communication mechanisms, threads might end up in efficient busy-waiting states, leading to wastage of CPU resources and potential deadlocks.
+
+❓ Why Thread Communication is Needed
+❌ Without communication:
+➤ Threads run independently, unaware of each other.
+➤ They may perform redundant operations or wait inefficiently (busy-waiting).
+➤ Leads to CPU wastage, race conditions, or deadlocks.
+✅ With communication:
+➤ One thread can signal another when a task is complete.
+➤ Threads can wait, notify, and resume execution in a controlled order.
+
+🔄 Methods (Used with synchronized)
+| Method        | Description                                                               | Used By         |
+| ------------- | ------------------------------------------------------------------------- | --------------- |
+| `wait()`      | Causes current thread to **release the lock** and enter the waiting state | Consumer thread |
+| `notify()`    | Wakes up **one** waiting thread                                           | Producer thread |
+| `notifyAll()` | Wakes up **all** waiting threads                                          | Producer thread |
+
+⚠️ These methods must be called inside a synchronized block or method, otherwise you’ll get an IllegalMonitorStateException.
+
+✅ Basic Workflow (Producer–Consumer Example)
+➤ Producer thread produces data (adds items to buffer).
+➤ Consumer thread consumes data (removes items from buffer).
+➤ Both need to coordinate:
+    ✔️ Producer must wait if buffer is full.
+    ✔️ Consumer must wait if buffer is empty.
+
+🔗 Code implementation:
+class SharedResource {
+    private int data;
+    private boolean available = false;
+
+    public synchronized void produce(int value) {
+        while (available) {
+            try { wait(); } catch (InterruptedException e) { 
+              Thread.currentThread().interrupt();
+                }
+        }
+        data = value;
+        System.out.println("Produced: " + data);
+        available = true;
+        notify(); //--> Wake up consumer
+    }
+
+    public synchronized void consume() {
+        while (!available) {
+            try { wait(); } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println("Consumed: " + data);
+        available = false;
+        notify(); //--> Wake up producer
+    }
+}
+
+public class ThreadCommunicationDemo {
+    public static void main(String[] args) {
+        SharedResource resource = new SharedResource();
+
+        Thread producer = new Thread(() -> {
+            for (int i = 1; i <= 5; i++) {
+                resource.produce(i);
+            }
+        });
+
+        Thread consumer = new Thread(() -> {
+            for (int i = 1; i <= 5; i++) {
+                resource.consume();
+            }
+        });
+
+        producer.start();
+        consumer.start();
+    }
+}
+
+✅ Output:
+Produced: 1
+Consumed: 1
+Produced: 2
+Consumed: 2
+Produced: 3
+Consumed: 3
+Produced: 4
+Consumed: 4
+Produced: 5
+Consumed: 5
+
+⚡ How It Works Internally
+| Step | Action                           | Thread State            |
+| ---- | -------------------------------- | ----------------------- |
+| 1    | Thread enters synchronized block | Running                 |
+| 2    | Calls `wait()`                   | Releases lock → Waiting |
+| 3    | Another thread calls `notify()`  | Waiting thread wakes up |
+| 4    | Waiting thread reacquires lock   | Runnable                |
+| 5    | Resumes after `wait()`           | Running                 |
+
+🚨 Important Rules
+✔️ Must be inside a synchronized context.
+synchronized(obj) { obj.wait(); }
+
+✔️ The thread calling wait() releases the lock immediately.
+✔️ notify()/notifyAll() do not release lock immediately —
+they only wake waiting threads; the lock is released after synchronized block exits.
+✔️ Always use while (not if) around wait() —
+because of spurious wakeups (unexpected wake signals).
+
+
+🔷 Thread Saftey
+Thread safety means that a piece of code, class, or object can be safely used by multiple threads simultaneously without causing inconsistent or incorrect results.
+
+❓ Why Thread Safety Is Needed
+When multiple threads access and modify shared data (like variables, objects, files, or collections) without synchronization, problems occur.
+
+💣 Common Thread Safety Problems
+| Problem                | Description                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------- |
+| **Race Condition**     | Two or more threads modify shared data concurrently, causing unpredictable results |
+| **Data Inconsistency** | Shared variable values become incorrect                                            |
+| **Deadlock**           | Threads waiting indefinitely for each other’s locks                                |
+| **Starvation**         | Some threads never get CPU time                                                    |
+| **Visibility Issues**  | One thread’s updates not visible to another due to caching                         |
+
+❌ Example (Non-thread-safe)
+class Counter {
+    private int count = 0;
+
+    public void increment() {
+        count++; // not atomic
+    }
+
+    public int getCount() {
+        return count;
+    }
+}
+
+public class Demo {
+    public static void main(String[] args) throws InterruptedException {
+        Counter c = new Counter();
+
+        Thread t1 = new Thread(() -> { for (int i = 0; i < 1000; i++) c.increment(); });
+        Thread t2 = new Thread(() -> { for (int i = 0; i < 1000; i++) c.increment(); });
+
+        t1.start(); t2.start();
+        t1.join(); t2.join();
+
+        System.out.println("Final count: " + c.getCount());
+    }
+}
+
+🔎 Output (inconsistent)
+Final count: 1876   // sometimes 1980, sometimes 2000, etc.
+
+❓ Why?
+➤ count++ is not atomic — it performs:
+    ✔️ Read value of count
+    ✔️ Increment value
+    ✔️ Write back
+➤ Two threads can interleave in between these steps, leading to race conditions.
+
+✅ How to Achieve Thread Safety
+1️⃣ Use Synchronization
+➤ Use synchronized keyword to ensure only one thread accesses a critical section at a time.
+
+class SafeCounter {
+    private int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+
+    public synchronized int getCount() {
+        return count;
+    }
+}
+
+2️⃣ Use Locks (java.util.concurrent.locks)
+➤ ReentrantLock, ReadWriteLock give more flexibility and control than synchronized.
+
+class SafeCounter {
+    private int count = 0;
+    private final Lock lock = new ReentrantLock();
+
+    public void increment() {
+        lock.lock();
+        try { count++; } 
+        finally { lock.unlock(); }
+    }
+}
+
+3️⃣ Use Atomic Classes
+➤ Classes like AtomicInteger, AtomicBoolean, AtomicReference perform atomic operations without explicit locks.
+
+class AtomicCounter {
+    private AtomicInteger count = new AtomicInteger(0);
+
+    public void increment() {
+        count.incrementAndGet();
+    }
+
+    public int getCount() {
+        return count.get();
+    }
+}
+
+4️⃣ Use Thread-safe Collections
+➤ Use collections from java.util.concurrent package:
+✔️ ConcurrentHashMap
+✔️ CopyOnWriteArrayList
+✔️ BlockingQueue
+✔️ ConcurrentLinkedQueue
+👉 These allow safe concurrent access without manual synchronization.
+
+5️⃣ Use Immutable Objects
+➤ If an object’s state cannot change, it’s automatically thread-safe.
+
+final class Student {
+    private final String name;
+    private final int rollNo;
+
+    public Student(String name, int rollNo) {
+        this.name = name;
+        this.rollNo = rollNo;
+    }
+}
+👉 Immutable objects are naturally thread-safe because no thread can modify their state.
+
+6️⃣ Use Volatile for Visibility
+➤ The volatile keyword ensures changes made by one thread are immediately visible to others.
+➤ But it does not make operations atomic.
+
+private volatile boolean flag = true;
+
+
+🔷 Thread Pool
+➤ A Thread Pool is a pool (collection) of pre-created worker threads that can execute tasks concurrently.
+➤ Instead of creating a new thread for every task (which is expensive), tasks are queued and executed by available threads in the pool.
+➤ Once a thread completes a task, it is reused for another one — improving performance and resource utilization.
+
+❓ Why Use a Thread Pool?
+| Problem                                                        | How Thread Pool Solves It                |
+| -------------------------------------------------------------- | ---------------------------------------- |
+| Creating too many threads causes high memory and CPU overhead. | Pool reuses a limited number of threads. |
+| Uncontrolled thread creation can crash the system.             | Pool size is fixed or managed.           |
+| Thread creation/destruction per task is costly.                | Threads are reused efficiently.          |
+
+🔄 Core Concepts
+➤ Task – A unit of work (e.g., implementing Runnable or Callable).
+➤ Worker Thread – Thread that takes tasks from the queue and executes them.
+➤ Blocking Queue – Stores tasks waiting to be executed.
+➤ Executor Framework – Provides thread pool management utilities.
+
+🔄 Executor Framework (Java 5+)
+Java introduced the java.util.concurrent package with the Executor Framework to simplify thread pool management.
+
+🔄 Key Interfaces & Classes
+| Component         | Description                                        |
+| ----------------- | -------------------------------------------------- |
+| `Executor`        | Base interface for executing tasks.                |
+| `ExecutorService` | Manages thread lifecycle (submit, shutdown, etc.). |
+| `Executors`       | Factory class providing ready-made thread pools.   |
+
+🔄 Common Thread Pool Types (via Executors)
+1️⃣ newFixedThreadPool(n)
+➤ Fixed number of threads.
+➤ Extra tasks wait in the queue.
+✅ Best for: constant load, predictable number of threads.
+ExecutorService pool = Executors.newFixedThreadPool(3);
+
+2️⃣ newCachedThreadPool()
+➤ Creates new threads as needed and reuses existing ones.
+➤ Threads idle for 60s are terminated.
+✅ Best for: many short-lived asynchronous tasks.
+ExecutorService pool = Executors.newCachedThreadPool();
+
+3️⃣ newSingleThreadExecutor()
+Only one thread executes tasks sequentially.
+✅ Best for: ensuring ordered execution.
+ExecutorService pool = Executors.newSingleThreadExecutor();
+
+4️⃣ newScheduledThreadPool(n)
+Supports scheduling tasks after delay or periodically.
+✅ Best for: background maintenance tasks.
+ScheduledExecutorService pool = Executors.newScheduledThreadPool(2);
+
+✅ Basic Example:
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class ThreadPoolExample {
+    public static void main(String[] args) {
+        ExecutorService pool = Executors.newFixedThreadPool(3); // 3 threads in pool
+
+        for (int i = 1; i <= 5; i++) {
+            int taskId = i;
+            pool.execute(() -> {
+                System.out.println(Thread.currentThread().getName() + " executing task " + taskId);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+        pool.shutdown(); // No new tasks accepted, wait for existing ones to finish
+    }
+}
+
+✅ Output Example
+pool-1-thread-1 executing task 1
+pool-1-thread-2 executing task 2
+pool-1-thread-3 executing task 3
+pool-1-thread-1 executing task 4
+pool-1-thread-2 executing task 5
+👉 Notice that only 3 threads are created and reused for 5 tasks.
+
+🔄 Advantages
+➤ Reuses threads → saves CPU and memory.
+➤ Prevents system overload from unbounded thread creation.
+➤ Better performance and scalability.
+➤ Simplifies task submission and lifecycle management.
+
+🔄 Disadvantages
+❌ Not suitable for tasks requiring long blocking I/O — threads may stay busy for long.
+❌ Fixed pool can cause tasks to wait if all threads are busy.
+❌ Harder to debug if tasks hang inside the pool.
+
+🔄 Best Practices
+➤ Always call shutdown() or shutdownNow() to stop accepting new tasks.
+➤ Use bounded queues for better control.
+➤ For large-scale systems, prefer ThreadPoolExecutor for custom configurations (core size, max size, queue size, etc.).
+➤ Use submit() if you need to get a Future result from a task.

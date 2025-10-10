@@ -1,0 +1,16 @@
+🔷 SpringBoot
+➤ SpringBoot is a framework that simplifies the development of Spring applications by providing a set of pre-configured features and tools.
+➤ SpringBoot=Spring - XML configuration
+➤ SpringBoot is not a replacement for Spring Framework. It was developed on top of Spring Framework to provide a more simplified and efficient way to develop Spring applications.
+
+🔄 Key Features
+➤ Auto-Configuration → Automatically configure Spring application based on dependencies in the classpath.
+➤ Starter Dependencies → Predefined dependency sets (e.g., spring-boot-starter-web, spring-boot-starter-data-jpa) to reduce manual configuration.
+➤ Embedded Servers → Comes with Tomcat, Jetty, Undertow embedded servers, so no need to deploy WAR files separately.
+➤ Production Ready → Provides health checks, metrics, logging, and monitoring with Spring Boot Actuator.
+➤ Convention over Configuration → Focus more on logic, less on XML/bean configuration.
+
+🔄 Advantages
+➤ Rapid development of Java apps (especially REST APIs and microservices).
+➤ Reduces boilerplate code.
+➤ Easier integration with databases, security, and cloud platforms.

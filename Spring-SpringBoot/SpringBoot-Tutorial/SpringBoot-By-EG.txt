@@ -1107,9 +1107,9 @@ Understanding structure:
     </appender>
 </configuration>
 
+
 🔄 Rolling FileAppender Based on Size of File
 ✅Example:
-
 <configuration>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
@@ -1122,3 +1122,5 @@ Understanding structure:
     </appender>
 </configuration>
 👉 Rolling based of size and time can be used at the same time whatever happens first will make logs accordingly.
+
+

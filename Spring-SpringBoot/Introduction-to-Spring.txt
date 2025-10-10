@@ -99,6 +99,39 @@ Spring solved this by:
 ➤ FileSystemXmlApplicationContext → Loads from XML in filesystem.
 ➤ AnnotationConfigApplicationContext → Loads from Java-based configuration classes.
 
+🔷 Spring Bean Lifecycle
+➤ Spring beans have a lifecycle:
+    1️⃣ Creation
+    2️⃣ Initialization
+    3️⃣ Destruction
+
+1️⃣ Creation
+➤ BeanFactory creates the object.
+➤ ApplicationContext creates the object and wires dependencies.
+
+2️⃣ Initialization
+➤ ApplicationContext calls init methods (if any).
+
+3️⃣ Destruction
+➤ ApplicationContext calls destroy methods (if any).
+👉 In real-world Spring apps, we mostly use ApplicationContext.
+
+📝 Common Implementations of Spring Bean Lifecycle Methods:
+1️⃣ ClassPathXmlApplicationContext → Loads bean definitions from XML in classpath.
+➤ It implements InitializingBean  and DisposableBean functional interfaces. 
+➤ These interface have have one unimplemented method each:
+afterPropertiesSet() and destroy()
+
+2️⃣FileSystemXmlApplicationContext → Loads from XML in filesystem.
+✅Example: 
+<bean id="car" class="com.example.Car" init-method="start" destroy-method="stop"/>
+➤ start() method will be called automatically when the bean is created and stop() method will be called when the bean is destroyed or removed from the IOC container respectively.
+
+CofigurableApplicationContext cfgContext= ConfigurableApplicationContext(context);
+cfgContext.registerShutdownHook();//tells IOC that you are going to die so clean up all the objects you are holding
+
+3️⃣ AnnotationConfigApplicationContext → Loads from Java-based configuration classes.
+➤ Uses @PostConstruct and @PreDestroy annotations on initialization and destruction methods.
 
 🔷 Ways to Configure IoC Container in Spring
 The IoC Container (BeanFactory / ApplicationContext) needs to know what beans to create and how to wire them.
@@ -122,12 +155,10 @@ Beans and dependencies are declared in an XML file (e.g., beans.xml).
     <bean id="engine" class="com.example.Engine"/>
 </beans>
 
-
 🔗 Java code:
 ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 Car car = context.getBean("car", Car.class);
-
-👉 Interview Angle: XML was common in older projects. Still seen in legacy systems.
+👉  XML was common in older projects. Still seen in legacy systems.
 
 
 2️⃣ Annotation-Based Configuration 
@@ -147,7 +178,7 @@ class Car {
 
 🔗 Java Config to enable scanning:
 @Configuration
-@ComponentScan("com.example")
+@ComponentScan(basePackages = {"com.tcs.vechiles", "com.tcs.services"}) //❌can have multiple base packages(not Recommended should have only one base package)
 class AppConfig {}
 
 🔗 Java code:
@@ -177,8 +208,7 @@ class AppConfig {
 🔗 Java code:
 ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 Car car = context.getBean(Car.class);
-
-👉 Interview Tip: JavaConfig is preferred in Spring Boot and modern projects because it’s type-safe, refactor-friendly, and avoids verbose XML.
+👉 JavaConfig is preferred in Spring Boot and modern projects because it’s type-safe, refactor-friendly, and avoids verbose XML.
 
 // Vechile.java Interface
 public interface Vechile {
@@ -429,6 +459,19 @@ public class MyWebSocketBean {}
 ➤ They do not affect the execution of code directly but can be used by tools, frameworks, and compilers.
 ➤ Introduced in: Java 5
 
+🔄 Few Types of Annotation in Spring Core:
+1️⃣ @Configuration: to represent java class as configuration class.
+2️⃣ @ComponentScan: To identify spring bean classes in the project.
+3️⃣ @Component: To represent java class as spring Bean.
+4️⃣ @Autowired: To inject dependencies.
+5️⃣ @Qualifier: To identify bean by name.
+6️⃣ @Scope: To set bean scope.
+7️⃣ @Service: To represent java class as business service.
+8️⃣ @Repository: To represent java class as data access object.
+9️⃣ @Primary: To represent primary bean for autowiring.
+1️⃣0️⃣ @Bean: To call the method which return bean object.
+
+
 ❓ Why Annotations?
 ➤ To reduce XML configuration (esp. in frameworks like Spring, Hibernate).
 ➤ To give hints to compiler (e.g., @Override).
@@ -627,7 +670,8 @@ beanName is the name of the bean you want to inject. It can be the default name 
 
 🔄 Field Injection
 @Autowired
-@Qualifier("beanName")
+@Qualifier("beanName") // Specify which bean to inject based on the beanId 
+@Primary // Specify that this bean has to be injected no need to pass any bean name or beanId
 private Vechile vechile;
 
 🔄 Setter Injection

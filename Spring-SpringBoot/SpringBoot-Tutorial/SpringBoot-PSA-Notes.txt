@@ -181,7 +181,6 @@ Handles HTTP DELETE requests (used for deleting resources).
 Handles HTTP PATCH requests (used for partial updates).
 
 ✅ Example:
-
 @Controller
 public class EmployeeController {
 
@@ -544,6 +543,79 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 
 ➤ Configures DB connection, view resolver (prefix/suffix), Hibernate settings.
+
+❓ Why Constructor Injection is Better than Field Injection (@Autowired)
+🔄 Field Injection
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;  // field injection
+}
+
+🔄 Constructor Injection
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Autowired  // optional since Spring 4.3+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+🔄 Why Constructor Injection is Preferred:
+
+1️⃣ Immutability (Good Design Principle)
+➤ Dependencies are final → can’t be changed after object creation.
+➤ Makes your beans immutable, leading to safer and more predictable code.
+
+private final UserRepository userRepository; // final ensures immutability
+
+2️⃣ Easier for Unit Testing
+➤ With field injection, you need reflection or Spring context to test.
+➤ With constructor injection, you can easily pass mock objects manually.
+
+✅ Example:
+❌ Field Injection (hard to test):
+UserService service = new UserService();
+ReflectionTestUtils.setField(service, "userRepository", mockRepo);
+
+✅ Constructor Injection (easy to test):
+UserService service = new UserService(mockRepo);
+
+3️⃣ Detects Missing Dependencies at Compile Time
+➤ Constructor injection ensures all required dependencies are provided during bean creation.
+➤ If any dependency is missing → Spring throws an error immediately.
+➤ Field injection, on the other hand, can fail at runtime — leading to NullPointerException.
+✅ Example:
+❌ Field Injection (compile-time error):
+UserService service = new UserService();
+service.userRepository = mockRepo;
+
+✅ Constructor Injection (no compile-time error):
+UserService service = new UserService(mockRepo);
+
+4️⃣ Encourages Better Design
+➤ If a constructor has too many parameters, it signals too many dependencies — i.e. your class is doing too much (violates Single Responsibility Principle).
+➤ Hence, constructor injection naturally enforces clean architecture.
+
+5️⃣ Works Better with @RequiredArgsConstructor (Lombok)
+➤ Lombok can automatically generate constructor injection for all final fields:
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+}
+👉 This is clean, concise, and immutable.
+
+6️⃣ Avoids Circular Dependency Problems
+➤ Constructor injection fails fast if circular dependencies exist (e.g., A → B → A), making them easier to detect.
+➤ Field injection might allow circular dependencies silently and fail later in runtime.
+
+7️⃣ Works with @Profile or @Conditional Beans Easily
+➤ Since dependencies are clearly defined in constructors, it’s straightforward for Spring to determine which beans to inject per profile/environment.
 
 
 🔷 Payload and DTO in SpringBoot

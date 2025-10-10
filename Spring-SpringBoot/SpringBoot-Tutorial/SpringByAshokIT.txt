@@ -371,3 +371,5 @@ public class SpringStarterApp {
 
     ➤ Car.class is the runtime representation of the Car type, and in Spring it makes bean retrieval type-safe (no casting errors).
 ✔️ Then call the drive method of Car class to perform the dependency injection.
+
+//constructor Injection --- take it from the EngineeringDigest file similar concept using constructor-args
