@@ -713,3 +713,333 @@ AND publication_date > '2023-03-31';
 > → greater than
 <= → less than or equal to
 >= → greater than or equal to
+
+👉 Create products table
+🔗 CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(50),
+    category VARCHAR(50),
+    price DECIMAL(10,2),
+    stock INT
+);
+
+👉 Insert sample data into products table
+🔗 INSERT INTO products (product_name, category, price, stock) VALUES
+('Laptop', 'Electronics', 1200.00, 10),
+('Phone', 'Electronics', 800.00, 15),
+('Tablet', 'Electronics', 600.00, 20),
+('Headphones', 'Accessories', 150.00, 50),
+('Mouse', 'Accessories', 30.00, 100),
+('Keyboard', 'Accessories', 45.00, 80);
+
+👉 Create orders table
+🔗 CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_date DATE,
+    customer_name VARCHAR(50)
+);
+
+
+✅Example:
+⚡  Get all products with a price of exactly 600
+🔗 SELECT * FROM products WHERE price = 600;
+
+⚡  Get all products that are NOT priced at 800
+🔗 SELECT * FROM products WHERE price <> 800; //---> something new
+🔗 SELECT * FROM products WHERE price != 800;
+
+⚡  Get all products priced below 500
+🔗 SELECT * FROM products WHERE price < 500;
+
+⚡  Get all products priced above 700
+🔗 SELECT * FROM products WHERE price > 700;
+
+⚡  Get all products priced at or below 150
+🔗 SELECT * FROM products WHERE price <= 150;
+
+⚡  Get all products priced at or above 800
+🔗 SELECT * FROM products WHERE price >= 800;
+
+⚡  Get all products where the category is exactly "Electronics"
+🔗 SELECT * FROM products WHERE category = 'Electronics';
+
+👉 Insert sample data into orders table
+🔗 INSERT INTO orders (order_date, customer_name) VALUES
+('2024-02-01', 'Alice'),
+('2024-02-05', 'Bob'),
+('2024-02-10', 'Charlie'),
+('2024-02-15', 'David');
+
+⚡  Retrieve Orders Placed Before February 10, 2024
+🔗 SELECT * FROM orders WHERE order_date < '2024-02-10';
+
+⚡  String comparison example (alphabetical ordering)
+🔗 SELECT * FROM products WHERE product_name > 'Mouse';
+
+⚡  Numeric comparison with strings (lexicographic comparison)
+🔗 SELECT '100' < '2';
+
+⚡  Another string comparison example (lexicographic ordering)
+🔗 SELECT 100 < '211fcfc';
+
+
+🧠 Understanding OrderBy clause
+OrderBy clause is used to sort the results of a query in ascending or descending order based on one or more columns.
+🔗 CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    price DECIMAL(10,2),
+    stock_quantity INT,
+    last_updated TIMESTAMP
+);
+
+🔗 INSERT INTO products VALUES
+(1, 'Laptop Pro', 'Electronics', 1299.99, 50, '2024-01-15 10:00:00'),
+(2, 'Desk Chair', 'Furniture', 199.99, 30, '2024-01-16 11:30:00'),
+(3, 'Coffee Maker', 'Appliances', 79.99, 100, '2024-01-14 09:15:00'),
+(4, 'Gaming Mouse', 'Electronics', 59.99, 200, '2024-01-17 14:20:00'),
+(5, 'Bookshelf', 'Furniture', 149.99, 25, '2024-01-13 16:45:00');
+
+
+🔄  Basic Sorting Operations
+🔗 SELECT * FROM products;  # Display all records (unsorted)
+
+🔗 SELECT * FROM products ORDER BY price ASC;        #Sort by price in ascending order (ASC is optional as it's the default)
+
+🔗 SELECT * FROM products ORDER BY price DESC;       #Sort by price in descending order
+
+🔗 SELECT * FROM products ORDER BY last_updated;   #Sort by last updated timestamp
+
+
+🔄 Advanced Sorting Techniques
+🔗 SELECT * FROM products ORDER BY category DESC, price DESC;      #Multiple column sorting (sort by category descending, then price descending)
+
+🔗 SELECT * FROM products ORDER BY 4;      #Sort using column position (4 represents the price column)  ❌Not preferred 
+
+🔗 SELECT * FROM products 
+WHERE category = 'Electronics' 
+ORDER BY price;     #Combining WHERE clause with ORDER BY
+
+🔗 SELECT * FROM products ORDER BY BINARY category;        #Case-sensitive sorting using BINARY
+
+
+🔄 Function-Based Sorting
+🔗 SELECT * FROM products ORDER BY LENGTH(product_name);       #Sort by product name length
+
+🔗 SELECT * FROM products ORDER BY DAY(last_updated);      #Sort by day of the month from timestamp
+
+🔗 SELECT * FROM products 
+ORDER BY stock_quantity DESC 
+LIMIT 1;        #Using LIMIT with ORDER BY to find highest stock quantity
+
+
+🔄 Custom Sorting Orders
+🔗 SELECT * FROM products ORDER BY category;       #Default category sorting
+
+🔗 SELECT * FROM products 
+ORDER BY FIELD(category, 'Electronics','Appliances','Furniture'), price DESC;       #Custom category order using FIELD function
+
+
+🔄 Complex Sorting with Conditions
+🔗 SELECT *, 
+    stock_quantity <= 50 AND price >= 200 AS priority_flag
+FROM products 
+ORDER BY (stock_quantity <= 50 AND price >= 200) DESC;      #Simple conditional sorting for low stock and high price items
+
+🔗 SELECT *,
+    CASE
+        WHEN stock_quantity <= 50 AND price >= 200 THEN 1
+        WHEN stock_quantity <= 50 THEN 2
+        ELSE 3
+    END AS priority 
+FROM products 
+ORDER BY priority;      #Advanced priority-based sorting using CASE
+
+
+🔄 Handling NULL Values
+🔗 INSERT INTO products VALUES
+(6, 'Desk Lamp', 'Furniture', NULL, 45, '2024-01-18 13:25:00'),
+(7, 'Keyboard', 'Electronics', 89.99, NULL, '2024-01-19 15:10:00');
+
+🔗 SELECT * FROM products ORDER BY price;      #Basic NULL handling in ORDER BY gives null value products at the top in ascending order sorting
+
+🔗 SELECT *, 
+    price IS NULL
+FROM products 
+ORDER BY price IS NULL;     #Explicit NULL handling
+
+
+🔄 Working with Calculated Columns
+🔗 SELECT *, 
+    price * stock_quantity AS total_value 
+FROM products 
+ORDER BY total_value DESC;      #Sort by total value (price * quantity)
+
+
+🔄 Query Performance Analysis
+🔗 EXPLAIN SELECT * FROM products
+ORDER BY category, price;       #Examine query execution plan for multi-column sort
+
+🔗 EXPLAIN SELECT * FROM products 
+ORDER BY product_id;    #Compare with primary key sort performance
+
+
+🧠 Understanding LIMIT & OFFSET 
+
+🔗 CREATE TABLE products (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100),
+price DECIMAL(10,2),
+category VARCHAR(50),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+🔗 INSERT INTO products (name, price, category) VALUES
+('Laptop', 999.99, 'Electronics'),
+('Smartphone', 499.99, 'Electronics'),
+('Coffee Maker', 79.99, 'Appliances'),
+('Headphones', 149.99, 'Electronics'),
+('Blender', 59.99, 'Appliances'),
+('Tablet', 299.99, 'Electronics'),
+('Microwave', 199.99, 'Appliances'),
+('Smart Watch', 249.99, 'Electronics'),
+('Toaster', 39.99, 'Appliances'),
+('Speaker', 89.99, 'Electronics');
+
+
+🔄 Basic LIMIT Usage
+🔗 SELECT * FROM products ORDER BY id LIMIT 2; # Return first 2 products
+
+🔄 LIMIT with OFFSET
+✅Syntax 1: LIMIT [row_count] OFFSET [offset]
+🔗 SELECT * FROM products ORDER BY id LIMIT 2 OFFSET 2; # return 3rd and 4th product skips first 2
+
+✅ Syntax 2: LIMIT [offset], [row_count]
+🔗 SELECT * FROM products ORDER BY id LIMIT 2, 2;
+
+
+🔄 Pagination Implementation
+✔️ Page size: 3 items per page
+✔️ For page 1 (Using OFFSET syntax):
+🔗 SELECT * FROM products LIMIT 3 OFFSET 0;
+✔️ For page 2:
+🔗 SELECT * FROM products LIMIT 3 OFFSET 3;
+✔️ For page 3:
+🔗 SELECT * FROM products LIMIT 3 OFFSET 6;
+
+⚡ Alternative syntax using LIMIT offset, count
+✔️ For page 1:
+🔗 SELECT * FROM products LIMIT 0, 3;
+✔️ For page 2:
+🔗 SELECT * FROM products LIMIT 3, 3;
+✔️ For page 3:
+🔗 SELECT * FROM products LIMIT 6, 3;
+
+🟢  Generic formula for pagination: LIMIT (page_number - 1) * items_per_page, items_per_page
+
+🔄 Common Use Cases
+✅ Top 3 most expensive products
+🔗 SELECT * FROM products
+ORDER BY price DESC
+LIMIT 3;
+
+✅ Get 5 random products
+🔗 SELECT * FROM products
+ORDER BY RAND()
+LIMIT 5;
+
+🔄 Performance Considerations
+✅ Example of potentially slow query with large offset
+🔗 SELECT *
+FROM products  ⚡ Note: In real scenario, this would be a much larger table
+ORDER BY created_at
+LIMIT 1000000, 10;
+
+👉 Better alternative using WHERE clause
+🔗 SELECT *
+FROM products
+WHERE created_at > '2025-01-01 00:00:00'
+ORDER BY created_at
+LIMIT 10;
+
+🔄 Key Takeaways
+✅ LIMIT helps in retrieving a specific number of rows
+✅ LIMIT offset, count is used for pagination
+✅ Combining ORDER BY with LIMIT is essential for meaningful result sets
+✅ Be cautious about performance impacts when using high offset values
+
+
+🧠 MySQL aliases
+Alias are temporary names assigned to database tables, column, or expressions to simplify their use in SQL queries.
+
+🔗 CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    salary DECIMAL(10,2),
+    hire_date DATE
+);
+
+🔗 INSERT INTO employees VALUES
+    (1, 'John', 'Doe', 60000.00, '2020-01-15'),
+    (2, 'Jane', 'Smith', 65000.00, '2019-11-20'),
+    (3, 'Mike', 'Johnson', 55000.00, '2021-03-10');
+
+
+🔗 SELECT * FROM employees;
+
+🔄 Basic column aliases: Creating full name using concatenation
+🔗 SELECT 
+    CONCAT(first_name, " ", last_name) AS full_name 
+FROM employees;
+
+🔗 CREATE TABLE departments (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50),
+    location VARCHAR(50)
+);
+
+🔗 INSERT INTO departments VALUES
+    (1, 'Engineering', 'New York'),
+    (2, 'Marketing', 'Los Angeles'),
+    (3, 'Finance', 'Chicago');
+
+🔗 ALTER TABLE employees ADD COLUMN department_id INT;     # Add department reference to employees table
+
+
+🔄 Using table aliases in JOIN operations
+🔗 SELECT 
+    e.first_name,
+    e.last_name,
+    d.dept_name 
+FROM employees AS e 
+JOIN departments AS d 
+    ON e.department_id = d.dept_id;
+
+Can be written without as also:
+🔗 SELECT 
+    e.first_name,
+    e.last_name,
+    d.dept_name 
+FROM employees e 
+JOIN departments d 
+    ON e.department_id = d.dept_id;
+
+🔄 Using aliases in subqueries
+🔗 SELECT avg_salary.average_salary
+FROM (
+    SELECT AVG(salary) AS average_salary 
+    FROM employees
+) AS avg_salary;
+👉 From this subquery a derived table is created named avg(salary) which is aliased with a name average_salary 
+👉 then we are refering as another alias avg_salary derived table average_salary.
+
+🔄 Storing case as alias
+🔗 Select first_name,
+case
+when age<18 then 'Minor'
+else 'Adult'
+end as age_group
+from students;
