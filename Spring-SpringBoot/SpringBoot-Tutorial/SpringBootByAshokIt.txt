@@ -1,6 +1,7 @@
 🔷 SpringBoot
 ➤ SpringBoot is a framework that simplifies the development of Spring applications by providing a set of pre-configured features and tools.
-➤ SpringBoot=Spring - XML configuration
+➤ SpringBoot=Spring - XML configuration.
+➤ It makes easy to create stand-alone, production-grade spring based application that you can just run.
 ➤ SpringBoot is not a replacement for Spring Framework. It was developed on top of Spring Framework to provide a more simplified and efficient way to develop Spring applications.
 
 🔄 Key Features
@@ -10,7 +11,511 @@
 ➤ Production Ready → Provides health checks, metrics, logging, and monitoring with Spring Boot Actuator.
 ➤ Convention over Configuration → Focus more on logic, less on XML/bean configuration.
 
-🔄 Advantages
-➤ Rapid development of Java apps (especially REST APIs and microservices).
-➤ Reduces boilerplate code.
-➤ Easier integration with databases, security, and cloud platforms.
+
+🔷 SpringBBoot Application Folder Structure
+➤ src/main/java
+➤ src/main/resources
+➤ src/test/java
+➤ src/test/resources
+➤ target
+➤ pom.xml
+
+
+🔷 SpringBoot Main Method
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+➤ It is enterpoint for boot application execution
+➤ @SpringBootApplication annotation is equal to 3 annotations:
+    ✔️ @SpringBootConfiguration
+    ✔️ @EnableAutoConfiguration
+    ✔️ @ComponentScan
+➤ SpringBoot start class will act as a configuration class because of the @SpringBootConfiguration annotation.
+➤ @EnableAutoConfiguration annotation tells SpringBoot to auto-configure beans based on classpath dependencies.
+➤ @ComponentScan annotation scans the package (and sub-packages) of the class for components (@Component, @Service, @Repository, @Controller, etc.).
+
+⚡ Note:Package naming Convention will play a major role in compoenent scanning.
+✅Example:  basePackage = com.tcs.vechiles
+➤ There should be one basePackage for all the packages, subpackages should be made inside this basePackage.
+➤ If we have multiple basePackage we have to manually tell the SpringBootApplication which package to scan by using @ComponentScan annotation and passing the array of basePackages.  
+
+
+🔷 SpringApplication.run() Method
+➤ It is used to start the Spring Boot application.
+➤ It takes 2 arguments:
+    ✔️ Application class
+    ✔️ Command-line arguments
+➤ SpringApplication.run() method takes care of configuring the embedded server and other necessary components.
+➤ It is the entry point for the Spring Boot application. This method will return reference of IOC.
+➤ It starts the Spring application context and also starts the embedded server.
+
+✅Example:
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+        System.out.println(context.getClass().getName());
+    }
+}
+
+➤ SpringApplication is a Predefined class and it will identify what type of application we have created based on dependencies added in pom.xml file:
+    ✔️ standalone (spring-boot-starter)
+        ⚡ ClassName: AnnotationConfigApplicationContext
+    ✔️ web app (spring-boot-starter-web)
+        ⚡ ClassName: AnnotationConfigServletWebServerApplicationContext
+    ✔️ reactive-application (spring-boot-starter-webflux) etc.
+        ⚡ ClassName: AnnotationConfigReactiveWebServerApplicationContext
+👉 If all there dependencies are added priority is given to web app.
+
+➤ If we want to remove the banner of the spring in application.properties file we can add:
+🔗 spring.main.banner-mode=off      ----> have 3 modes off, console, log
+
+➤ If we want to change the banner message we can add:
+🔗 spring.banner.image.location=classpath:banner.txt    ----> will print the banner message from this file
+➤ Or we can put the banner.txt file inside the src/main/resources folder where out application.properties file is there.
+
+URL is:  https://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=SpringBoot
+
+
+🔷 Runners In SpringBoot
+➤ When a Spring Boot application starts, sometimes you want to run custom logic — for example:
+    ✔️ Loading initial data into the database
+    ✔️ Sending a notification at startup
+    ✔️ Checking configurations
+    ✔️ Running background tasks
+➤ For this, Spring Boot provides two special interfaces:
+👉 CommandLineRunner
+👉 ApplicationRunner
+
+🔄 CommandLineRunner
+This interface lets you run code after the Spring context is loaded (i.e., after all beans are initialized).
+
+✅ Example
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyStartupRunner implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("Application started! Running initial setup...");
+        // You can call a service, load data, etc.
+    }
+}
+❓ What happens here:
+When your Spring Boot app starts,
+It automatically calls the run() method after all beans are created and the application context is ready.
+
+🔄 ApplicationRunner
+This is almost identical to CommandLineRunner,
+but it provides a more structured way to access application arguments via the ApplicationArguments object.
+
+✅ Example
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyAppRunner implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        System.out.println("ApplicationRunner executing...");
+        if (args.containsOption("debug")) {
+            System.out.println("Debug mode is enabled!");
+        }
+    }
+}
+✔️ You can now start your app with:
+java -jar myapp.jar --debug
+
+✔️ And it will print:
+ApplicationRunner executing...
+Debug mode is enabled!
+
+🔄 Difference Between CommandLineRunner and ApplicationRunner
+| Feature          | CommandLineRunner | ApplicationRunner                                         |
+| ---------------- | ----------------- | --------------------------------------------------------- |
+| Arguments Type   | `String... args`  | `ApplicationArguments`                                    |
+| Argument Parsing | Manual            | Built-in support for options and non-option args          |
+| Use Case         | Simple tasks      | When you need to access or parse command-line args easily |
+
+
+🔄 Execution Order
+➤ If both CommandLineRunner and ApplicationRunner are defined, they will run in the order they are declared in the application context.
+
+➤ If you have multiple runners, you can control their order using the @Order annotation.
+
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.boot.CommandLineRunner;
+
+@Component
+@Order(1)
+public class FirstRunner implements CommandLineRunner {
+    @Override
+    public void run(String... args) {
+        System.out.println("Runner 1 executed");
+    }
+}
+
+@Component
+@Order(2)
+public class SecondRunner implements CommandLineRunner {
+    @Override
+    public void run(String... args) {
+        System.out.println("Runner 2 executed");
+    }
+}
+✅ Output:
+Runner 1 executed
+Runner 2 executed
+
+🔄 Use Cases
+| Use Case                | Description                                      |
+| ---------------------   | ------------------------------------------------ |
+| ✅ Data Initialization | Insert default users, roles, or configurations   |
+| ✅ Validation          | Check environment variables or configs           |
+| ✅ Logging             | Log startup details                              |
+| ✅ Integration         | Trigger background processes when the app starts |
+
+❓ When is a Runner executed?
+✅ After the Spring ApplicationContext is fully initialized but before the application is ready to receive requests.
+
+❓ Difference between @PostConstruct and Runners?
+@PostConstruct: Runs right after bean initialization.
+Runners: Run after the entire Spring context is initialized (i.e., all beans are ready).
+
+
+=========================================================================
+🔷 Which Dependency Injection is Better — Field, Setter, or Constructor?
+=========================================================================
+➤ Spring supports three main types of Dependency Injection (DI):
+    ✔️ Field Injection
+    ✔️ Setter Injection
+    ✔️ Constructor Injection
+1️⃣ Field Injection (@Autowired directly on fields)
+✅ Example:
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public void getUser() {
+        System.out.println(userRepository.findAll());
+    }
+}
+⚙️ How it works:
+👉 Spring uses reflection to set the dependency field directly, even if it’s private.
+
+⚠️ Disadvantages:
+❌ Not testable easily – can’t inject mock dependencies manually for unit testing.
+❌ Hidden dependencies – dependencies aren’t visible in the constructor.
+❌ No immutability – dependencies can’t be declared final.
+❌ Difficult for mandatory dependencies – Spring doesn’t enforce that the field must be set.
+
+👉 Field injection is considered the worst practice for maintainable and testable code.
+
+2️⃣ Setter Injection
+✅ Example:
+@Service
+public class UserService {
+
+    private UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void getUser() {
+        System.out.println(userRepository.findAll());
+    }
+}
+✅ Advantages:
+➤ Allows optional dependencies (useful if bean might not always be required).
+➤ Makes it easier to change dependencies later.
+
+⚠️ Disadvantages:
+➤ Not suitable for mandatory dependencies.
+➤ Object can be created without a dependency, which can lead to NullPointerException.
+➤ Still not fully immutable.
+
+3️⃣ Constructor Injection (Recommended ✅)
+✅ Example:
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Autowired  //----------➤ Not required since Spring 4.3+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void getUser() {
+        System.out.println(userRepository.findAll());
+    }
+}
+
+✅ Advantages:
+💪 Immutable dependencies → mark fields as final.
+🧠 Clear dependencies → visible in the constructor.
+🧪 Best for testing → easy to pass mock objects in unit tests.
+🔐 Ensures all mandatory dependencies are available during bean creation.
+💡 Recommended by Spring Team (and used by Spring itself internally).
+
+➤ From Spring Framework 4.3 onward, if a class has only one constructor, Spring automatically injects dependencies — no need for @Autowired.
+
+🔄 Comparison
+| Feature                    | Field Injection | Setter Injection | Constructor Injection |
+| -------------------------- | --------------- | ---------------- | --------------------- |
+| Visibility                 | Hidden          | Visible          | Visible               |
+| Immutability               | ❌ No           | ❌ No           | ✅ Yes                |
+| Testability                | ❌ Poor        | ⚙️ Medium        | ✅ Best               |
+| Optional Dependencies      | ⚙️ Medium      | ✅ Yes           | ❌ No                 |
+| Mandatory Dependencies     | ❌ Risky        | ⚙️ Medium       | ✅ Best               |
+| Spring Recommendation      | ❌ No           | ⚙️ Sometimes    | ✅ Yes                |
+
+➤ Adding all 3 types of DI in one class is not a good practice. It creates confusion and makes the code hard to maintain.
+➤ Choose one type of DI per class, preferably constructor injection for better maintainability and testability.
+
+==========================================
+🔷 @Component vs @Service in Spring Boot
+==========================================
+➤ Both @Component and @Service are annotations used in Spring to define beans, but they serve different purposes and convey different semantics. 
+| Annotation   | Description                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------------- |
+| `@Component` | Generic stereotype annotation that marks a class as a Spring-managed bean.                                      |
+| `@Service`   | A specialized type of `@Component used to mark classes that hold business logic or service-layer code.          |
+
+🔄 What They Do Internally
+✅ Both @Component and @Service
+➤ Register the class as a bean in the Spring ApplicationContext
+➤ Enable dependency injection via @Autowired.
+
+👉 In short:
+@Service = @Component + Semantic meaning (used for service/business layer)
+
+🔄 Layer Meaning in Spring 
+| Layer                | Annotation                        | Purpose                                   |
+| -------------------- | --------------------------------- | ----------------------------------------- |
+| Controller Layer     | `@Controller` / `@RestController` | Handles web requests (presentation layer) |
+| Service Layer        | `@Service`                        | Contains business logic                   |
+| Repository Layer     | `@Repository`                     | Deals with persistence (database access)  |
+| Generic Bean         | `@Component`                      | Used for any other general-purpose bean   |
+
+✅ Example: Using @Component
+@Component
+public class EmailValidator {
+    public boolean isValid(String email) {
+        return email.contains("@");
+    }
+}
+➤ Registered as a Spring Bean.
+➤ Can be injected anywhere:
+@Autowired
+private EmailValidator validator;
+
+✅ Example: Using @Service
+@Service
+public class UserService {
+    public void registerUser(User user) {
+        // business logic for registration
+    }
+}
+➤ Also a Spring Bean.
+➤ But used to represent business logic layer.
+
+🔄 Key Difference — Intent and Semantics
+| Feature                               | `@Component`         | `@Service`                                             |
+| ------------------------------------- | -------------------- | ------------------------------------------------------ |
+| Purpose                               | Generic bean         | Business logic layer                                   |
+| Spring Behavior                       | Registers bean       | Registers bean (same behavior)                         |
+| Semantic Meaning                      | Can be used anywhere | Indicates service-level component                      |
+| AOP (Aspect-Oriented Programming)     | No special behavior  | May be used by Spring for transactional or proxy logic |
+| Readability                           | Less descriptive     | More expressive for business services                  |
+
+🔄 AOP (Aspect-Oriented Programming) Note
+➤ Spring often applies aspects (like @Transactional, @Async, etc.) at the service layer.
+So using @Service:
+➤ Helps Spring automatically detect it as a target for business logic–related aspects.
+
+======================
+🔷 @Value Annotation
+======================
+In Spring Boot, the @Value annotation is used to inject values into fields, method parameters, or constructor arguments directly from:
+✔️ application.properties / application.yml
+✔️ Environment variables
+✔️ System properties
+✔️ Expression Language (SpEL)
+
+🔄 Syntax
+@Value("${property.key}")
+private String value;
+👉 Spring replaces ${property.key} with the actual value from application.properties (or other sources).
+
+✅ Example 1: Injecting from application.properties
+🔗 application.properties
+app.name=WeatherApp
+app.version=1.0.3
+
+🔗 Java Class
+@Component
+public class AppConfig {
+    
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.version}")
+    private String version;
+
+    public void printDetails() {
+        System.out.println(appName + " - " + version);
+    }
+}
+✅ Output:
+WeatherApp - 1.0.3
+
+
+✅ Example 2: Default Value
+If the property doesn’t exist, you can provide a default value:
+
+@Value("${app.description:Default Description}")
+private String description;
+
+✅ Example 3: Injecting System or Environment Variables
+You can directly access environment/system variables:
+@Value("${JAVA_HOME}")
+private String javaHome;
+
+✅ Example 4: Using SpEL (Spring Expression Language)
+You can perform calculations or logic:
+@Value("#{2 * 10}")
+private int value; // 20
+
+@Value("#{systemProperties['user.home']}")
+private String userHome;
+
+✅ Example 5: Injecting Lists or Arrays
+🔗 application.properties
+
+app.cities=Delhi,Mumbai,Bangalore
+
+🔗 Java Class
+@Value("${app.cities}")
+private List<String> cities;
+
+🔄 When to Use @Value
+➤ For simple property injection (like strings, numbers, or constants).
+➤ When you don’t need a full configuration class.
+
+🔄 Better Alternative for Multiple Values → @ConfigurationProperties
+For injecting multiple related properties, prefer:
+
+@ConfigurationProperties(prefix = "app")
+public class AppConfig {
+    private String name;
+    private String version;
+    // getters & setters
+}
+✅ Cleaner and easier to maintain for grouped properties.
+
+🔷 application.properties vs application.yml in Spring Boot
+1️⃣ application.properties (Default format)
+This is a key-value pair file.
+
+✅ Example:
+# Server Configuration
+server.port=8081
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/testdb
+spring.datasource.username=root
+spring.datasource.password=1234
+
+🧠 Syntax Rules:
+Each property is a key=value pair.
+Hierarchical configs use dots (.).
+Comments start with #.
+Easy for simple configurations, but harder for nested data.
+
+2️⃣ application.yml ((Yet Another Markup Language)YAML format)
+YAML is a human-readable hierarchical format (preferred for complex configs).
+
+✅ Example:
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/testdb
+    username: root
+    password: 1234
+
+🧠 Syntax Rules:
+Uses indentation (spaces, not tabs) to define hierarchy.
+No = or : for nesting — just indentation.
+Supports arrays/lists easily.
+
+Example with list:
+emails:
+  - ankur@gmail.com
+  - test@example.com
+
+You can use both files together — Spring Boot automatically merges them.
+Priority order:
+application.properties (if defined later)
+application.yml (if both exist, last loaded wins)
+
+Properties files are used only in java language based projects.
+YAML files can be used in any language based projects.
+
+
+However, in real-world projects —
+👉 prefer YAML (.yml) for readability & structure,
+
+🔄 Advantages of YAML over Properties:
+| Feature            | `.properties` | `.yml`                   |
+| ------------------ | ------------- | ------------------------ |
+| Readability        | ❌ Average     | ✅ Excellent              |
+| Hierarchical Data  | ❌ Complex     | ✅ Natural                |
+| Array/List Support | ❌ Hard        | ✅ Easy                   |
+| Structure          | Flat          | Nested                   |
+| Popularity         | Legacy style  | Modern Spring Boot style |
+| Comments           | ✅ Supported   | ✅ Supported (`#`)        |
+
+
+🔄 Profile-Specific Configurations
+Spring Boot allows multiple environment profiles (e.g. dev, test, prod).
+
+You can define profile-specific files:
+application-dev.yml
+application-prod.yml
+application-test.yml
+
+Then activate one in your main config:
+
+In application.properties
+spring.profiles.active=dev
+
+In application.yml
+spring:
+  profiles:
+    active: dev
+In YML, multiple profiles can be configured in single YML file(three dashes --- is used to separate the profiles)
+✅Example:
+--- spring:
+  profiles: dev
+server:
+  port: 8081
+
+--- spring:
+  profiles: prod
+server:
+  port: 8082

@@ -1,0 +1,1036 @@
+====================
+🔗 GenderType.java
+====================
+package com.example.type;
+
+public enum GenderType {
+    MALE,
+    FEMALE,
+    OTHER
+}
+
+❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌ 
+-----------------➤ Add remaining code and concept from the code and 
+-----------------➤ fix the mapping of patient and insurance
+========================
+🔗 BloodGroupType.java
+========================
+package com.example.type;
+
+public enum BloodGroupType {
+    A_POSITIVE,
+    A_NEGATIVE,
+    B_POSITIVE,
+    B_NEGATIVE,
+    O_POSITIVE,
+    O_NEGATIVE,
+    AB_POSITIVE,
+    AB_NEGATIVE
+}
+
+
+====================
+🔗 Patient.java
+====================
+package com.example.entity;
+
+import com.example.type.BloodGroupType;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "patient",
+        indexes = {
+        @Index(name="idx_patient_birthdate", columnList = "birthDate", unique = true),
+        @Index(name="idx_patient_email", columnList = "email", unique = true)
+        }
+        ,
+        uniqueConstraints = {
+        @UniqueConstraint(name="unique_patient_birthdate_and_name", columnNames = {"birthDate","name"})
+        }
+)
+@Getter
+@Setter
+@ToString
+public class Patient {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ToString.Exclude
+    private Long id;
+
+    @Column(name = "name", length = 30, nullable = false)
+    private String name;
+
+    private LocalDate birthDate;
+
+    @Column(name = "email", nullable = false, unique = true, length = 50)
+    private String email;
+
+    @Column(name = "gender", unique = true, length = 40)
+    @Enumerated(EnumType.ORDINAL)
+    private GenderType gender;
+    
+    @Enumerated(EnumType.STRING)  ----➤ Tells the database to store the enum type as a string which is given in the BloodGroupType class
+    @Column(name = "blood_group", unique = true, length = 40)
+    private BloodGroupType bloodGroup;  ----➤ Added an enum type field know as blood_group and created a class called BloodGroupType
+    ✔️ Another type is @Enumerated(EnumType.ORDINAL) which is used to store the enum type as an integer(mostly used in SQL to save space)
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true) // cascade all operations (persist, merge, remove, etc.) to the insurance entity
+    @JoinColumn(name="patient_insurance_id")
+    private Insurance insurance; // this is the owning side
+
+    @OneToMany(mappedBy = "patient")
+    private List<Appointment> appointments;// this is the inverse side
+}
+
+======================
+🔗 Insurance.java
+======================
+package com.example.entity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Insurance {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "policy_number", nullable = false, unique = true)
+    private String policyNumber;
+
+    @Column(name = "provider", nullable = false, length = 100)
+    private String provider;
+
+    @CreationTimestamp
+    @Column(nullable = false,updatable = false)
+    private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "insurance")// this is mapped to the insurance that is exisiting in the patient
+    private Patient patient; //this is the inverse side
+}
+
+🔄 OneToOne Mapping
+1️⃣ One Patient has exactly one Insurance, and one Insurance belongs to exactly one Patient.
+
+2️⃣ Entity Roles
+| Role             | Entity          | Description                                                                      |
+| ---------------- | -----------     | -------------------------------------------------------------------------------- |
+| Owning Side      | `Patient`       | The side that owns the foreign key (`patient_insurance_id`) in the database.     |
+| Inverse Side     | `Insurance`     | The side that refers back to the owning side using `mappedBy`.                   |
+
+3️⃣ Code Explanation
+🔗 In Patient (Owning side)
+@OneToOne
+@JoinColumn(name = "patient_insurance_id")
+private Insurance insurance;
+
+
+✅ Key Points:
+✔️ @OneToOne defines a 1–1 relationship.
+✔️ @JoinColumn(name="patient_insurance_id") means the patient table will have a foreign key column named patient_insurance_id which points to the insurance table’s primary key (id).
+✔️ This side controls the relationship — insert/update/delete will happen through Patient.
+
+🔗 In Insurance (Inverse side)
+@OneToOne(mappedBy = "insurance")
+private Patient patient;
+
+✅ Key Points:
+✔️ mappedBy = "insurance" → tells JPA that Patient owns the relationship (the field name insurance in the Patient entity is the mapping point).
+✔️ No separate foreign key column will be created in the insurance table.
+✔️ It’s just a back-reference used for bidirectional navigation.
+
+4️⃣ How It Works in Practice
+➤ When Saving:
+If you save a Patient with an associated Insurance,
+JPA automatically updates the foreign key column (patient_insurance_id) in the patient table.
+
+✅ Example:
+Insurance insurance = new Insurance();
+insurance.setPolicyNumber("POL123");
+insurance.setProvider("ICICI Health");
+
+Patient patient = new Patient();
+patient.setName("Isha Gupta");
+patient.setEmail("isha@gmail.com");
+patient.setInsurance(insurance);
+
+patientRepository.save(patient); // Patient saved → insurance linked
+
+👉 Cascade (optional):	You can use @OneToOne(cascade = CascadeType.ALL) if you want saving/deleting Patient to automatically affect Insurance.
+👉 Fetch Type:	Default is EAGER for @OneToOne. Can set to LAZY for better performance.
+
+
+======================
+🔗 Appointment.java
+======================
+package com.example.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@ToString
+public class Appointment{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "appointment_time", nullable = false)
+    private LocalDateTime appointmentTime;
+
+    @Column(name = "reason", length = 500)
+    private String reason;
+
+    @ManyToOne
+    @JoinColumn(name="patient_id", nullable = false)// if appointment exist then the patient must exist
+    // Owning side used join column because it creates the foreign key in the appointment table
+    private Patient patient;
+
+     @ManyToOne
+    @JoinColumn(name="doctor_id", nullable = false)
+    private Doctor doctor;
+
+}
+
+🔄 ManyToOne Mapping(Appointment <-> Patient)
+| Aspect                          | Explanation                                                                                                                         |
+|Entities Involved                    | `Appointment` (many) ↔ `Patient(one)                                                                                            |
+| Meaning                         | A single patient can have multiple appointments, but each appointment belongs to exactly one patient.                               |
+| Owning Side                     | `Appointment` is the **owning side** because it contains the foreign key column `patient_id`.                                       |
+|Foreign Key              | The `@JoinColumn(name="patient_id")` annotation creates a foreign key in the `appointment` table that references the `patient` table’s `id` |
+| Nullable = false                | Ensures that every appointment **must have an associated patient** — an appointment cannot exist without a patient.                 |
+|Inverse Relationship(Optional)| Patient`class, define the reverse mapping using `@OneToMany(mappedBy = "patient")` if we want to access all appointments of a patient  |
+| Database Table Structure        | The `appointment` table will have columns like `id`, `appointment_time`, `reason`, and `patient_id` (FK referencing `patient.id`).  |
+| Example    | Patient “John” can have appointments like “General Checkup” and “Follow-up Visit”. Both appointments will have the same `patient_id` (John’s ID).        |
+
+
+======================
+🔗 Departments.java
+======================
+
+package com.example.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "department_name", nullable = false, unique = true, length = 100)
+    private String name;
+
+    @OneToOne
+    @JoinColumn(name = "head_doctor_id")
+    private  Doctor headDoctor;
+
+    @ManyToMany
+    @JoinTable(name = "department_doctor",
+    joinColumns = @JoinColumn(name = "department_id"),
+    inverseJoinColumns = @JoinColumn(name = "doctor_id"))
+    private Set<Doctor> doctors=new HashSet<>();
+}
+
+🔷 @ManyToMany Mapping (Department ↔ Doctor)
+| Aspect                       | Explanation                                                                                                                          |
+| Entities Involved            | `Department` ↔ `Doctor`                                                                                                              |
+| Meaning                      | One department can have multiple doctors, and one doctor can work in multiple departments.                                           |
+| Owning Side                  | `Department` is the owning side of the relationship here because it defines the `@JoinTable`.                                        |
+| Join Table Name              | `department_doctor` — acts as a bridge (junction) table that connects both entities.                                                 |
+| joinColumns                  | `@JoinColumn(name = "department_id")` → Represents the foreign key from the Department table.                                        |
+| inverseJoinColumns           | `@JoinColumn(name = "doctor_id")` → Represents the foreign key from the Doctor table.                                                |
+| Data Structure Used          | `Set<Doctor>` — avoids duplicates (no doctor should be added twice to the same department).                                          |
+| Table Structure              | `department_doctor` table will have two columns:• `department_id` (FK referencing Department) • `doctor_id` (FK referencing Doctor)  |
+| Inverse Side                 | In the `Doctor` entity, you can define the reverse mapping as`@ManyToMany(mappedBy = "doctors") private Set<Department> departments;`|
+| Cascade and Fetch (optional) | You can specify behaviors like `cascade = CascadeType.ALL` or `fetch = FetchType.LAZY` depending on the use case.                    |
+
+
+===========================
+🔗 PatientRepository.java
+===========================
+
+package com.example.repository;
+
+import com.example.entity.Patient;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+     Patient findByName(String name);  ----➤ This method is used to get the patient by name we only have to write the function name with correct naming convention rest of the implementation will be done by JPA
+
+    List<Patient> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
+    List<Patient> findByBirthDateAndEmail(LocalDate birthDate,String email);
+    List<Patient> findByNameContainingOrderByIdDesc(String name);
+
+    @Query("select p from Patient p where p.bloodGroup = :bloodGroup")
+    List<Patient>findByBloodGroup(BloodGroupType bloodGroup);
+
+    🌟 Explanation:
+    1️⃣ Named Parameter Style (:bloodGroup)
+    ➤ Uses a named parameter (:bloodGroup) in the JPQL query.
+    ➤ The parameter name must match the method parameter name (bloodGroup).
+    ➤ Spring automatically binds the parameter value to the placeholder.
+
+    ✅ Pros:
+    ➤ More readable.
+    ➤ Safe when you have multiple parameters (order doesn’t matter).
+    ➤ Easier to maintain (renaming method parameters won’t break query).
+
+    ✔️ Similar to the above query
+    2️⃣ Positional Parameter Style (?1)
+    @Query("SELECT p FROM Patient p WHERE p.bloodGroup = ?1")
+    List<Patient> findByBloodGroup(BloodGroupType bloodGroup); 
+
+    🌟 Explanation:
+    ➤ Uses positional parameters, where ?1 means “the first method parameter”.
+    ➤ You can also use ?2, ?3, etc., for additional parameters.
+
+    ✅ Pros:
+    ➤ Shorter syntax.
+    ➤ Useful when you don’t want to rely on parameter names.
+
+    ⚠️ Cons:
+    ➤ If you reorder method parameters, you must update all ? positions manually.
+    ➤ Less readable in complex queries.
+
+    ✔️ Similar to the above query
+    3️⃣ Using @Param annotation (Optional)
+    ➤ If you want to use named parameters but with different names, then use @Param:
+    @Query("SELECT p FROM Patient p WHERE p.bloodGroup = :bg")
+    List<Patient> findByBloodGroup(@Param("bg") BloodGroupType bloodGroup);
+
+    👉 Here, :bg (in JPQL) is explicitly bound to the Java method parameter bloodGroup.
+
+    @Query("select p.bloodGroup, count(p) from Patient p  group by p.bloodGroup")
+   List<Object[]> countEachBloodGroup();  ----➤ Example of using aggregate function in JPQL query
+
+   @Query(value = "SELECT * FROM patient", nativeQuery = true)
+List<Patient> findAllPatient();  ----➤ Example of using Native SQL query in Spring Data JPA
+
+    ✅ Update Query
+   @Modifying
+   @Transactional
+   @Query("update Patient p set p.name = :name where p.id = :id")
+   int updatePatientNameById(@Param("id") Long id,@Param("name") String name);
+    ----➤ Example of using update query in Spring Data JPA
+
+    🌟 Explanation:
+    This method is used to update data in the database (not select or fetch).
+
+    🔄 Annotations Used
+    1️⃣ @Modifying
+    ➤ Tells Spring Data JPA that this query is not a SELECT query, but an update/delete/insert query.
+    ➤ Without this annotation, Spring tries to use getResultList() or getSingleResult(), which only work for select queries — leading to runtime errors.
+    ➤ Internally, @Modifying makes JPA call executeUpdate() instead of getResultList().
+
+    2️⃣ @Transactional
+    ➤ Required for data modification queries because updates must occur inside a transaction.
+    ➤ Ensures that if an exception occurs, changes are rolled back automatically.
+    ➤ Can be placed at either:
+        ✔️  Method level (inside repository), or
+        ✔️ Service layer level (recommended for larger applications).
+    ➤ If omitted, you may get exceptions like:
+        ✔️ TransactionRequiredException: Executing an update/delete query
+
+ to coun✔️ Queryt each blood group type and map the result to a custom DTO class
+@Query("select new com.example.dto.BloodGroupCountResponseEntity(p.bloodGroup, count(p)) " +
+       "from Patient p " +
+       "group by p.bloodGroup")
+List<BloodGroupCountResponseEntity> countEachBloodGroupType();  ----➤ Example of using JPQL constructor expression to map the result to a custom DTO class
+
+🌟 Explanation:
+1️⃣ JPQL Constructor Expression
+➤ The keyword new in JPQL (Java Persistence Query Language) allows you to map query results directly into a custom class (DTO).
+➤ It avoids manually converting Object[] results.
+
+✅ Syntax:
+🔗 SELECT new full.package.DTOName(field1, field2, ...)
+FROM Entity e
+
+So here:
+🔗 SELECT new com.example.dto.BloodGroupCountResponseEntity(p.bloodGroup, COUNT(p))
+👉 For each blood group, count the number of patients and store that data into a new object of BloodGroupCountResponseEntity.
+
+2️⃣ GROUP BY Clause
+🔗 GROUP BY p.bloodGroup
+
+➤ Aggregates all patients that share the same blood group.
+➤ COUNT(p) counts the number of rows (patients) per blood group.
+➤ So each record in the result represents one unique blood group and its count.
+}
+
+🔄 How to write custom Repository Methods for JPA 
+Rules for writing custom methods:
+
+⚡ Start with a Recognized Prefix
+➤ Every finder method must start with one of these prefixes:
+🔗 findBy... → fetch data
+🔗 readBy... → alias of findBy
+🔗 queryBy... → alias of findBy
+🔗 getBy... → alias of findBy
+🔗 countBy... → count records matching condition
+🔗 existsBy... → check if record exists
+🔗 deleteBy... / removeBy... → delete records
+
+⚡ End with an Entity Name
+➤ The entity name must be the last word in the method name.
+
+⚡ Method name should follow camelCase
+✅Example:
+Optional<Employee> findByEmailId(String email);
+long countByLastName(String lastName);
+boolean existsByMobile(String mobile);
+
+➤ Avoid using special characters in the method name.
+➤ Avoid using reserved words in the method name.
+➤ Avoid using SQL keywords in the method name.
+
+✔️ If want to create method based on more then one fieldName then:
+⚡  Rules to aggregate multiple field values:
+➤ Using AND: findByEmailIdAndMobile(String email,String mobile);
+➤ Using OR: findByEmailIdOrMobile(String email,String mobile);
+
+✅Example:
+Optional<Employee> findByEmailIdAndMobile(String email,String mobile);
+
+🌟 To Read More on Naming and Method making visit: https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
+
+🔄 Native Query
+A native query means you are writing the raw SQL that will be executed directly by the database, rather than using JPQL (Java Persistence Query Language).
+
+@Query(value = "SELECT * FROM patient", nativeQuery = true)
+List<Patient> findAllPatient();
+👉 This tells Spring Data JPA:
+    ✔️ Execute the raw SQL:
+        🔗 SELECT * FROM patient;
+➤ Map the result to the Patient entity.
+➤ Because you marked nativeQuery = true, JPA will not validate the query against entity names or JPQL syntax.
+
+🔄 How It Differs from JPQL
+| Feature     | JPQL                                 | Native Query                                 |
+| ----------- | ------------------------------------ | -------------------------------------------- |
+| Syntax      | Works on entity names and fields | Works on actual table and column names   |
+| Example     | `SELECT p FROM Patient p`            | `SELECT * FROM patient`                      |
+| Validation  | Checked by JPA at startup            | Not checked (errors show at runtime)         |
+| Portability | Database-agnostic                    | Database-specific SQL                        |
+| Mapping     | Automatic (based on entity fields)   | Must ensure column names match entity fields |
+
+
+🔄 When to Use Native Queries
+✅ Use native queries when:
+    ✔️ You need database-specific functions (like LIMIT, TOP, or joins not supported by JPQL).
+    ✔️ You’re dealing with complex queries or performance tuning.
+    ✔️ You want to reuse an existing SQL query or stored procedure.
+
+❌ Avoid them when:
+    ✔️ A simple JPQL query or derived method (findByXyz) would work — it’s safer and portable.
+
+
+===========================================================================================
+BloodGroupCountResponseEntity.java (DTO Projection Class for custom query of BloodGroupCount)
+===========================================================================================
+
+package com.example.dto;
+
+import com.example.type.BloodGroupType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+public class BloodGroupCountResponseEntity {
+    private BloodGroupType bloodGroup;
+    private Long count;
+}
+
+
+=========================
+🔗 Patience.Service
+=========================
+
+package com.example.service;
+
+import com.example.entity.Patient;
+import com.example.repository.PatientRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class PatientService {
+
+    private final PatientRepository patientRepository;
+
+
+    ✔️ Service method is used to get the patient by id
+    @Transactional
+    public Patient getPatientById(Long id){
+        return patientRepository.findById(id).orElse(null);
+    }
+
+    ✔️ Service method is used to get the patient by name
+     public Patient getPatientByName(String name) {
+        return patientRepository.findByName(name);
+    }
+
+    ✔️ Service method is used to update the patient name by id
+    public int updatePatientNameById(long l, String name) {
+        return patientRepository.updatePatientNameById(l,name);
+    }
+
+    ✔️ Service method to get all patient from the database with pagination and sorting
+      public Page<Patient> findAllPatient(){
+    // return patientRepository.findAllPatient(PageRequest.of(0,2));
+        1️⃣ return patientRepository.findAllPatient(PageRequest.of(0,2, Sort.by("name").ascending().and(Sort.by("birthDate").descending()))); -----➤ get the patient list in ascending order based on name and birthDate of page 0 and size 2
+        //Another way of writing the above line
+        2️⃣ return patientRepository.findAllPatient(PageRequest.of(0,2,Sort.by(Sort.Order.desc("name"))));
+    }
+
+    ✔️ Service method to count each blood group type and map the result to a custom DTO class
+     public List<BloodGroupCountResponseEntity> getPatientListByBloodGroup() {
+        return patientRepository.countEachBloodGroupType();
+    }
+}
+
+
+======================
+🔗 PatientTests.java
+======================
+
+package com.example;
+
+import com.example.entity.Patient;
+import com.example.repository.PatientRepository;
+import com.example.service.PatientService;
+import com.example.type.BloodGroupType;
+import com.example.type.GenderType;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@SpringBootTest
+public class PatientTests {
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private PatientService patientService;
+
+🔄 Test should include assestions
+➤ When you write a test in JUnit, its goal is not just to print output — it should verify whether the actual output matches what you expected.
+➤ Printing values using System.out.println() only helps you manually check.
+➤ But an assertion automatically checks correctness.
+➤ If the result is wrong, JUnit will fail the test instead of silently passing it.
+
+✅ Why This Matters
+➤ Assertions make your tests automated — no manual checking needed.
+➤ CI/CD pipelines rely on them to detect regressions automatically.
+➤ It ensures your service logic works even after code changes.
+
+
+    ✔️ Test to get all patient from the database
+    @Test
+    public void testPatientRepository(){
+         List<Patient> patientList = patientRepository.findAll();
+        assertNotNull(patientList, "Patient list should not be null");
+        assertTrue(patientList.size() > 0, "There should be at least one patient in the database");
+        System.out.println(patientList);
+    }
+
+    ✔️ Test for inserting patient in the database
+    @Test
+    public void insertPatientTest(){
+        Patient patient = new Patient();
+        patient.setName("Isha Gupta");
+        patient.setBirthDate(LocalDate.of(2002, 11, 28));
+        patient.setEmail("isha@gmail.com");
+        patient.setGender(GenderType.FEMALE);
+        patient.setBloodGroup(BloodGroupType.B_POSITIVE);
+
+        Patient savedPatient = patientRepository.save(patient);
+        assertNotNull(savedPatient.getId(), "Saved patient should have an ID assigned");
+        assertEquals("Isha Gupta", savedPatient.getName(), "Patient name should match");
+    }
+
+    ✔️ Test for getting patient by id
+    @Test
+    public void getPatientByIdTest(){
+   Patient patient = patientService.getPatientById(1L);
+        assertNotNull(patient, "Patient should not be null");
+        assertEquals(1L, patient.getId(), "Patient ID should match the requested ID");
+        System.out.println(patient);
+    }
+
+    ✔️ Test for getting patient by name
+    @Test
+    public void getPatientByNameTest(){
+        Patient patient = patientService.getPatientByName("Isha Gupta");
+        assertNotNull(patient, "Patient should not be null");
+        assertEquals("Isha Gupta", patient.getName(), "Patient name should match");
+        System.out.println(patient);
+    }
+
+    ✔️ Test for updating patient name by id
+      @Test
+    void updatePatientNameByIdTest(){
+       int result = patientService.updatePatientNameById(1L, "Ankur Wariko");
+        assertTrue(result > 0, "Update result should be greater than 0");
+
+        Patient updatedPatient = patientService.getPatientById(1L);
+        assertNotNull(updatedPatient, "Updated patient should not be null");
+        assertEquals("Ankur Wariko", updatedPatient.getName(), "Patient name should be updated");
+        System.out.println(patient);
+    }
+
+    ✔️ Test to get the count of each blood group type
+     @Test
+    void getPatientListByBloodGroup(){
+        List<BloodGroupCountResponseEntity> patientList = patientService.getPatientListByBloodGroup();
+        assertNotNull(patientList, "Blood group count list should not be null");
+        assertTrue(patientList.size() > 0, "There should be at least one blood group entry");
+
+        for (BloodGroupCountResponseEntity s : patientList) {
+            assertNotNull(s.getBloodGroup(), "Blood group should not be null");
+            assertTrue(s.getCount() > 0, "Count of patients should be greater than 0");
+             System.out.println("Blood Group type is "+s.getBloodGroup()+" Count is "+s.getCount());
+        }
+        }
+
+        void findAllPatientByPageTest(){
+        Page<Patient> patientPage = patientService.findAllPatient();
+
+        // Assert
+        assertNotNull(patientPage, "Page result should not be null");
+        assertTrue(patientPage.getTotalElements() > 0, "There should be at least one patient record");
+        assertTrue(patientPage.getContent().size() <= 5, "Page size should be 5 or less");
+
+        // Optional — log for visibility
+        patientPage.forEach(p -> System.out.println(p))
+}
+}
+
+🔄 Commonly Used JUnit Assertions:
++---------------------------+-------------------------------------------+
+| Assertion                 | Purpose                                   |
++---------------------------+-------------------------------------------+
+| assertNotNull(obj)        | Checks object is not null                 |
++---------------------------+-------------------------------------------+
+| assertTrue(condition)     | Checks condition is true                  |
++---------------------------+-------------------------------------------+
+| assertEquals(expected, actual) | Checks expected value equals actual    |
++---------------------------+-------------------------------------------+
+| assertNotEquals(notExpected, actual) | Checks values are not equal       |
++---------------------------+-------------------------------------------+
+| assertNull(obj)           | Checks object is null                     |
++---------------------------+-------------------------------------------+
+| assertSame(expected, actual) | Checks both references point to same object |
++---------------------------+-------------------------------------------+
+| assertNotSame(notExpected, actual) | Checks references do not point to same object |
++---------------------------+-------------------------------------------+
+| fail(message)             | Marks the test as failed intentionally   |
++---------------------------+-------------------------------------------+
+
+
+
+======================
+InsuranceTest.java
+======================
+package com.example;
+
+import com.example.entity.Insurance;
+import com.example.entity.Patient;
+import com.example.service.InsuranceService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
+
+@SpringBootTest
+public class InsuranceTest {
+
+    @Autowired
+    private InsuranceService insuranceService;
+
+    ✔️ Test for creating insurance and assigning it to a patient
+    @Test
+    public void createInsurance(){
+        Insurance insurance=Insurance.builder()
+                .policyNumber("HDFC_1234")
+                .provider("HDFC")
+                .validUntil(LocalDate.of(2030,12,12))
+                .build();
+
+        Patient patient = insuranceService.assignInsuranceToPatient(insurance, 1L);
+        System.out.println(patient);
+    }
+}
+
+🧠 Concept Behind CascadeType and FetchType
+
+🔄 Cascade Type — “What happens to related entities when one entity is saved/updated/deleted”
+➤ When you perform operations on one entity (like save, delete, update), cascade determines whether those operations should propagate to the associated entity.
+
+✅ Example from createInsurance() test:
+patient.setInsurance(insurance);
+insurance.setPatient(patient);
+patientRepository.save(patient); //Optional will saved automatically when the transaction ends because of CascadeType.ALL
+
+➤ Here, you are saving the patient, but the insurance is a related entity.
+❓ Now the question is: Should the insurance automatically be saved when I save the patient?
+➤ That’s where CascadeType comes in.
+
+
+🔄 Common Cascade Types
+| Cascade Type          | What it does                                                         |                     Example Use Case                                  |
+|CascadeType.PERSIST| When you save(`persist`)a parent entity, the child entity is also saved. | Save a `Patient` and automatically save its `Insurance`.              |
+|CascadeType.MERGE | When you update (`merge`) a parent entity, updates propagate to the child.| Update `Patient` details and automatically update linked `Insurance`. |
+|CascadeType.REMOVE   | Deleting parent deletes child.                                         | Delete a `Patient`, also delete `Insurance`.                          |
+|CascadeType.ALL`     | Applies all above operations.                                          | When you want total propagation of all operations.                    |
+|CascadeType.DETACH`  | Detaches both parent and child from the persistence context.           | Rarely used.                                                          |
+|CascadeType.REFRESH` | Refreshing parent also refreshes the child.                            | Reload from DB both entities.                                         |
+
+
+✅ Correct Way to Use in Your Entities
+🔄 In your Patient entity:
+
+@OneToOne(cascade = CascadeType.ALL)
+@JoinColumn(name="patient_insurance_id")
+private Insurance insurance;
+
+➡️ This means:
+➤ When you call patientRepository.save(patient), the insurance will automatically be persisted — even if you don’t call insuranceRepository.save() manually.
+
+➤ So in your test:
+Insurance insurance = ...
+Patient patient = insuranceService.assignInsuranceToPatient(insurance, 1L);
+
+👉 If you had cascade = CascadeType.ALL, you could skip manually saving insurance — the cascade would handle it.
+
+🔄 Fetch Type — “When is the related entity loaded from the database?”
+Every JPA relationship has a fetch strategy that decides whether related entities are loaded immediately (EAGER) or lazily (LAZY).
+
+| Fetch Type    | Behavior                                                            |           Example                                                               |
+|FetchType.EAGER| Loads the related entity immediately with the parent                | When you fetch a `Patient`, Hibernate also fetches its `Insurance` instantly    |
+|FetchType.LAZY|Loads related entity only when accessed (uses proxy object until then)| Fetching Patient, insurance is not loaded until you call `patient.getInsurance()|
+
+
+✅ Default Fetch Types
+| Relationship Type | Default Fetch Type |
+| ----------------- | ------------------ |
+| @OneToOne         | EAGER              |
+| @ManyToOne        | EAGER              |
+| @OneToMany        | LAZY               |
+| @ManyToMany       | LAZY               |
+
+✅ Example 
+If you write:
+@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+private Insurance insurance;
+
+➤ When you load a patient from DB → insurance won’t be loaded until accessed.
+➤ When you save a patient → insurance will also be saved automatically.
+
+🔗 Test Code
+@Test
+public void createInsurance(){
+    Insurance insurance = Insurance.builder()
+        .policyNumber("HDFC_1234")
+        .provider("HDFC")
+        .validUntil(LocalDate.of(2030,12,12))
+        .build();
+
+    Patient patient = insuranceService.assignInsuranceToPatient(insurance, 1L);
+    System.out.println(patient);
+}
+✔️ If cascade = ALL, you don’t need to manually save insurance.
+✔️ If fetch = EAGER, printing patient will also print insurance details.
+✔️ If fetch = LAZY, Hibernate will fetch insurance only when you call patient.getInsurance().
+
+===========================
+🔗 application.properties
+===========================
+spring.application.name=hibernate-demo
+
+spring.datasource.url=jdbc:mysql://localhost:3306/hospitaldb
+spring.datasource.username=root
+spring.datasource.password=ankur@1234
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+✔️ This will help the database to initialize itself with some default values present in the data.sql file in the, commonly used for testing Purpose 
+resources folder
+spring-jpa-defer-datasource-initialization=true
+spring.sql.init.mode=always
+spring.sql.init.data-location=classpath:data.sql  ----➤ can add multiple data.sql files
+
+
+==================================
+🔗 HibernateDemoApplication.java
+==================================
+
+package com.example;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class HibernateDemoApplication {
+
+	public static void main(String[] args) {
+        SpringApplication.run(HibernateDemoApplication.class, args);
+
+	}
+}
+
+
+=============
+🔗 pom.xml
+=============
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.6</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>hibernate-demo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>hibernate-demo</name>
+	<description>Learning Hibernate</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+
+
+======================
+Paging and Sorting
+======================
+🔄 Pagination and Sorting in Spring Data JPA
+➤ Pagination is the process of dividing a large set of data into smaller chunks (pages) to improve performance and user experience.
+➤ Sorting is the process of arranging data in a specific order (ascending or descending) based on one or more fields.
+
+🔄 Key Interfaces
+| Interface                  | Description                                                          |
+|-----------                 |-------------                                                         |
+| Page<T>                    | Used to represent a page of data.                                    |
+| Pageable                   | Used to specify pagination and sorting options.                      |
+| Sort                       | Used to specify sorting options.                                     |
+| Sort.Order                 | Used to specify a sorting order for a field.                         |
+| Sort.Direction             | Used to specify the direction of sorting (ascending or descending).  |
+| Sort.Direction.ASC         | Used to specify an ascending sort order.                             |
+| Sort.Direction.DESC        | Used to specify a descending sort order.                             |
+
+🔄 Pagination
+🔗 Page<T> page = repo.findAll(PageRequest.of(0, 10));   #PageRequest.of(page number, size of page)
+➤ This will fetch the first page (page index 0) containing 10 records.
+
+🔗 Page<T> page = repo.findAll(PageRequest.of(1, 5));    #This will fetch the second page (page index 1) containing 5 records.
+➤ Page index is zero-based, so page 0 is the first page.
+
+🔗 Page<T> page = repo.findAll(PageRequest.of(0, 10, Sort.by("name").ascending()));  #Fetch first page of 10 records sorted by name in ascending order
+➤ You can also combine pagination with sorting.
+
+🔗 Page<T> page = repo.findAll(PageRequest.of()0, 10, Sort.by("name").descending().and(Sort.by("age").ascending()));  #Fetch first page of 10 records sorted by name (desc) and age (asc)
+➤ You can sort by multiple fields using Sort.by().and().
+
+🔗 Page<T> page = repo.findAll(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("name"), Sort.Order.asc("age"))));  #Another way to sort by multiple fields
+➤ You can also create Sort.Order objects to specify sorting orders for multiple fields.
+
+🔄 Sorting
+🔗 List<T> list = repo.findAll(Sort.by("name").ascending());  #Sort by name in ascending order
+➤ You can also create Sort objects to specify sorting orders for multiple fields.
+
+🔗 List<T> list = repo.findAll(Sort.by("name").descending().and(Sort.by("age").ascending()));  #Sort by name (desc) and age (asc)
+➤ You can sort by multiple fields using Sort.by().and().
+
+🔗 List<T> list = repo.findAll(Sort.by(Sort.Order.desc("name"), Sort.Order.asc("age")));  #Another way to sort by multiple fields
+➤ You can also create Sort.Order objects to specify sorting orders for multiple fields.
+
+
+===========================
+Query By Example (QBE)
+===========================
+🔄 Query By Example (QBE) in Spring Data JPA
+➤ Query By Example (QBE) is a feature in Spring Data JPA that allows you to create queries based on the properties of a given example entity.
+
+➤ It provides a way to search for entities by providing a prototype entity with the desired property values.
+
+🔄 Key Components
+| Component                                         | Description                                                           |
+|-----------                                        |-------------                                                          |   
+| CriteriaBuilder                                   | Used to construct the query.                                          |
+| CriteriaQuery<T>                                  | Used to construct the query.                                          |
+| Root<T>                                           | Used to specify the root entity in the query.                         |
+| CriteriaQuery.from()                              | Used to specify the root entity in the query.                         |
+| Predicate                                         | Used to specify the conditions in the query.                          |
+| CriteriaBuilder.equal()                           | Used to specify an equality condition.                                |
+| CriteriaBuilder.like()                            | Used to specify a LIKE condition.                                     |
+| CriteriaBuilder.and()                             | Used to combine multiple conditions with AND.                         |
+| CriteriaBuilder.or()                              | Used to combine multiple conditions with OR.                          |
+| EntityManager                                     | Used to create and execute the query.                                 |
+| TypedQuery<T>                                     | Used to execute the query and get the results.                        |
+| TypedQuery.getResultList()                        | Used to execute the query and get the results.                        |
+| TypedQuery.getSingleResult()                      | Used to execute the query and get a single result.                    |
+| Example<T>                                        | Used to create an example entity for querying.                        |
+| ExampleMatcher                                    | Used to customize the matching behavior of the example entity.        |
+| ExampleMatcher.GenericPropertyMatchers            | Used to customize the matching behavior of individual properties.     |
+| ExampleMatcher.matching()                         | Used to create a matcher that matches all properties.                 |
+| ExampleMatcher.matchingAny()                      | Used to create a matcher that matches any property.                   |    
+| ExampleMatcher.withIgnoreNullValues()             | Used to ignore null values in the example entity.                     |
+| ExampleMatcher.withIgnoreCase()                   | Used to ignore case when matching string properties.                  |
+| ExampleMatcher.withStringMatcher()                | Used to specify how string properties should be matched.              |
+| ExampleMatcher.StringMatcher.EXACT                | Used to specify exact matching for string properties.                 |
+| ExampleMatcher.StringMatcher.STARTING             | Used to specify starting matching for string properties.              |
+| ExampleMatcher.StringMatcher.ENDING               | Used to specify ending matching for string properties.                |
+| ExampleMatcher.StringMatcher.CONTAINING           | Used to specify containing matching for string properties.            |
+| ExampleMatcher.StringMatcher.REGEX                | Used to specify regex matching for string properties.                 |
+| ExampleMatcher.StringMatcher.DEFAULT              | Used to specify default matching for string properties.               |
+| ExampleMatcher.withMatcher()                      | Used to customize the matching behavior of individual properties.     |
+| Example.of()                                      | Used to create an example entity for querying.                        |
+| Repository.findAll(Example<T>)                    | Used to execute the query and get the results.                        |
+| Repository.findOne(Example<T>)                    | Used to execute the query and get a single result                     |
+| Repository.count(Example<T>)                      | Used to count the number of entities matching the example.            |
+| Repository.exists(Example<T>)                     | Used to check if any entities match the example.
+
+🔄 Example Usage
+➤ Suppose you have an entity class Patient with fields like name, email, gender, and bloodGroup.
+@Entity
+public class Patient { 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String email;
+    @Enumerated(EnumType.STRING)
+    private GenderType gender;
+    @Enumerated(EnumType.STRING)
+    private BloodGroupType bloodGroup;
+}
+➤ You can use QBE to find patients based on an example patient entity.
+Patient probe = new Patient();
+probe.setGender(GenderType.FEMALE);
+probe.setBloodGroup(BloodGroupType.A_POSITIVE); 
+Example<Patient> example = Example.of(probe);
+List<Patient> femalePatientsWithAPositiveBloodGroup = patientRepository.findAll(example);
+➤ This will return all female patients with A_POSITIVE blood group.
+
+🔄 Customizing Matching Behavior
+➤ You can customize how properties are matched using ExampleMatcher.
+ExampleMatcher matcher = ExampleMatcher.matching()
+    .withIgnoreNullValues() // Ignore null values in the example entity
+    .withIgnoreCase("name") // Ignore case when matching the name property
+    .withStringMatcher(StringMatcher.CONTAINING); // Use "contains" matching for string properties
+Example<Patient> example = Example.of(probe, matcher);
+List<Patient> patientsWithMatchingName = patientRepository.findAll(example);                        

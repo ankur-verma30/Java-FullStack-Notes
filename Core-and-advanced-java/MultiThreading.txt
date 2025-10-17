@@ -1141,26 +1141,42 @@ private volatile boolean flag = true;
 ➤ Blocking Queue – Stores tasks waiting to be executed.
 ➤ Executor Framework – Provides thread pool management utilities.
 
-🔄 Executor Framework (Java 5+)
-Java introduced the java.util.concurrent package with the Executor Framework to simplify thread pool management.
 
-🔄 Key Interfaces & Classes
-| Component         | Description                                        |
-| ----------------- | -------------------------------------------------- |
-| `Executor`        | Base interface for executing tasks.                |
-| `ExecutorService` | Manages thread lifecycle (submit, shutdown, etc.). |
-| `Executors`       | Factory class providing ready-made thread pools.   |
+🔷 Executor Framework (Java 5+)
+➤ Java introduced the java.util.concurrent package with the Executor Framework to simplify thread management and the development of concurrent applications.
+➤ It abstracts many low-level complexities of creating, starting, and managing threads manually.
+
+🔄 Why Executor Framework Was Introduced
+
+Before the Executor Framework, developers had to manually handle:
+| Problem                          | Description                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| 1️⃣ Manual Thread Management | Manually creating, starting, and stopping threads increased code complexity.  |
+| 2️⃣ Resource Management      | Threads consumed heavy system resources if not properly reused or terminated. |
+| 3️⃣ Scalability              | Handling large numbers of tasks with individual threads was inefficient.      |
+| 4️⃣ Thread Reuse             | Threads could not be easily reused once terminated.                           |
+| 5️⃣ Error Handling           | Managing task exceptions and states manually was cumbersome.                  |
+
+🔄 Key Interfaces & Classes in Executor Framework
+| Component                       | Description                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Executor                  | Base interface for executing submitted tasks.                                                                             |
+| ExecutorService           | Extends `Executor` to manage the lifecycle of tasks — includes methods like `submit()`, `shutdown()`, `invokeAll()`, etc. |
+| ScheduledExecutorService  | Extends `ExecutorService` to schedule commands to run after a delay or periodically.                                      |
+| Executors` (Utility Class) | Provides factory methods to create various pre-configured thread pools.                                                   |
+
 
 🔄 Common Thread Pool Types (via Executors)
 1️⃣ newFixedThreadPool(n)
-➤ Fixed number of threads.
-➤ Extra tasks wait in the queue.
+➤ Creates a pool of fixed number of threads.
+➤ If all threads are busy, extra tasks wait in the queue.
+
 ✅ Best for: constant load, predictable number of threads.
 ExecutorService pool = Executors.newFixedThreadPool(3);
 
 2️⃣ newCachedThreadPool()
 ➤ Creates new threads as needed and reuses existing ones.
-➤ Threads idle for 60s are terminated.
+➤ Threads idle for 60s are terminated after inactivity.
 ✅ Best for: many short-lived asynchronous tasks.
 ExecutorService pool = Executors.newCachedThreadPool();
 
@@ -1174,50 +1190,211 @@ Supports scheduling tasks after delay or periodically.
 ✅ Best for: background maintenance tasks.
 ScheduledExecutorService pool = Executors.newScheduledThreadPool(2);
 
-✅ Basic Example:
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+✅Example 1: Fixed Thread Pool
+package com.executorframework;
 
-public class ThreadPoolExample {
+import java.util.concurrent.*;
+
+public class Main {
     public static void main(String[] args) {
-        ExecutorService pool = Executors.newFixedThreadPool(3); // 3 threads in pool
+        long startTime = System.currentTimeMillis();
 
-        for (int i = 1; i <= 5; i++) {
-            int taskId = i;
-            pool.execute(() -> {
-                System.out.println(Thread.currentThread().getName() + " executing task " + taskId);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        for (int i = 1; i <= 10; i++) {
+            int finalI = i;
+            executor.submit(() -> {
+                long result = factorial(finalI);
+                System.out.println("Factorial of " + finalI + " is " + result);
             });
         }
-        pool.shutdown(); // No new tasks accepted, wait for existing ones to finish
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken: " + (endTime - startTime));
+    }
+
+    private static long factorial(int n) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return (n <= 1) ? 1 : n * factorial(n - 1);
+    }
+}
+👉 Only 2 threads are created and reused for 10 tasks.
+
+✅Example 2:Using Future to Get Result from Callable
+package com.executorframework;
+
+import java.util.concurrent.*;
+
+public class Main {
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Integer> future = executorService.submit(() -> 42);
+
+        try {
+            System.out.println(future.get());
+            if (future.isDone()) {
+                System.out.println("Task completed successfully");
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        executorService.shutdown();
     }
 }
 
-✅ Output Example
-pool-1-thread-1 executing task 1
-pool-1-thread-2 executing task 2
-pool-1-thread-3 executing task 3
-pool-1-thread-1 executing task 4
-pool-1-thread-2 executing task 5
-👉 Notice that only 3 threads are created and reused for 5 tasks.
 
-🔄 Advantages
-➤ Reuses threads → saves CPU and memory.
-➤ Prevents system overload from unbounded thread creation.
-➤ Better performance and scalability.
-➤ Simplifies task submission and lifecycle management.
+
+| Feature                           |   Runnable                                  | Callable                                                                          |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Package                           | `java.lang`                                 | `java.util.concurrent`                                                            |
+| Method to Implement               | `void run()`                                | `V call()`                                                                        |
+| Return Type                       | Does not return any result                  | Returns a result of type `V`                                                      |
+| Checked Exception Handling        | Cannot throw checked exceptions             | Can throw checked exceptions                                                      |
+| Usage                             | when you don’t need a result from a thread  | Used when you need a result or to handle exceptions                               |
+| Result Retrieval                  | No direct way to get a result               | Returns a result via `Future.get()`                                               |
+| Thread Execution                  | Passed to `Thread` or `Executor`            | Submitted to `ExecutorService` using `submit()`                                   |
+| Introduced In                     | Java 1.0                                    | Java 5 (as part of `java.util.concurrent`)                                        |
+| Example Interface Declaration     | `public interface Runnable { void run(); }` | `public interface Callable<V> { V call() throws Exception; }`                     |
+| Typical Use Case                  | Background tasks like logging, cleanup, etc.| Computation tasks needing a result, like fetching data or performing calculations |
+
+
+✅ Example: Callable vs Runnable
+package com.executorframework;
+
+import java.util.concurrent.*;
+
+public class Main {
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        // Runnable cannot return a result
+        // Runnable runnable = () -> 42; ❌ Error
+
+        Callable<Integer> callable = () -> 42; // ✅ Callable can return a result
+        Future<Integer> future = executorService.submit(callable);
+
+        try {
+            System.out.println(future.get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        executorService.shutdown();
+    }
+}
+
+
+🔄 invokeAll() Method
+Executes a collection of tasks and returns a list of Futures when all are complete.
+
+package com.executorframework;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+public class Main {
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        Callable<Integer> c1 = () -> { System.out.println("Callable1 gives 2"); return 2; };
+        Callable<Integer> c2 = () -> { System.out.println("Callable2 gives 4"); return 4; };
+        Callable<Integer> c3 = () -> { System.out.println("Callable3 gives 6"); return 6; };
+
+        List<Callable<Integer>> callables = Arrays.asList(c1, c2, c3);
+
+        try {
+            List<Future<Integer>> futures = executorService.invokeAll(callables);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Hello world"); // Main thread waits until all tasks complete
+        executorService.shutdown();
+    }
+}
+
+🔄 Another Variant: invokeAll(Collection, timeout, unit)
+➤ Cancels remaining tasks if timeout expires.
+➤ Returns null for incomplete tasks.
+➤ Throws CancellationException for cancelled tasks.
+
+
+🔄 Other Common Methods
+| Method                      | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `invokeAny()`               | Runs multiple tasks but returns the result of first successful one.     |
+| `submit()`                  | Submits a Runnable/Callable and returns a Future.                       |
+| `Future.get()`              | Waits for the task to complete and returns result.                      |
+| `Future.isDone()`           | Checks if task completed or cancelled.                                  |
+| `Future.cancel()`           | Attempts to cancel execution.                                           |
+| `Future.get(timeout, unit)` | Waits for a limited time, else throws TimeoutException.                 |
+
+
+🔄 ScheduledExecutorService
+Used for delayed or periodic task execution.
+
+✅ Example 1 — One-shot Task After Delay
+ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+scheduler.schedule(() -> System.out.println("Task executed after 5 seconds delay!"), 5, TimeUnit.SECONDS);
+scheduler.shutdown();
+System.out.println("Main thread continues...");
+
+✅Example 1:
+  public static void main(String[] args) {
+       ScheduledExecutorService scheduler=Executors.newScheduledThreadPool(1);
+       scheduler.schedule(()-> System.out.println("Task executed after 5 seconds delay!"),5, TimeUnit.SECONDS);
+       scheduler.shutdown();
+        System.out.println("Main thread is doing something else");
+    }
+
+
+✅ Example 2 — Periodic Task (Fixed Rate)
+ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+scheduler.scheduleAtFixedRate(() -> System.out.println("Task executed every 5 seconds!"),
+        5, 5, TimeUnit.SECONDS);
+Thread.sleep(10000);
+scheduler.shutdown();
+
+
+✅ Example 3 — Periodic Task (Fixed Delay)
+ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+scheduler.scheduleWithFixedDelay(() -> System.out.println("Task executed after every 5-second delay!"),
+        5, 5, TimeUnit.SECONDS);
+Thread.sleep(10000);
+scheduler.shutdown();
+
+➤ Difference:
+    ✔️ scheduleAtFixedRate() → runs periodically regardless of task duration (may overlap).
+    ✔️ scheduleWithFixedDelay() → waits for task completion + delay before next execution (no overlap)
+
+
+🔄 Advantages of Executor Framework
+✅ Reuses threads → reduces CPU and memory overhead.
+✅ Prevents overload by controlling number of concurrent threads.
+✅ Improves performance and scalability.
+✅ Simplifies task lifecycle management.
+✅ Provides better error and result handling with Future.
+
 
 🔄 Disadvantages
-❌ Not suitable for tasks requiring long blocking I/O — threads may stay busy for long.
-❌ Fixed pool can cause tasks to wait if all threads are busy.
-❌ Harder to debug if tasks hang inside the pool.
+❌ Not ideal for long blocking I/O tasks.
+❌ Fixed pool can delay tasks if all threads are busy.
+❌ Debugging hung or slow tasks can be harder.
+
 
 🔄 Best Practices
-➤ Always call shutdown() or shutdownNow() to stop accepting new tasks.
-➤ Use bounded queues for better control.
-➤ For large-scale systems, prefer ThreadPoolExecutor for custom configurations (core size, max size, queue size, etc.).
-➤ Use submit() if you need to get a Future result from a task.
+⚡ Always call shutdown() or shutdownNow() to release resources.
+⚡ Use bounded queues to prevent overload.
+⚡ For large-scale systems, prefer ThreadPoolExecutor for advanced configurations.
+⚡ Use submit() for tasks needing results.
+⚡ Handle InterruptedException properly inside tasks.

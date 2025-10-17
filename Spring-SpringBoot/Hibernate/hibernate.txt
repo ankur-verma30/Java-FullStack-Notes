@@ -239,7 +239,7 @@ Annotation: @OneToOne
     1. In a Banking application, one Customer has exactly one PAN Card or KYC record.
     2. In an HR system, one Employee has exactly one EmployeeProfile record (with DOB, address, etc.).
     3. In a Car Rental app, one Car has exactly one Insurance Policy.    
-
+ 
 🔷 Spring Data JPA
 Spring Data JPA is a Spring framework project built on top of JPA (Java Persistence API) that makes database access and persistence operations easier.
 

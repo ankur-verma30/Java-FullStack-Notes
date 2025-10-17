@@ -116,7 +116,6 @@ Common Archetypes:
 
 
 🔷 Types of Repositories
-
 1️⃣ Local Repository (.m2 folder)
   ✔️ Default: `~/.m2/repository`
   ✔️ Cache of downloaded dependencies.
@@ -129,6 +128,12 @@ Common Archetypes:
   ✔️ Company/team-specific (e.g., Nexus, JFrog).
   ✔️ Stores private libraries not in Maven Central.
 
+  Code Example to add private repo in `pom.xml`:
+<repositories>
+  <repository>
+    <id>nexus-repo</id>
+    <url>http://nexus.company.com/repository/maven-releases/</url>
+  </repository>
 
 ❓ If Maven cannot find a dependency in local repo, where does it look next?
 ➤ First Local → then Remote (private if configured) → then Central.

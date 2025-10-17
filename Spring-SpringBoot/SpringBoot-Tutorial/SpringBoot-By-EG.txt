@@ -35,10 +35,220 @@ Spring Boot provides:
 4️⃣ Embedded server (Tomcat/Jetty/Undertow) starts if it’s a web app.
 
 
+🔷 @Component vs @Service in Spring Boot
+| Annotation   | Description                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------------- |
+| `@Component` | Generic stereotype annotation that marks a class as a Spring-managed bean.                                      |
+| `@Service`   | A specialized type of `@Component used to mark classes that hold business logic or service-layer code.          |
+
+🔄 What They Do Internally
+✅ Both @Component and @Service
+➤ Register the class as a bean in the Spring ApplicationContext
+➤ Enable dependency injection via @Autowired.
+
+👉 In short:
+@Service = @Component + Semantic meaning (used for service/business layer)
+
+🔄 Layer Meaning in Spring 
+| Layer                | Annotation                        | Purpose                                   |
+| -------------------- | --------------------------------- | ----------------------------------------- |
+| Controller Layer     | `@Controller` / `@RestController` | Handles web requests (presentation layer) |
+| Service Layer        | `@Service`                        | Contains business logic                   |
+| Repository Layer     | `@Repository`                     | Deals with persistence (database access)  |
+| Generic Bean         | `@Component`                      | Used for any other general-purpose bean   |
+
+✅ Example: Using @Component
+@Component
+public class EmailValidator {
+    public boolean isValid(String email) {
+        return email.contains("@");
+    }
+}
+➤ Registered as a Spring Bean.
+➤ Can be injected anywhere:
+@Autowired
+private EmailValidator validator;
+
+✅ Example: Using @Service
+@Service
+public class UserService {
+    public void registerUser(User user) {
+        // business logic for registration
+    }
+}
+➤ Also a Spring Bean.
+➤ But used to represent business logic layer.
+
+🔄 Key Difference — Intent and Semantics
+| Feature                               | `@Component`         | `@Service`                                             |
+| ------------------------------------- | -------------------- | ------------------------------------------------------ |
+| Purpose                               | Generic bean         | Business logic layer                                   |
+| Spring Behavior                       | Registers bean       | Registers bean (same behavior)                         |
+| Semantic Meaning                      | Can be used anywhere | Indicates service-level component                      |
+| AOP (Aspect-Oriented Programming)     | No special behavior  | May be used by Spring for transactional or proxy logic |
+| Readability                           | Less descriptive     | More expressive for business services                  |
+
+🔄 AOP (Aspect-Oriented Programming) Note
+➤ Spring often applies aspects (like @Transactional, @Async, etc.) at the service layer.
+So using @Service:
+➤ Helps Spring automatically detect it as a target for business logic–related aspects.
+
+
 🔷 REST API
 ➤ REST = Representational State Transfer → an architectural style for designing networked applications.
 ➤ REST API = An API that follows REST principles → uses HTTP methods to perform operations on resources (data).
 ➤ Resources are identified by URIs (Uniform Resource Identifiers) and exchanged in formats like JSON / XML.
+
+
+🔷 @Value Annotation
+In Spring Boot, the @Value annotation is used to inject values into fields, method parameters, or constructor arguments directly from:
+✔️ application.properties / application.yml
+✔️ Environment variables
+✔️ System properties
+✔️ Expression Language (SpEL)
+
+🔄 Syntax
+@Value("${property.key}")
+private String value;
+👉 Spring replaces ${property.key} with the actual value from application.properties (or other sources).
+
+✅ Example 1: Injecting from application.properties
+🔗 application.properties
+app.name=WeatherApp
+app.version=1.0.3
+
+🔗 Java Class
+@Component
+public class AppConfig {
+    
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.version}")
+    private String version;
+
+    public void printDetails() {
+        System.out.println(appName + " - " + version);
+    }
+}
+✅ Output:
+WeatherApp - 1.0.3
+
+
+✅ Example 2: Default Value
+If the property doesn’t exist, you can provide a default value:
+
+@Value("${app.description:Default Description}")
+private String description;
+
+✅ Example 3: Injecting System or Environment Variables
+You can directly access environment/system variables:
+@Value("${JAVA_HOME}")
+private String javaHome;
+
+✅ Example 4: Using SpEL (Spring Expression Language)
+You can perform calculations or logic:
+@Value("#{2 * 10}")
+private int value; // 20
+
+@Value("#{systemProperties['user.home']}")
+private String userHome;
+
+✅ Example 5: Injecting Lists or Arrays
+🔗 application.properties
+
+app.cities=Delhi,Mumbai,Bangalore
+
+🔗 Java Class
+@Value("${app.cities}")
+private List<String> cities;
+
+🔄 When to Use @Value
+➤ For simple property injection (like strings, numbers, or constants).
+➤ When you don’t need a full configuration class.
+
+🔄 Better Alternative for Multiple Values → @ConfigurationProperties
+For injecting multiple related properties, prefer:
+
+@ConfigurationProperties(prefix = "app")
+public class AppConfig {
+    private String name;
+    private String version;
+    // getters & setters
+}
+✅ Cleaner and easier to maintain for grouped properties.
+
+
+🔷 @PostConstruct in Spring Boot
+@PostConstruct is a lifecycle annotation used in Spring to execute a method after dependency injection is complete — but before the bean is put into service (i.e., before it’s ready to handle requests).
+
+🔄 Purpose
+It is mainly used for initialization logic — tasks you want to run once right after the bean is created and dependencies are injected.
+
+✅ Example
+@Component
+public class DataLoader {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("Initializing data...");
+        userRepository.save(new User("Ankur", "ankur@example.com"));
+    }
+}
+
+🔄 What happens here:
+    ✔️ Spring creates the DataLoader bean.
+    ✔️ It injects the UserRepository dependency.
+    ✔️ Then it automatically calls the init() method once.
+    ✔️ This ensures your logic runs only after all beans and dependencies are ready.
+
+❓ When is it Called?
+➤ Called after the bean is constructed and all dependencies are injected.
+➤ Runs before the @PreDestroy method (if any).
+➤ Executes only once per bean lifecycle.
+
+🔄 Common Use Cases
+    ✔️  Loading initial data into the database
+    ✔️  Validating configuration after injection
+    ✔️  Establishing a connection or preloading cache
+    ✔️  Printing startup messages
+
+✅ Example with Logging and Config
+@Component
+public class AppStartup {
+
+    @Value("${app.name}")
+    private String appName;
+
+    @PostConstruct
+    public void onStart() {
+        System.out.println("Application '" + appName + "' started successfully!");
+    }
+}
+
+| Concept               | Description                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| Annotation Source     | `jakarta.annotation.PostConstruct`                                                                |
+| Runs When             | After dependency injection, before bean is used                                                   |
+| Method Rules          | Must be `void`, no parameters, can throw exceptions                                               |
+| Alternatives          | `InitializingBean.afterPropertiesSet()` or a custom `@EventListener(ApplicationReadyEvent.class)` |
+
+
+🔄 Modern Alternative (Recommended in Spring Boot)
+Instead of @PostConstruct, you can use an ApplicationListener or @EventListener(ApplicationReadyEvent.class) for cleaner startup logic:
+
+@Component
+public class StartupListener {
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        System.out.println("✅ Application is fully started and ready!");
+    }
+}
+👉 This ns after the full Spring context is initialized (safer for web apps).
 
 🔄 Core Principles of REST
 ➤ Stateless → Each request is independent; server doesn’t store client state.
@@ -1124,3 +1334,711 @@ Understanding structure:
 👉 Rolling based of size and time can be used at the same time whatever happens first will make logs accordingly.
 
 
+
+🔷 Working of Rest Template
+@Component
+public class WeatherService {
+    private static final String apiKey = "a3cc93faecd095d1f1303fb69c75edae";
+    private static final String API = "https://api.weatherstack.com/current?access_key=API_KEY" +
+            "&query=CITY";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public WeatherResponse getWeather(String city) {
+        String finalURL = API.replace("API_KEY", apiKey).replace("CITY", city);
+        ResponseEntity<WeatherResponse> res = restTemplate.exchange(
+                finalURL,
+                HttpMethod.GET,
+                null,
+                WeatherResponse.class
+        );
+        return res.getBody();
+    }
+}
+
+➤ RestTemplate is a synchronous client to perform HTTP requests, exposing a simple, template method API over underlying HTTP client libraries such as the JDK HttpURLConnection, Apache HttpComponents, and others.
+➤ It simplifies communication with HTTP servers, and enforces RESTful principles.
+➤ Spring injects the RestTemplate bean here automatically.
+➤ It simplifies sending HTTP requests and deserializing JSON responses into Java objects.
+
+🔄 Making the REST Call
+ResponseEntity<WeatherResponse> res = restTemplate.exchange(
+        finalURL,             // URL
+        HttpMethod.GET,        // HTTP Method
+        null,                  // HTTP Entity (headers/body) — here null
+        WeatherResponse.class  // Expected Response Type
+);
+
+👉 What Happens Here:
+    ✔️ Sends a GET request to the Weather API.
+    ✔️ The response (which is JSON) is automatically converted (deserialized) into a WeatherResponse Java object.
+    ✔️ ResponseEntity<WeatherResponse> wraps the HTTP response → includes status code, headers, and body.
+
+
+🔷 Headers in HTTP
+➤ HTTP Headers are key-value pairs sent between the client and server in an HTTP request or response.
+➤ They carry metadata about the request/response — such as content type, authorization token, user agent, etc.
+
+✅ Example of Common HTTP Headers
+GET /api/weather HTTP/1.1
+Host: api.weatherstack.com
+Authorization: Bearer abc123
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.32.2
+
+👉 Here:
+    ✔️ Authorization → carries credentials or API keys
+    ✔️ Content-Type → tells the server the data format (JSON, XML, etc.)
+    ✔️ User-Agent → describes the client making the request
+
+🔷 Pass Headers in Code (Spring Boot using RestTemplate)
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class WeatherService {
+
+    private static final String API = "https://api.weatherstack.com/current?access_key={key}&query={city}";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public WeatherResponse getWeather(String apiKey, String city) {
+
+        // 1️⃣ Create headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json"); // tells server to respond in JSON
+        headers.set("User-Agent", "SpringBootApp");
+        headers.set("Authorization", "Bearer some_token_here"); // example of passing token
+
+        // 2️⃣ Build HttpEntity (headers + body)
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // 3️⃣ Send request
+        ResponseEntity<WeatherResponse> response = restTemplate.exchange(
+                API,
+                HttpMethod.GET,
+                entity,                // includes headers
+                WeatherResponse.class,
+                apiKey, city           // replaces placeholders in URL
+        );
+
+        // 4️⃣ Return only body
+        return response.getBody();
+    }
+}
+
+
+🔄 Sending Headers + Body in a POST request
+String url = "https://api.example.com/users";
+
+// 1️⃣ Create headers
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.APPLICATION_JSON);
+headers.set("Authorization", "Bearer xyz123");
+
+// 2️⃣ Create request body
+User user = new User("Ankur", "ankur@example.com");
+
+// 3️⃣ Combine headers and body
+HttpEntity<User> entity = new HttpEntity<>(user, headers);
+
+// 4️⃣ Make POST request
+ResponseEntity<String> response = restTemplate.exchange(
+        url,
+        HttpMethod.POST,
+        entity,
+        String.class
+);
+
+🔄 Key Classes for HTTP Headers in Spring
+| Class                   | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| `HttpHeaders            | Represents HTTP header values                      |
+| `HttpEntity<T           | Represents request entity (headers + body)         |
+| `ResponseEntity<T       | Represents the response (status, headers, body)    |
+| `MediaType              | Helps specify content type like `application/json` |
+
+
+🔄 Common HTTP Headers and Their Purposes
+| Header          | Purpose                                                           |
+| --------------- | ----------------------------------------------------------------- |
+| `Content-Type`  | Tells server what type of data is being sent (`application/json`) |
+| `Accept`        | Tells server what response format client expects                  |
+| `Authorization` | Sends tokens, API keys, or credentials                            |
+| `User-Agent`    | Identifies client making the request                              |
+| `Cache-Control` | Caching policies                                                  |
+| `Custom-Header` | You can define your own headers                                   |
+
+
+🔷 MongoTemplate, Criteria, and Query in Spring Boot
+➤ MongoTemplate is a core class in Spring Data MongoDB that provides:
+    ✔️ Fine-grained control over queries,
+    ✔️ Custom query building (beyond @Query or repository methods),
+    ✔️ Access to MongoDB’s full query and aggregation power.
+👉 It’s similar to how JdbcTemplate works for relational databases.
+
+✅ Example:
+  @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public List<User> getUserForSentimentAnalysis() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userName").is("Ram"));
+        return mongoTemplate.find(query, User.class);
+
+    }
+
+➤ MongoTemplate is auto-configured by Spring Boot if MongoDB connection details exist in application.properties.
+➤ Using @Autowired injects the template, allowing you to directly interact with the MongoDB database.
+
+Query query = new Query();
+👉 Creates a blank query object that can be configured with filters, sort, projection, etc.
+
+query.addCriteria(Criteria.where("userName").is("Ram"));
+👉 Builds a filter condition using Criteria.
+
+This is equivalent to MongoDB’s JSON query:
+{ "userName": "Ram" }
+👉 You can chain multiple criteria using .and(), .orOperator(), .gt(), etc.
+
+return mongoTemplate.find(query, User.class);
+➤ Executes the query on the User collection (Spring automatically maps the class to the MongoDB collection).
+➤ Converts each matching MongoDB document into a User Java object.
+➤ Returns a List<User>
+
+✅ Extended Examples: Find by multiple fields:
+Query query = new Query();
+query.addCriteria(Criteria.where("userName").is("Ram").and("age").gte(25));
+List<User> users = mongoTemplate.find(query, User.class);
+
+✅ Example: Using OR condition
+Query query = new Query();
+query.addCriteria(new Criteria().orOperator(
+    Criteria.where("userName").is("Ram"),
+    Criteria.where("email").is("ram@ram")
+));
+List<User> users = mongoTemplate.find(query, User.class);
+
+❓ Why Use MongoTemplate Instead of MongoRepository?
+| Use Case                                        | Prefer            |
+| ----------------------------------------------- | ----------------- |
+| Simple CRUD, auto queries                       | `MongoRepository` |
+| Complex filters, dynamic criteria, aggregations | `MongoTemplate`   |
+
+
+🔷 Send Email Using Spring Boot
+1️⃣ Add Dependency
+
+If you’re using Maven:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+
+2️⃣ Configure application.properties
+
+For Gmail SMTP:
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_app_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.debug=true
+spring.mail.default-encoding=UTF-8
+
+⚠️ Use an App Password for Gmail, not your normal password.
+
+3️⃣ Create a Mail Service
+Plain Text Email
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MailService {
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    public void sendSimpleEmail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        message.setFrom("your_email@gmail.com");
+
+        mailSender.send(message);
+        System.out.println("✅ Email sent successfully to " + to);
+    }
+}
+
+HTML Email with Attachment
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import java.io.File;
+
+@Service
+public class AdvancedMailService {
+
+    private final JavaMailSender mailSender;
+
+    public AdvancedMailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void sendHtmlEmailWithAttachment(String to, String subject, String htmlBody, String filePath) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlBody, true); // true = HTML
+        helper.setFrom("your_email@gmail.com");
+
+        FileSystemResource file = new FileSystemResource(new File(filePath));
+        helper.addAttachment(file.getFilename(), file);
+
+        mailSender.send(message);
+        System.out.println("✅ HTML Email with attachment sent to " + to);
+    }
+}
+
+
+🔷 Scheduling Tasks with Cron Jobs in Spring Boot
+🔄 Enabling Scheduling
+Before you can schedule tasks, you must enable scheduling in your Spring Boot application.
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EnableScheduling  // ✅ Enables Spring’s scheduling capability
+public class SchedulerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SchedulerApplication.class, args);
+    }
+}
+
+🔄 Creating a Scheduled Task
+You can schedule any method to run automatically using the @Scheduled annotation.
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EmailScheduler {
+
+    // Runs every 10 seconds
+    @Scheduled(fixedRate = 10000)
+    public void sendEmailReminder() {
+        System.out.println("Sending reminder email at: " + java.time.LocalTime.now());
+    }
+}
+
+🔄 Using Cron Expressions
+For more flexible scheduling, you can use a cron expression.
+
+@Component
+public class CronJobScheduler {
+
+    // Runs every day at 10:30 AM
+    @Scheduled(cron = "0 30 10 * * ?")
+    public void runDailyReport() {
+        System.out.println("Running daily report at: " + java.time.LocalTime.now());
+    }
+}
+
+🔄 Cron Expression Format
+┌───────────── second (0–59)
+│ ┌───────────── minute (0–59)
+│ │ ┌───────────── hour (0–23)
+│ │ │ ┌───────────── day of month (1–31)
+│ │ │ │ ┌───────────── month (1–12)
+│ │ │ │ │ ┌───────────── day of week (0–6) (Sunday=0 or 7)
+│ │ │ │ │ │
+│ │ │ │ │ │
+* * * * * *
+
+✅ Examples
+Cron Expression	Meaning
+| Cron Expression      | Meaning                               |
+| -------------------- | ------------------------------------- |
+| `0 * * * * *`        | Every minute                          |
+| `0 0 * * * *`        | Every hour                            |
+| `0 0 10 * * *`       | Every day at 10 AM                    |
+| `0 0 10 * * MON-FRI` | Every weekday at 10 AM                |
+| `0 */5 * * * *`      | Every 5 minutes                       |
+| `0 0 0 1 * *`        | On the 1st of every month at midnight |
+
+
+🔄 Scheduling with Zone and Initial Delay
+You can specify time zones or add a delay before execution.
+
+@Component
+public class ReportScheduler {
+
+    // Runs at 9 AM in IST time zone
+    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Kolkata")
+    public void generateReport() {
+        System.out.println("Generating report at: " + java.time.ZonedDateTime.now());
+    }
+
+    // Runs 10 seconds after startup, then every 30 seconds
+    @Scheduled(initialDelay = 10000, fixedRate = 30000)
+    public void sendStartupNotification() {
+        System.out.println("Running after startup: " + java.time.LocalTime.now());
+    }
+}
+
+🔄 Use Cases
+➤ Sending periodic emails (daily reports, reminders)
+➤ Cleaning up database logs
+➤ Generating reports
+➤ Triggering backup jobs
+➤ Running batch processes
+
+
+🔷 Working with Redis in SpringBootApplication
+➤ Redis is an open-source, in-memory data structure store used as a database, cache, and message broker.
+➤ It supports various data structures such as strings, hashes, lists, sets, and more
+
+install wsl (ubuntu) on windows and then follow below steps:
+🟢 Redis Installation:
+🔗 curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+🔗 echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+
+🔗 sudo apt-get update
+🔗 sudo apt-get install redis
+
+🔗 sudo service redis-server start ----➤ this will start the server for the redis 
+🔗 redis-cli ----➤ this will open the command line interface for redis we can see our port address on this 127.0.0.1:6379(localhost:port)
+
+🔄 Adding Configuration in application.properties file:
+🔗 spring.redis.host=localhost
+🔗 spring.redis.port=6379
+
+🔄 Redis Configuration Class
+package net.engineeringdigest.journalApp.config;
+
+@Configuration
+public class RedisConfig {
+
+    @Bean
+    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        //redisConnectionFactory is used to make connection with the redis server
+        RedisTemplate redisTemplate = new RedisTemplate();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+
+} 
+✅Explanation:
+➤ RedisConnectionFactory: Spring injects this (normally a LettuceConnectionFactory by default in Spring Boot). It contains connection details (host/port/password) and manages connections to Redis nodes.
+➤ RedisTemplate: Spring’s main helper for Redis operations. It exposes opsForValue(), opsForHash(), opsForList(), etc.
+➤ Serializers:
+    ✔️ Redis stores raw bytes. Serializers convert Java objects ↔ bytes.
+    ✔️ StringRedisSerializer encodes/decodes UTF-8 strings. Using it for keys/values/hash entries ensures what you write looks the same in redis-cli.
+➤ Why set all four serializers?
+    ✔️ Keys: readable keys in CLI.
+    ✔️ Values: you want stored JSON strings (not Java binary).
+    ✔️ Hash key/value serializers: useful when using opsForHash() (Map-like structures).
+
+👉 Effect: Your template writes keys and values as plain strings (UTF-8). Good for interoperability with other tools/clients.
+
+🔄 RedisService.java
+Redis Service package net.engineeringdigest.journalApp.service;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@Slf4j
+public class RedisService {
+
+    @Autowired
+    private RedisTemplate redisTemplate;  ------➤ the raw RedisTemplate (no generics). It works but loses compile-time type safety.
+
+    public <T> T getValue(String key, Class<T> entityClass) {
+        try {
+            Object object = redisTemplate.opsForValue().get(key);
+            ObjectMapper mapper = new ObjectMapper();------➤ ObjectMapper is a Java library for reading and writing JSON, stored value (a string containing JSON), convert it to requested entityClass using ObjectMapper.
+            return mapper.readValue(object.toString(), entityClass);
+        } catch (Exception e) {
+            log.error("Exception while getValue ", e);
+            return null;
+        }
+    }
+
+    public void setValue(String key, Object o, Long ttl) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonValue = mapper.writeValueAsString(o);
+            redisTemplate.opsForValue().set(key, jsonValue, ttl, TimeUnit.SECONDS);-----➤ Serialize o to JSON string and call set(key, value, ttl, SECONDS)
+        } catch (Exception e) {
+            log.error("Exception while setValue ", e);
+        }
+    }
+}  
+
+🔄 UserService.java
+@Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private RedisService redisService;
+
+    public WeatherResponse getWeather(String city) {
+        WeatherResponse weatherResponse = redisService.getValue("weather_of_ " +city, WeatherResponse.class);
+        if (weatherResponse != null) {
+            return weatherResponse;
+        } 
+            
+        String finalURL = API.replace("API_KEY", apiKey).replace("CITY", city);
+        ResponseEntity<WeatherResponse> res = restTemplate.exchange(finalURL, HttpMethod.GET, null, WeatherResponse.class);//Deserializing the JSON
+
+// response to the Java object is done automatically by the RestTemplate.
+            WeatherResponse responseBody = res.getBody();
+            if (responseBody != null) {
+                redisService.setValue("weather_of_ " + city, responseBody, 5L * 60);
+            }
+        
+        return weatherResponse;
+    }  
+
+
+========================
+ 🔷 Working with Kafka
+ ========================
+➤ Apache Kafka is a distributed event streaming platform used to:
+    ✔️ Publish (send) and Subscribe (receive) streams of records/events.
+    ✔️ Store streams of data durably.
+    ✔️ Process streams of data in real time.
+➤ Think of Kafka as a message broker — similar to RabbitMQ or ActiveMQ — but much more scalable, fault-tolerant, and high-throughput.
+Kafka is designed to handle data that is constantly being generated and needs to be processed or analyzed in real time.
+
+2️⃣ Real-World Example
+Imagine you have an e-commerce system:
+➤ When an order is placed → event published to Kafka.
+➤  services listen:
+    ✔️ Inventory Service → decreases stock.
+    ✔️ Payment Service → charges the user.
+    ✔️ Notification Service → sends email confirmation.
+
+👉 These services are decoupled and communicate asynchronously via Kafka topics.
+
+3️⃣ Core Kafka Concepts
+| Concept            | Description                                                                        | Analogy                                   |
+| ------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Producer**       | Sends messages (events) to Kafka topics.                                           | Like a publisher.                         |
+| **Consumer**       | Reads messages from Kafka topics.                                                  | Like a subscriber.                        |
+| **Topic**          | A named category/feed where messages are stored.                                   | Like a “channel.”                         |
+| **Partition**      | A topic is split into partitions for parallelism.                                  | Like dividing a queue into parts.         |
+| **Offset**         | Each message in a partition has a unique ID (offset).                              | Like message index number.                |
+| **Broker**         | A Kafka server that stores topics and data.                                        | Like a post office branch.                |
+| **Consumer Group** | Group of consumers sharing the same topic messages.                                | Like team members splitting the workload. |
+| **ZooKeeper**      | Manages Kafka brokers and cluster metadata. *(Now optional in new Kafka versions)* | Like a cluster manager.                   |
+
+🔄 Kafka Connect
+Kafka Connect is a framework provided by Apache Kafka to simplify data integration between Kafka and external systems such as databases, cloud storage, or APIs — without writing custom code.
+
+🔄 Kafka Connect Architecture
+        +-------------------+
+        |    Source System  |
+        | (e.g., MySQL DB)  |
+        +-------------------+
+                  |
+                  |   Source Connector
+                  v
+           +----------------+
+           |   Kafka Topic  |
+           +----------------+
+                  ^
+                  |   Sink Connector
+                  |
+        +-------------------+
+        |  Target System    |
+        | (e.g., Elastic)   |
+        +-------------------+
+
+
+🔄 Kafka Topic:
+➤ Named container for similar events, unique identifier of a topic is its name.
+✅ Example: Student topic will have student related data.
+➤ They are like tables in a database.
+➤ They live insde a broker.
+➤ Producer produce a message into the topic(ultimately to partitions in round robin fashion) or direectly to the partitions. Consumer poll continuously for few message using the topic name.
+
+✔️ Partition:A topic is partitioned and distributed to kafka brokers in round robin fashion to achieve distributed system.
+✔️ Replication Factor: A partition is replicated by this factor and it is replicated in another broker to prevent fault tolerance.
+
+
+🔄 Partitions
+➤ A topic is split into serveral parts which are known as the partitions of the topic.
+➤ Partitions is where actually the message is located inside the topic.
+➤ Therefore, while creating a topic we need to specify the number of partitions (the number is arbitrary and depends on the use case).
+➤ Each partition is an ordered, immutable sequence of messages that is continually appended to—a structured commit log.
+➤ Each message gets stored into partitions with an incremental id known as the offset valu.
+➤ Ordering is there only at partition level(so if data is to be stored in order than do it on same partition).
+➤ Partition continuously grows(offset increases) as new records are produced.
+➤ All the records exist in distributed log file.
+
+🔄 Working of Partitioner
+We can send message with key or without key.
+➤ If we send message without key, the producer will send the message to the partitions in round robin fashion hence, we cannot gurantee the ordering of message as consumer poll the message from all the partitions at the same time.
+➤ If we send message with key, the producer will hash the key and then decide the partition to which the message is to be sent and the ordering will be maintained.
+
+4️⃣ Why Use Kafka?
+✅ High Throughput – Can process millions of events per second.
+✅ Scalable – Add brokers or partitions easily.
+✅ Durable – Data persisted to disk and replicated.
+✅ Fault-Tolerant – If one broker fails, others continue.
+✅ Decoupled Microservices – Producer and consumer are independent.
+
+5️⃣ Kafka Architecture Overview
++-------------+        +----------------+         +----------------+
+|   Producer  | -----> |     Kafka       | ----->  |    Consumer    |
+|  (Publisher)|        |  (Topic, Broker)|         |  (Subscriber)  |
++-------------+        +----------------+         +----------------+
+Topic: "weather_updates"
+    ✔️ Producer: Weather Service publishing updates.
+    ✔️ Consumer: Dashboard Service receiving updates.
+
+
+
+🧰 6️⃣ Spring Boot Kafka Integration 
+Add in pom.xml:
+
+<dependencies>
+    <!-- Spring Boot Kafka -->
+    <dependency>
+        <groupId>org.springframework.kafka</groupId>
+        <artifactId>spring-kafka</artifactId>
+    </dependency>
+</dependencies>
+
+🔄 Step 2: Configure application.properties
+# Kafka broker address (local or remote)
+spring.kafka.bootstrap-servers=localhost:9092
+
+# Producer properties
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+
+# Consumer properties
+spring.kafka.consumer.group-id=my-group
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+🔄 Step 3: Create a Producer (Publisher)
+package com.example.kafka.producer;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class KafkaProducerService {
+
+    private static final String TOPIC = "weather_updates";
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    public void sendMessage(String message) {
+        System.out.println("📤 Sending message: " + message);
+        kafkaTemplate.send(TOPIC, message);
+    }
+}
+
+🔄 Step 4: Create a Consumer (Subscriber)
+package com.example.kafka.consumer;
+
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
+@Service
+public class KafkaConsumerService {
+
+    @KafkaListener(topics = "weather_updates", groupId = "my-group")
+    public void consumeMessage(String message) {
+        System.out.println("📩 Received message: " + message);
+    }
+}
+
+🔄 Step 5: Create Controller to Test
+package com.example.kafka.controller;
+
+import com.example.kafka.producer.KafkaProducerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/kafka")
+public class KafkaController {
+
+    @Autowired
+    private KafkaProducerService producer;
+
+    @GetMapping("/publish/{message}")
+    public String publishMessage(@PathVariable String message) {
+        producer.sendMessage(message);
+        return "Message published successfully: " + message;
+    }
+}
+
+▶️ Step 6: Run Kafka + Zookeeper Locally (Docker Example)
+Create docker-compose.yml:
+version: '3'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+Then run:
+docker-compose up -d
+
+✅ Step 7: Test
+Open browser:
+http://localhost:8080/kafka/publish/HelloKafka
+
+Console output:
+📤 Sending message: HelloKafka
+📩 Received message: HelloKafka
+
+
+🎉 Success! You have a fully working Kafka producer–consumer setup.
+
+🔄 Advanced Concepts
+| Concept                                | Explanation                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------- |
+| **Partitions**                         | Split topic data for scalability; each consumer reads from specific partitions. |
+| **Replication**                        | Kafka keeps multiple copies of data across brokers for fault tolerance.         |
+| **Offset Management**                  | Keeps track of which messages were read by which consumer.                      |
+| **Consumer Groups**                    | Multiple consumers in same group share messages (load-balanced).                |
+| **Dead Letter Topics**                 | Store failed messages for debugging.                                            |
+| **Avro / JSON / Protobuf Serializers** | For structured message formats.                                                 |
+| **Kafka Streams / ksqlDB**             | For processing and aggregating data in real time.                               |
