@@ -481,13 +481,13 @@ However, in real-world projects —
 👉 prefer YAML (.yml) for readability & structure,
 
 🔄 Advantages of YAML over Properties:
-| Feature            | `.properties` | `.yml`                   |
-| ------------------ | ------------- | ------------------------ |
+| Feature            | `.properties` | `.yml`                      |
+| ------------------ | ------------- | ------------------------    |
 | Readability        | ❌ Average     | ✅ Excellent              |
 | Hierarchical Data  | ❌ Complex     | ✅ Natural                |
 | Array/List Support | ❌ Hard        | ✅ Easy                   |
-| Structure          | Flat          | Nested                   |
-| Popularity         | Legacy style  | Modern Spring Boot style |
+| Structure          | Flat          | Nested                      |
+| Popularity         | Legacy style  | Modern Spring Boot style    |
 | Comments           | ✅ Supported   | ✅ Supported (`#`)        |
 
 
@@ -519,3 +519,139 @@ server:
   profiles: prod
 server:
   port: 8082
+
+
+🔷 Spring MVC
+Spring MVC (Model-View-Controller) is a web framework within the Spring Framework used to build web applications (both traditional and RESTful).
+
+It follows the MVC design pattern, which separates the application into:
+➤ Model → Data & Business logic
+➤ View → User Interface
+➤ Controller → Request handling
+
+🧠 Goal of Spring MVC
+To separate concerns and make the application flexible, maintainable, and testable.
+
+⚙️ Architecture Overview
+Client (Browser)
+   ↓
+DispatcherServlet  ←── Front Controller
+   ↓
+HandlerMapping
+   ↓
+Controller
+   ↓
+Service / DAO / Model
+   ↓
+ViewResolver
+   ↓
+View (HTML / JSP / Thymeleaf / JSON)
+   ↓
+Response to Client
+
+1️⃣ Client sends request
+➤ A user makes a request (e.g., /patients).
+➤ The request first reaches the DispatcherServlet, the Front Controller.
+
+2️⃣ DispatcherServlet
+➤ It’s the central controller of the Spring MVC framework.
+➤ It delegates the request to appropriate components.
+➤ Defined in web.xml or automatically configured in Spring Boot.
+
+3️⃣ HandlerMapping
+➤ Determines which controller should handle the incoming request.
+➤ Uses annotations like @RequestMapping, @GetMapping, etc.
+
+4️⃣ Controller
+Contains request-handling methods (business logic triggers).
+
+✅ Example:
+
+@Controller
+public class PatientController {
+
+    @GetMapping("/patients")
+    public String getPatients(Model model) {
+        List<Patient> list = patientService.getAllPatients();
+        model.addAttribute("patients", list);
+        return "patientsView"; // logical view name
+    }
+}
+
+5️⃣ Model
+➤ Represents data that will be displayed in the view.
+➤ Often filled by the controller (via Model, ModelMap, or ModelAndView).
+
+6️⃣ ViewResolver
+Resolves the logical view name (like "patientsView") to an actual view (e.g., patientsView.jsp or patients.html).
+
+✅ Common examples:
+InternalResourceViewResolver → JSP
+ThymeleafViewResolver → HTML template
+
+7️⃣ View
+➤ The actual UI component (e.g., JSP, Thymeleaf, React frontend, etc.)
+➤ Displays the model data and sends the final HTML (or JSON) to the browser.
+
+8️⃣ Response to Client
+The generated view is returned to the DispatcherServlet, which sends it back as an HTTP response.
+
+🌟 Client can send data to server in three ways:
+1️⃣ Query Parameters (?key=value)
+➤ Data is sent in the URL after a ?, as key-value pairs.
+➤ Often used for filtering, searching, or optional parameters.
+ 
+✅ Example URL:
+GET /patients?age=30&gender=male
+
+✅ Example:
+@GetMapping("/patients")
+public List<Patient> getPatients(
+        @RequestParam int age,
+        @RequestParam String gender) {
+    return patientService.getByAgeAndGender(age, gender);
+}
+➤ Use @RequestParam annotation.
+➤ Works only with GET or DELETE (not ideal for POST).
+➤ Data visible in URL (less secure).
+➤ Great for filtering/sorting/pagination.
+
+2️⃣ Path Parameters (Dynamic Part of URL)
+➤ Data is part of the URI path itself.
+➤ Used to identify a specific resource.
+
+✅ Example URL:
+GET /patients/101
+
+✅ Example:
+@GetMapping("/patients/{id}")
+public Patient getPatientById(@PathVariable Long id) {
+    return patientService.getPatient(id);
+}
+➤ Use @PathVariable annotation.
+➤ Used for resource identification (like ID, username, etc.).
+➤ RESTful & clean URLs.
+➤ More semantic than query params for IDs.
+
+3️⃣ Request Body
+➤ Data is sent inside the HTTP request body, not in the URL.
+➤ Used to send complex objects, JSON, or large data (e.g., user info, forms).
+
+✅ Example Request:
+POST /patients
+Content-Type: application/json
+{
+  "name": "Ankur Verma",
+  "age": 25,
+  "gender": "Male"
+}
+
+✅ Example:
+@PostMapping("/patients")
+public Patient createPatient(@RequestBody Patient patient) {
+    return patientService.save(patient);
+}
+➤ Use @RequestBody annotation.
+➤ Works with POST, PUT, PATCH.
+➤ Ideal for sending JSON/XML payloads.
+➤ Must set appropriate Content-Type (e.g., application/json).

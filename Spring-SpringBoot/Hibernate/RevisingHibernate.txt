@@ -125,6 +125,31 @@ public class Insurance {
     private Patient patient; //this is the inverse side
 }
 
+🔷 Timestamping in Data JPA
+These are the two annotations used to automatically add creation and update timestamps to your entities:
+
+🔗 @CreationTimestamp
+➤ Automatically sets the current timestamp when the entity is first persisted (inserted).
+➤ It’s set only once, when the record is created.
+➤ Commonly used for fields like createdAt, createdDate, or registeredOn
+
+if we want to prevent the updation of the createdAt field, we can use @Column(updatable = false)
+
+👉  When you save a new User, Hibernate automatically fills createdAt with the current time.
+
+🔗 @UpdateTimestamp
+➤ Automatically updates the timestamp whenever the entity is updated (i.e., on UPDATE operation).
+➤ Commonly used for fields like updatedAt, lastModified, or lastUpdatedOn.
+
+if we want to prevent the insertion of the updatedAt field at the time of creation of record, we can use @Column(insertable = false)
+
+👉 When you modify any field in the User and save/update it, Hibernate automatically updates updatedAt to the current time.
+
+🔄 Behind the Scenes
+➤ These are Hibernate-only annotations (not part of pure JPA).
+➤ Hibernate injects the timestamp values before persisting or updating.
+➤ No need to manually set createdAt or updatedAt in code.
+
 🔄 OneToOne Mapping
 1️⃣ One Patient has exactly one Insurance, and one Insurance belongs to exactly one Patient.
 
@@ -212,16 +237,15 @@ public class Appointment{
      @ManyToOne
     @JoinColumn(name="doctor_id", nullable = false)
     private Doctor doctor;
-
 }
 
 🔄 ManyToOne Mapping(Appointment <-> Patient)
 | Aspect                          | Explanation                                                                                                                         |
 |Entities Involved                    | `Appointment` (many) ↔ `Patient(one)                                                                                            |
 | Meaning                         | A single patient can have multiple appointments, but each appointment belongs to exactly one patient.                               |
-| Owning Side                     | `Appointment` is the **owning side** because it contains the foreign key column `patient_id`.                                       |
+| Owning Side                     | `Appointment` is the owning side because it contains the foreign key column `patient_id`.                                       |
 |Foreign Key              | The `@JoinColumn(name="patient_id")` annotation creates a foreign key in the `appointment` table that references the `patient` table’s `id` |
-| Nullable = false                | Ensures that every appointment **must have an associated patient** — an appointment cannot exist without a patient.                 |
+| Nullable = false                | Ensures that every appointment must have an associated patient — an appointment cannot exist without a patient.                 |
 |Inverse Relationship(Optional)| Patient`class, define the reverse mapping using `@OneToMany(mappedBy = "patient")` if we want to access all appointments of a patient  |
 | Database Table Structure        | The `appointment` table will have columns like `id`, `appointment_time`, `reason`, and `patient_id` (FK referencing `patient.id`).  |
 | Example    | Patient “John” can have appointments like “General Checkup” and “Follow-up Visit”. Both appointments will have the same `patient_id` (John’s ID).        |
@@ -269,15 +293,15 @@ public class Department {
 
 🔷 @ManyToMany Mapping (Department ↔ Doctor)
 | Aspect                       | Explanation                                                                                                                          |
-| Entities Involved            | `Department` ↔ `Doctor`                                                                                                              |
+| Entities Involved            | Department` ↔ `Doctor                                                                                                              |
 | Meaning                      | One department can have multiple doctors, and one doctor can work in multiple departments.                                           |
-| Owning Side                  | `Department` is the owning side of the relationship here because it defines the `@JoinTable`.                                        |
-| Join Table Name              | `department_doctor` — acts as a bridge (junction) table that connects both entities.                                                 |
-| joinColumns                  | `@JoinColumn(name = "department_id")` → Represents the foreign key from the Department table.                                        |
-| inverseJoinColumns           | `@JoinColumn(name = "doctor_id")` → Represents the foreign key from the Doctor table.                                                |
-| Data Structure Used          | `Set<Doctor>` — avoids duplicates (no doctor should be added twice to the same department).                                          |
-| Table Structure              | `department_doctor` table will have two columns:• `department_id` (FK referencing Department) • `doctor_id` (FK referencing Doctor)  |
-| Inverse Side                 | In the `Doctor` entity, you can define the reverse mapping as`@ManyToMany(mappedBy = "doctors") private Set<Department> departments;`|
+| Owning Side                  | Department` is the owning side of the relationship here because it defines the `@JoinTable.                                        |
+| Join Table Name              | department_doctor` — acts as a bridge (junction) table that connects both entities.                                                 |
+| joinColumns                  | @JoinColumn(name = "department_id")` → Represents the foreign key from the Department table.                                        |
+| inverseJoinColumns           | @JoinColumn(name = "doctor_id")` → Represents the foreign key from the Doctor table.                                                |
+| Data Structure Used          | Set<Doctor>` — avoids duplicates (no doctor should be added twice to the same department).                                          |
+| Table Structure              | department_doctor` table will have two columns:• `department_id` (FK referencing Department) • `doctor_id` (FK referencing Doctor)  |
+| Inverse Side                 | In the `Doctor` entity, you can define the reverse mapping as`@ManyToMany(mappedBy = "doctors") private Set<Department> departments;|
 | Cascade and Fetch (optional) | You can specify behaviors like `cascade = CascadeType.ALL` or `fetch = FetchType.LAZY` depending on the use case.                    |
 
 
@@ -1034,3 +1058,288 @@ ExampleMatcher matcher = ExampleMatcher.matching()
     .withStringMatcher(StringMatcher.CONTAINING); // Use "contains" matching for string properties
 Example<Patient> example = Example.of(probe, matcher);
 List<Patient> patientsWithMatchingName = patientRepository.findAll(example);                        
+
+
+🧠 Why HQL/JPQL Can’t Perform INSERT Operations
+➤ HQL (Hibernate Query Language) or JPQL (Java Persistence Query Language) is object-oriented, not table-oriented.
+➤ It works with entities, not raw database tables.
+➤ Therefore, HQL doesn’t support INSERT INTO ... VALUES (...) syntax like SQL does.
+➤ Instead, it only allows “INSERT INTO ... SELECT ...” — i.e., inserting data by copying from another entity.
+
+✅ Example (the only valid HQL insert form):
+@Modifying
+@Query("INSERT INTO Patient(name, email, gender, bloodGroup) SELECT p.name, p.email, p.gender, p.bloodGroup FROM OldPatient p")
+void copyPatients();
+
+So your original example ❌
+@Query("INSERT INTO Patient (name, email, gender, bloodGroup) VALUES (:name, :email, :gender, :bloodGroup)")
+👉 fails because HQL doesn’t know how to handle literal VALUES insertions — that’s SQL-only.
+
+✅ What You Should Use Instead
+1️⃣ — Use the Default JPA Repository Method
+Simplest and most idiomatic:
+Patient patient = new Patient(name, email, gender, bloodGroup);
+patientRepository.save(patient);
+
+👉 Works perfectly with HQL, transactions, and entity lifecycle.
+Automatically handles persist/flush operations.
+
+2️⃣ — Use Native SQL Query
+If you really want custom insertion, switch to native SQL:
+
+@Modifying
+@Transactional
+@Query(
+  value = "INSERT INTO patient (name, email, gender, blood_group) VALUES (:name, :email, :gender, :bloodGroup)",
+  nativeQuery = true
+)
+void insertPatient(@Param("name") String name,
+                   @Param("email") String email,
+                   @Param("gender") String gender,
+                   @Param("bloodGroup") String bloodGroup);
+👉 Works fine because native queries are executed directly as SQL, bypassing HQL limitations.
+
+
+🧠 Soft Delete 🆚 Hard Delete
+🔄 Hard Delete
+➤ The record is permanently removed from the database.
+➤ Once deleted, the data cannot be recovered.
+➤ Performed using the standard SQL DELETE statement.
+
+✅ Example:
+userRepository.deleteById(1L);
+
+or in SQL:
+DELETE FROM users WHERE id = 1;
+
+⚡ Effect:
+The row is completely removed from the users table.
+
+⚠️ Disadvantages:
+Lost data cannot be recovered.
+No way to maintain historical records or audit trails.
+
+🔄 Soft Delete
+➤ The record is not physically deleted from the database.
+➤ Instead, it is marked as deleted using a flag/column (e.g., is_deleted = true or deleted_at timestamp).
+➤ The record is ignored in normal queries, but still exists for recovery or auditing.
+
+✅ Example:
+🔗 User.java Entity Class
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String email;
+
+    private boolean isDeleted = false; // 👈 soft delete flag
+}
+
+✔️ Repository method:
+@Modifying
+@Query("UPDATE User u SET u.isDeleted = true WHERE u.id = :id")
+void softDelete(@Param("id") Long id);
+
+✔️ Fetch only active users:
+@Query("SELECT u FROM User u WHERE u.isDeleted = false")
+List<User> findAllActiveUsers();
+
+⚡ Effect:
+Instead of deleting the row, the field is_deleted is updated to true.
+
+🔁 Compairison Table:
+| Feature                  | Hard Delete                 | Soft Delete                     |
+| ------------------------ | --------------------------- | ------------------------------- |
+| Data physically removed? | ✅ Yes                       | ❌ No                            |
+| Can be recovered?        | ❌ No                        | ✅ Yes                           |
+| Query complexity         | Simple                      | Slightly complex (add filter)   |
+| Storage use              | Less                        | More                            |
+| Best for                 | Irrelevant / Temporary data | Critical / Audit-sensitive data |
+
+
+🔄 Advanced Hibernate Trick (Soft Delete Automation)
+➤ Hibernate provides a way to handle this automatically using:
+    ✔️ @SQLDelete → custom delete SQL
+    ✔️ @Where → filter records automatically
+
+✅ Example:
+@Entity
+@SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private boolean isDeleted = false;
+}
+
+
+🧠 Explanation:
+➤ When you call userRepository.delete(user), Hibernate runs the UPDATE query instead of DELETE.
+➤ @Where ensures that all SELECT queries automatically ignore soft-deleted rows.
+
+
+🔷 Custom Primary Key Generation 
+➤ In Hibernate/JPA, you can control how the primary key (ID) is generated for your entity.
+➤ Normally you use:
+🔗 @GeneratedValue(strategy = GenerationType.IDENTITY) → auto-increment
+🔗 GenerationType.SEQUENCE → uses database sequence
+🔗 GenerationType.AUTO → Hibernate decides automatically
+
+➤ But custom generation means:
+➡️ You define your own logic or sequence for generating IDs — not relying on database auto-increment.
+
+🔄 Methods for Custom ID Generation in Hibernate
+
+1️⃣ Using @GenericGenerator (Hibernate-specific)
+This allows you to define your own generator strategy and customize how IDs are formed.
+✅ Example: Custom Prefix + Increment ID
+
+Let’s say you want IDs like:
+EMP_1001, EMP_1002, EMP_1003 ...
+
+🔗 Code Snippet of Entity Class:
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(generator = "custom-id")
+    @GenericGenerator(
+        name = "custom-id",
+        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+        parameters = {
+            @org.hibernate.annotations.Parameter(name = "sequence_name", value = "employee_seq"),
+            @org.hibernate.annotations.Parameter(name = "initial_value", value = "1000"),
+            @org.hibernate.annotations.Parameter(name = "increment_size", value = "1")
+        }
+    )
+    private Long id;
+    private String name;
+}
+👉 This example uses Hibernate’s built-in SequenceStyleGenerator but customizes:
+    ✔️ Sequence name: employee_seq
+    ✔️ Starting value: 1000
+    ✔️ Increment: 1
+➤ This will generate IDs like 1000, 1001, 1002, etc.
+
+🔄 Explanation:
+    ✔️ The parameter sequence_name = "employee_seq" just names the underlying sequence/table, not the prefix of the ID.
+initial_value = "1000" means your IDs start at 1000.
+    ✔️ increment_size = "1" means each new record increases by 1.
+    ✔️ Result = 1000, 1001, 1002, …, not employee_seq_1000.
+
+
+2️⃣ Writing a Custom ID Generator Class
+If you want full control (e.g., prefix + date + counter), you can create your own generator logic by implementing Hibernate’s IdentifierGenerator interface.
+
+✅ Example:
+⚡ Step 1: Create Custom Generator
+import java.io.Serializable;
+import java.util.UUID;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.IdentifierGenerator;
+
+public class CustomIdGenerator implements IdentifierGenerator {
+
+    @Override
+    public Serializable generate(SharedSessionContractImplementor session, Object obj) {
+        // Example: custom ID like EMP-2025-<random>
+        return "EMP-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 4);
+    }
+}
+
+⚡ Step 2: Use it in Entity
+import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(generator = "emp-id-gen")
+    @GenericGenerator(name = "emp-id-gen", strategy = "com.example.generator.CustomIdGenerator")
+    private String id;
+
+    private String name;
+}
+👉 Result:
+EMP-1739778635191-a7b3
+EMP-1739778636234-7c2f
+ 
+🔄 Hibernate Primary Key Generation Strategies and MySQL Compatibility
+| Strategy                       | Description                                                  | Supported in MySQL?   | Notes                                        |
+| IDENTITY                       | Uses MySQL’s auto-increment column                           | ✅ Yes| Most common for MySQL. Each insert gets a new auto ID from DB.|
+| SEQUENCE                       | Uses a database sequence object (like in Oracle/PostgreSQL)  | ❌ No | MySQL not support sequences natively                          |
+| TABLE                          | Uses a separate table to store and increment IDs             | ✅ Yes| Works on any DB, but slower than IDENTITY.                    |
+| AUTO                           | Lets Hibernate choose based on dialect.                      | ✅ Yes| In MySQL, it automatically picks `IDENTITY` under the hood.   |
+| CUSTOM / @GenericGenerator     | Your own logic or UUID generator.                            | ✅ Yes| Works fine — Hibernate handles it internally.                 |
+
+🌟 Note: We cannot use generator to generate value for composite primary key.
+
+🔄 Working with composite Primary Key
+To Generate composite primary key we use @Embeddable and @Embedded annotation.
+@Embeddable annotation is used for creating a separate table for composite primary key.
+
+🔗 AccountPK.java
+@Embeddable
+public class AccountPK implements Serializable{
+    private String accType;
+    private Integer accId;
+    private Long accNum;
+
+    getters and setters...
+}
+
+❓ Why Serializable?
+1️⃣ For Uniquely Identifying Entity Instances
+➤ Hibernate needs to store and compare primary key objects during:
+    ✔️ Entity caching
+    Session management
+    ✔️ Lazy loading
+    ✔️ Entity identity comparison
+
+➤ If your key class is serializable, Hibernate can easily:
+    ✔️ Copy it,
+    ✔️ Send it over the network,
+    ✔️ Store it in 2nd-level cache.
+👉 Without Serializable, Hibernate cannot safely persist or retrieve entities by key.
+
+2️⃣ For Storing Key Objects in Caches
+➤ Hibernate’s first-level (Session) and second-level cache may serialize entity keys.
+➤ That means your key object must be serializable so Hibernate can:
+    ✔️ Save it in memory or file caches,
+    ✔️ Restore it later exactly as it was.
+
+3️⃣ For Distributed Systems or Clustered Environments
+➤ If your app runs on multiple JVMs or uses a distributed cache (like Redis, Ehcache, or Hazelcast), Hibernate serializes entity identifiers to transmit them across nodes.
+➤ So, your composite key (AccountPK) must support serialization to ensure consistency across all nodes.
+
+4️⃣ JPA Specification Requirement
+The JPA specification itself mandates that:
+"An IdClass or an Embeddable class that is used as a composite primary key must be public and must implement Serializable."
+👉 This ensures consistency across all JPA providers (Hibernate, EclipseLink, etc.)
+
+✅  Example of What Happens Internally
+When Hibernate fetches or compares entities:
+Account a1 = session.get(Account.class, new AccountPK("SAVING", 1, 1001L));
+Account a2 = session.get(Account.class, new AccountPK("SAVING", 1, 1001L));
+➤ It internally calls equals() and hashCode() on AccountPK objects.
+➤ If these objects are serializable, Hibernate can also cache and reuse them efficiently.
+
+🔗 Account.java Entity class
+@Entity
+public class Account{
+    @EmbeddedId
+    private AccountPK accountPK;
+
+    private String holderName;
+    private String branch;
+}
+

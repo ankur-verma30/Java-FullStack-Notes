@@ -1,0 +1,207 @@
+
+🔷 SDLC in Traditional 🆚 Agile
+| Aspect               | Traditional SDLC (outdated) (Waterfall)                                    | Agile SDLC                                                       |
+| Approach    | Sequential (phases: Requirement→Design→Implementation→Testing→Deployment→Maintenance)|Iterative & Incremental (short cycles called sprints/iterations) |
+| Flexibility          | Low — changes are difficult                                                | High — welcomes changes even late in the cycle                   |
+| Delivery             | At the end of project                                                      | Continuous delivery of working software in each sprint           |
+| Customer Involvement | Limited — mostly at requirement phase                                      | High — continuous collaboration and feedback                     |
+| Testing            | After development                                                            | Integrated throughout the sprint                                 |
+
+
+🔷 Agile SDLC Phases
+Agile adapts the SDLC to be iterative and flexible, but the phases are still there, just continuous and overlapping:
+
+1️⃣ Requirement Gathering & Analysis
+➤ Done in a lightweight way.
+➤ Requirements are captured as user stories in the Product Backlog.
+➤ Prioritized based on business value.
+➤ Continuous refinement via backlog grooming.
+
+2️⃣ Planning
+➤ Sprint Planning sets the goals for the upcoming iteration (usually 2–4 weeks).
+➤ Team estimates tasks using story points.
+➤ Determines what backlog items can be completed in the sprint.
+
+3️⃣ Design(SRS - System Requirements Specification)
+➤ Incremental design — only what’s needed for the sprint.
+➤ Often collaborative and flexible; evolves over time.
+➤ Focus on simple design that supports quick iterations.
+
+4️⃣ Development / Implementation
+➤ Actual coding happens in short sprints.
+➤ Frequent integrations to ensure working software.
+➤ Practices like pair programming, TDD may be used (Extreme Programming influence).
+
+5️⃣ Testing / Quality Assurance
+➤ Continuous testing is integrated into development.
+➤ Automated tests & regression tests run frequently.
+➤ Feedback from QA team or Product Owner is immediate.
+
+6️⃣ Review / Sprint Review
+➤ Completed features are demonstrated to stakeholders.
+➤ Feedback is collected to refine next sprint planning.
+
+7️⃣ Deployment / Delivery
+➤ Working software can be delivered at the end of each sprint.
+➤ Supports continuous integration & continuous delivery (CI/CD).
+
+8️⃣ Maintenance / Retrospective/ SLA( Service Line Agreement)
+➤ Continuous improvement via Sprint Retrospective.
+➤ Bugs, performance issues, and enhancements are added back to the backlog.
+
+🔷 Key Agile SDLC Characteristics
+✔️ Iterative & Incremental: SDLC is a loop of planning → developing → testing → reviewing → adapting.
+✔️ Customer-centric: Continuous feedback influences every phase.
+✔️ Flexible Design & Requirements: Changes don’t break the cycle; they are embraced.
+✔️ Integrated Testing: No separate QA phase at the end — testing is continuous.
+✔️ Rapid Delivery: Small, functional releases every sprint.
+
+🔹 Visual Representation (Agile SDLC Loop)
+Backlog → Sprint Planning → Development → Testing → Review → Deployment → Retrospective → Backlog (refined)
+
+👉 This loop repeats until the product is complete.
+👉 Each sprint produces potentially shippable working software.
+
+
+🧠 Core Agile Terms
+1️⃣ Agile
+A mindset and methodology focused on iterative development, customer collaboration, and flexibility in responding to change.
+
+2️⃣ Iteration / Sprint
+➤ A time-boxed period (usually 1–4 weeks) during which a specific set of work (user stories) is completed and made ready for review.
+➤ Commonly used term in Scrum = Sprint.
+
+3️⃣ User Story
+➤ A short, simple description of a feature told from the user's perspective.
+✅ Example: “As a user, I want to reset my password so that I can access my account if I forget it.”
+➤ Stored in the Product Backlog.
+
+4️⃣ Epic
+➤ A large user story that can be broken down into smaller stories.
+✅Example: “User Account Management” → can be divided into login, logout, registration, etc.
+
+5️⃣ Product Backlog
+➤ A prioritized list of features, enhancements, bugs, and technical tasks maintained by the Product Owner.
+➤ It’s dynamic — evolves as new requirements appear.
+
+6️⃣ Sprint Backlog
+➤ The list of items the team commits to complete during a specific sprint.
+➤ Derived from the product backlog during Sprint Planning.
+
+7️⃣ Product Owner (PO)
+➤ Represents the customer/business side.
+➤ Defines and prioritizes backlog items to maximize product value.
+
+8️⃣ Scrum Master
+➤ The process coach who ensures Scrum rules are followed.
+➤ Removes impediments, facilitates ceremonies, and supports the team.
+
+9️⃣ Development Team
+Cross-functional team (developers, testers, designers) responsible for delivering potentially shippable increments at the end of each sprint.
+
+1️⃣0️⃣ Increment
+➤ The working software or usable output delivered at the end of each sprint.
+➤ Must meet the Definition of Done (DoD).
+
+1️⃣1️⃣ Definition of Done (DoD)
+➤ A clear checklist of what “done” means.
+✅Example: “Code implemented, reviewed, tested, and deployed to staging.”
+
+1️⃣2️⃣ Definition of Ready (DoR)
+A checklist that ensures a backlog item is ready to be worked on.
+✅Example: “Acceptance criteria defined, dependencies cleared.”
+
+1️⃣3️⃣ Sprint Planning
+A meeting at the start of each sprint to decide what items will be completed and how they’ll be achieved.
+
+1️⃣4️⃣ Daily Scrum (Daily Stand-Up)
+➤ A 15-minute meeting for the team to sync up on progress.
+Each member answers:
+❓ What did I do yesterday?
+❓ What will I do today?
+❓ Are there any blockers?
+
+1️⃣5️⃣ Sprint Review
+Meeting held at the end of the sprint to demonstrate the completed work to stakeholders and collect feedback.
+
+1️⃣6️⃣ Sprint Retrospective
+A meeting after the sprint review for the team to reflect and improve processes.
+✅Example questions:
+❓ What went well?
+❓ What didn’t go well?
+❓ What can we improve?
+
+1️⃣7️⃣ Velocity
+➤ The measure of work completed per sprint, usually in story points.
+➤ Helps in predicting how much work can be taken in future sprints.
+
+1️⃣8️⃣ Story Points
+➤ A relative measure of effort/complexity of a user story.
+➤ Estimated using Planning Poker or Fibonacci sequence ( 1, 2, 3, 5, 8, 13...).
+
+1️⃣9️⃣ Burndown Chart
+➤ A graph showing remaining work vs time in a sprint.
+➤ Helps track progress toward sprint completion.
+
+2️⃣0️⃣ Burnup Chart
+Tracks work completed over time toward the project goal.
+
+2️⃣1️⃣ Backlog Refinement (Grooming)
+A continuous activity where the team reviews and refines backlog items to ensure they are well understood, estimated, and prioritized.
+
+2️⃣2️⃣ Impediment / Blocker
+Any obstacle preventing the team from achieving sprint goals.
+The Scrum Master is responsible for removing it.
+
+2️⃣3️⃣ Spike
+A time-boxed research task used to gain knowledge or explore uncertainty before implementing a feature.
+✅ Example: “Research a suitable API for payment integration.”
+
+2️⃣4️⃣ Minimum Viable Product (MVP)
+The smallest version of a product that delivers value and gathers feedback for improvement.
+
+2️⃣5️⃣ Incremental Development
+Building the product in small increments, adding functionality step-by-step.
+
+2️⃣6️⃣ Continuous Integration (CI)
+Frequently merging code changes into a shared repository and automatically testing to catch issues early.
+
+2️⃣7️⃣ Continuous Delivery (CD)
+Automating the release process to deploy code to production frequently and reliably.
+
+2️⃣8️⃣ Kanban
+➤ A visual workflow management system (To Do → In Progress → Done).
+➤ Focuses on continuous flow, not time-boxed sprints.
+
+2️⃣9️⃣ Work In Progress (WIP) Limit
+The maximum number of tasks allowed in a given column (In Progress) at once — prevents overload and improves focus.
+
+3️⃣0️⃣ Agile Coach
+A mentor who helps organizations adopt and improve Agile practices across multiple teams.
+
+3️⃣1️⃣ Scrum of Scrums
+A scaled Scrum meeting where representatives from multiple teams coordinate dependencies and progress.
+
+3️⃣2️⃣ Release Planning
+A higher-level planning activity that groups multiple sprints to deliver a product version or major feature.
+
+3️⃣3️⃣ Acceptance Criteria
+The conditions that must be met for a user story to be accepted as complete by the Product Owner.
+
+3️⃣4️⃣ Timeboxing
+Allocating a fixed maximum time for an activity (e.g., sprint = 2 weeks, daily stand-up = 15 mins).
+
+3️⃣5️⃣ Lead Time / Cycle Time
+➤ Lead Time: Time from when a request is made → delivered.
+➤ Cycle Time: Time from when work starts → delivered.
+
+
+🔷 Jira
+Jira is a project management and issue-tracking tool developed by Atlassian, widely used in Agile and Scrum environments for managing software development projects.
+
+🔄 Jira Is Used For
+➤ Managing Agile projects (Scrum / Kanban boards)
+➤ Tracking tasks, bugs, stories, and epics
+➤ Planning sprints and releases
+➤ Visualizing progress using boards and reports
+➤ Enabling team collaboration and transparency

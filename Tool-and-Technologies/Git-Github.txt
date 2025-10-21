@@ -3,7 +3,7 @@
 ➤ VCS (Version Control System): Manages changes, tracks history, allows rollbacks, and enables collaboration.
 ➤ DVCS vs CVCS:
     ✔️ DVCS → Each developer has a full copy of the repo (with complete history).
-    ✔️ CVCS → Single central repository, developers depend on it for history.
+    ✔️ CVCS → Single central repository, developers depend on it for history.git
 
 🔄 What is a Repository?
 ➤ A repository is a storage location for source code + history.
@@ -74,6 +74,7 @@ git switch and git restore were introduced to make it cleaner.
 
 📌 File Operations
 🔗 git checkout fileName → Discard uncommitted changes in specific file (irreversible).
+If you have committed the file and then again you do some changes and then use git checkout filename then it will revert the changes to the last commit state.
 🔗 git checkout . → Discard uncommitted changes in all files (irreversible).
 🔗 cat fileName → View file content.
 🔗 cat -n fileName → View file content with line numbers.
