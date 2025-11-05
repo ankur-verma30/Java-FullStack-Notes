@@ -1,0 +1,1050 @@
+🔷 MongoDB
+➤ MongoDB is a NoSQL (non-relational) database
+➤ It stores data in documents instead of tables.
+➤ Each document is a JSON-like object (BSON) — flexible, schema-less, and easy to scale.
+
+
+🆚Difference Between MySQL and MongoDB
+| Feature                | **MySQL (Relational DB)**                      | **MongoDB (Non-relational DB)**                    |
+| ---------------------- | ---------------------------------------------- | -------------------------------------------------- |
+| **Data Format**        | Tables with rows and columns                   | Collections with JSON-like documents               |
+| **Schema**             | Fixed schema (predefined columns)              | Schema-less (fields can vary per document)         |
+| **Joins**              | Supports JOIN operations                       | No JOINs (uses embedding or referencing instead)   |
+| **Scalability**        | Vertical (add more CPU/RAM to one machine)     | Horizontal (add more servers easily)               |
+| **Transactions**       | Strong ACID compliance                         | Supports multi-document transactions (since v4.0)  |
+| **Query Language**     | SQL (Structured Query Language)                | MongoDB Query Language (MQL) – JSON-style queries  |
+| **Data Relationships** | Uses foreign keys                              | Embeds related data within documents               |
+| **Best Use Cases**     | Financial, structured data, strong consistency | Real-time apps, IoT, social media, flexible schema |
+
+🔷 Basic Structural Difference
+🔄 MySQL
+Database → Tables → Rows → Columns
+
+✅ Example:
+
+CREATE TABLE users (
+  id INT PRIMARY KEY,
+  name VARCHAR(50),
+  email VARCHAR(100)
+);
+
+Data:
+| id | name  | email                                     |
+| -- | ----- | ----------------------------------------- |
+| 1  | Ankur | [ankur@gmail.com](mailto:ankur@gmail.com) |
+
+🔄 MongoDB
+Database → Collections → Documents → Fields
+
+✅ Example: JSON format
+{
+  "_id": 1,
+  "name": "Ankur",
+  "email": "ankur@gmail.com"
+}
+
+🔄Structure of MongoDB Database
+MongoDB structure hierarchy:
+MongoDB Server
+    └── Database
+          └── Collection
+                └── Documents
+                      └── Fields (Key-Value pairs)
+
+🔄 JSON to BSON Conversion
+➤ MongoDB internally stores documents in BSON (Binary JSON) — a binary-encoded version of JSON.
+➤ BSON allows:
+    ✔️ More data types (e.g., Date, ObjectId, Decimal128)
+    ✔️ Faster traversal and storage
+    ✔️ Efficient indexing
+
+⚡ To start sevice on MongoDB shell: mongodb://localhost:27017/
+
+
+🔷  Create Database in MongoDB
+🔗 show dbs  →  Display all databases
+🔗 use <database_name> → Switch to a specific database if does not exist it will create one
+🔗 db.collection_name → Create a collection in the current database if does not exist
+
+✅Example db.students.insertOne({
+    "name": "Ankur",
+    "email": "ankur@gmail.com"
+});
+
+🔗 db.collecction_name.find() → Return all documents in a collection
+
+🔄 Update Database
+db.students.updateOne({ "name": "Ankur" }, { $set: {idCards:{hasPanCard:false, hasAadharCard:true}} });
+
+✅ Output: 
+acknowleged: true,
+insertedId: null,
+matchedCount: 1, 
+modifiedCount: 1, 
+upsertedCount: 0
+
+⚡ Max size of a document in MongoDB is 16MB.
+
+🔄 updating many documents at once
+✅ Example:
+db.students.updateMany({},{$set:{hobbies:["Anime","Coding","Cooking"]}});
+✅ Output:
+acknowleged: true,
+insertedId: null,
+matchedCount: 3,
+modifiedCount: 3,
+upsertedCount: 0
+
+🔄 Searching in db
+✅Example: db.students.find({hobbies:"Anime"});  →  Even though hobbies is list of hobbies it will return all the documents having Anime as one of their hobbies
+
+👉 can count also:
+✅Example: db.students.find({hobbies:"Anime"}).count();
+
+🔄 Searching Nested documents
+✅Example: db.students.find({'idCards.hasPanCard':true});
+✅ Output: will give the documents having hasPanCard as true
+ 
+🔷 CRUD Operations in MongoDB
+1️⃣ Create
+    ✔️ insertOne(data, options)
+    ✔️ insertMany(data, options)  → we have to provide an array of documents
+
+✅ Example :
+🔗 db.collection_name.insertOne({
+    "name": "Ankur",
+    "email": "ankur@gmail.com"
+});
+
+🔗 db.collection_name.insertMany([
+    {
+        "name": "Ankur",
+        "email": "ankur@gmail.com"
+    },
+    {
+        "name": "Ankur",
+        "email": "ankur@gmail.com"
+    }
+]);
+
+2️⃣ Read
+    ✔️ find(filter, options)
+    ✔️ findOne(filter, options)
+    ✔️ count(filter, options)
+
+✅Example:
+🔗 db.collection.find({name:"Ankur"}); return a list or pointer  on which/ through which  we can iterate on the result, if not found does not return anything
+So we can do something like db.students.find().forEach((x)=>{}) --> similar to JavaScript
+🔗 db.collection.findOne({name:"Ankur"}); return single document if not found return null 
+🔗 db.collection.find({name:"Ankur"}).count();
+
+🔄 Conditional Searching:
+✅Example:
+🔗 db.collection.find({age:{$lte:12}});
+🔗 db.collection.find({age:{$gte:12}});
+🔗 db.collection.find({age:{$lt:12}});
+🔗 db.collection.find({age:{$gt:12}});
+
+
+3️⃣ Update
+    ✔️ updateOne(filter, updateData, options)
+    ✔️ updateMany(filter, updateData, options)
+    ✔️ replaceOne(filter, updateData, options)
+✅Example:
+🔗 db.students.updateOne({ "name": "Ankur" }, { $set: {idCards:{hasPanCard:false, hasAadharCard:true}} });
+
+🔗 db.students.updateMany({},{$set:{hobbies:["Anime","Coding","Cooking"]}});
+
+4️⃣ Delete
+    ✔️ deleteOne(filter, options)
+    ✔️ deleteMany(filter, options)
+
+✅Example:
+🔗 db.collection.deleteOne({name:"Ankur"});
+🔗 db.collection.deleteMany({name:"Ankur"});
+
+🔗 db.collecti on.deleteMany({}); → delete all the documents in a collection
+
+🔷 Select Column query (Projection in MongoDB)
+✅Example:
+🔗 db.collection.find({},{name:1,email:1}); → will return only name and email columns
+🔗 db.collection.find({},{name:1}); → will return only name column 
+Returns only the required field along with the id as id is a default field and always inclusive
+
+🔷 Is MongoDB Schemaless ❓
+✅ MongoDB is Schema-less by Nature
+But ⚠️ not schema-free in practice.
+
+➤ MongoDB does not require you to define a fixed schema (like MySQL tables do).
+➤ You can insert documents with different fields into the same collection.
+
+✅ Example:
+🔗 db.students.insertOne({ name: "Ankur", age: 22 });
+🔗 db.students.insertOne({ name: "Riya", branch: "IT", city: "Delhi" });
+
+✅ Both documents are valid — even though their fields are different.
+That’s why MongoDB is often called schema-less.
+
+🧩 However — It Can Have a Schema
+MongoDB allows optional schema validation using JSON Schema Validators.
+You can enforce structure if your application needs it.
+
+✅ Example:
+🔗 db.createCollection("students", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "age"],
+      properties: {
+        name: { bsonType: "string" },
+        age: { bsonType: "int" }
+      }
+    }
+  }
+});
+
+Now MongoDB will reject documents that don’t follow this schema.
+
+🔄 Schema-less vs Schema-enforced
+| Aspect                | Description                                              |
+| --------------------- | -------------------------------------------------------- |
+| **Default behavior**  | Schema-less (no enforced structure)                      |
+| **Possible behavior** | Schema-enforced (using validators or ORMs like Mongoose) |
+| **Developer control** | You decide whether to enforce or keep it flexible        |
+
+🔷 Common MongoDB Data Types
+| **Data Type**                  | **Description**                                    | **Example**                                       |
+| ------------------------------ | -------------------------------------------------- | ------------------------------------------------- |
+| **String**                     | Stores text data                                   | `{ name: "Ankur" }`                               |
+| **Number / Int32**             | 32-bit integer                                     | `{ age: 22 }`                                     |
+| **Long / Int64**               | 64-bit integer (for large values)                  | `{ phone: NumberLong(9876543210) }`               |
+| **Double**                     | 64-bit floating point                              | `{ marks: 88.5 }`                                 |
+| **Decimal128**                 | High-precision decimal (for financial data)        | `{ amount: NumberDecimal("1234.5678") }`          |
+| **Boolean**                    | True/False values                                  | `{ isActive: true }`                              |
+| **Date**                       | Stores date and time (in UTC)                      | `{ joinedAt: new Date() }`                        |
+| **Timestamp**                  | Internal timestamp for operations                  | `{ createdAt: new Timestamp() }`                      |
+| **ObjectId**                   | Unique 12-byte ID automatically created by MongoDB | `{ _id: ObjectId("64a0b2f4c2...") }`              |
+| **Array**                      | Stores list of values                              | `{ skills: ["JavaScript", "Node.js"] }`           |
+| **Object / Embedded Document** | Nested document inside another                     | `{ address: { city: "Delhi", pincode: 110001 } }` |
+| **Binary Data**                | Stores binary (e.g., image, file)                  | `{ file: BinData(0, "base64string") }`            |
+| **Null**                       | Represents null or missing value                   | `{ middleName: null }`                            |
+| **Regular Expression**         | For pattern matching                               | `{ name: /Ank/i }`                                |
+| **JavaScript (Code)**          | Stores JavaScript code snippets                    | `{ calc: function() { return 5 + 2 } }`           |
+| **MinKey / MaxKey**            | Used for comparison operations                     | `{ value: MinKey }`                               |
+
+🔄 Numeric Type Details
+| Type             | Size     | Range              | Usage                      |
+| ---------------- | -------- | ------------------ | -------------------------- |
+| **Int32**        | 4 bytes  | −2³¹ to 2³¹−1      | Regular integers           |
+| **Int64 (Long)** | 8 bytes  | Very large numbers | Timestamps, large counters |
+| **Double**       | 8 bytes  | IEEE 754 standard  | Decimal values             |
+| **Decimal128**   | 16 bytes | High precision     | Finance, currency          |
+
+⚡ can use typeof to check the datatype of a field
+🔗 typeof db.companyData.findOne().name
+
+
+🔷 Delete Database in MongoDB
+🔗 db.dropDatabase(); delete the whole database along with all the collections present inside it
+🔗 dp.products.drop(); delete only the products collection
+
+
+🔷 Ordered Options in insert Commmand
+When you insert multiple documents at once in MongoDB (using insertMany() or insert()),
+you can control whether MongoDB stops on the first error or continues inserting the rest.
+
+🔄 🔄 Syntax:
+db.collection.insertMany(
+  [ <document1>, <document2>, ... ],
+  { ordered: <boolean> }
+)
+
+🔄 Option Explanation
+| Option                        | Behavior                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| **`ordered: true` (default)** | Stops inserting when the **first error** occurs (e.g., duplicate `_id`). |
+| **`ordered: false`**          | Continues inserting the remaining documents even if one fails.           |
+
+✅ Example 1: Ordered = true (Default)
+🔗 db.students.insertMany(
+  [
+    { _id: 1, name: "Ankur" },
+    { _id: 2, name: "Riya" },
+    { _id: 1, name: "Sohan" }  // duplicate _id
+  ],
+  { ordered: true }
+);
+
+🔄 Result:
+➤ MongoDB inserts {_id:1} and {_id:2} successfully.
+➤ When it reaches the duplicate _id:1, it throws an error and stops.
+➤ The third document is not inserted.
+
+✅ Example 2: Ordered = false
+🔗 db.students.insertMany(
+  [
+    { _id: 1, name: "Ankur" },
+    { _id: 2, name: "Riya" },
+    { _id: 1, name: "Sohan" }  // duplicate _id
+  ],
+  { ordered: false }
+);
+
+🔄 Result:
+➤ MongoDB inserts documents with _id:1 and _id:2.
+➤ Encounters an error at the duplicate _id:1, but continues.
+➤ Other valid documents after the error are still inserted successfully.
+
+🔄 Why It Matters
+➤ ordered: true → ensures data integrity (good for critical transactions).
+➤ ordered: false → ensures performance and partial success (useful for bulk inserts where some failures are acceptable).
+
+
+🔷 Schema Validation in MongoDB 
+➤ By default, MongoDB is schema-less — it allows documents with any structure in a collection.
+➤ However, Schema Validation lets you enforce rules or structure on documents using JSON Schema.
+✅ This ensures data consistency and prevents invalid data from being inserted or updated.
+
+🔄 How It Works
+➤ MongoDB uses the $jsonSchema operator inside a validator when creating or modifying a collection.
+➤ You define:
+    ✔️ required fields
+    ✔️ data types (bsonType)
+    ✔️ nested objects and arrays
+    ✔️ constraints like minimum, maximum, pattern, etc.
+
+🔄 Basic Syntax
+🔗 db.createCollection("students", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "age"],
+      properties: {
+        name: { bsonType: "string", description: "must be a string" },
+        age: { bsonType: "int", minimum: 18, description: "must be at least 18" },
+        branch: { bsonType: "string" }
+      }
+    }
+  },
+  validationLevel: "strict",
+  validationAction: "error" or "warn" error is by Default
+});
+
+🔄 Important Options
+| Option                 | Description
+| `validationLevel       | Controls how strictly MongoDB applies validation.
+                           `"strict"` → all inserts and updates are validated. 
+                           `"moderate"` → only newly inserted or modified documents are validated.|
+| `validationAction      | Determines what happens when validation fails.
+                           `"error"` → rejects invalid documents.
+                           `"warn"` → logs a warning but allows insertion.|
+
+Example: Valid vs Invalid Inserts
+✅ Valid Document:
+🔗 db.students.insertOne({ name: "Ankur", age: 22, branch: "IT" });
+
+❌ Invalid Document:
+🔗 db.students.insertOne({ name: "Riya", age: "twenty-two" });
+👉 Error: Document failed validation (because age must be an integer).
+
+🔄 Updating Schema for Existing Collection
+You can add validation to an existing collection using:
+🔗 db.runCommand({
+  collMod: "students", tells which collection you want to modify
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "age"],
+      properties: {
+        name: { bsonType: "string" },
+        age: { bsonType: "int", minimum: 18 }
+      }
+    }
+  },
+  validationLevel: "strict",
+  validationAction: "error"
+});
+
+✅ Example with Nested Object Validation
+🔗 db.createCollection("employees", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "price", "authors],
+      properties: {
+        name: { bsonType: "string" 
+                description: "must be a string" },
+        },
+        price:{
+            bsonType: "int",
+            minimum: 110,
+            description: "must be a positive number"
+        }
+        authors:{
+            bsonType: "array",
+            minItems: 1,
+            items: {
+            bsonType: "object",
+            required: ["firstName", "lastName"],
+            properties: {
+                firstName: { bsonType: "string" },
+                lastName: { bsonType: "string" }
+            }
+        }
+        }
+      }
+    }
+  },
+  validationLevel: "strict",
+  validationAction: "error"
+);
+
+
+🔷 Write Concern in MongoDB
+Write Concern defines how strictly MongoDB acknowledges write operations (insert, update, delete) —
+i.e., how many replicas/nodes must confirm the write before the client considers it successful.
+
+It controls data durability and acknowledgment level of a write.
+
+🔄 Why It Matters
+➤ Different write concerns let you trade off between:
+    ✔️ Performance (speed)
+    ✔️ Reliability (data safety)
+➤ If you want fast writes → lower write concern
+➤ If you want guaranteed persistence → higher write concern
+
+🔄 Syntax
+You can set write concern at:
+    ✔️ Collection level
+    ✔️ Database level
+    ✔️ Per operation
+
+✅ Example:
+🔗 db.students.insertOne(
+  { name: "Ankur", age: 22 },
+  { writeConcern: { w: 1 } }
+);
+
+🔄 Write Concern Parameters
+| Option         | Description                                                       |
+| -------------- | ----------------------------------------------------------------- |
+| **`w`**        | The number of nodes that must acknowledge the write.              |
+| **`j`**        | If `true`, the write must be committed to the **journal** (disk). |
+| **`wtimeout`** | Maximum time (ms) to wait for acknowledgment before timing out.   |
+
+🔄 Values for w Parameter
+| Value          | Meaning                                             | Durability             |
+| -------------- | --------------------------------------------------- | ---------------------- |
+| **0**          | Fire-and-forget (no acknowledgment)                 | ⚡ Fastest, ❌ Unsafe    |
+| **1**          | Acknowledged by **primary** only                    | ✅ Safe enough for most |
+| **majority**   | Acknowledged by **majority of replica set members** | 🔒 Most reliable       |
+| **n** (number) | Acknowledged by **n nodes**                         | Depends on setup       |
+
+✅ Examples:
+🔄 Fire-and-forget (w:0)
+db.logs.insertOne(
+  { msg: "test log" },
+  { writeConcern: { w: 0 } }
+);
+👉MongoDB does not wait for acknowledgment. Fast, but risky.
+
+🔄 Acknowledged by Primary (w:1)
+db.users.insertOne(
+  { name: "Ankur" },
+  { writeConcern: { w: 1 } }
+);
+👉MongoDB waits for the primary to confirm the write.
+
+🔄 Majority Acknowledgment
+db.orders.insertOne(
+  { item: "Laptop", qty: 2 },
+  { writeConcern: { w: "majority", j: true, wtimeout: 5000 } }
+);
+👉MongoDB waits until the write is:
+    ✔️ replicated to the majority of nodes
+    ✔️ written to the journal
+    ✔️ within 5 seconds timeout
+
+⚡ Default Write Concern
+➤ Default is usually { w: 1 } (acknowledged by primary).
+➤ Can be configured at the replica set or database level.
+
+⚡ Atomicity is achieved at document level in mongodb
+
+
+🔷 MongoImport in MongoDB
+➤ mongoimport is a command-line tool used to import data into a MongoDB collection from files like JSON, CSV, or TSV.
+➤ It helps you load bulk data into MongoDB — for example, from external systems, backups, or exported datasets.
+
+🔄 Syntax
+mongoimport --db <database> --collection <collection> --file <path-to-file> [options]
+
+✅ Example Commands
+1️⃣ Import a JSON file
+mongoimport --db school --collection students --file students.json --jsonArray
+
+    ✔️ --db school → Database name
+    ✔️ --collection students → Collection name
+    ✔️ --file students.json → Input file path
+    ✔️ --jsonArray → Indicates that the JSON file contains an array of documents
+
+2️⃣ Import a CSV file
+mongoimport --db school --collection students --type csv --headerline --file students.csv
+    ✔️ --type csv → File type is CSV
+    ✔️ --headerline → Uses first line of file as field names
+    ✔️ --file students.csv → Input file path
+
+🔄 Useful Options
+| Option         | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| `--db`         | Specifies the database name                               |
+| `--collection` | Target collection name                                    |
+| `--file`       | Input data file path                                      |
+| `--jsonArray`  | Treats JSON as an array of documents                      |
+| `--type`       | Type of file (`json`, `csv`, `tsv`)                       |
+| `--drop`       | Drops the collection before importing new data            |
+| `--upsert`     | Updates existing docs if `_id` matches, else inserts      |
+| `--uri`        | Allows importing to a remote MongoDB using connection URI |
+   
+✅ Example: Using URI and Drop
+mongoimport --uri "mongodb+srv://ankur:password@cluster.mongodb.net/school" \
+--collection students --drop --file students.json --jsonArray
+👉 Drops the existing students collection and imports fresh data from students.json.
+
+🔷 Comparison Operator 
+| Operator | Description                | Example                            |
+| -------- | -------------------------- | ---------------------------------- |
+| `$eq`    | Equal to                   | `{ age: { $eq: 25 } }` → age = 25  |
+| `$ne`    | Not equal to               | `{ age: { $ne: 25 } }` → age ≠ 25  |
+| `$gt`    | Greater than               | `{ age: { $gt: 25 } }` → age > 25  |
+| `$gte`   | Greater than or equal to   | `{ age: { $gte: 25 } }` → age ≥ 25 |
+| `$lt`    | Less than                  | `{ age: { $lt: 25 } }` → age < 25  |
+| `$lte`   | Less than or equal to      | `{ age: { $lte: 25 } }` → age ≤ 25 |
+| `$in`    | Matches any value in array | `{ age: { $in: [20, 25, 30] } }`   |
+| `$nin`   | Not in array               | `{ age: { $nin: [20, 25, 30] } }`  |
+
+✅ Example Query
+1️⃣ Find all students with marks greater than 80:
+🔗 db.students.find({ marks: { $gt: 80 } })
+
+2️⃣ Find students whose city is either "Delhi" or "Mumbai":
+🔗 db.students.find({ city: { $in: ["Delhi", "Mumbai"] } })
+
+3️⃣ Find students whose age is not equal to 18:
+🔗 db.students.find({ age: { $ne: 18 } })
+
+🔷 Logical Operator
+| Operator | Description                    | Example                                      |
+| -------- | ------------------------------ | -------------------------------------------- |
+| `$and`   | Matches all conditions         | `{ $and: [{ age: 20 }, { city: "Delhi" }] }` |
+| `$or`    | Matches any condition          | `{ $or: [{ age: 20 }, { city: "Delhi" }] }`  |
+| `$not`   | Negates a condition            | `{ marks: { $not: { $gt: 80 } } }`           |
+| `$nor`   | Matches none of the conditions | `{ $nor: [{ age: 20 }, { city: "Delhi" }] }` |
+
+
+🔷 Element Query Operators
+1️⃣ $exists → Checks if a Field Exists
+Returns documents where a specified field exists or not.
+
+🔄 🔄 Syntax:
+{ field: { $exists: <boolean> } }
+
+✅ Example 1:
+Find students who have the field marks:
+db.students.find({ marks: { $exists: true } })
+
+✅ Example 2:
+Find students who don’t have the field email:
+db.students.find({ email: { $exists: false } })
+
+
+2️⃣ $type → Checks the Data Type of a Field
+Returns documents where the field is of the specified BSON type.
+
+🔄 🔄 Syntax:
+{ field: { $type: <BSON type number or alias> } }
+
+✅ Example 1:
+Find documents where age is a number:
+db.students.find({ age: { $type: "number" } })
+
+✅ Example 2:
+Find documents where name is a string:
+db.students.find({ name: { $type: "string" } })
+
+✅ Example 3 (using type code):
+db.students.find({ marks: { $type: 16 } }) // 16 = int
+
+🔄 Common BSON Type Aliases
+| Alias     | Type Code | Description       |
+| --------- | --------- | ----------------- |
+| `double`  | 1         | Floating-point    |
+| `string`  | 2         | String            |
+| `object`  | 3         | Embedded document |
+| `array`   | 4         | Array             |
+| `binData` | 5         | Binary data       |
+| `bool`    | 8         | Boolean           |
+| `date`    | 9         | Date              |
+| `null`    | 10        | Null              |
+| `int`     | 16        | 32-bit integer    |
+| `long`    | 18        | 64-bit integer    |
+| `decimal` | 19        | Decimal128        |
+
+🔷 Evaluation Query Operators
+Evaluation operators are used to perform custom evaluations — such as regular expressions, text search, JavaScript expressions, or mathematical checks — inside queries.
+
+1️⃣ $regex → Pattern Matching (Regular Expression)
+Used to search for a pattern in string fields (similar to LIKE in SQL).
+🔄 Syntax:
+{ field: { $regex: /pattern/, $options: 'i' } }
+
+✅ Examples:
+🔗 db.students.find({ name: { $regex: /^A/ } })       // Starts with A
+🔗 db.students.find({ name: { $regex: /verma/i } })   // Case-insensitive match
+✔️ $options: 'i' → Case insensitive
+✔️ $options: 'm' → Multiline match
+
+
+2️⃣ $expr → Use Aggregation Expressions in Queries
+Allows using aggregation expressions (like $add, $gt, $eq, etc.) directly in the find() query.
+
+✅ Example:
+🔗 db.students.find({
+  $expr: { $gt: ["$marks", "$attendance"] }
+})
+➡️ Finds documents where marks > attendance.
+
+
+3️⃣ $mod → Modulus (Remainder) Condition
+Selects documents where the field value divided by a divisor has a specific remainder.
+🔄 Syntax:
+{ field: { $mod: [divisor, remainder] } }
+
+✅ Example:
+🔗 db.students.find({ rollNo: { $mod: [2, 0] } })
+➡️ Finds students with even roll numbers.
+
+
+4️⃣ $text → Full-Text Search
+Searches text content in fields that have a text index.
+
+✔️ Create a text index first:
+🔗 db.articles.createIndex({ content: "text" })
+
+✔️ Search for documents:
+🔗 db.articles.find({ $text: { $search: "mongodb" } })
+
+✔️ Advanced options:
+🔗 db.articles.find({ $text: { $search: "mongodb database" } })
+🔗 db.articles.find({ $text: { $search: "\"exact phrase\"" } })
+
+
+5️⃣ $where → JavaScript Expression Evaluation (⚠️ Slow)
+Allows using a custom JavaScript condition for complex logic.
+
+✅ Example:
+🔗 db.students.find({
+  $where: "this.marks + this.attendance > 150"
+})
+⚠️ Not recommended for production — slower and less secure.
+
+
+🔷 Querying Arrays in MongoDB
+In MongoDB, arrays are first-class data types — you can store, query, and update them directly.
+
+1️⃣ Match Array Exactly
+Matches a document where the array field exactly equals the specified array (order & elements both must match).
+
+🔗 db.students.find({ subjects: ["Math", "Science"] })
+👉 Matches documents with subjects exactly equal to ["Math", "Science"].
+
+
+2️⃣ Match If Array Contains a Specific Value
+Matches if the array contains at least one specified element.
+
+🔗 db.students.find({ subjects: "Math" })
+👉 Finds all students having "Math" in the subjects array.
+
+✅ Example document:
+{ name: "Ankur", subjects: ["Math", "Science", "English"] }
+👉 This will match because "Math" exists inside the array.
+
+
+3️⃣ Using Comparison Operators Inside Arrays
+You can use $gt, $lt, $eq, etc. to match array elements.
+
+🔗 db.students.find({ marks: { $gt: 80 } })
+👉 Matches documents where any element in the marks array is greater than 80.
+
+4️⃣ $all → Match All Values in Array
+Checks if the array contains all specified elements (order doesn’t matter).
+
+🔗 db.students.find({ subjects: { $all: ["Math", "Science"] } })
+👉 Finds students having both "Math" and "Science" in their subjects array.
+
+5️⃣ $elemMatch → Match Based on Multiple Conditions in a Single Element
+Used when an array of objects is present and you want to match conditions on the same element.
+
+✅ Example document:
+{
+  name: "Ankur",
+  scores: [
+    { subject: "Math", marks: 90 },
+    { subject: "Science", marks: 80 }
+  ]
+}
+
+✅ Query:
+🔗 db.students.find({
+  scores: { $elemMatch: { subject: "Math", marks: { $gt: 85 } } }
+})
+👉 Matches if there is at least one element with subject = "Math" and marks > 85.
+
+6️⃣ $size → Match Array Length
+Matches documents based on number of elements in the array.
+
+🔗 db.students.find({ subjects: { $size: 3 } })
+Finds documents where the subjects array has exactly 3 elements.
+
+
+7️⃣ Access Elements by Index
+Use dot notation with index to query a specific element.
+
+🔗 db.students.find({ "marks.0": 100 })
+👉 Finds documents where the first element of marks array is 100.
+
+
+🔷 Sorting in MongoDB
+Sorting in MongoDB is done using the .sort() method, which arranges documents in ascending or descending order based on one or more fields — similar to ORDER BY in SQL.
+
+🔄 Syntax
+🔗 db.collection.find().sort({ field: <order> })
+<order> → 1 for ascending, -1 for descending.
+
+1️⃣ Sort by One Field
+🔗 db.students.find().sort({ age: 1 })
+👉 Sorts students by age in ascending order (smallest → largest).
+
+🔗 db.students.find().sort({ age: -1 })
+👉 Sorts by age in descending order (largest → smallest).
+
+2️⃣ Sort by Multiple Fields
+If two documents have the same value for the first field, MongoDB uses the second field to break the tie.
+
+🔗 db.students.find().sort({ age: 1, name: -1 })
+👉 Sorts first by age ascending, and within the same age, by name descending.
+
+3️⃣ Sort with Limit
+You can combine .sort() with .limit() to get top results.
+
+🔗 db.students.find().sort({ marks: -1 }).limit(5)
+👉 Returns top 5 students with the highest marks.
+
+4️⃣ Sorting in Aggregation
+You can also sort inside an aggregation pipeline using $sort.
+
+🔗 db.students.aggregate([
+  { $sort: { marks: -1, name: 1 } }
+])
+
+5️⃣ Sorting on Embedded Fields
+Use dot notation to sort by a field inside an embedded document.
+
+✅ Example document:
+{ name: "Ankur", address: { city: "Delhi", pincode: 110001 } }
+
+Query:
+🔗 db.students.find().sort({ "address.city": 1 })
+
+
+🔷 Advanced Update Operators in MongoDB
+MongoDB provides several update operators to modify document fields dynamically — without replacing the entire document.
+
+1️⃣ $inc → Increment / Decrement a Field
+Used to increase or decrease numeric values.
+
+🔗 db.students.updateOne(
+  { name: "Ankur" },
+  { $inc: { marks: 10, attendance: -2 } }
+)
+👉 Increases marks by 10 and decreases attendance by 2.
+
+2️⃣ $mul → Multiply a Field
+Used to multiply numeric values.
+
+🔗 db.students.updateOne(
+  { name: "Ankur" },
+  { $mul: { marks: 2, attendance: 2 } }
+)
+👉 Multiplies marks by 2 and attendance by 2.
+
+3️⃣ $min → Update Only if New Value is Smaller
+Replaces the field only if the new value is less than the current one.
+
+🔗 db.students.updateOne(
+  { name: "Ankur" },
+  { $min: { marks: 80 } }
+)
+👉 Updates marks to 80 only if the current marks are greater than 80.
+
+4️⃣ $max → Update Only if New Value is Greater
+Replaces the field only if the new value is greater than the current one.
+
+🔗 db.students.updateOne(
+  { name: "Ankur" },
+  { $max: { marks: 90 } }
+)
+👉 Updates marks to 90 only if the current marks are less than 90.
+
+8️⃣ $unset → Remove a Field
+Deletes a field from the document.
+
+🔗 db.students.updateOne(
+  { name: "Ankur" },
+  { $unset: { address: "" } }
+)
+👉 Removes the address field from the document.
+
+6️⃣ $rename → Rename a Field
+Changes the name of a field.
+
+🔗 db.students.updateOne(
+  { name: "Ankur" },
+  { $rename: { "fullname": "name" } }
+)
+👉 Renames field fullname to name.
+
+7️⃣ Upsert → Insert if Document Doesn’t Exist
+If no matching document is found, MongoDB creates a new one instead of skipping the update.
+
+🔄 Syntax:
+🔗 db.students.updateOne(
+  { name: "Rohit" },
+  { $set: { marks: 80, city: "Delhi" } },
+  { upsert: true }
+)
+👉 If Rohit exists → updates it.
+👉 If not → inserts a new document with those fields.
+
+🔷 Update Nested Arrays
+🔄 Sample document
+{
+  _id: 1,
+  name: "Ankur",
+  comments: [
+    { id: 1, text: "great", likes: 2 },
+    { id: 2, text: "nice", likes: 5 }
+  ],
+  tags: ["mongodb", "db"],
+  scores: [10, 20, 30]
+}
+
+1️⃣ $push — add an element (or many) to an array
+Basic:
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  { $push: { tags: "database" } }
+);
+
+Add multiple elements with ordering/slicing:
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  {
+    $push: {
+      tags: {
+        $each: ["ops", "nosql"],
+        $position: 0,     // insert at start
+        $slice: -5,       // keep last 5 elements
+        $sort: 1          // sort elements after insertion (1 asc, -1 desc)
+      }
+    }
+  }
+);
+
+2️⃣ $addToSet — add only if not already present (no duplicates)
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  { $addToSet: { tags: "mongodb" } }  // won't add if "mongodb" exists
+);
+
+Add multiple unique values:
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  { $addToSet: { tags: { $each: ["scaling", "sharding"] } } }
+);
+
+3️⃣ $pull — remove elements that match a condition
+Remove scalar value:
+
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  { $pull: { tags: "db" } }
+);
+
+Remove objects matching criteria (nested):
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  { $pull: { comments: { id: 2 } } }
+);
+
+Remove by more complex condition:
+🔗 db.posts.updateMany(
+  {},
+  { $pull: { comments: { likes: { $lt: 3 } } } } // remove comments with likes < 3
+);
+
+$pullAll removes specific listed values (scalars only):
+🔗 db.posts.updateOne({ _id: 1 }, { $pullAll: { scores: [10, 30] } });
+
+4️⃣ $pop — remove first or last element
+Remove last element:
+🔗 db.posts.updateOne({ _id: 1 }, { $pop: { tags: 1 } });
+
+Remove first element:
+🔗 db.posts.updateOne({ _id: 1 }, { $pop: { tags: -1 } });
+
+
+5️⃣ Update multiple matching elements — arrayFilters
+When multiple array elements in the same document should be updated, use arrayFilters:
+
+✅ Example: set approved: true for all comments with likes > 3
+🔗 db.posts.updateOne(
+  { _id: 1 },
+  { $set: { "comments.$[c].approved": true } },
+  { arrayFilters: [{ "c.likes": { $gt: 3 } }] }
+);
+
+Multiple arrayFilters identifiers:
+🔗 db.orders.updateMany(
+  {},
+  { $set: { "items.$[it].status": "shipped", "items.$[it].shippedAt": new Date() } },
+  { arrayFilters: [{ "it.status": "packed" }] }
+);
+
+🔷 Indexing in MongoDB
+➤ An index in MongoDB is a data structure (usually a B-Tree) that improves the speed of data retrieval.
+➤ Without an index, MongoDB performs a collection scan — checking every document to find matches (very slow for large collections).
+➤ With an index, MongoDB can jump directly to the required data (like an index in a book 📖).
+
+🔄 Default Index
+Every collection automatically creates an index on the _id field.
+
+{ "_id": 1 } // ascending order
+👉 It ensures uniqueness and allows fast lookup by _id.
+
+1️⃣ Create an Index
+Syntax:
+🔗 db.collection.createIndex({ fieldName: 1 })
+
+✔️ 1 → Ascending order
+✔️ -1 → Descending order
+
+Example:
+🔗 db.students.createIndex({ name: 1 })
+👉 Creates an ascending index on the name field.
+
+
+2️⃣ Compound Index
+Index on multiple fields.
+
+🔗 db.students.createIndex({ name: 1, age: -1 })
+👉 Sorts primarily by name, and then by age within the same name.
+
+⚠️ Order matters!
+A compound index { name: 1, age: -1 } can support queries on:
+    { name: "Ankur" }
+    { name: "Ankur", age: 22 }
+❌ But not { age: 22 } alone (unless name is also in query).
+
+
+3️⃣ Unique Index
+Prevents duplicate values.
+🔗 db.students.createIndex({ email: 1 }, { unique: true })
+
+
+4️⃣ Sparse Index
+Only indexes documents that contain the field.
+
+🔗 db.students.createIndex({ phone: 1 }, { sparse: true })
+👉 Documents without phone will be ignored by the index.
+
+
+5️⃣ TTL (Time-To-Live) Index
+Automatically removes documents after a given time.
+
+🔗 db.sessions.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 })
+👉 Documents expire 1 hour (3600 seconds) after createdAt.
+
+6️⃣ Text Index
+For full-text search on string fields.
+Only one per collection
+
+🔗 db.articles.createIndex({ content: "text" })
+
+✅ Query example:
+🔗 db.articles.find({ $text: { $search: "mongodb indexing" } })
+
+7️⃣ Geospatial Index
+Used for location-based queries (2d or 2dsphere).
+
+🔗 db.places.createIndex({ location: "2dsphere" })
+
+Query nearby points:
+🔗 db.places.find({
+  location: {
+    $near: {
+      $geometry: { type: "Point", coordinates: [77.5946, 12.9716] },
+      $maxDistance: 1000 // in meters
+    }
+  }
+})
+
+
+8️⃣  Covered Query
+If all fields used in query and projection are part of the index →
+MongoDB can answer query without touching actual documents.
+
+✅ Example:
+🔗 db.students.createIndex({ name: 1, age: 1 })
+🔗 db.students.find({ name: "Ankur" }, { name: 1, age: 1, _id: 0 })
+
+👉 This is a covered query — faster, uses only index.
+
+9️⃣ Partial Covered Query
+If only some fields used in query and projection are part of the index →
+MongoDB can answer query without touching actual documents.
+
+db.teachers.createIndex({name: 1}, {partialFilterExpression: {name: {$exists: true}}})
+db.teachers.find({name: "Ankur"}, {name: 1, _id: 0})
+
+⚡ In case of multiple indexes
+MongoDB checks the performance of index on a sample of documents once the queries are run and set it as winning plan.
+Then the second query of similary type id doesn't race them again.
+It stores that winning plan in cache.
+
+🔄 Cache is reset after:
+1️⃣ After 1000 writes
+2️⃣ Index is reset
+3️⃣ Mongo server is restarted
+4️⃣ Other indexes are manipulated
+
+db.teachers.find({name:"Ankur"}).explain("allPlansExecution") -> gives the winning and losing plan based on some sample data
+
+
+🔄 View Existing Indexes
+🔗 db.students.getIndexes()
+
+🔄 Drop an Index
+🔗 db.students.dropIndex("name_1")
+
+🔄 Performance Notes
+➤ Indexing improves read/query performance ✅
+➤ But slows down write operations (insert/update/delete) ❌
+➤ More indexes = more memory & disk usage
+➤ Always create indexes based on query patterns (use explain())
+
+
+🔷 Aggregation in MongoDB
+
+🔷
+🔷

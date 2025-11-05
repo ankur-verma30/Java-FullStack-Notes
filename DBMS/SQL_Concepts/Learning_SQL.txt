@@ -3,7 +3,6 @@ We need a language to interact with databases—whether it's to store, retrieve,
 SQL (Structured Query Language) is the standard language used for interacting with Relational Databases.
 
 With SQL, we can perform:
-
 ➤ Create – Create new records or database structures
 ➤ Read – Retrieve data from tables
 ➤ Update – Modify existing records

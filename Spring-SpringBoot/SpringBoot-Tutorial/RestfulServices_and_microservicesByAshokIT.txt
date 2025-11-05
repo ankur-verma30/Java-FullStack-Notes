@@ -1,0 +1,1097 @@
+🔷 Distributed Application
+A distributed application is an application where components are spread across multiple computers (nodes) connected through a network, but they work together as a single system.
+➤ They are used for Business to Business commnication unlike web applciaton communicate with Business to Client (C2B).
+
+⚙️ Key Idea:
+Instead of all logic running on one server (like in a monolithic app), different parts — frontend, backend, databases, microservices, etc. — run on different machines or locations and communicate via network protocols (like HTTP, RPC, or gRPC).
+
+✅ Example: E-commerce Application
+➤ Frontend (React app) → runs on user’s browser.
+➤ Backend API (Spring Boot) → runs on AWS server.
+➤ Database (MySQL) → runs on a separate database server.
+➤ Payment service (third-party) → hosted externally.
+
+All these parts interact to form one working e-commerce platform — that’s a distributed application.
+
+🔄 Characteristics:
+➤ Multiple independent nodes (different machines).
+➤ Communication over network (e.g., REST, gRPC).
+➤ Data sharing and synchronization between components.
+➤ Scalability – you can scale specific services independently.
+➤ Fault tolerance – if one node fails, others can still run.
+
+🧱 Architecture Examples:
+➤ Client–Server (basic distributed system)
+➤ 3-Tier Architecture (UI, Application Server, Database)
+➤ Microservices Architecture (each service deployed independently)
+➤ Cloud-Native Applications (services running across data centers)
+
+🧰 Technologies Used:
+➤ APIs / REST / gRPC for communication
+➤ Message Queues (Kafka, RabbitMQ) for async communication
+➤ Databases like MongoDB, Cassandra (distributed data)
+➤ Load Balancers for traffic distribution
+➤ Containers / Kubernetes for deployment
+
+🔁 Another Scenario of Distributed Application
+✅Example:MMT ↔ IRCTC — A Real Distributed Interaction Example
+➤ Both MMT (MakeMyTrip) and IRCTC are independent distributed systems,
+but they interact with each other over a network to complete a single user request.
+➤ That interaction itself makes the overall system — the combination of MMT + IRCTC + users — a larger distributed ecosystem.
+➤ MMT doesn’t own the train data — it connects to IRCTC’s distributed system through APIs.
+➤ Both systems communicate and cooperate over the internet, while users experience it as one smooth platform.
+➤ XML and JSON data will be used as mediaters to transfer data between MMT and IRCTC.
+
+
+🔷 Intereoperability
+➤ The term interoperability refers to the ability of two or more systems to work together, even if they are not built for the same purpose or use the same architecture.
+➤ It is a way to ensure that different systems can communicate and exchange data with each other, even if they are built using different technologies or have different interfaces.
+
+
+🔷 XML
+XML (eXtensible Markup Language) is a markup language used to store and transport data in a structured, human-readable, and machine-readable format.
+
+✅ Example:
+<Student>  -------------> compound eleement containing other elements
+    <Name>Ankur Verma</Name>--------> simple element
+    <RollNo>101</RollNo>
+    <Branch>Information Technology</Branch>
+</Student>
+👉 This stores structured data about a student — not for displaying (like HTML), but for data exchange.
+
+🔄 Key Features:
+➤ Self-descriptive – Tags describe the data.
+➤ Custom tags – You can define your own (unlike HTML’s fixed tags).
+➤ Platform-independent – Works across systems and languages.
+➤ Hierarchical structure – Data stored in parent–child format.
+➤ Supports validation – You can define structure rules using:
+➤ DTD (Document Type Definition)
+➤ XSD (XML Schema Definition)
+
+🔄 Common Uses:
+➤ Configuration files (e.g., web.xml in Java web apps)
+➤ Data exchange between systems (SOAP APIs, web services)
+➤ Document storage (e.g., Office files internally use XML)
+➤Serialization (saving objects in XML format)
+
+
+🔷 JAXB (Java Architecture for XML Binding) — also called JAX-B API
+✔️ JAXB is a Java API that allows you to convert Java objects into XML (marshalling) and XML back into Java objects (unmarshalling) easily.
+
+✔️ It’s part of the Jakarta / Java EE (formerly JAX-B) stack and simplifies XML handling in Java applications — no manual parsing required.
+
+Upto Java 1.8 JAXB was part of the Java SE platform but removed from Java 1.9 version if you want to use should have a jax-b dependency.
+
+🔄 Core Operations:
+1️⃣ Marshalling: Converts Java objects into XML.
+2️⃣ Unmarshalling: Converts XML into Java objects.
+3️⃣ Binding: Maps Java classes to XML elements and attributes.
+4️⃣ Validation: Validates XML against a schema.
+5️⃣ Schema Generation: Generates XML schemas from Java classes.
+
+✅ Example: 1️⃣ Create a java class
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "student")
+public class Student {
+    private String name;
+    private int rollNo;
+
+    // Default constructor (required by JAXB)
+    public Student() {}
+
+    public Student(String name, int rollNo) {
+        this.name = name;
+        this.rollNo = rollNo;
+    }
+
+    @XmlElement
+    public String getName() {
+        return name;
+    }
+
+    @XmlElement
+    public int getRollNo() {
+        return rollNo;
+    }
+}
+
+2️⃣ Marshalling(Java --> XML)
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+
+public class MarshallExample {
+    public static void main(String[] args) throws Exception {
+        Student s = new Student("Ankur Verma", 101);
+        JAXBContext context = JAXBContext.newInstance(Student.class);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(s, System.out); // prints XML to console
+    }
+}
+✅ Output XML:
+<student>
+    <name>Ankur Verma</name>
+    <rollNo>101</rollNo>
+</student>
+
+3️⃣ Unmarshalling(XML --> Java)
+import jakarta.xml.bind.Unmarshaller;
+import java.io.File;
+
+public class UnmarshallExample {
+    public static void main(String[] args) throws Exception {
+        JAXBContext context = JAXBContext.newInstance(Student.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        Student s = (Student) unmarshaller.unmarshal(new File("student.xml"));
+        System.out.println(s.getName() + " - " + s.getRollNo());
+    }
+}
+✅ Output:
+Ankur Verma - 101
+
+🔄 Real-World Use Cases:
+➤ Converting XML payloads in SOAP web services
+➤ Reading/writing config files in XML
+➤ Data exchange between Java systems via XML
+➤ Used in Spring Boot (for XML-based request/response mapping)
+
+
+🔷 JSON (JavaScript Object Notation)
+JSON is a lightweight data-interchange format used to store and exchange data between a client and a server.
+
+It’s language-independent, but easily readable by both humans and machines.
+
+✅ Example:
+{
+  "name": "Ankur Verma",
+  "rollNo": 101,
+  "branch": "Information Technology"
+}
+
+🔄 Key Features of JSON:
+➤ Lightweight – smaller and faster than XML
+➤ Easy to parse – simple key-value structure
+➤ Language-independent
+➤ Key-value pair format
+➤ Used widely in REST APIs
+➤ Supports basic data types: string, number, boolean, array, object, null
+
+🔄JSON in Java (Working & Usage)
+Java doesn’t have built-in JSON support, but several popular libraries make it easy to convert between Java objects and JSON:
+
+Common libraries:
+➤ Jackson (most popular, used by Spring Boot)
+➤ Gson (by Google)
+➤ org.json
+
+1️⃣ Using Jackson Library (Most Common in Spring Boot)
+✅ Example of Java Class:
+public class Student {
+    private String name;
+    private int rollNo;
+
+    public Student() {}
+    public Student(String name, int rollNo) {
+        this.name = name;
+        this.rollNo = rollNo;
+    }
+
+    // Getters and setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getRollNo() { return rollNo; }
+    public void setRollNo(int rollNo) { this.rollNo = rollNo; }
+}
+
+🌀 Object → JSON (Serialization)
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ObjectToJson {
+    public static void main(String[] args) throws Exception {
+        Student s = new Student("Ankur Verma", 101);
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonString = mapper.writeValueAsString(s);
+        // for adding the json to a file
+        // mapper.writeValue(new File("student.json"), s);
+        System.out.println(jsonString);
+    }
+}
+
+✅ Output:
+{"name":"Ankur Verma","rollNo":101}
+
+🔁 JSON → Object (Deserialization)
+public class JsonToObject {
+    public static void main(String[] args) throws Exception {
+        String jsonString = "{\"name\":\"Ankur Verma\",\"rollNo\":101}";
+        ObjectMapper mapper = new ObjectMapper();
+
+        Student s = mapper.readValue(jsonString, Student.class);
+        System.out.println(s.getName() + " - " + s.getRollNo());
+    }
+}
+✅ Output:
+Ankur Verma - 101
+
+2️⃣ Using Gson Library (Alternative)
+import com.google.gson.Gson;
+
+public class GsonExample {
+    public static void main(String[] args) {
+        Student s = new Student("Ankur", 101);
+        Gson gson = new Gson();
+
+        // Object → JSON
+        String json = gson.toJson(s);
+        System.out.println(json);
+
+        // JSON → Object
+        Student obj = gson.fromJson(json, Student.class);
+        System.out.println(obj.getName());
+    }
+}
+
+Spring Boot automatically uses Jackson internally for JSON conversion.
+
+🔄 Real-World Use Cases:
+➤ Reading/writing config files in JSON
+➤ Data exchange between Java systems via JSON
+
+
+🔷 HTTP protocol
+➤ HTTP (HyperText Transfer Protocol) is a client-server communication protocol used for transmitting data over the web.
+➤ It defines how messages are formatted and transmitted, and how web servers and browsers should respond to various commands.
+➤ It is a stateless protocol. It will treat each request independently.
+
+
+❓How It Works
+➤ Client sends a request → (e.g., a web browser or REST client sends an HTTP request to the server).
+➤ Server processes the request → The web server receives the request, processes it, and prepares a response.
+➤ Server sends back a response → The server returns an HTTP response (status code + data).
+➤ Connection may close (in HTTP/1.1 or remain open for HTTP/2 and HTTP/3).
+
+🌟 Basic Structure
+1️⃣ HTTP Request Structure
+GET /index.html HTTP/1.1
+Host: www.example.com
+User-Agent: Chrome/108.0
+Accept: text/html
+
+
+2️⃣ HTTP Response Structure
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+
+<html>
+<body>Hello, World!</body>
+</html>
+
+🔄 Common HTTP Methods
+| Method     | Description                                       |
+| ---------- | ------------------------------------------------- |
+| **GET**    | Retrieve data from the server (no body).          |
+| **POST**   | Send data to the server (used for creating data). |
+| **PUT**    | Update existing resource completely.              |
+| **PATCH**  | Update part of a resource.                        |
+| **DELETE** | Delete a resource.                                |
+| **HEAD**   | Same as GET but returns only headers.             |
+
+🔹 HTTP Status Codes
+| Code Range | Meaning       | Example                        |
+| ---------- | ------------- | ------------------------------ |
+| **1xx**    | Informational | 100 Continue                   |
+| **2xx**    | Success       | 200 OK, 201 Created            |
+| **3xx**    | Redirection   | 301 Moved Permanently          |
+| **4xx**    | Client Error  | 400 Bad Request, 404 Not Found |
+| **5xx**    | Server Error  | 500 Internal Server Error      |
+
+🔄 Features
+➤ Stateless: Each request is independent; no session info is stored by default.
+➤ Text-based: Human-readable request and response format.
+➤ Extensible: Supports custom headers, cookies, and authentication.
+➤ Uses TCP (Port 80) or HTTPS (Port 443) for secure communication.
+
+
+🔷 HTTP Request and HTTP Response
+1️⃣ HTTP Request
+An HTTP request is a message sent by the client (like a browser or app) to ask the server to perform an action — such as fetching data, submitting a form, or deleting a record.
+
+🔄 Structure of an HTTP Request
+Method  URL  Protocol-Version
+Headers
+(blank line)
+Body (optional)
+
+✅ Example:
+GET /users?id=10 HTTP/1.1
+Host: example.com
+User-Agent: Chrome/121.0
+Accept: application/json
+
+🔄 Main Components:
+➤ Request Line
+    ✔️ Includes HTTP method, URL, and HTTP version.
+    ✅ Example: GET /home HTTP/1.1
+➤ Headers
+    ✔️ Provide additional info like content type, authentication, etc.
+    ✅ Example:
+            Content-Type: application/json
+            Authorization: Bearer token123
+➤ Body (Optional)
+    ✔️ Carries data with requests like POST, PUT, or PATCH.
+    ✅ Example:
+        {
+          "name": "Ankur",
+          "email": "ankur@gmail.com"
+        }
+
+2️⃣ HTTP Response
+An HTTP response is the message sent by the server back to the client after processing the request.
+
+🔄 Structure of an HTTP Response
+Protocol-Version Status-Code Status-Message
+Headers
+(blank line)
+Body (optional)
+
+✅ Example:
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 47
+{
+  "id": 10,
+  "name": "Ankur",
+  "email": "ankur@gmail.com"
+}
+
+🔄 Main Components:
+➤ Status Line
+✅ Example: HTTP/1.1 200 OK
+    🔗 Includes:
+        ✔️ HTTP version (HTTP/1.1)
+        ✔️ Status code (200)
+        ✔️ Status message (OK)
+➤ Headers
+    ✔️ Give info about the response.
+    ✅ Example:
+        Content-Type: text/html
+        Cache-Control: no-cache
+➤ Body (Optional)
+    ✔️ Contains the actual data (HTML, JSON, XML, etc.)
+
+🔄 Request–Response Flow Example
+🔗 Client (Browser):
+    GET /products HTTP/1.1
+    Host: www.shop.com
+
+🔗 Server (Response):
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    [{"id":1,"name":"Laptop","price":50000}]
+
+
+🔷 Media Types in Rest API
+➤ A Media Type (or MIME type) tells the format of data being sent or received in an HTTP message.
+➤ It helps the client and server understand how to interpret the request or response body.
+
+💡 Syntax: type/subtype
+
+✅ Examples:
+| Media Type            | Description           |
+| --------------------- | --------------------- |
+| `application/json`    | JSON data             |
+| `application/xml`     | XML data              |
+| `text/html`           | HTML content          |
+| `text/plain`          | Plain text            |
+| `multipart/form-data` | Used for file uploads |
+| `application/pdf`     | PDF file              |
+
+
+1️⃣ Media Type in HTTP Request
+When a client sends data (like in a POST or PUT request), it uses the Content-Type header to specify the format.
+✅ Example:
+POST /api/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Ankur",
+  "email": "ankur@gmail.com"
+}
+➡️ This tells the server that the body is in JSON format.
+
+2️⃣ Media Type in HTTP Response
+The server uses the Content-Type header to tell the client what type of data it’s returning.
+✅ Example:
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "status": "success",
+  "id": 101
+}
+➡️ This tells the client that the response body is JSON.
+
+3️⃣ Content Negotiation in REST APIs
+In REST, the client can tell the server which format it accepts using the Accept header.
+✅ Example:
+GET /api/users HTTP/1.1
+Accept: application/json
+✔️ The client says: “I want the response in JSON.”
+✔️ The server will then return data in JSON format (if supported).
+
+➤ If the client instead says:
+Accept: application/xml
+
+➤ The server can respond with:
+Content-Type: application/xml
+
+
+4️⃣ Media Types in Spring Boot REST APIs
+In Spring Boot, you can specify media types using:
+➤ @RequestMapping, @PostMapping, @GetMapping etc.
+@RestController
+@RequestMapping("/api")
+public class UserController {
+
+    @PostMapping(
+        value = "/users",
+        consumes = "application/json",     // Request body format 
+        produces = "application/json"      // Response format
+    )
+    // can provide multiple values for the consumes and produces
+    public ResponseEntity<User> addUser(@RequestBody User user) {
+        return ResponseEntity.ok(user);
+    }
+}
+
+✅ consumes → tells what type of input the API accepts
+✅ produces → tells what type of output the API returns
+
+📋 Common Media Types in REST APIs
+| Media Type                          | Use                            |
+| ----------------------------------- | ------------------------------ |
+| `application/json`                  | Most common for REST APIs      |
+| `application/xml`                   | Used in SOAP or XML-based APIs |
+| `text/plain`                        | Simple text data               |
+| `multipart/form-data`               | File uploads (e.g. image, PDF) |
+| `application/x-www-form-urlencoded` | HTML form submissions          |
+
+
+⚡ Real-World Example
+✅ Request:
+POST /upload HTTP/1.1
+Content-Type: multipart/form-data
+Accept: application/json
+
+✅ Response:
+HTTP/1.1 200 OK
+Content-Type: application/json
+{"message": "File uploaded successfully!"}
+
+
+
+🔷 Rest Client Development
+A REST Client is a tool, library, or component that allows you to send HTTP requests (GET, POST, PUT, DELETE, etc.) to a REST API and receive responses — typically used to test, consume, or interact with RESTful web services.
+
+A REST Client acts as a consumer of REST APIs.
+It sends HTTP requests to the server (REST API endpoint) and reads the HTTP responses returned.
+
+In springboot we can develop REST Client using 3 ways:
+1️⃣ Using RestTemplate (Synchrnous Communication: sending request and wating for response then processing other requests)
+2️⃣ Using WebClient (Synchrnous + Asynchrnous Communication)
+3️⃣ Using Feign
+
+🔄 Example in Real Life
+➤ When you use Postman, you’re using a REST Client application to test APIs.
+➤ When a frontend app (React, Angular, Flutter) calls an API using fetch() or axios, those are REST Client libraries making HTTP calls.
+
+✅ Example - Java REST Client Using RestTemplate
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+
+
+🔄 Working of RestTemplate
+➤ RestTemplate is a class provided by Spring Framework that acts as a synchronous REST client.
+➤ It allows your Spring application to make HTTP requests (GET, POST, PUT, DELETE) to consume REST APIs.
+
+➤ Think of it as your Java-based Postman — but used inside your application code.
+
+2️⃣ When to Use It
+➤ You use RestTemplate when:
+    ✔️ Your Spring app wants to call another REST API (either external or internal).
+    ✔️ You need to integrate multiple microservices.
+    ✔️ You want to send or receive JSON data programmatically
+
+3️⃣ How It Works Internally
+Here’s the internal flow:
+
+[Your Spring App] → (RestTemplate) → [HTTP Request] → [Target REST API] 
+→ [Response] → (RestTemplate parses it) → [Java Object or String]
+
+✅ Example Flow:
+You call:
+restTemplate.getForObject("https://jsonplaceholder.typicode.com/posts/1", Post.class);
+→ It makes a GET request to that URL
+→ Gets the JSON response
+→ Converts it automatically into a Post Java object using Jackson JSON Mapper
+
+✅ Example:
+Let's say we have StudentService and a client Service that calls it.
+
+🔗 StudentController.java (Server/API Provider)
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    @GetMapping("/{id}")
+    public Student getStudent(@PathVariable int id) {
+        return new Student(id, "Ankur Verma", "IT");
+    }
+}
+
+🔗 StudentService.java 
+package com.example.demo.request;
+@Data
+class Student {
+    private int id;
+    private String name;
+    private String department;
+}
+
+🔗 StudentClient.java (Consumer using RestTemplate)
+package com.example.demo.client;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class StudentClient {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public void getStudentDetails() {
+        String url = "http://localhost:8080/api/students/1";
+
+        // Make GET request and receive response as Student object
+        ResponseEntity<Student> response = restTemplate.getForEntity(url, Student.class);
+
+        // Print response
+        System.out.println("Status Code: " + response.getStatusCode());
+        System.out.println("Student Details:");
+        System.out.println("ID: " + response.getBody().getId());
+        System.out.println("Name: " + response.getBody().getName());
+        System.out.println("Department: " + response.getBody().getDepartment());
+    }
+}
+
+// Student model (same structure as in API)
+@Data
+class Student {
+    private int id;
+    private String name;
+    private String department;
+}
+
+🔄 Running the Example
+➤ Run the StudentController application (port 8080).
+→ It exposes an endpoint:
+GET http://localhost:8080/api/students/1
+
+➤ Run StudentClient class (it can be in another app or in same app).
+→ It makes a GET call using RestTemplate.
+
+✅ You’ll see output like:
+Status Code: 200 OK
+Student Details:
+ID: 1
+Name: Ankur Verma
+Department: IT
+
+
+Commonly Used RestTemplate Methods
+| Method                            | Purpose                                                  | Example                                                   |
+| --------------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
+| `getForObject(url, class)`        | GET request and returns object directly                  | `restTemplate.getForObject(url, Student.class)`           |
+| `getForEntity(url, class)`        | GET request and returns `ResponseEntity` (status + body) | `restTemplate.getForEntity(url, Student.class)`           |
+| `postForObject(url, body, class)` | POST request and returns created object                  | `restTemplate.postForObject(url, student, Student.class)` |
+| `postForEntity(url, body, class)` | POST request returning full response                     | `restTemplate.postForEntity(url, student, Student.class)` |
+| `put(url, body)`                  | PUT request (no return)                                  | `restTemplate.put(url, student)`                          |
+| `delete(url)`                     | DELETE request                                           | `restTemplate.delete(url)`                                |
+
+
+🔷 WebClient
+➤ WebClient is part of Spring WebFlux, a reactive web framework introduced in Spring 5.
+➤ It is used to make asynchronous, non-blocking HTTP requests to REST APIs.
+
+👉 Think of it as:
+A reactive, lightweight, and flexible version of RestTemplate
+
+🔄 Why WebClient Was Introduced
+➤ RestTemplate (older client) works in a blocking manner —
+that means each thread waits for the response before continuing.
+➤ In contrast, WebClient is non-blocking —
+it can handle many requests concurrently with fewer threads, improving performance and scalability.
+
+🔄 Key Features of WebClient
+| Feature                      | Description                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| **Reactive (Non-blocking)**  | Uses Project Reactor (`Mono` and `Flux`) for async programming.           |
+| **Lightweight**              | Doesn’t depend on Servlet API. Works in both Spring MVC and WebFlux apps. |
+| **Supports Streaming**       | Can handle continuous data streams (e.g., SSE, WebSockets).               |
+| **Functional API**           | Fluent builder-style syntax for constructing requests.                    |
+| **Can Replace RestTemplate** | Fully supports GET, POST, PUT, DELETE, etc.                               |
+
+
+🔄 When to Use WebClient
+✔️ When building reactive or high-performance applications.
+✔️ When handling multiple concurrent API calls.
+✔️ When you need to stream data (e.g., continuous updates).
+✔️ When you’re using Spring WebFlux or microservices.
+
+🔄 Basic Syntax
+WebClient webClient = WebClient.create("http://localhost:8080");
+
+Mono<Student> studentMono = webClient.get()
+    .uri("/api/students/1")
+    .retrieve()
+    .bodyToMono(Student.class);
+Mono<Student> is a reactive type that represents one asynchronous result (like a Future<Student>).
+
+
+🔄 WebClient vs RestTemplate
+| Feature                   | `RestTemplate`                  | `WebClient`                 |
+| ------------------------- | ------------------------------- | --------------------------- |
+| **Introduced In**         | Spring 3                        | Spring 5 (WebFlux)          |
+| **Type**                  | Synchronous (Blocking)          | Asynchronous (Non-blocking) |
+| **Performance**           | Slower (one thread per request) | Faster (reactive model)     |
+| **Reactive Support**      | ❌ No                            | ✅ Yes                       |
+| **Streaming Support**     | ❌ No                            | ✅ Yes                       |
+| **Recommended By Spring** | Deprecated (for new apps)       | ✅ Official Replacement      |
+
+
+Maven dependency for WebClient:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
+
+➤ spring-boot-starter-web --> class
+➤ spring-boot-starter-webflux --> interface
+
+🔄 Reactive Concepts Used
+1️⃣ Mono<T> → represents 0 or 1 asynchronous result (like one Student).
+2️⃣ Flux<T> → represents 0 or many asynchronous results (like list of Students).
+
+✅ Example:
+Flux<Student> students = webClient.get()
+    .uri("/api/students")
+    .retrieve()
+    .bodyToFlux(Student.class);
+
+🔄 Real-World Use Case Example
+Let’s say you have a Student Service that needs to call another Course Service.
+
+@Service
+public class StudentService {
+
+    private final WebClient webClient = WebClient.create("http://course-service:8081");
+
+    public Mono<Course> getCourseDetails(int studentId) {
+        return webClient.get()
+                .uri("/api/courses/student/{id}", studentId)
+                .retrieve()
+                .bodyToMono(Course.class);
+    }
+}
+✅ Non-blocking, so the thread doesn’t wait for the response —
+it can handle hundreds of concurrent API calls efficiently.
+
+
+🔷 Spring Data REST
+➤ Spring Data REST is a module of the Spring Data project that automatically exposes RESTful APIs for your Spring Data Repositories — without writing any controller code.
+
+➤ If you already have a JpaRepository, Spring Data REST will automatically create REST endpoints (GET, POST, PUT, DELETE) for you.
+
+🔄 How It Works
+When you include the dependency spring-boot-starter-data-rest, Spring Boot:
+➤ Scans your repositories (like StudentRepository).
+➤ Automatically creates REST endpoints under /entities or your custom path.
+➤ Converts Java entities to JSON responses.
+➤ Handles CRUD operations and pagination by default.
+
+
+🔄 Dependency
+👉 Add this dependency in your pom.xml:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-rest</artifactId>
+</dependency>
+⚡ (You must also have spring-boot-starter-data-jpa and a database driver like mysql-connector-java.)
+
+✅ Example: Exposing Student Repository as REST API
+1️⃣ Entity Class
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String course;
+
+    // getters and setters
+}
+
+2️⃣ Repository Interface
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+@RepositoryRestResource(path = "students")
+public interface StudentRepository extends JpaRepository<Student, Long> {
+}
+✅ The @RepositoryRestResource(path = "students") annotation tells Spring Data REST to expose this repository as a REST resource under /students.
+
+3️⃣ Run the Application
+When you start your Spring Boot app, Spring Data REST automatically generates endpoints like:
+| HTTP Method | Endpoint         | Description                        |
+| ----------- | ---------------- | ---------------------------------- |
+| **GET**     | `/students`      | Get all students (with pagination) |
+| **GET**     | `/students/{id}` | Get student by ID                  |
+| **POST**    | `/students`      | Create a new student               |
+| **PUT**     | `/students/{id}` | Update an existing student         |
+| **DELETE**  | `/students/{id}` | Delete student by ID               |
+
+✅ Example Request & Response
+👉 POST Request:
+POST /students
+Content-Type: application/json
+{
+  "name": "Ankur Verma",
+  "course": "B.Tech IT"
+}
+
+👉 Response:
+{
+  "id": 1,
+  "name": "Ankur Verma",
+  "course": "B.Tech IT"
+}
+
+🔄 Customization Options
+| Annotation                               | Purpose                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `@RepositoryRestResource`                | Customize path, collection name, and relation name.                   |
+| `@RestResource`                          | Customize endpoint exposure for specific methods.                     |
+| `@Projection`                            | Control what fields are shown in REST responses.                      |
+| `@ExcerptProjection`                     | Show summarized data when listing entities.                           |
+| `@HandleBeforeSave` / `@HandleAfterSave` | Add custom logic (like events) before or after repository operations. |
+
+
+✅ Example of Customization
+@RepositoryRestResource(collectionResourceRel = "learners", path = "students")
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    @RestResource(path = "byName", rel = "byName")
+    List<Student> findByNameContaining(@Param("name") String name);
+}
+👉 Now you can access:
+For findBy queries we have to add /search to the path, for example:
+GET /students/search/byName?name=Ankur
+
+🔄 Internals & Concepts
+➤ Spring Data REST uses HAL (Hypertext Application Language) format by default for HATEOAS links.
+➤ Uses Spring MVC under the hood, but you don’t need to write controllers.
+➤ It’s built on Spring Data Repositories, so all query methods automatically become endpoints.
+
+🔄 Advantages
+✅ No need to write boilerplate controller code.
+✅ Automatic CRUD and pagination.
+✅ HATEOAS support for navigable APIs.
+✅ Integrates easily with JPA, MongoDB, Neo4j, etc.
+✅ Easy to customize endpoints and data projections.
+
+🔄 When Not to Use
+➤ If your API requires complex business logic or custom response structures.
+➤ If you need authentication, role-based access, or API versioning — then you’d better write custom controllers.
+
+🔄 Goal
+Restrict or disable specific HTTP methods (like POST, PUT, or DELETE) for certain entities when using Spring Data REST.
+
+1️⃣ Create Configuration Class
+You’ll use RepositoryRestConfigurer to customize repository exposure.
+
+package com.example.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+import org.springframework.http.HttpMethod;
+
+import com.example.entity.Student;
+
+@Configuration
+public class RestRepositoryConfig implements RepositoryRestConfigurer {
+
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+
+        // Disable HTTP methods for Student entity: PUT, POST, DELETE
+        HttpMethod[] unsupportedActions = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
+
+        // Apply restrictions
+        config.getExposureConfiguration()
+                .forDomainType(Student.class)
+                .withItemExposure((metadata, httpMethods) ->
+                        httpMethods.disable(unsupportedActions))
+                .withCollectionExposure((metadata, httpMethods) ->
+                        httpMethods.disable(unsupportedActions));
+    }
+}
+
+
+🔄 Apply Restrictions to Multiple Entities
+You can restrict multiple repositories easily:
+
+config.getExposureConfiguration()
+        .forDomainType(Student.class)
+        .withItemExposure((metadata, httpMethods) -> httpMethods.disable(unsupportedActions))
+        .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(unsupportedActions));
+
+config.getExposureConfiguration()
+        .forDomainType(Course.class)
+        .withItemExposure((metadata, httpMethods) -> httpMethods.disable(unsupportedActions))
+        .withCollectionExposure((metadata, httpMethods) -> httpMethods.disable(unsupportedActions));
+
+🔄 Optional — Expose Entity IDs in JSON
+By default, Spring Data REST hides entity IDs.
+You can expose them in the same config class:
+
+config.exposeIdsFor(Student.class);
+
+
+🔷 REST API Exception handling
+In springboot we can handle exception in 2 ways:
+| Type                         | Description                                                                 | Scope               |
+| ---------------------------- | --------------------------------------------------------------------------- | ------------------- |
+| **Global Exception Handler** | Handles exceptions **across all controllers** using `@RestControllerAdvice` | Application-wide    |
+| **Local Exception Handler**  | Handles exceptions **within a single controller** using `@ExceptionHandler` | Controller-specific |
+
+🔄 Steps:
+➤ Create User Defined Exception class
+➤ Create ExceptionInfo binding class
+➤ Create Rest Controller Advice to handle global exceptions in our application.
+
+Step 1️⃣ Create User-Defined Exception Class
+This is your custom business exception — for example, when a student is not found.
+
+package com.example.exception;
+
+public class StudentNotFoundException extends RuntimeException {
+    public StudentNotFoundException(String message) {
+        super(message);
+    }
+}
+
+2️⃣ Create ExceptionInfo (Response Model) Class
+This class represents the structure of the error response returned to the client.
+
+package com.example.exception;
+
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@AllArgsConstructor
+@Data
+public class ExceptionInfo {
+    private String message;
+    private String path;
+    private LocalDateTime timestamp;
+    private String errorCode;
+    
+}
+
+🌐 3️⃣ Global Exception Handler — @RestControllerAdvice
+This handles exceptions for the entire Spring Boot application.
+package com.example.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // Handle specific exception
+    @ExceptionHandler(StudentNotFoundException.class)
+    public ResponseEntity<ExceptionInfo> handleStudentNotFound(StudentNotFoundException ex, WebRequest request) {
+        ExceptionInfo info = new ExceptionInfo(
+                ex.getMessage(),
+                request.getDescription(false),
+                "STUDENT_NOT_FOUND"
+        );
+        return new ResponseEntity<>(info, HttpStatus.NOT_FOUND);
+    }
+
+    // Handle all other exceptions (fallback)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionInfo> handleGeneralException(Exception ex, WebRequest request) {
+        ExceptionInfo info = new ExceptionInfo(
+                ex.getMessage(),
+                request.getDescription(false),
+                "INTERNAL_SERVER_ERROR"
+        );
+        return new ResponseEntity<>(info, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+👉 What Happens Here:
+➤ Whenever StudentNotFoundException is thrown in any controller, this advice class catches it.
+➤ It returns a JSON response with details like timestamp, error message, and URL
+
+
+🔄 Local Exception Handler (Controller-Specific)
+This handles exceptions inside a specific controller only.
+
+package com.example.controller;
+
+import com.example.exception.StudentNotFoundException;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    @GetMapping("/{id}")
+    public String getStudent(@PathVariable int id) {
+        if (id != 1) {
+            throw new StudentNotFoundException("Student with ID " + id + " not found!");
+        }
+        return "Student Found: Ankur";
+    }
+
+    // Local handler — only works inside this controller
+    @ExceptionHandler(StudentNotFoundException.class)
+    public String handleLocalException(StudentNotFoundException ex) {
+        return "⚠ Local Handler: " + ex.getMessage();
+    }
+}
+👉 What Happens:
+✔️ When /api/students/5 is called, it throws StudentNotFoundException.
+✔️ The local exception handler catches it first (if available).
+✔️ If not defined locally, then the global handler catches it.
+
+🧾 5️⃣ Sample JSON Response (From Global Handler)
+{
+  "message": "Student with ID 10 not found!",
+  "path": "uri=/api/students/10",
+  "timestamp": "2025-11-04T15:12:40.305",
+  "errorCode": "STUDENT_NOT_FOUND"
+}
+
+
+🔷 DIFFERENCE BETWEEN @ControllerAdvice AND @RestControllerAdvice
+Annotation              | Description / Behavior
+---------------------------------------------------------------------------------------
+@ControllerAdvice        | Used to handle exceptions globally across controllers.
+                         | Returns a view name (HTML/JSP) by default.
+                         | Typically used in web MVC applications (non-REST).
+                         | Must use @ResponseBody on methods to return JSON.
+                         | Combines well with @ExceptionHandler, @ModelAttribute, etc.
+                         | Example: returns "error-page" view template.
+
+@RestControllerAdvice    | Introduced as a specialized version of @ControllerAdvice.
+                         | It combines @ControllerAdvice + @ResponseBody.
+                         | All handler methods return JSON or XML automatically.
+                         | Ideal for REST APIs (Spring Boot RESTful services).
+                         | No need to explicitly add @ResponseBody on methods.
+                         | Example: returns JSON error response instead of a view.
+
+---------------------------------------------------------------------------------------
+
+✅ Example 1 — Using @ControllerAdvice (Web MVC)
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleException(Exception ex) {
+        ModelAndView mav = new ModelAndView("error");
+        mav.addObject("message", ex.getMessage());
+        return mav;
+    }
+}
+🔄 Explanation:
+➤ Used in normal Spring MVC web apps.
+➤ Returns a view page (e.g., error.html or error.jsp).
+➤ If you want JSON, you must manually add @ResponseBody to the method.
+
+
+✅ Example 2 — Using @RestControllerAdvice (REST API)
+@RestControllerAdvice
+public class GlobalRestExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleAll(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        error.put("status", "500");
+        return ResponseEntity.status(500).body(error);
+    }
+}
+🔄 Explanation:
+➤ Used for REST controllers.
+➤ Automatically converts return values to JSON (no need for @ResponseBody).
+➤ Cleaner and preferred for Spring Boot RESTful APIs.
+
+
+🔷 REST(Representation State Transfer) Architecture Principles 
+1️⃣ Client-Server Architecture  
+➤ Separation of concerns between client (frontend/UI) and server (backend).  
+➤ Client handles UI and user interaction; server handles data storage and logic.  
+➤ Enables scalability, modularity, and independent development.
+
+2️⃣ Statelessness  
+➤ Each request from client to server must contain all required information.  
+➤ Server does not store any client session data.  
+➤ Improves reliability and scalability since each request is independent.
+
+3️⃣ Cacheability  
+➤ Responses must define themselves as cacheable or non-cacheable.  
+➤ Reduces client-server interactions, improves performance.  
+➤ Example: HTTP headers like Cache-Control, ETag.
+
+4️⃣ Uniform Interface  
+➤ Common standard way to communicate between client and server.  
+➤ Core of REST design — ensures simplicity and decoupling.  
+➤ Includes:
+    ✔️ Resource Identification (using URIs)
+    ✔️ Manipulation of Resources through representations (JSON/XML)
+    ✔️ Self-descriptive messages (metadata in headers)
+    ✔️ HATEOAS (Hypermedia as the Engine of Application State)
+
+5️⃣ Layered System  
+➤ Architecture composed of hierarchical layers (client, API gateway, server, DB).  
+➤ Each layer has a specific function and does not need to know others’ details.  
+➤ Improves scalability and security through load balancers, proxies, etc.
+
+6️⃣ Code-on-Demand (Optional)  
+➤ Allows server to send executable code (like JavaScript) to client for execution.  
+➤ Adds flexibility, but rarely used due to security concerns.
+
+

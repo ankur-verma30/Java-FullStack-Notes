@@ -1,0 +1,13 @@
+🔷 Shell Scripting
+A shell script is a file containing a series of Linux commands that the shell (command-line interpreter) executes one after another automatically.
+
+Think of it like:
+🧩 Instead of typing each command manually in the terminal, you write them in a file and let the system run them all at once.
+
+🔷 Why Use Shell Scripting?
+➤ Automation
+➤ Reusability
+➤ Security
+
+Creating a Shell Script
+🔗 nano script.sh --> file should be of .sh extension 

@@ -1,0 +1,458 @@
+Swagger is an open-source framework used for designing, building, documenting, and consuming RESTful APIs.
+
+It provides tools to:
+➤ Describe your API in a standardized format (called OpenAPI Specification, formerly called Swagger Specification).
+➤ Generate interactive API documentation automatically.
+➤ Test APIs easily from a browser.
+➤ Auto-generate client SDKs and server stubs in multiple languages.
+
+
+🔄 Steps to Add Swagger Documentation for REST API
+1️⃣ Add swagger and swagger-ui dependencies in project pom.xml
+
+👉 dependency for swagger:
+✅ This is deprecated:
+    <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+    </dependency>
+
+✅ Springdoc OpenAPI is used:
+
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.7.0</version>
+</dependency>
+
+2️⃣ Run the application and access swagger documentation
+Once you start your application (e.g., mvn spring-boot:run or Run Application),
+Swagger UI will automatically be available at:
+
+👉 http://localhost:8080/swagger-ui.html
+or
+👉 http://localhost:8080/swagger-ui/index.html
+
+3️⃣ Example REST controller
+package com.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    private final Map<Integer, String> studentDB = new HashMap<>();
+
+    // ✅ GET all students
+    @Operation(summary = "Get all students", description = "Fetches the list of all students in the database.")
+    @ApiResponse(responseCode = "200", description = "List retrieved successfully")
+    @GetMapping
+    public Collection<String> getAllStudents() {
+        if (studentDB.isEmpty()) {
+            studentDB.put(1, "Ankur Verma");
+            studentDB.put(2, "John Doe");
+        }
+        return studentDB.values();
+    }
+
+    // ✅ GET student by ID
+    @Operation(summary = "Get a student by ID", description = "Fetch a specific student using their ID.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Student found",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "404", description = "Student not found")
+    })
+    @GetMapping("/{id}")
+    public String getStudentById(
+        @Parameter(description = "ID of the student to fetch", example = "1")
+        @PathVariable int id) {
+
+        return studentDB.getOrDefault(id, "Student not found");
+    }
+
+    // ✅ POST add a new student
+    @Operation(summary = "Add a new student", description = "Create a new student record in the database.")
+    @ApiResponse(responseCode = "201", description = "Student added successfully")
+    @PostMapping
+    public String addStudent(@RequestParam int id, @RequestParam String name) {
+        studentDB.put(id, name);
+        return "Added student: " + name;
+    }
+
+    // ✅ DELETE student by ID
+    @Operation(summary = "Delete a student", description = "Remove a student by their ID.")
+    @ApiResponse(responseCode = "200", description = "Student deleted successfully")
+    @DeleteMapping("/{id}")
+    public String deleteStudent(@PathVariable int id) {
+        if (studentDB.remove(id) != null) {
+            return "Deleted student with ID: " + id;
+        }
+        return "Student not found!";
+    }
+}
+
+🔄 Annotations used in Swagger
+🧩 1️⃣ CLASS LEVEL ANNOTATIONS
+============================================================
+Annotation       | Purpose
+------------------------------------------------------------
+🔗 @Tag             | Defines a logical grouping of APIs under a
+                 | name and description. Used at class level to
+                 | describe a controller or API section.
+------------------------------------------------------------
+Example:
+@RestController
+@RequestMapping("/api/students")
+@Tag(name = "Student API",
+     description = "Operations related to students")
+public class StudentController { }
+
+------------------------------------------------------------
+🔗 @OpenAPIDefinition | Defines global metadata for the entire API
+                   | — title, version, description, contact,
+                   | license, etc. Usually placed on main
+                   | Application or Config class.
+------------------------------------------------------------
+Example:
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Student Management API",
+        version = "1.0",
+        description = "API documentation for Student Management"
+    )
+)
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args){
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+------------------------------------------------------------
+🔗 @Server          | Defines server URL and description for the
+                 | API. Multiple can be declared for different
+                 | environments.
+------------------------------------------------------------
+Example:
+@OpenAPIDefinition(
+    servers = {
+        @Server(
+            url = "http://localhost:8080",
+            description = "Local Server"
+        )
+    }
+)
+============================================================
+
+
+🧩 2️⃣ METHOD LEVEL ANNOTATIONS
+============================================================
+Annotation       | Purpose
+------------------------------------------------------------
+🔗 @Operation       | Describes an individual API operation
+                 | (summary, description, parameters, responses).
+------------------------------------------------------------
+Example:
+@PostMapping("/add")
+@Operation(
+    summary = "Add a new student",
+    description = "Creates a new student record using details"
+)
+public String addStudent(@RequestParam int id,
+                         @RequestParam String name) {
+    return "Added student " + name;
+}
+
+------------------------------------------------------------
+🔗 @ApiResponse     | Describes possible HTTP responses for an
+                 | operation (e.g., 200 OK, 404 Not Found).
+------------------------------------------------------------
+Example:
+@ApiResponses({
+    @ApiResponse(responseCode = "200",
+                 description = "Student added successfully"),
+    @ApiResponse(responseCode = "400",
+                 description = "Invalid input")
+})
+
+------------------------------------------------------------
+🔗 @RequestBody     | Marks a parameter as coming from the request
+                 | body (for JSON input).
+------------------------------------------------------------
+Example:
+@PostMapping("/register")
+public String registerStudent(@RequestBody Student student) {
+    return "Registered " + student.getName();
+}
+
+------------------------------------------------------------
+🔗 @Parameter       | Describes a single parameter for documentation
+                 | (overrides auto-generated info).
+------------------------------------------------------------
+Example:
+@PostMapping("/greet")
+public String greet(
+    @Parameter(description = "Name of student to greet",
+               example = "Ankur")
+    @RequestParam String name) {
+    return "Hello " + name;
+}
+============================================================
+
+
+🧩 3️⃣ PARAMETER LEVEL ANNOTATIONS
+============================================================
+Annotation       | Purpose
+------------------------------------------------------------
+🔗 @Parameter       | Provides documentation for individual params
+                 | (path, query, header, etc.).
+------------------------------------------------------------
+Example:
+@GetMapping("/find")
+public String findStudent(
+    @Parameter(description = "Student ID", example = "101")
+    @RequestParam int id) {
+    return "Found student " + id;
+}
+
+------------------------------------------------------------
+🔗 @Schema          | Defines schema metadata for models or params
+                 | (example value, type, format, etc.).
+------------------------------------------------------------
+Example:
+public class Student {
+    @Schema(description = "Unique ID of the student",
+            example = "1")
+    private int id;
+
+    @Schema(description = "Full name of the student",
+            example = "Ankur Verma")
+    private String name;
+}
+============================================================
+
+
+🧩 4️⃣ MODEL / ENTITY LEVEL ANNOTATIONS
+============================================================
+Annotation       | Purpose
+------------------------------------------------------------
+🔗 @Schema          | Provides details about model class or its
+                 | fields. Appears in Swagger model schema.
+------------------------------------------------------------
+Example:
+@Schema(name = "Student",
+        description = "Represents a student in the system")
+public class Student {
+    @Schema(description = "Unique ID", example = "1")
+    private int id;
+
+    @Schema(description = "Name", example = "Ankur Verma")
+    private String name;
+}
+============================================================
+
+
+🧩 5️⃣ RESPONSE AND ERROR HANDLING ANNOTATIONS
+============================================================
+Annotation       | Purpose
+------------------------------------------------------------
+🔗 @ApiResponse     | Describes a specific response for a given
+                 | status code.
+------------------------------------------------------------
+Example:
+@ApiResponse(responseCode = "404",
+             description = "Student not found")
+
+------------------------------------------------------------
+🔗 @ApiResponses    | Container for multiple @ApiResponse
+                 | annotations.
+------------------------------------------------------------
+Example:
+@ApiResponses({
+    @ApiResponse(responseCode = "200",
+                 description = "Success"),
+    @ApiResponse(responseCode = "400",
+                 description = "Bad Request")
+})
+============================================================
+                                
+
+4️⃣ Add Basic Metadata (Optional)
+You can customize the Swagger page (title, description, version, contact info, etc.)
+by creating a @Configuration class like this:
+package com.example.demo.config;
+
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.OpenAPI;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("Student Management API")
+                .version("1.0")
+                .description("API documentation for Student Management System")
+                .contact(new Contact()
+                    .name("Ankur Verma")
+                    .email("ankur@example.com")
+                    .url("https://github.com/ankur-verma30")));
+    }
+}
+
+5️⃣ Adding JWT or Basic Auth Support (Optional)
+If your APIs require authentication, you can define security schemes in Swagger:
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+
+@Bean
+public OpenAPI secureOpenAPI() {
+    return new OpenAPI()
+        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+        .components(new io.swagger.v3.oas.models.Components()
+            .addSecuritySchemes("bearerAuth",
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")))
+        .info(new Info().title("Secure API").version("1.0"));
+}
+Now, Swagger UI will show an "Authorize" button to enter your JWT token.
+
+🔷 The OpenAPI Specification (OAS)
+At the heart of Swagger lies the OpenAPI Specification — a language-agnostic standard to describe REST APIs.
+
+Example (in YAML or JSON):
+openapi: 3.0.0
+info:
+  title: Student API
+  version: 1.0.0
+paths:
+  /students:
+    get:
+      summary: Get all students
+      responses:
+        '200':
+          description: Successful response
+
+This specification defines:
+✔️ Endpoints (/students)
+✔️ HTTP methods (GET, POST, etc.)
+✔️ Parameters and request bodies
+✔️ Responses and status codes
+✔️ Authentication methods
+✔️ Data models (schemas)
+
+🔄 Swagger Ecosystem (Tools)
+Swagger offers a suite of tools for API lifecycle management:
+| Tool                           | Purpose                                                           |
+| ------------------------------ | ----------------------------------------------------------------- |
+| **Swagger Editor**             | Write and visualize the OpenAPI spec in the browser.              |
+| **Swagger UI**                 | Generate interactive API documentation (try out APIs in browser). |
+| **Swagger Codegen**            | Auto-generate client SDKs or server stubs from spec.              |
+| **SwaggerHub**                 | Cloud-based platform to collaborate on API design & docs.         |
+| **Swagger Parser / Validator** | Validate and parse OpenAPI documents.                             |
+
+
+🔄 Why Swagger is Used (Main Benefits)
+1️⃣ Standardization
+➤ Defines APIs in a consistent, machine-readable format using OpenAPI.
+➤ Acts as a single source of truth for developers and consumers.
+
+2️⃣ Documentation
+➤ Automatically generates beautiful, interactive documentation.
+➤ Users can try endpoints directly from the Swagger UI.
+
+3️⃣ Communication & Collaboration
+➤ Helps backend and frontend teams communicate API contracts early.
+➤ Reduces miscommunication between teams.
+
+4️⃣ Testing and Mocking
+➤ You can test API endpoints directly from Swagger UI.
+➤ Can create mock servers before backend implementation (useful for frontend devs).
+
+5️⃣ Code Generation
+Auto-generates client SDKs (Java, Python, JS, etc.) and server stubs, saving development time.
+
+6️⃣ Version Control
+Swagger specs are plain JSON/YAML, easy to version control via Git.
+
+Use Cases of Swagger
+| Use Case                        | Description                                                                |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| **API Design First Approach**   | Design the API in Swagger before writing backend code.                     |
+| **API Documentation**           | Generate interactive, shareable API docs automatically.                    |
+| **Client SDK Generation**       | Generate code for calling APIs in various programming languages.           |
+| **Testing APIs**                | Manually test API endpoints (GET, POST, PUT, DELETE) from the UI.          |
+| **Mocking APIs**                | Simulate API behavior before the backend is ready.                         |
+| **Contract-Driven Development** | Both frontend and backend developers agree on the Swagger spec (contract). |
+| **Versioning and Maintenance**  | Easily manage changes in API versions and update docs automatically.       |
+
+
+✅ Real-World Examples
+1️⃣ Swagger UI in Spring Boot:
+➤ By adding the springdoc-openapi dependency, your API endpoints are ➤ automatically documented and accessible at:
+👉 http://localhost:8080/swagger-ui.html
+
+2️⃣ In Microservices Architecture:
+Each microservice can have its own Swagger documentation for easier integration and testing.
+
+3️⃣ In API Gateways:
+Tools like Kong, Tyk, or AWS API Gateway can import Swagger specs for route definitions and documentation.
+
+
+✅ Example Flow
+➤ Developer creates swagger.yaml describing all API endpoints.
+➤ Swagger Editor validates and previews it.
+➤ Swagger Codegen generates:
+    ✔️ Backend stubs (controller, routes)
+    ✔️ Client SDKs (JS, Python, Java, etc.)
+➤ Swagger UI visualizes endpoints:
+    ✔️ /users → GET, POST, PUT, DELETE
+➤ Test APIs interactively from the Swagger UI browse
+
+
+🔄 Swagger + Security
+You can define security mechanisms such as:
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+👉 This tells Swagger UI to include an "Authorize" button where users can input JWT tokens before testing secured endpoints.
+
+
+Swagger 🆚 Postman
+| Feature         | Swagger                                | Postman                     |
+| --------------- | -------------------------------------- | --------------------------- |
+| Purpose         | API design, documentation, and testing | API testing and collections |
+| Format          | Based on OpenAPI spec                  | JSON-based collections      |
+| Docs            | Auto-generated, interactive            | Requires manual setup       |
+| Code Generation | Yes (via Swagger Codegen)              | Limited                     |
+| Collaboration   | SwaggerHub (team design)               | Postman Workspaces  
+        |
+⚡ In short:
+Swagger = For designing + documenting APIs
+Postman = For testing + automation of APIs
+

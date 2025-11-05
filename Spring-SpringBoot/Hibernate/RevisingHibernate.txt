@@ -240,15 +240,15 @@ public class Appointment{
 }
 
 🔄 ManyToOne Mapping(Appointment <-> Patient)
-| Aspect                          | Explanation                                                                                                                         |
-|Entities Involved                    | `Appointment` (many) ↔ `Patient(one)                                                                                            |
-| Meaning                         | A single patient can have multiple appointments, but each appointment belongs to exactly one patient.                               |
-| Owning Side                     | `Appointment` is the owning side because it contains the foreign key column `patient_id`.                                       |
-|Foreign Key              | The `@JoinColumn(name="patient_id")` annotation creates a foreign key in the `appointment` table that references the `patient` table’s `id` |
-| Nullable = false                | Ensures that every appointment must have an associated patient — an appointment cannot exist without a patient.                 |
-|Inverse Relationship(Optional)| Patient`class, define the reverse mapping using `@OneToMany(mappedBy = "patient")` if we want to access all appointments of a patient  |
-| Database Table Structure        | The `appointment` table will have columns like `id`, `appointment_time`, `reason`, and `patient_id` (FK referencing `patient.id`).  |
-| Example    | Patient “John” can have appointments like “General Checkup” and “Follow-up Visit”. Both appointments will have the same `patient_id` (John’s ID).        |
+| Aspect                 | Explanation                                                                                                                                 |
+| Entities Involved      | `Appointment` (many) ↔ `Patient(one)                                                                                                        |
+| Meaning                | A single patient can have multiple appointments, but each appointment belongs to exactly one patient.                                       |
+| Owning Side            | `Appointment` is the owning side because it contains the foreign key column `patient_id`.                                                   |
+| Foreign Key            | The `@JoinColumn(name="patient_id")` annotation creates a foreign key in the `appointment` table that references the `patient` table’s `id` |
+| Nullable = false       | Ensures that every appointment must have an associated patient — an appointment cannot exist without a patient.                             |
+|Inverse Relationship    | Patient`class, define the reverse mapping using `@OneToMany(mappedBy = "patient")` if we want to access all appointments of a patient       |
+|  DB Table Structure    | The `appointment` table will have columns like `id`, `appointment_time`, `reason`, and `patient_id` (FK referencing `patient.id`).          |
+| Example                | Ex.“John” have appointments like “General Checkup” & “Follow-up Visit”.Both appointments will have same `patient_id` (John’s ID).           |
 
 
 ======================

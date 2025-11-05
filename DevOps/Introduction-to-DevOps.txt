@@ -1,0 +1,214 @@
+🔷 DevOps
+DevOps (Development + Operations) is a set of practices that combines software development (Dev) and IT operations (Ops) to:
+➤ Increase software delivery speed using Automation
+➤ Improve product quality
+➤ Enable continuous integration and deployment (CI/CD)
+➤ Continuous Monitoring and logging
+➤ Continuous Testing
+DevOps is a culture and process that helps teams build, test, and release software faster and more reliably through automation and collaboration.
+
+🔷 Why Devops?
+Because it solves the traditional gap between developers and operations teams.
+
+🔑 Key Reasons:
+✔️ Faster Delivery: Automates build, test, and deployment → delivers updates quickly.
+✔️ Better Collaboration: Breaks silos between dev & ops → teams work together efficiently.
+✔️ Higher Quality: Continuous testing & monitoring → fewer bugs in production.
+✔️ Scalability: Easier to handle large, complex systems through automation tools.
+✔️ Reliability: Continuous integration and deployment ensure stable, consistent releases.
+✔️ Quick Recovery: Issues are detected and fixed faster with monitoring and rollback features.
+✔️ Customer Satisfaction: Frequent updates and faster fixes → happier users.
+
+
+🔷 Software Development Lifecycle(SDLC) 
+SDLC is the process used to design, develop, test, and deploy software systematically and efficiently.
+
+🧩 Phases of SDLC:
+✔️ Requirement Analysis(Planning and Defining)
+➤ Understand what the client/user needs.
+➤ Gather and docu ment functional & non-functional requirements.
+➤ Output: Software Requirement Specification (SRS)
+
+✔️ System Design
+➤ Plan architecture, database, UI, and technology stack.
+➤ Output: Design Documents, Wireframes
+
+⚡ DevOps Centric Phases
+✔️ Implementation (Coding)
+➤ Developers write code based on the design.
+➤ Follow coding standards and version control.
+
+✔️ Testing
+➤ Verify that the software works correctly and meets requirements.
+➤ Includes unit testing, integration testing, and system testing.
+
+✔️ Deployment
+➤ Release the software to production (end users).
+➤ Can be manual or automated (DevOps CI/CD).
+
+✔️ Maintenance
+➤ Fix bugs, update features, and ensure system reliability.
+
+🔁 Popular SDLC Models:
+➤ Waterfall Model: Linear, phase-by-phase.
+➤ Agile Model: Iterative and flexible.
+➤ Spiral Model: Combines design + prototyping.
+➤ V-Model: Verification and validation in parallel.
+
+
+🔷 Roles in Company
+✔️ Business Analyst: Gathers and documents customer requierments.
+✔️ Product Manager: Defines the vision, goals, and priorities
+✔️ Product Owner: Manages baclong and converts vision into actionable stories
+✔️ UI/UX Designer: Designs user interface and user experience.
+✔️ Software Architect: Designs technical system structure and frameworks.
+✔️ Developers: Build the actual product(UI, APIs, databases).
+✔️ DBA: Designs and manages the database.
+✔️ Security Engineer: Ensures product and infrasturcture security.
+✔️ QA Engineer: Tests product quality and performance.
+✔️ DevOps Engineer: Builds CI/CD pipelines and manages environments.
+✔️ Release Manager: Plans and manages releases.
+✔️ SRE: Ensures uptime, performance, and reliability post-release.
+✔️ Technical Writer: Creates documentation for users and developers.
+
+🔷 Virtual Machines (VM)
+➤ A Virtual Machine is a software-based computer that runs inside another physical computer.
+➤ It behaves just like a real machine (has its own CPU, memory, disk, OS), but it's virtual — created using virtualization software.
+➤ A VM is like a computer inside a computer.
+
+🌐 What is a Server?
+A server is a computer that provides resources or services (like websites, databases, or files) to other computers (called clients) over a network.
+
+✅ Example:
+✔️ A web server hosts websites.
+✔️ A database server stores and manages data.
+
+⚙️ Physical vs Virtual Servers
+| Feature            | **Physical Server**                      | **Virtual Server (VM)**                                        |
+| ------------------ | ---------------------------------------- | -------------------------------------------------------------- |
+| **Definition**     | Actual hardware machine                  | Software-based machine running on a physical host              |
+| **Resource Usage** | Dedicated (not shared)                   | Shared among multiple VMs                                      |
+| **Scalability**    | Difficult (requires new hardware)        | Easy (create new VMs quickly)                                  |
+| **Cost**           | Expensive                                | Cost-effective                                                 |
+| **Isolation**      | One OS per server                        | Multiple OSs can run on one physical machine                   |
+| **Example**        | A Dell PowerEdge server in a data center | Several Ubuntu/Windows VMs running inside VMware or VirtualBox |
+
+
+🔄 Hypervisor
+A Hypervisor is software that creates and manages virtual machines by sharing physical resources (CPU, RAM, disk) between them. 
+🧩 Types of Hypervisors:
+👉 Type 1 – Bare Metal Hypervisor:
+➤ Runs directly on hardware (no host OS).
+✅ Examples: VMware ESXi, Microsoft Hyper-V, KVM
+
+👉 Type 2 – Hosted Hypervisor:
+➤ Runs on top of a host OS (like an app).
+✅ Examples: Oracle VirtualBox, VMware Workstation
+
+🌍 Real-World Examples:
+✔️ Cloud Providers:
+➤  AWS EC2, Google Cloud Compute Engine, Azure VMs — all use virtualization to create VMs on demand.
+
+✔️ Development & Testing:
+➤  Developers use VMs to test software in multiple OS environments.
+
+✔️ Server Consolidation:
+➤  Companies run multiple VMs (web server, DB server, mail server) on a single physical server to save costs.
+
+
+❓ How to Automate the creation of Virtual Machines on any Cloud Platform using API?
+Automation means you don’t manually click buttons to create a VM — instead, you use scripts or tools to create and manage VMs automatically.
+
+1️⃣ AWS CLI (Command Line Interface)
+➤ A command-line tool to interact directly with AWS services.
+➤ Executes imperative commands (step-by-step actions).
+
+✅ Example:
+aws ec2 run-instances --image-id ami-0abcdef --instance-type t2.micro
+
+🔄 Use case:
+➤ Quick manual automation or scripting.
+➤ Good for ad-hoc tasks, like creating or stopping instances.
+⚙️ Level: Low-level (manual commands)
+
+2️⃣ AWS SDK / API
+➤ Programmatic access to AWS services using code.
+➤ Available for languages like Python (Boto3), JavaScript, Java, etc.
+
+✅ Example (Python Boto3):
+import boto3
+ec2 = boto3.client('ec2')
+ec2.run_instances(ImageId='ami-0abcdef', InstanceType='t2.micro', MinCount=1, MaxCount=1)
+
+🔄 Use case:
+➤ When you want to integrate AWS operations inside an app or custom automation scripts.
+⚙️ Level: Low-level (programmatic control)
+
+3️⃣ AWS CloudFormation (CFT)
+➤ Infrastructure as Code (IaC) tool native to AWS.
+➤ Uses YAML/JSON templates to define and deploy AWS resources.
+
+✅ Example (YAML):
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0abcdef
+      InstanceType: t2.micro
+
+🔄 Use case:
+➤ Automate AWS infrastructure provisioning in a declarative way.
+➤ Used for repeatable deployments (same infra across environments).
+⚙️ Level: Declarative IaC (AWS-only)
+
+4️⃣ Terraform
+➤ Multi-cloud Infrastructure as Code tool by HashiCorp.
+➤ Works with AWS, Azure, GCP, etc.
+➤ Uses HCL (HashiCorp Configuration Language).
+
+✅ Example (HCL):
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0abcdef"
+  instance_type = "t2.micro"
+}
+
+🔄 Use case:
+➤ Cross-cloud automation
+➤ Version-controlled infrastructure
+➤ More flexible than CloudFormation (modular, reusable, portable).
+⚙️ Level: Declarative IaC (multi-cloud)
+
+💡 5️⃣ AWS CDK (Cloud Development Kit)
+➤ High-level Infrastructure as Code using real programming languages (TypeScript, Python, Java, etc.)
+➤ Converts your code → CloudFormation under the hood.
+
+✅ Example (TypeScript):
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { Stack } from 'aws-cdk-lib';
+
+class MyStack extends Stack {
+  constructor(scope, id, props) {
+    super(scope, id, props);
+    new ec2.Instance(this, 'MyInstance', {
+      instanceType: new ec2.InstanceType('t2.micro'),
+      machineImage: ec2.MachineImage.latestAmazonLinux(),
+    });
+  }
+}
+
+🔄 Use case:
+➤ Developers who prefer real code over YAML.
+➤ Allows loops, conditions, functions in infra definitions.
+⚙️ Level: High-level IaC (code-driven)
+
+| Tool                     | Type            | Scope       | Language         | Style                    | Use Case                     |
+| ------------------------ | --------------- | ----------- | ---------------- | ------------------------ | ---------------------------- |
+| **AWS CLI**              | Command line    | AWS only    | Shell            | Imperative               | Quick manual automation      |
+| **AWS SDK/API**          | Programming API | AWS only    | Python, JS, etc. | Imperative               | Embed AWS ops in code        |
+| **CloudFormation (CFT)** | IaC             | AWS only    | YAML/JSON        | Declarative              | AWS-native infra automation  |
+| **Terraform**            | IaC             | Multi-cloud | HCL              | Declarative              | Cross-cloud infra automation |
+| **AWS CDK**              | IaC             | AWS only    | Python/TS/Java   | Declarative (code-based) | Code-native infra definition |

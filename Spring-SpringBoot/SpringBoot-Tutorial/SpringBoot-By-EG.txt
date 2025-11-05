@@ -1129,6 +1129,24 @@ System.out.println(context.getEnvironment().getActiveProfiles()[0]);
 
 3️⃣ Java Util Logging (JUL): A logging framework that is a part of the Java platform. While it's less feature rich than some third-party frameworks, it is straightforward to use.
 
+4️⃣ Log Monitoring Tools
+1. Putty -- CLI tool
+2. WinScp -- GUI tool
+   ➤ Using WinScp we can upload and download files from windows to linux or vice versa using the file explorer.
+3. ELK -- GUI tool
+    ➤ E = Elasticsearch, L = Logstash, K = Kibana     
+4. Splunk(Licensed) -- GUI tool
+
+🔄 How to Connect to Putty
+1️⃣ Open Putty CLI in your machine
+2️⃣ Enter the IP address of your server
+4️⃣ Enter the port number
+5️⃣ Enter the username
+6️⃣ Enter the password
+7️⃣ Connect
+ 
+Enter the keypair file in Auth --> Credentials and enter the username and password for authentication on linux server and access the log file.
+
 ✔️ Spring Boot uses Logback as the default logging framework provides a good balance between simplicity and performance.
 ✔️ The default configuration is embedded within the Spring Boot libraries, and it may not be visible in your application's source code.
 ✔️ If you want to customize the logging configuration, you can create your own logback-spring.xml or logback.xml file in the src/main/resources directory.
@@ -1257,6 +1275,14 @@ public void init() {
     logger.info("Active profile: {}", activeProfile);
 }
 
+🔄 Logback Architecture (Default in Spring Boot)
+🔗 Logger → Appender → Layout → Destination
+
+➤ Logger: The entry point in your code (LoggerFactory.getLogger(...))
+➤ Appender: Defines where to send logs (console, file, socket)
+➤ Layout / Encoder: Defines how the log message looks
+➤ Destination: Final output (file, stdout,+ Database etc.)
+
 🔄 Configure in logback-spring.xml (Advanced)
 When we have application.properties, we should use logback-spring.xml for logging configuration specifically.
 
@@ -1277,6 +1303,7 @@ When we have application.properties, we should use logback-spring.xml for loggin
         </encoder>
         <file>PAth_of_the_file</file>
     </appender>
+👉  Database appender use jdbcAppender
 
 👉 Set the root level and attach the console appender
     <root level="INFO">

@@ -3,14 +3,13 @@
 ➤ Improves readability and makes code look cleaner.
 ➤ Introduced in Java 8 with functional programming features.
 
-🔹 Syntax
+🔄 Syntax
 ClassName::methodName
 object::methodName
 ClassName::new  (for constructors)
 
-🔹 Types of Method References
+🔄 Types of Method References
 ✅Type 1: Reference to a static method
-
 list.forEach(System.out::println);  
 // equivalent to: list.forEach(x -> System.out.println(x));
 
@@ -28,12 +27,12 @@ names.sort(String::compareToIgnoreCase);
 Supplier<Student> s = Student::new;
 Student st = s.get();
 
-🔹 Why Method Reference?
+🔄 Why Method Reference?
 ➤ Makes lambda shorter and cleaner.
 ➤ Avoids boilerplate (param) -> obj.method(param).
 ➤ Improves readability in sorting, filtering, mapping, etc.
 
-🔹 Example: Sorting with Method Reference
+🔄 Example: Sorting with Method Reference
 students.sort(Comparator.comparingInt(Student::getAge));
 
 Equivalent lambda:
@@ -1187,7 +1186,7 @@ Map<String, Double> avgMarksBySubject = students.stream()
 ➤ Extra specialized methods (like sum(), average(), range(), etc.).
 
 2️⃣ Types of Primitive Streams
-🔹 IntStream: Used for int values.
+🔄 IntStream: Used for int values.
 ✅ Example:
 
 import java.util.stream.*;
@@ -1200,7 +1199,7 @@ public class IntStreamExample {
     }
 }
 
-🔹 LongStream: Used for long values.
+🔄 LongStream: Used for long values.
 ✅ Example:
 
 import java.util.stream.*;
@@ -1212,7 +1211,7 @@ public class LongStreamExample {
     }
 }
 
-🔹 DoubleStream: Used for double values.
+🔄 DoubleStream: Used for double values.
 ✅ Example:
 
 import java.util.stream.*;

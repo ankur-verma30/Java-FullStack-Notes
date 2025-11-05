@@ -600,6 +600,8 @@ The generated view is returned to the DispatcherServlet, which sends it back as 
 1️⃣ Query Parameters (?key=value)
 ➤ Data is sent in the URL after a ?, as key-value pairs.
 ➤ Often used for filtering, searching, or optional parameters.
+➤ Query parameters are only present at the end of the url.
+➤ Query parameters are less secure as they are visible in the URL.
  
 ✅ Example URL:
 GET /patients?age=30&gender=male
@@ -619,6 +621,7 @@ public List<Patient> getPatients(
 2️⃣ Path Parameters (Dynamic Part of URL)
 ➤ Data is part of the URI path itself.
 ➤ Used to identify a specific resource.
+➤ Path parameters can be present anywhere in the url.
 
 ✅ Example URL:
 GET /patients/101
@@ -655,3 +658,344 @@ public Patient createPatient(@RequestBody Patient patient) {
 ➤ Works with POST, PUT, PATCH.
 ➤ Ideal for sending JSON/XML payloads.
 ➤ Must set appropriate Content-Type (e.g., application/json).
+
+Spring Web MVC module provide Form Tag library to simplify form handling.
+<form:form/>
+<form:input/>
+<form:errors/>
+<form:label/>
+<form:select/>
+<form:password/>
+
+✅Example:
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+    <h2>Login Here...</h2>
+    <form action="login" method="post">
+        <label>Email: </label> <input type="text" name="email" /> <br /> <label>Password:
+        </label> <input type="password" name="password" /> <br /> <input
+            type="submit" value="login" />
+    </form>
+</body>
+</html>
+
+🔷 H2 database
+H2 Database is a lightweight, fast, open-source relational database written in Java. It’s often used for development, testing, and small-scale production applications, especially when you don’t want to set up a full external database like MySQL or PostgreSQL.
+
+⚙️ Key Features
+➤ -memory & file-based modes:
+    ✔️ In-memory mode: Data is stored in RAM (deleted when app stops).
+    ✔️ File-based mode: Data is stored on disk (persistent).
+➤ Pure Java: Runs anywhere Java runs.
+➤ Embedded or Server mode:
+    ✔️ Embedded: Runs inside your application.
+    ✔️ Server: Can be accessed remotely via TCP.
+➤ Compatible with JDBC & SQL: Fully supports standard SQL syntax.
+➤ Browser-based console: Comes with an easy-to-use web UI at http://localhost:8082.
+
+Very fast startup & execution speed.
+
+🧩 Common Use Case
+➤ In Spring Boot projects, H2 is used for:
+➤ Quickly testing your JPA or Hibernate code.
+➤ Running unit/integration tests without needing MySQL/PostgreSQL.
+➤ Prototyping new applications before connecting to a real database.
+
+✅ Example (Spring Boot Application)
+application.properties
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true
+
+Now you can access the database console at:
+👉 http://localhost:8080/h2-console
+
+🗃️ Example Query
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50),
+  email VARCHAR(50)
+);
+
+INSERT INTO users (name, email) VALUES ('Ankur', 'ankur@example.com');
+SELECT * FROM users;
+
+⚡ Advantages
+➤ Extremely lightweight and fast.
+➤ No setup required.
+➤ Ideal for testing and development.
+➤ 
+🚫 Limitations
+➤ Not designed for high concurrency or large-scale production.
+➤ Data in memory mode is temporary.
+➤ Limited performance compared to enterprise DBs like PostgreSQL or MySQL. 
+
+
+🔷 @Valid Annottion and Binding result in Spring Boot
+To enable validation in our spring project we have to add dependency:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+
+➤ @Valid is used to trigger validation on an object (usually a request body or form input) before it reaches your controller logic.
+➤ It works with Jakarta Bean Validation (JSR-380) — typically using annotations like:
+✔️ @NotNull
+✔️ @NotEmpty
+✔️ @Size
+✔️ @Email
+✔️ @Min, @Max, etc.
+
+✅ Example: Using @Valid in a Controller
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @PostMapping("/register")
+    public String registerUser(@Valid @RequestBody User user, BindingResult result) {
+        if (result.hasErrors()) {
+            return "Validation failed: " + result.getAllErrors();
+        }
+        return "User registered successfully!";
+    }
+}
+
+🧱 User Entity Example
+import jakarta.validation.constraints.*;
+
+public class User {
+
+    @NotEmpty(message = "Name cannot be empty")
+    private String name;
+
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @Min(value = 18, message = "Age must be at least 18")
+    private int age;
+
+    // Getters and Setters
+}
+
+🔄 BindingResult in Spring Boot
+➤ BindingResult is used right after the @Valid annotated object.
+➤ It captures validation errors detected during the validation process.
+➤ It must immediately follow the validated parameter in the method signature, or Spring will throw an exception.
+
+⚠️ Example — Wrong Order (will not work)
+// ❌ Incorrect
+public String registerUser(BindingResult result, @Valid @RequestBody User user) { ... }
+
+
+✅ Correct Order:
+public String registerUser(@Valid @RequestBody User user, BindingResult result) { ... }
+
+🔄 What BindingResult Contains
+🔗 result.hasErrors() → checks if there are validation errors
+🔗 result.getAllErrors() → returns all validation messages
+🔗 result.getFieldErrors() → returns only field-specific errors
+
+🔄 Typical Use Case Flow
+➤ Client sends JSON data to endpoint
+➤ Spring validates it using @Valid and annotations in the DTO
+➤ If errors exist → captured in BindingResult
+➤ Controller handles validation failure gracefully (instead of 400 Bad Request)
+
+✅ Example Output (if invalid data sent)
+Request Body:
+{
+  "name": "",
+  "email": "invalid",
+  "age": 15
+}
+
+✅ Response:
+Validation failed: [Field error in object 'user' on field 'name': rejected value []; 
+ message: Name cannot be empty,
+ Field error in object 'user' on field 'email': rejected value [invalid]; 
+ message: Invalid email format,
+ Field error in object 'user' on field 'age': rejected value [15]; 
+ message: Age must be at least 18]
+
+
+❓ How to configure Jetty as embedded server?
+Even if you remove the spring-boot-starter-tomact-dependency from pom.xml file it will still work.
+for that we have to use exclusions
+
+<exclusions>
+  <exclusion>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-tomcat</artifactId>
+  </exclusion>
+</exclusions>
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency> 
+
+@RestController is used to send direct response to client without any view files.
+
+
+🔷 Interceptor in Spring Web MVC
+An Interceptor in Spring MVC is a component that intercepts HTTP requests and responses —
+before they reach the controller and after the controller has executed.
+
+Think of it as a middleware that can:
+➤ Pre-process requests (like checking authentication)
+➤ Post-process responses (like adding custom headers)
+➤ Handle after-completion logic (like logging or cleanup)
+
+🔄 Use Case of Interceptor
+➤ Calculate each request processing time
+➤ Log Request and Response details
+➤ Add custom headers to responses
+➤ Add analytics/tracking events
+
+✅ Example: Interceptor in Spring Boot
+import org.springframework.web.servlet.HandlerInterceptor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+public class LoggingInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        System.out.println("➡️ Request URL: " + request.getRequestURL());
+        return true; // continue to controller
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, 
+                           Object handler, org.springframework.web.servlet.ModelAndView modelAndView) {
+        System.out.println("✅ Controller executed successfully.");
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, 
+                                Object handler, Exception ex) {
+        System.out.println("🏁 Request completed.");
+    }
+}
+
+🔄 Microservices / Spring Boot REST APIs
+    ✔️ Interceptors are still used, but less often for security, because:
+    ✔️ Authentication/authorization is usually handled by Spring Security filters (JWT, OAuth2).
+    ✔️ Cross-cutting concerns may be handled by AOP (Aspects) or Filters.
+However, interceptors are still useful for:
+    ✔️ API request/response logging
+    ✔️ Adding custom headers (e.g., trace ID for distributed tracing)
+    ✔️ Request timing or rate-limiting hooks
+    ✔️ Analytics/tracking events before controller execution
+
+🔄 In modern alternatives (Reactive apps)
+➤ For Spring WebFlux (reactive), the equivalent concept is called a WebFilter, not an interceptor.
+➤ So if the app is reactive, you’ll rarely see traditional interceptors.
+
+
+🔷 Exception Handling in Spring MVC
+1️⃣ Using @ExceptionHandler (Method-Level)
+Used inside a specific controller to handle exceptions thrown only by that controller.
+
+@Controller
+public class UserController {
+
+    @GetMapping("/user/{id}")
+    public String getUser(@PathVariable int id) {
+        if (id <= 0)
+            throw new IllegalArgumentException("Invalid ID");
+        return "user";
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleInvalidId(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+}
+📌 Use when you want controller-specific exception handling.
+
+2️⃣ Using @ControllerAdvice (Global Exception Handling) or using @RestControllerAdvice
+A class annotated with @ControllerAdvice applies to all controllers globally.
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAll(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Something went wrong: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+}
+📌 Best practice for production apps — keeps controllers clean.
+
+3️⃣ Using @ResponseStatus on Custom Exceptions
+Attach HTTP status directly to an exception class.
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String msg) {
+        super(msg);
+    }
+}
+Now if you throw new ResourceNotFoundException("User not found"),
+Spring automatically returns a 404 response.
+
+4️⃣ Using ResponseEntityExceptionHandler (Framework-Level)
+You can extend this base class to override built-in exception handling (like MethodArgumentNotValidException, HttpRequestMethodNotSupportedException, etc.).
+
+@ControllerAdvice
+public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex,
+        HttpHeaders headers,
+        HttpStatus status,
+        WebRequest request) {
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+}
+📌 Use this when you want to customize Spring’s built-in validation error responses.
+
+🔄Hierarchy of Handling
+If multiple exception handlers match:
+    ✔️ Method-level @ExceptionHandler (highest priority)
+    ✔️ @ControllerAdvice (global)
+    ✔️ Default Spring error page (if not caught above)
+
+⚡ Example Flow
+➤ If /user/0 is requested:
+    ✔️ IllegalArgumentException is thrown
+    ✔️ Handled by either:
+        ➤ @ExceptionHandler in UserController, OR
+        ➤ global @ControllerAdvice, OR
+        ➤ default Spring error JSON if none found
