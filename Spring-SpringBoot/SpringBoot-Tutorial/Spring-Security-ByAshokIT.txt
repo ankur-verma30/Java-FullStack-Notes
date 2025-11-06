@@ -1,0 +1,140 @@
+🔷 Spring Security?
+
+Spring Security is a powerful and customizable security framework provided by the Spring ecosystem.
+It is used to secure Java web applications, especially Spring Boot applications, by handling
+✔️ Authentication → Who are you
+✔️ Authorization → What are you allowed to do?
+
+It’s like a security guard that checks the identity of users and ensures they can only access what they’re permitted to.
+
+
+🔄 Core Features of Spring Security
+| Feature                    | Description                                                                   |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| 🔑 **Authentication**      | Verifies the user’s identity (e.g., via username/password, JWT, OAuth2, etc.) |
+| 🧾 **Authorization**       | Controls access to specific endpoints or resources                            |
+| 🧱 **Session Management**  | Handles login sessions, cookies, and logout behavior                          |
+| 🕵️ **CSRF Protection**    | Prevents Cross-Site Request Forgery attacks                                   |
+| 🛡️ **CORS Handling**      | Controls which front-end origins can access backend APIs                      |
+| 🔒 **Password Encryption** | Uses secure hashing (e.g., BCrypt) for passwords                              |
+| 🌐 **Integration Support** | Works with JWT, OAuth2, LDAP, SSO, etc.                                       |
+
+
+🔄 How Spring Security Works
+1️⃣ User sends a request
+✅ Example:
+POST /login
+{
+  "username": "ankur",
+  "password": "1234"
+}
+
+2️⃣ Spring Security intercepts the request
+It checks whether the request requires authentication or not.
+
+3️⃣ Authentication Manager verifies credentials
+➤ The AuthenticationManager delegates authentication to providers (like a DaoAuthenticationProvider).
+➤ It loads the user using a UserDetailsService from the database or in-memory storage.
+➤ Passwords are compared using a PasswordEncoder (e.g., BCrypt).
+
+4️⃣ If successful
+➤ Spring Security generates an Authentication object.
+➤ The user’s details are stored in the SecurityContext.
+➤ The user gains access to secured endpoints.
+
+5️⃣ If failed
+The framework automatically returns a 401 Unauthorized or 403 Forbidden response.
+
+
+🔄 Key Components
+| Component                 | Description                                                              |
+| ------------------------- | ------------------------------------------------------------------------ |
+| **SecurityFilterChain**   | Defines which routes are secured and what kind of authentication applies |
+| **AuthenticationManager** | Core engine that performs authentication                                 |
+| **UserDetailsService**    | Loads user info from DB or memory                                        |
+| **UserDetails**           | Represents a single user                                                 |
+| **PasswordEncoder**       | Encrypts and verifies passwords                                          |
+| **SecurityContextHolder** | Stores the authenticated user details in current thread                  |
+
+➤ By default spring security gives password and after that the endpoints can be accessed by using:
+✔️ username: user 
+✔️ password: <password given on console>
+
+We can override the default behavior by using:
+🔗 spring.security.user.name=your-username
+🔗 spring.security.user.password=your-password
+
+We do not need security for all the endpoints just some of it so we can configure it using configuration file of spring security.
+
+✅ Example (Modern Spring Boot 3+)
+In Spring Boot 3, security configuration uses a bean instead of extending WebSecurityConfigurerAdapter (which is deprecated).
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()   // no auth required
+                .requestMatchers("/api/admin/**").hasRole("ADMIN") // only ADMIN
+                .anyRequest().authenticated()                    // others need login
+            )
+            .httpBasic(Customizer.withDefaults()); // basic auth (username/password)
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails user = User.withUsername("ankur")
+                .password(passwordEncoder().encode("1234"))
+                .roles("USER")
+                .build();
+
+        UserDetails admin = User.withUsername("admin")
+                .password(passwordEncoder().encode("admin"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(user, admin);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+👉 Now:
+✔️ /api/public/** → accessible to everyone
+✔️ /api/admin/** → accessible only to ADMIN
+✔️ /api/** → requires authentication
+
+🔄 Types of Authentication Supported
+| Type                     | Description                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| **Basic Auth**           | Username and password in the request header (simple, but not very secure alone) |
+| **Form Login**           | Traditional HTML login form                                                     |
+| **JWT (JSON Web Token)** | Token-based authentication for REST APIs                                        |
+| **OAuth2 / SSO**         | Login with Google, GitHub, etc.                                                 |
+| **LDAP**                 | Enterprise authentication system                                                |
+
+🔄 Spring Security + Microservices
+➤ In a microservice architecture:
+    ✔️ API Gateway often handles authentication (via JWT).
+    ✔️ Individual microservices use Spring Security to verify and authorize requests based on roles/claims inside the JWT.
+
+➤ Common pattern:
+    ✔️ Gateway validates the token → passes user info in headers.
+    ✔️ Downstream services apply @PreAuthorize or role-based access control.
+
+
+ 
+🔄
+🔄
+🔄
+🔄
+🔄
+🔄
+🔄

@@ -1095,3 +1095,318 @@ public class GlobalRestExceptionHandler {
 ➤ Adds flexibility, but rarely used due to security concerns.
 
 
+🔷 HATEOAS (Hypermedia As The Engine Of Application State)
+➤ HATEOAS is a REST principle that allows a client to dynamically navigate a REST API using hyperlinks provided in the responses.  
+➤ It means that each response from the server includes links (URLs) to related actions or resources — guiding the client on what can be done next.
+
+2️⃣ Purpose  
+➤ Makes REST APIs more discoverable and self-descriptive.  
+➤ Client does not need hard-coded knowledge of API routes.  
+➤ Reduces coupling between client and server.  
+➤ Enables API evolution without breaking clients.
+
+✅ Example  
+   ➤ Without HATEOAS:
+       {
+         "id": 1,
+         "name": "Ankur",
+         "department": "IT"
+       }
+
+   ➤ With HATEOAS:
+       {
+         "id": 1,
+         "name": "Ankur",
+         "department": "IT",
+         "_links": {
+           "self": { "href": "http://localhost:8080/api/students/1" },
+           "all_students": { "href": "http://localhost:8080/api/students" },
+           "update": { "href": "http://localhost:8080/api/students/1" },
+           "delete": { "href": "http://localhost:8080/api/students/1" }
+         }
+       } 
+🔗 _links.self → shows the current resource link
+🔗 _links.update → tells where to send a PUT request to update
+🔗 _links.delete → tells where to send a DELETE request
+🔗 _links.all-students → provides link to fetch all students
+
+
+4️⃣ Key Components  
+➤ Resource Representation → The actual data (like student details).  
+➤ Hypermedia Links → Embedded links to related resources/actions.  
+➤ Relation Types → Describe purpose of each link (self, update, delete, etc.)
+
+5️⃣ Implementation In Spring Boot  
+➤ Spring provides support via `spring-hateoas` library.  
+➤ You can use classes like:
+         ✔️ EntityModel<T> : wraps a resource and adds links.
+         ✔️ WebMvcLinkBuilder : used to build links to controller methods.
+
+✅ Example:
+         Student student = new Student(1, "Ankur");
+         EntityModel<Student> model = EntityModel.of(student);
+         model.add(linkTo(methodOn(StudentController.class)
+             .getStudentById(1)).withSelfRel());
+         model.add(linkTo(methodOn(StudentController.class)
+             .getAllStudents()).withRel("all_students"));
+
+
+🔄 Benefits of HATEOAS
+1️⃣ Discoverability
+➤ Clients can discover available actions dynamically through links in the response.
+➤ No need for clients to hardcode URLs — they just follow links provided by the server.
+
+2️⃣ Reduced Coupling
+➤ Client and server are loosely coupled.
+➤ If server endpoints change, clients still work as long as links in responses are updated.
+➤ Makes APIs easier to evolve without breaking old clients.
+
+3️⃣ Self-Descriptive APIs
+➤ Each response contains both data and the available next actions.
+➤ Clients can understand what to do next without additional documentation.
+
+4️⃣ Easier Navigation
+➤ Just like browsing a website, the client navigates the API using provided links.
+➤ Example: From a student resource, client can directly get links to update or delete that student.
+
+5️⃣ Better Maintainability
+➤ Since clients depend on links, not hardcoded URIs, server changes cause minimal impact.
+➤ Makes long-term maintenance and versioning simpler.
+
+6️⃣ Improved Usability
+➤ Helps build intelligent clients that can automatically discover and consume new features.
+➤ Especially useful for large-scale or evolving APIs.
+
+
+🔷 working of HATEOAS with REST API in springboot
+🔄 Add Dependency
+Add this to your pom.xml:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-hateoas</artifactId>
+</dependency>
+
+🔄 Create a Simple Entity (Example: Student) Work without extending RepresentationModel class
+public class Student {
+    private Long id;
+    private String name;
+    private String course;
+
+    // Constructors, Getters, Setters
+}
+
+🔄 Create a Controller with HATEOAS Support
+Use Spring HATEOAS’s EntityModel and WebMvcLinkBuilder.
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+
+    private static List<Student> students = new ArrayList<>(List.of(
+            new Student(1L, "Ankur", "Java"),
+            new Student(2L, "Riya", "Spring Boot")
+    ));
+
+    @GetMapping("/{id}")
+    public EntityModel<Student> getStudent(@PathVariable Long id) {
+        Student student = students.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        // Wrap student with links
+        EntityModel<Student> resource = EntityModel.of(student);
+
+        // Add self link
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(StudentController.class).getStudent(id))
+                .withSelfRel());
+
+        // Add link to all students
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(StudentController.class).getAllStudents())
+                .withRel("all-students"));
+
+        return resource;
+    }
+
+    @GetMapping
+    public List<Student> getAllStudents() {
+        return students;
+    }
+}
+
+ Example JSON Response
+When you hit
+👉 GET http://localhost:8080/students/1
+
+You’ll get this:
+
+{
+    "id": 1,
+    "name": "Ankur",
+    "course": "Java",
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/students/1"
+        },
+        "all-students": {
+            "href": "http://localhost:8080/students"
+        }
+    }
+}
+
+🔄 What Happened Here
+➤ EntityModel<Student> wraps your Student object.
+➤ _links section shows possible navigation options (self, all-students).
+➤ Client doesn’t need to know URL structure — it just follows these links.
+
+
+🔷 SpringBoot Acuators
+Spring Boot Actuator is a module provided by Spring Boot that adds production-ready features to your application.
+It allows you to monitor and manage your application by exposing endpoints that provide insights into:
+✔️ Application health
+✔️ Metrics (like memory usage, HTTP requests, database status)
+✔️ Environment properties
+✔️ Logging levels
+✔️ Thread dumps
+
+Actuators help you observe and manage your Spring Boot application in production or development without writing additional monitoring code.
+
+
+⚡ Key Features of Actuator
+1️⃣ Health Checks
+✔️ /actuator/health endpoint tells whether the application is up or down.
+✔️ Can include custom checks (database connection, disk space, etc.).
+
+2️⃣ Metrics
+✔️ /actuator/metrics endpoint shows JVM stats, HTTP requests, memory usage, garbage collection, etc.
+✔️ Useful for performance monitoring.
+
+3️⃣ Environment Info
+/actuator/env endpoint shows environment variables, system properties, and application configuration properties.
+
+4️⃣ Application Info
+/actuator/info endpoint allows you to add custom metadata like version, description, or author.
+
+5️⃣ Loggers
+/actuator/loggers endpoint lets you view and modify logging levels at runtime.
+
+6️⃣ Thread Dumps
+/actuator/threaddump provides a thread dump of the JVM for debugging purposes.
+
+7️⃣ HTTP Tracing
+Tracks recent HTTP requests and responses.
+
+8️⃣ Integration with Monitoring Tools
+Works with Prometheus, Grafana, New Relic, or Spring Boot Admin for full monitoring dashboards.
+
+✔️ All these actuators endpoints are predefined and they are binded to HTTP GET requests.
+✔️ In Actuator we have a special endpoint called /shutdown which is used to shutdown the application.
+✔️ This endpoint is binded to HTTP POST requests.
+
+🔄 Why Use Spring Boot Actuator❓
+1️⃣ Production-Ready Monitoring
+Helps detect problems early in production.
+
+2️⃣ Simplifies Maintenance
+No need to manually write monitoring code for common checks.
+
+3️⃣ Customizable
+You can add your own health indicators, metrics, and info details.
+
+4️⃣ Secure
+Endpoints can be restricted using Spring Security.
+
+
+🔄 How to Add Actuator to a Spring Boot Project
+1️⃣ Add Dependency in pom.xml:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+2️⃣ Configure Endpoints (Optional)
+By default, only a few endpoints are exposed (/health and /info).
+You can expose more endpoints in application.properties or application.yml:
+
+# Expose all actuator endpoints
+management.endpoints.web.exposure.include=*
+
+# Exclude health endpoint
+management.endpoints.web.exposure.exclude=health
+
+# Customize server port for actuator
+management.server.port=8081
+
+# Show detailed info in health endpoint
+management.endpoint.health.show-details=always
+
+# Enable shutdown endpoint
+management.endpoint.shutdown.enabled=true
+
+
+3️⃣ Access Actuator Endpoints
+| Endpoint               | Purpose                         |
+| ---------------------- | ------------------------------- |
+| `/actuator/health`     | Shows application health status |
+| `/actuator/info`       | Shows custom app info           |
+| `/actuator/metrics`    | Shows JVM and HTTP metrics      |
+| `/actuator/env`        | Shows environment properties    |
+| `/actuator/loggers`    | View/change log levels          |
+| `/actuator/threaddump` | Thread dump of JVM              |
+| `/actuator/httptrace`  | Recent HTTP requests            |
+
+
+4️⃣ Customizing Health Indicator
+You can create a custom health check by implementing HealthIndicator:
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DatabaseHealthCheck implements HealthIndicator {
+
+    @Override
+    public Health health() {
+        // Imagine checking database connection
+        boolean dbUp = checkDatabaseConnection();
+        if (dbUp) {
+            return Health.up().withDetail("Database", "Available").build();
+        } else {
+            return Health.down().withDetail("Database", "Not Available").build();
+        }
+    }
+
+    private boolean checkDatabaseConnection() {
+        // Logic to check DB connectivity
+        return true;
+    }
+}
+Now, when you hit /actuator/health, it will show something like:
+{
+  "status": "UP",
+  "components": {
+    "db": {
+      "status": "UP",
+      "details": {
+        "Database": "Available"
+      }
+    }
+  }
+}
+
+5️⃣ Security Consideration
+➤ Actuator endpoints are sensitive (they expose internal info).
+➤ Secure them using Spring Security:
+
+# Require authentication for all actuator endpoints
+management.endpoints.web.exposure.include=*
+management.endpoint.health.show-details=when-authorized
