@@ -1,0 +1,209 @@
+🔷 Decorator Pattern
+The Decorator pattern allows you to dynamically add new behavior or responsibilities to an object without modifying its existing code.
+
+👉 Purpose:
+To extend the functionality of objects at runtime, not at compile time — unlike inheritance. 
+
+🔄 Real-World Analogy
+
+Think of a coffee shop ☕:
+➤ You start with a plain coffee.
+➤ Then you can add milk, sugar, or cream — each decorator adds extra behavior (cost + description).
+
+You didn’t modify the base coffee class — you just wrapped it!
+
+
+🔄 Structure
+➤ Component (Interface): Defines the base behavior.
+➤ Concrete Component: The original object that we decorate.
+➤ Decorator (Abstract Class): Holds a reference to the component and delegates operations to it.
+➤ Concrete Decorators: Add new behavior around the base component.
+
+✅ Example:
+Coffee Order System
+1️⃣ Component
+interface Coffee {
+    String getDescription();
+    double getCost();
+}
+
+2️⃣ Concrete Component
+class BasicCoffee implements Coffee {
+    @Override
+    public String getDescription() {
+        return "Basic Coffee";
+    }
+
+    @Override
+    public double getCost() {
+        return 50;
+    }
+}
+
+3️⃣ Abstract Decorator
+abstract class CoffeeDecorator implements Coffee {
+    protected Coffee decoratedCoffee;
+
+    public CoffeeDecorator(Coffee decoratedCoffee) {
+        this.decoratedCoffee = decoratedCoffee;
+    }
+
+    public String getDescription() {
+        return decoratedCoffee.getDescription();
+    }
+
+    public double getCost() {
+        return decoratedCoffee.getCost();
+    }
+}
+
+4️⃣ Concrete Decorators
+class MilkDecorator extends CoffeeDecorator {
+    public MilkDecorator(Coffee coffee) {
+        super(coffee);
+    }
+
+    public String getDescription() {
+        return super.getDescription() + ", Milk";
+    }
+
+    public double getCost() {
+        return super.getCost() + 10;
+    }
+}
+
+class SugarDecorator extends CoffeeDecorator {
+    public SugarDecorator(Coffee coffee) {
+        super(coffee);
+    }
+
+    public String getDescription() {
+        return super.getDescription() + ", Sugar";
+    }
+
+    public double getCost() {
+        return super.getCost() + 5;
+    }
+}
+
+class CreamDecorator extends CoffeeDecorator {
+    public CreamDecorator(Coffee coffee) {
+        super(coffee);
+    }
+
+    public String getDescription() {
+        return super.getDescription() + ", Cream";
+    }
+
+    public double getCost() {
+        return super.getCost() + 15;
+    }
+}
+
+5️⃣ Client
+public class DecoratorPatternDemo {
+    public static void main(String[] args) {
+        Coffee coffee = new BasicCoffee();                     // Base
+        coffee = new MilkDecorator(coffee);                    // Add milk
+        coffee = new SugarDecorator(coffee);                   // Add sugar
+        coffee = new CreamDecorator(coffee);                   // Add cream
+
+        System.out.println("Order: " + coffee.getDescription());
+        System.out.println("Total Cost: ₹" + coffee.getCost());
+    }
+}
+✅ Output
+Order: Basic Coffee, Milk, Sugar, Cream
+Total Cost: ₹80.0
+
+🔄 Where Used in Java
+| Class                                          | Decorator Role                        |
+| ---------------------------------------------- | ------------------------------------- |
+| `java.io.BufferedReader`                       | Decorates `Reader`                    |
+| `java.io.DataInputStream`                      | Decorates `InputStream`               |
+| `java.util.Collections.synchronizedList()`     | Returns a decorated version of a List |
+| `javax.servlet.http.HttpServletRequestWrapper` | Decorates a servlet request           |
+
+🔄 Spring Boot 
+In Spring Boot, Decorator pattern is commonly seen when adding behavior to Beans or Services dynamically.
+
+
+✅ Example: Logging Decorator for a Payment Service
+1️⃣ Component
+public interface PaymentService {
+    void pay(double amount);
+}
+
+2️⃣ Concrete Component
+@Service
+class BasicPaymentService implements PaymentService {
+    public void pay(double amount) {
+        System.out.println("Processing payment of ₹" + amount);
+    }
+}
+
+3️⃣ Decorator
+@Service
+@Primary  // ensures this bean is used when autowired
+class LoggingPaymentDecorator implements PaymentService {
+    private final PaymentService paymentService;
+
+    public LoggingPaymentDecorator(BasicPaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("Logging: Payment started...");
+        paymentService.pay(amount);
+        System.out.println("Logging: Payment completed successfully.");
+    }
+}
+
+
+👉 Usage in Controller:
+@RestController
+public class PaymentController {
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    @PostMapping("/pay")
+    public String pay(@RequestParam double amount) {
+        paymentService.pay(amount);
+        return "Payment Successful";
+    }
+}
+👉 This dynamically adds logging behavior without changing the original BasicPaymentService.
+
+
+Decorator 🆚 Inheritance
+| Aspect                | Decorator           | Inheritance              |
+| --------------------- | ------------------- | ------------------------ |
+| Flexibility           | ✅ Runtime extension | ❌ Compile-time extension |
+| Class explosion       | ❌ Reduced           | ✅ Increases              |
+| Open/Closed Principle | ✅ Respected         | ❌ Often violated         |
+| Multiple Behaviors    | ✅ Easy to combine   | ❌ Harder to combine      |
+
+
+🔄 Where to Use in Projects
+➤ Add logging, caching, security, validation, metrics to services dynamically.
+➤ Add response formatting or data enrichment in REST APIs.
+➤ Wrap repository/service beans for AOP-like behavior without using aspects.
+➤ Wrap HttpServletRequest or HttpResponse objects.
+
+🔄 Advantages
+Adds new behavior without modifying existing code (Open/Closed Principle).
+Can combine multiple decorators flexibly.
+Promotes composition over inheritance.
+
+🔄 Disadvantages
+Increases number of small objects.
+Can become hard to debug if too many decorators wrap each other.
+Order of decorators matters.
+🔄
+
+🔄
+🔄

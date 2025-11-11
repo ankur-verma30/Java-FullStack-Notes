@@ -126,6 +126,9 @@ In a microservices architecture:
 | **Zookeeper (Apache)**   | Distributed coordination + service discovery | High availability, consistency, hierarchical namespace   |
 | **etcd**                 | Distributed key-value store                  | Lightweight, used in Kubernetes for service discovery    |
 
+🔄 Project Starter dependency
+spring-web
+Eureka server
 
 Spring Cloud + Eureka Example
 1️⃣ Add Dependencies (pom.xml)
@@ -160,7 +163,6 @@ public class EurekaServerApplication {
 ⚡ eureka.client.register-with-eureka=false
 We make it false so that service-registry does not register with itself as a client to itself.
 ⚡ eureka.client.fetch-registry=false
-
 
 
 3️⃣ Eureka Client Setup
@@ -240,7 +242,7 @@ In the Spring ecosystem, you can use:
 1️⃣ Spring Cloud Gateway (modern, reactive, recommended)
 2️⃣ Spring Cloud Zuul (Netflix OSS) (older, now in maintenance mode)
 
-  👉 For creating the gateway we need:
+👉 For creating the gateway we need:
 ➤ web-starter
 ➤ eureka-client
 ➤ cloud-gateway
@@ -469,6 +471,9 @@ An Admin Server is a centralized management and monitoring tool for multiple Spr
 Admin Server presents this in a web UI dashboard.
 [Microservices] --> [Actuator Endpoints] --> [Admin Server Dashboard] --> [Admin User]
 
+🔄Add to configure Admin Server Project
+spring-web
+Codecentric's Spring Boot Admin (Server)
 
 🔄 Setting Up Spring Boot Admin
 1️⃣ Admin Server
@@ -571,7 +576,6 @@ Think of Zipkin as a flight tracker for requests across your microservices
 | **Span**         | A **single unit of work** within a trace, e.g., an HTTP request to a service.         |
 | **Annotation**   | Marks an **event** or **timestamp** in a span (like request received, response sent). |
 | **Service Name** | Name of the microservice generating the span.                                         |
-
 
 
 🔄 How Zipkin Works
@@ -919,7 +923,6 @@ java -jar target/greet-api.jar --server.port=8083
 
 
 🔷 How Feign Client Does Load Balancing Internally
-
 1️⃣ Historical Context — Ribbon + Feign (Old Stack)
 Earlier, in Spring Cloud Netflix (pre-2021):
 Feign used Ribbon under the hood for client-side load balancing.
@@ -1082,9 +1085,9 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
 🔄 How It Works
                ┌──────────────────────────────┐
                │  Git Repository (Config Repo)│
-               │  ─ application.yml            │
-               │  ─ student-service.yml        │
-               │  ─ order-service-dev.yml      │
+               │  ─ application.yml           │
+               │  ─ student-service.yml       │
+               │  ─ order-service-dev.yml     │
                └──────────────┬───────────────┘
                               │
                      (reads configuration)
@@ -1374,3 +1377,575 @@ management.endpoints.web.exposure.include=health,metrics
 
 👉 Then access metrics at:
 http://localhost:8080/actuator/metrics/resilience4j.circuitbreaker.calls
+
+
+
+🔷 Spring Boot With Redis Cache Integration
+1️⃣ Redis
+Redis (Remote Dictionary Server) is an in-memory key–value data store.
+It’s fast, lightweight, and supports caching, session storage, pub/sub messaging, leaderboard data, etc.
+
+
+2️⃣ Why Redis is used for Caching in Spring Boot
+| Reason                          | Explanation                                                    |
+| ------------------------------- | -------------------------------------------------------------- |
+| 🚀 **In-memory storage**        | Redis stores data in RAM, giving nanosecond-level access times |
+| 🧠 **Persistent option**        | Can optionally persist data to disk                            |
+| ⚖️ **Scalable**                 | Works well in distributed/microservices systems                |
+| 🧩 **Supports data structures** | Strings, Hashes, Lists, Sets, Sorted Sets                      |
+| 🕒 **TTL (Time To Live)**       | Keys can expire automatically after a time                     |
+| 🧱 **Stateless Microservices**  | Perfect for caching results shared across instances            |
+
+
+3️⃣ Redis Architecture (Simple Flow)
+Client (Spring Boot App)
+        |
+        |   cache request
+        v
+   Redis Cache (in-memory)
+        |
+        |   if not found (cache miss)
+        v
+   Database (MySQL, etc)
+✅ Cache Hit → value found in Redis → fast response
+❌ Cache Miss → fetch from DB → store result in Redis → serve response
+
+
+4️⃣ Spring Boot Caching Abstraction (Important)
+Spring provides a simple caching abstraction via annotations.
+| Annotation       | Description                                     |
+| ---------------- | ----------------------------------------------- |
+| `@EnableCaching` | Enables caching support in Spring Boot          |
+| `@Cacheable`     | Stores method result in cache                   |
+| `@CachePut`      | Updates cache without skipping method execution |
+| `@CacheEvict`    | Removes entry from cache                        |
+| `@CacheConfig`   | Defines common cache properties for a class     |
+
+
+5️⃣ How Caching Works Internally
+1️⃣ When a method annotated with @Cacheable is called:
+    ➤ Spring first checks the cache (Redis)
+    ➤ If result is found → return cached value
+    ➤ If not found → execute method → save result to cache → return result
+
+🔄 Integrate Redis Cache in Spring Boot
+1️⃣ Add Dependencies
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-pool2</artifactId>
+    </dependency>
+</dependencies>
+
+
+2️⃣ Install Redis Locally
+👉 Windows:
+Use Redis from https://github.com/microsoftarchive/redis/releases
+
+👉 Start server:
+redis-server
+
+👉 Verify connection:
+redis-cli
+> ping
+PONG
+
+👉 Stop server:
+redis-cli
+> shutdown
+
+3️⃣ Configure Redis in application.yml
+spring:
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
+🔄 Method 1️⃣: Manual Redis Caching using RedisTemplate
+This gives full control — you manually define keys, expiry, and log cache hits/misses yourself.
+
+1️⃣ Configuration
+package com.example.redis.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+
+@Configuration
+public class RedisConfig {
+
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory();
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
+    }
+}
+
+2️⃣ Model Class
+package com.example.redis.model;
+
+import java.io.Serializable;
+
+public class Student implements Serializable {
+    private Long id;
+    private String name;
+    private String branch;
+
+    public Student(Long id, String name, String branch) {
+        this.id = id;
+        this.name = name;
+        this.branch = branch;
+    }
+
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getBranch() { return branch; }
+
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", name='" + name + "', branch='" + branch + "'}";
+    }
+}
+
+3️⃣ Service Using RedisTemplate
+package com.example.redis.service;
+
+import com.example.redis.model.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+
+@Service
+public class StudentServiceManual {
+
+    private static final String CACHE_PREFIX = "STUDENT_";
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    public Student getStudent(Long id) {
+        String key = CACHE_PREFIX + id;
+
+        // 🔹 1. Try fetching from Redis cache
+        Object cachedData = redisTemplate.opsForValue().get(key);
+        if (cachedData != null) {
+            System.out.println("✅ [CACHE-HIT] Data fetched from Redis → " + cachedData);
+            return (Student) cachedData;
+        }
+
+        // 🔹 2. Cache miss → fetch from database
+        System.out.println("🚀 [CACHE-MISS] Fetching from database for ID: " + id);
+        Student student = fetchFromDatabase(id);
+
+        // 🔹 3. Store in cache with 5-minute expiry
+        redisTemplate.opsForValue().set(key, student, Duration.ofMinutes(5));
+        System.out.println("🧠 [CACHE-STORE] Data cached in Redis for 5 minutes → " + student);
+
+        return student;
+    }
+
+    public void deleteStudent(Long id) {
+        String key = CACHE_PREFIX + id;
+        redisTemplate.delete(key);
+        System.out.println("🗑️ [CACHE-EVICT] Deleted student from Redis cache: " + id);
+    }
+
+    private Student fetchFromDatabase(Long id) {
+        // Simulate DB call
+        return new Student(id, "Ankur Verma", "IT");
+    }
+}
+
+4️⃣ Controller
+package com.example.redis.controller;
+
+import com.example.redis.model.Student;
+import com.example.redis.service.StudentServiceManual;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/manual")
+public class StudentManualController {
+
+    @Autowired
+    private StudentServiceManual studentService;
+
+    @GetMapping("/{id}")
+    public Student getStudent(@PathVariable Long id) {
+        return studentService.getStudent(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+        return "Cache deleted for ID: " + id;
+    }
+}
+
+👉 Console Logs
+First Request:
+🚀 [CACHE-MISS] Fetching from database for ID: 1
+🧠 [CACHE-STORE] Data cached in Redis for 5 minutes → Student{id=1, name='Ankur Verma', branch='IT'}
+
+👉 Second Request:
+✅ [CACHE-HIT] Data fetched from Redis → Student{id=1, name='Ankur Verma', branch='IT'}
+
+🔄 Pros and Cons
+| Pros                                                | Cons                                   |
+| --------------------------------------------------- | -------------------------------------- |
+| Full control over keys, TTL, eviction               | Manual implementation for every entity |
+| Can add custom logics (like custom TTLs per object) | More boilerplate code                  |
+| Works independently of Spring Cache abstraction     | Harder to maintain for large apps      |
+
+
+2️⃣: Annotation-Based Caching using @Cacheable, @CacheEvict, and @CachePut
+This is the Spring abstraction layer over Redis caching — very clean, declarative, and maintainable.
+
+1️⃣ Enable Caching
+package com.example.redis;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
+
+@SpringBootApplication
+@EnableCaching
+public class RedisAnnotationApp {
+    public static void main(String[] args) {
+        SpringApplication.run(RedisAnnotationApp.class, args);
+    }
+}
+
+2️⃣ Configuration with TTL (Expiry)
+
+Unlike RedisTemplate, TTL is not directly set in @Cacheable,
+so we define TTL at the cache manager level 👇
+
+package com.example.redis.config;
+
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+
+import java.time.Duration;
+
+@Configuration
+@EnableCaching
+public class RedisCacheConfig {
+
+    @Bean
+    public CacheManager cacheManager(LettuceConnectionFactory connectionFactory) {
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(5))  // Set global expiry for all caches
+                .disableCachingNullValues()
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(config)
+                .build();
+    }
+
+    @Bean
+    public SimpleCacheErrorHandler errorHandler() {
+        return new SimpleCacheErrorHandler();
+    }
+}
+
+3️⃣ Service Layer
+package com.example.redis.service;
+
+import com.example.redis.model.Student;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+@Service
+public class StudentServiceAnnotation {
+
+    @Cacheable(value = "students", key = "#id")
+    public Student getStudent(Long id) {
+        System.out.println("🚀 [CACHE-MISS] Fetching student from DB for ID: " + id);
+        return fetchFromDatabase(id);
+    }
+
+    @CachePut(value = "students", key = "#student.id")
+    public Student updateStudent(Student student) {
+        System.out.println("♻️ [CACHE-UPDATE] Updated student in cache → " + student);
+        return student;
+    }
+
+    @CacheEvict(value = "students", key = "#id")
+    public void deleteStudent(Long id) {
+        System.out.println("🗑️ [CACHE-EVICT] Deleted student from cache ID: " + id);
+    }
+
+    private Student fetchFromDatabase(Long id) {
+        return new Student(id, "Ankur Verma", "IT");
+    }
+}
+
+4️⃣ Controller
+package com.example.redis.controller;
+
+import com.example.redis.model.Student;
+import com.example.redis.service.StudentServiceAnnotation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/annotation")
+public class StudentAnnotationController {
+
+    @Autowired
+    private StudentServiceAnnotation studentService;
+
+    @GetMapping("/{id}")
+    public Student getStudent(@PathVariable Long id) {
+        return studentService.getStudent(id);
+    }
+
+    @PutMapping("/")
+    public Student updateStudent(@RequestBody Student student) {
+        return studentService.updateStudent(student);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+        return "Cache deleted for ID: " + id;
+    }
+}
+
+✅ Console Output
+👉 First request:
+🚀 [CACHE-MISS] Fetching student from DB for ID: 1
+
+👉 Second request (same ID within TTL):
+✅ [CACHE-HIT] Student fetched from Redis automatically (no DB log)
+
+👉 On update:
+♻️ [CACHE-UPDATE] Updated student in cache → Student{id=1, name='Ankur Updated', branch='IT'}
+
+👉 On delete:
+🗑️ [CACHE-EVICT] Deleted student from cache ID: 1
+
+
+🔄 Redis Cache Operations (Conceptually)
+| Operation           | Description             | Example            |
+| ------------------- | ----------------------- | ------------------ |
+| **SET key value**   | Adds/updates value      | `SET user:1 Ankur` |
+| **GET key**         | Fetch value             | `GET user:1`       |
+| **DEL key**         | Delete key              | `DEL user:1`       |
+| **EXPIRE key time** | Set TTL in seconds      | `EXPIRE user:1 60` |
+| **TTL key**         | Time left before expiry | `TTL user:1`       |
+
+
+🔄 Comparison
+| Feature          | **Method 1: RedisTemplate (Manual)** | **Method 2: @Cacheable (Annotation)**                 |
+| ---------------- | ------------------------------------ | ----------------------------------------------------- |
+| Control over TTL | Per-entry using `Duration`           | Global TTL via `CacheManager`                         |
+| Logging          | Manual (you define hit/miss logs)    | Implicit (you can log inside method to detect misses) |
+| Simplicity       | More code                            | Very concise                                          |
+| Customization    | Full flexibility                     | Limited (per cache, not per record)                   |
+| Ideal for        | Fine-grained caching logic           | Quick declarative caching                             |
+| Best Used When   | Complex cache management needed      | Standard read/update/delete caching                   |
+
+
+
+🔷 Apache Kafka - Message Broker 
+Apache Kafka is a distributed event streaming platform designed to handle high-throughput, real-time data feeds.
+It allows different applications or microservices to communicate asynchronously using messages (events).
+
+
+🔄 Core Kafka Concepts
+| Concept                | Description                                                                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Producer**           | Publishes messages (events) to a Kafka topic.                                                                  |
+| **Subscriber**           | Subscribes to a topic and processes messages.                                                                | 
+| **Topic**              | A named **category or channel** where records (messages) are stored and published.                             |
+| **Partition**          | Each topic is divided into partitions for scalability and parallel processing.                                 |
+| **Offset**             | A unique ID for each message in a partition — helps track consumer progress.                                   |
+| **Broker**             | A Kafka server that stores messages and handles client requests.                                               |
+| **Cluster**            | A group of brokers working together for scalability and fault tolerance.                                       |
+| **Consumer Group**     | A group of consumers that share the workload — each message is processed by only one consumer in the group.    |
+| **ZooKeeper (Legacy)** | Used for managing Kafka cluster provides runtime environment  (replaced by Kafka’s internal Raft quorum ). |
+
+
+🔄 How Kafka Works (Flow)
+➤ Producer sends a message to a topic.
+➤ The topic is divided into partitions stored across brokers.
+➤ Subscribers  (in groups) subscribe to the topic.
+
+➤ Kafka ensures:
+    ✔️ Each partition’s messages are ordered.
+    ✔️ Each message is delivered at least once to a consumer group.
+    ✔️ High availability using replication.
+
+🔄 Why Kafka is Used in Microservices / Spring Boot
+| Reason                         | Explanation                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------------ |
+| **Decoupling Services**        | Producers and consumers don’t need to know each other — they communicate via topics.       |
+| **Asynchronous Communication** | Services don’t block each other; producers send messages without waiting for consumers.    |
+| **Scalability**                | Kafka can handle millions of messages per second using partitioning.                       |
+| **Fault Tolerance**            | Kafka replicates data across brokers — no message loss if a node fails.                    |
+| **Replay Capability**          | Consumers can reprocess data from any offset — useful for debugging or rebuilding systems. |
+| **Event-Driven Architecture**  | Microservices communicate through events instead of direct REST calls.                     |
+
+🔄 Kafka Architecture Diagram (Conceptually)
+ ┌───────────────┐      ┌───────────────┐
+ │   Producer 1  │ ---> │               │
+ │   Producer 2  │ ---> │   Kafka Topic │
+ └───────────────┘      │  (with N partitions)
+                        └───────────────┘
+                              ↓
+                       ┌───────────────┐
+                       │ Consumer App1 │  (Group A)
+                       │ Consumer App2 │  (Group B)
+                       └───────────────┘
+
+🔄 Kafka Integration with Spring Boot
+
+Spring Boot integrates Kafka using Spring for Apache Kafka (spring-kafka dependency).
+
+1️⃣ Add Maven Dependency
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+
+2️⃣ Add Kafka Configuration in application.yml
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: myGroup
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
+3️⃣ Create Producer Service
+@Service
+public class KafkaProducer {
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    private static final String TOPIC = "test_topic";
+
+    public void sendMessage(String message) {
+        kafkaTemplate.send(TOPIC, message);
+        System.out.println("Produced message: " + message);
+    }
+}
+
+4️⃣ Create Consumer Listener
+@Service
+public class KafkaConsumer {
+
+    @KafkaListener(topics = "test_topic", groupId = "myGroup")
+    public void consume(String message) {
+        System.out.println("Consumed message: " + message);
+    }
+}
+
+
+5️⃣ Kafka Controller (for testing)
+@RestController
+@RequestMapping("/kafka")
+public class KafkaController {
+
+    @Autowired
+    private KafkaProducer producer;
+
+    @GetMapping("/publish/{message}")
+    public String sendMessage(@PathVariable String message) {
+        producer.sendMessage(message);
+        return "Message sent successfully!";
+    }
+}
+
+🔄 Architecture Visualization
+🔗 Same app (local use)
+ ┌──────────────────────┐
+ │   Spring Boot App    │
+ │  ┌──────────────┐    │
+ │  │  Producer    │───┼────▶  [ Kafka Broker ]  ◀───┼───│  Consumer Listener │
+ │  └──────────────┘    │
+ └──────────────────────┘
+
+
+Here, both connect to the same broker but serve different purposes.
+
+🔗 Different microservices
+ ┌──────────────────────┐      ┌──────────────────────┐
+ │  Order Service       │      │  Payment Service     │
+ │  ┌──────────────┐    │      │  ┌──────────────┐    │
+ │  │  Producer    │────|──▶  │  │  Consumer     │    │
+ │  └──────────────┘    │      │  └──────────────┘    │
+ └──────────────────────┘      └──────────────────────┘
+              ▲
+              │
+        [ Kafka Broker ]
+        
+
+🔄 Advanced Kafka Concepts
+| Concept                          | Description                                                                         |
+| -------------------------------- | ----------------------------------------------------------------------------------- |
+| **Retention Policy**             | Kafka keeps messages for a configurable time (e.g., 7 days) even after consumption. |
+| **Replication Factor**           | Ensures high availability — each partition’s data is replicated across brokers.     |
+| **Acks (Acknowledgments)**       | Controls reliability — `acks=0`, `acks=1`, or `acks=all`.                           |
+| **Idempotent Producer**          | Ensures no duplicate messages when retries happen.                                  |
+| **Transactional Messaging**      | Ensures atomicity across multiple Kafka operations.                                 |
+| **Exactly-Once Semantics (EOS)** | Prevents duplicate processing in consumers.                                         |
+| **Kafka Streams API**            | For stream processing — transform, aggregate, and process messages in real-time.    |
+| **Schema Registry (Avro/JSON)**  | Manages schemas for structured messages.                                            |
+| **Offset Management**            | Consumer offset can be auto-committed or manually managed.                          |
+
+🔄 Real-World Use Cases
+| Use Case                       | Example                                           |
+| ------------------------------ | ------------------------------------------------- |
+| **Log aggregation**            | Collecting logs from multiple servers.            |
+| **Event sourcing**             | Tracking all state changes in microservices.      |
+| **Stream processing**          | Fraud detection, metrics monitoring.              |
+| **Asynchronous communication** | Between order, payment, and inventory services.   |
+| **Analytics pipelines**        | Real-time data ingestion into Spark/Flink/Hadoop. |
+

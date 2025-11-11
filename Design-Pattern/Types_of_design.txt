@@ -1,0 +1,38 @@
+🔄 Creational Patterns
+1️⃣ Singleton
+2️⃣ Factory
+3️⃣ Abstract Factory
+4️⃣ Builder
+5️⃣ Prototype
+
+🔄 Structural Patterns
+1️⃣ Adapter
+2️⃣ Bridge
+3️⃣ Composite
+4️⃣ Decorator
+5️⃣ Facade
+6️⃣ Flyweight
+7️⃣ Proxy
+
+🔄 Behavioral Patterns
+1️⃣ Chain of Responsibility
+2️⃣ Command
+3️⃣ Interpreter
+4️⃣ Iterator
+5️⃣ Mediator
+6️⃣ Memento
+7️⃣ Observer
+8️⃣ State
+9️⃣ Strategy
+1️⃣0️⃣ Template Method
+
+
+🔄 Micro Services Patterns
+1️⃣ API Gateway
+2️⃣ Saga Pattern
+3️⃣ Database per Service
+4️⃣ Distributed Tracing
+5️⃣ Service Discovery Pattern
+6️⃣ Circuit Breaker
+
+🔄 SOLID Principles 

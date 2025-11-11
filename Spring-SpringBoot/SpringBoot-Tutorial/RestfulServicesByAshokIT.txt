@@ -729,6 +729,10 @@ When you include the dependency spring-boot-starter-data-rest, Spring Boot:
 ➤ Converts Java entities to JSON responses.
 ➤ Handles CRUD operations and pagination by default.
 
+🔄 What to Add while making project:
+➤ Spring Data JPA
+➤ Rest Repositories
+➤ MySQL Driver
 
 🔄 Dependency
 👉 Add this dependency in your pom.xml:
@@ -1179,6 +1183,13 @@ public class GlobalRestExceptionHandler {
 
 
 🔷 working of HATEOAS with REST API in springboot
+
+Dependency for HATEOAS project:
+spring data jpa
+lombok
+MySQL Driver
+Spring HATEOAS
+
 🔄 Add Dependency
 Add this to your pom.xml:
 
@@ -1196,54 +1207,68 @@ public class Student {
     // Constructors, Getters, Setters
 }
 
-🔄 Create a Controller with HATEOAS Support
-Use Spring HATEOAS’s EntityModel and WebMvcLinkBuilder.
+🔄 Create a JpaRepository 
+package com.example.spring_rest_demo.repository;
 
+import com.example.spring_rest_demo.entity.Student;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+
+@RepositoryRestResource(collectionResourceRel = "students", path = "students")
+public interface StudentRepository extends JpaRepository<Student, Long> {}
+
+🔄 Create a Controller with HATEOAS Support
+package com.example.spring_rest_demo.controller;
+
+import com.example.spring_rest_demo.entity.Student;
+import com.example.spring_rest_demo.repository.StudentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/students")
+@RequiredArgsConstructor
 public class StudentController {
-
-    private static List<Student> students = new ArrayList<>(List.of(
-            new Student(1L, "Ankur", "Java"),
-            new Student(2L, "Riya", "Spring Boot")
-    ));
-
+    
+    private final StudentRepository studentRepository;
+    
     @GetMapping("/{id}")
-    public EntityModel<Student> getStudent(@PathVariable Long id) {
-        Student student = students.stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst()
+    public EntityModel<Student> getStudents(@PathVariable Long id){
+        Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
+        EntityModel<Student> studentEntityModel = EntityModel.of(student);
 
-        // Wrap student with links
-        EntityModel<Student> resource = EntityModel.of(student);
 
-        // Add self link
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(StudentController.class).getStudent(id))
-                .withSelfRel());
+        //Add a self link
+        studentEntityModel.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(StudentController.class)
+                        .getStudents(id)).
+                        withSelfRel());
 
-        // Add link to all students
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(StudentController.class).getAllStudents())
-                .withRel("all-students"));
+        studentEntityModel.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(
+                StudentController.class
+        ).
+                getAllStudents()).withRel("all-students"));
 
-        return resource;
+        return studentEntityModel;
     }
 
     @GetMapping
-    public List<Student> getAllStudents() {
-        return students;
+    public List<Student> getAllStudents(){
+        return studentRepository.findAll();
     }
 }
 
- Example JSON Response
+
+✅ Example JSON Response
 When you hit
 👉 GET http://localhost:8080/students/1
 
@@ -1397,11 +1422,33 @@ Now, when you hit /actuator/health, it will show something like:
     "db": {
       "status": "UP",
       "details": {
-        "Database": "Available"
+        "database": "MySQL",
+        "validationQuery": "isValid()"
+      }
+    },
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 131071995904,
+        "free": 104784420864,
+        "threshold": 10485760,
+        "path": "D:\\Microservices_practice\\.",
+        "exists": true
+      }
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "ssl": {
+      "status": "UP",
+      "details": {
+        "validChains": [],
+        "invalidChains": []
       }
     }
   }
 }
+
 
 5️⃣ Security Consideration
 ➤ Actuator endpoints are sensitive (they expose internal info).
@@ -1409,4 +1456,11 @@ Now, when you hit /actuator/health, it will show something like:
 
 # Require authentication for all actuator endpoints
 management.endpoints.web.exposure.include=*
-management.endpoint.health.show-details=when-authorized
+
+# Require authentication for health endpoint 
+management.endpoint.health.show-details=when-authorized 
+👉 without adding security when we access /actuator/health we will only:
+{
+    status: "UP"
+}
+

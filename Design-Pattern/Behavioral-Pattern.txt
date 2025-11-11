@@ -1,0 +1,157 @@
+🔷 Chain of Responsibility
+➤ The Chain of Responsibility pattern is used to pass a request along a chain of handlers.
+➤ Each handler decides either to process the request or pass it to the next handler in the chain.
+
+👉 Purpose:
+To decouple the sender and receiver of a request by allowing multiple objects a chance to handle it.
+
+🔄 Real-world Analogy
+Imagine customer support:
+
+Level 1 Support → Level 2 Support → Level 3 Support
+If Level 1 can’t solve your issue, it passes it to Level 2, and so on.
+
+🔄Structure
+1️⃣ Handler (Interface/Abstract Class): Defines an interface for handling requests and setting the next handler.
+2️⃣ Concrete Handlers: Handle requests they are responsible for; otherwise, forward to the next handler.
+3️⃣ Client: Initiates the request.
+
+✅ Example:
+⚡Step 1: Abstract Handler
+abstract class Logger {
+    public static int INFO = 1;
+    public static int DEBUG = 2;
+    public static int ERROR = 3;
+
+    protected int level;
+    protected Logger nextLogger;
+
+    public void setNextLogger(Logger nextLogger) {
+        this.nextLogger = nextLogger;
+    }
+
+    public void logMessage(int level, String message) {
+        if (this.level <= level) {
+            write(message);
+        }
+        if (nextLogger != null) {
+            nextLogger.logMessage(level, message);
+        }
+    }
+
+    protected abstract void write(String message);
+}
+
+⚡Step 2: Concrete Handlers
+class InfoLogger extends Logger {
+    public InfoLogger(int level) { this.level = level; }
+
+    @Override
+    protected void write(String message) {
+        System.out.println("INFO: " + message);
+    }
+}
+
+class DebugLogger extends Logger {
+    public DebugLogger(int level) { this.level = level; }
+
+    @Override
+    protected void write(String message) {
+        System.out.println("DEBUG: " + message);
+    }
+}
+
+class ErrorLogger extends Logger {
+    public ErrorLogger(int level) { this.level = level; }
+
+    @Override
+    protected void write(String message) {
+        System.out.println("ERROR: " + message);
+    }
+}
+
+⚡Step 3: Client
+public class ChainOfResponsibilityDemo {
+    private static Logger getChainOfLoggers() {
+        Logger errorLogger = new ErrorLogger(Logger.ERROR);
+        Logger debugLogger = new DebugLogger(Logger.DEBUG);
+        Logger infoLogger = new InfoLogger(Logger.INFO);
+
+        errorLogger.setNextLogger(debugLogger);
+        debugLogger.setNextLogger(infoLogger);
+        return errorLogger; // head of chain
+    }
+
+    public static void main(String[] args) {
+        Logger loggerChain = getChainOfLoggers();
+
+        loggerChain.logMessage(Logger.INFO, "This is an information.");
+        loggerChain.logMessage(Logger.DEBUG, "This is a debug level message.");
+        loggerChain.logMessage(Logger.ERROR, "This is an error message.");
+    }
+}
+
+✅ Output
+INFO: This is an information.
+DEBUG: This is a debug level message.
+INFO: This is a debug level message.
+ERROR: This is an error message.
+DEBUG: This is an error message.
+INFO: This is an error message.
+
+
+🔄 Spring Boot Example
+In Spring Boot, the CoR pattern is often used in:
+➤ Request filtering and processing
+➤ Spring Security filter chains
+➤ Exception handling chains
+
+✅ Example: Custom Spring Boot Filter Chain
+
+@Component
+@Order(1)
+public class AuthenticationFilter implements Filter {
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        System.out.println("Authentication Filter: Checking credentials");
+        chain.doFilter(req, res); // Pass to next filter
+    }
+}
+
+@Component
+@Order(2)
+public class LoggingFilter implements Filter {
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        System.out.println("Logging Filter: Logging request");
+        chain.doFilter(req, res); // Pass to next filter
+    }
+}
+🧠 Here, Spring internally builds a chain of filters—just like our CoR pattern.
+
+🔄 Real Java Classes Using CoR
+➤ javax.servlet.Filter and FilterChain
+➤ java.util.logging.Logger
+➤ Spring Security Filter Chain
+
+
+🔄 Where to Use in Projects
+➤ Logging frameworks (like above example)
+➤ Event processing systems
+➤ Request validation or authentication pipelines
+➤ Error handling chains
+➤ Middleware request processing (Spring Filters, Interceptors)
+
+
+🔄 Advantages
+Decouples sender and receiver.
+Promotes flexibility in assigning responsibilities.
+Allows dynamic changes in handling order.
+
+🔄 Disadvantages
+➤ Request may pass through many handlers, reducing performance.
+➤ Harder to debug and trace flow. 
+
+🔄

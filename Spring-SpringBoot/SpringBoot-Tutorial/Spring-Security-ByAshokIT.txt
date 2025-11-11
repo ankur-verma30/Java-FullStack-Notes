@@ -130,11 +130,745 @@ public class SecurityConfig {
     ✔️ Downstream services apply @PreAuthorize or role-based access control.
 
 
- 
-🔄
-🔄
-🔄
-🔄
-🔄
-🔄
-🔄
+🔷 Role-Based Login
+Role-Based Login (or Role-Based Access Control, RBAC) means:
+➤ Users have roles, e.g., USER, ADMIN.
+➤ Access to endpoints is restricted based on roles.
+✅ Example:
+✔️ /admin/** → only ADMIN can access
+✔️ /user/** → only USER or ADMIN can access
+✔️ /public/** → everyone can access
+
+Spring Security makes this easy using:
+➤ hasRole("ROLE")
+➤ hasAuthority("AUTHORITY")
+➤ @PreAuthorize annotations
+
+
+🔄 Create Security Configuration
+Since WebSecurityConfigurerAdapter is deprecated, use SecurityFilterChain:
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // for REST APIs
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/user/**").hasRole("USER")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(Customizer.withDefaults()) // form-based login
+            .httpBasic(Customizer.withDefaults()); // basic auth
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails user = User.withUsername("ankur")
+                .password(passwordEncoder().encode("1234"))
+                .roles("USER") // ROLE_USER
+                .build();
+
+        UserDetails admin = User.withUsername("admin")
+                .password(passwordEncoder().encode("admin"))
+                .roles("ADMIN") // ROLE_ADMIN
+                .build();
+
+        return new InMemoryUserDetailsManager(user, admin);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+👉 roles("USER") automatically adds ROLE_ prefix internally.
+👉 hasRole("USER") checks for ROLE_USER.
+👉 formLogin() enables login page, httpBasic() allows basic auth for APIs
+
+🔄 Using @PreAuthorize for Method-Level Security
+You can secure individual methods instead of entire paths:
+
+@RestController
+@RequestMapping("/api")
+public class RoleController {
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/user/home")
+    public String userHome() {
+        return "Welcome User!";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/home")
+    public String adminHome() {
+        return "Welcome Admin!";
+    }
+}
+
+👉 Enable method-level security:
+@EnableMethodSecurity // // Enables @PreAuthorize, @PostAuthorize, @Secured
+@Configuration
+public class MethodSecurityConfig {
+}
+✔️ Spring does not enable method-level security by default.
+✔️ So you need to explicitly tell Spring: “Hey, look for method-level security annotations.”
+
+🔄 Password Encoding
+Spring Security requires encoded passwords.
+Using BCryptPasswordEncoder ensures passwords are safely hashed.
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+
+🔄 JDBC Authentication
+➤ Spring Security loads users and their roles from a relational database.
+➤ Instead of in-memory users, credentials (username, password, roles) are stored in tables.
+➤ Spring Security queries the DB using SQL queries or default table structures.
+
+1️⃣ Database Setup
+Spring Security expects a user table and an authority/role table. Default schema:
+👉 users table
+| Column   | Type    | Description      |
+| -------- | ------- | ---------------- |
+| username | VARCHAR | User login       |
+| password | VARCHAR | Encoded password |
+| enabled  | BOOLEAN | Is user active?  |
+
+👉 authorities table
+| Column   | Type    | Description      |
+| -------- | ------- | ---------------- |
+| username | VARCHAR | User login       |
+| authority| VARCHAR | User authority   |
+
+✅ Example SQL for H2/SQL:
+CREATE TABLE users (
+    username VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(100) NOT NULL,
+    enabled BOOLEAN NOT NULL
+);
+
+CREATE TABLE authorities (
+    username VARCHAR(50) NOT NULL,
+    authority VARCHAR(50) NOT NULL,
+    FOREIGN KEY (username) REFERENCES users(username)
+);
+
+INSERT INTO users VALUES ('ankur', '$2a$10$AqHq0Yc0p8Uov7E1dQJ6Bu4rF2EvzpYH7QvZ.3pFZ9/V36q3Yd4xi', true); 
+-- password=1234 (BCrypt)
+
+INSERT INTO authorities VALUES ('ankur', 'ROLE_USER');
+⚡ Note: Passwords must be encoded (BCrypt, for example).
+
+
+2️⃣ Spring Security Configuration for JDBC Authentication
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/user/**").hasRole("USER")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(Customizer.withDefaults())
+            .httpBasic(Customizer.withDefaults());
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService users() {
+        JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
+        return manager;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+➤ DataSource → Spring Boot automatically configures this if you set database properties in 
+
+🔗 application.properties: 
+
+spring.datasource.url=jdbc:mysql://localhost:3306/springsecurity
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=none
+
+➤ JdbcUserDetailsManager → Loads user credentials and roles from the DB.
+    ✔️ Uses default queries:
+        🔗 SELECT username, password, enabled FROM users WHERE username = ?
+        🔗 SELECT username, authority FROM authorities WHERE username = ?
+
+    ✔️ Can be customized using:
+        🔗 manager.setUsersByUsernameQuery("custom query");
+        🔗 manager.setAuthoritiesByUsernameQuery("custom query");
+
+
+➤ PasswordEncoder → Passwords in the DB must be encoded (BCrypt recommended).
+➤ Roles → Must start with ROLE_ if using hasRole() in SecurityFilterChain.
+
+
+3️⃣ How It Works at Runtime
+➤ User hits /login endpoint.
+➤ Spring Security uses JdbcUserDetailsManager to:
+    ✔️ Query user credentials
+    ✔️ Load roles/authorities
+➤ Checks password using PasswordEncoder.
+➤ If successful, user is authenticated and roles are applied for authorization.
+
+
+🔷 OAuth2
+OAuth2 (Open Authorization 2.0) is a framework for authorization — not authentication.
+
+It allows an app (Client) to securely access resources (like user data) from another service (Resource Server) without sharing credentials (like passwords).
+
+✅ Example
+➤ You click “Login with Google” on Spotify:
+➤ Google authenticates you (proves your identity)
+➤ Spotify receives limited access (like your email)
+➤ You never give Spotify your Google password.
+➤ That’s OAuth2 in action.
+
+🔄 Key Roles in OAuth2
+| Role                     | Description                               | Example               |
+| ------------------------ | ----------------------------------------- | --------------------- |
+| **Resource Owner**       | The user who owns the data                | You                   |
+| **Client**               | The app that wants access                 | Spotify               |
+| **Authorization Server** | Issues access tokens after verifying user | Google                |
+| **Resource Server**      | Hosts protected APIs or data              | Google’s userinfo API |
+
+
+🔄 OAuth2 Grant Types (Flows)
+Each “flow” defines how tokens are issued. Spring Security supports all major ones.
+
+| Grant Type               | Use Case                                     | Who Uses It        |
+| ------------------------ | -------------------------------------------- | ------------------ |
+| **Authorization Code**   | Server-side web apps (secure, uses redirect) | Login with Google  |
+| **Implicit**             | Deprecated (for SPAs, not secure)            | Old JS apps        |
+| **Password Credentials** | User directly gives username/password        | Internal apps only |
+| **Client Credentials**   | Service-to-service (no user involved)        | Microservices      |
+| **Refresh Token**        | Used to renew access tokens                  | All apps           |
+
+🔄 Tokens in OAuth2
+| Token Type                    | Purpose                           | Example                   |
+| ----------------------------- | --------------------------------- | ------------------------- |
+| **Access Token**              | Grants access to resource         | `ya29.a0AfH6S...`         |
+| **Refresh Token**             | Used to get a new access token    | `1//0gLqF7L5...`          |
+| **ID Token (OpenID Connect)** | Contains user identity info (JWT) | `eyJhbGciOiJIUzI1NiIs...` |
+
+👉 ID Token = only when OAuth2 + OpenID Connect (OIDC) used → gives authentication info.
+
+
+🔄 OAuth2 Flow in Steps (Authorization Code Grant)
+1️⃣ → User clicks “Login with Google”
+
+👉 Spring redirects to:
+https://accounts.google.com/o/oauth2/auth?
+ client_id=xyz
+ &redirect_uri=http://localhost:8080/login/oauth2/code/google
+ &scope=email profile
+ &response_type=code
+
+2️⃣ → Google shows consent screen
+👉 User grants access.
+
+3️⃣ → Google redirects back with code
+http://localhost:8080/login/oauth2/code/google?code=abc123
+
+4️⃣ → Spring exchanges code for tokens
+👉 Spring Security automatically calls Google token endpoint to get:
+
+{
+ "access_token": "ya29.a0AfH6S...",
+ "id_token": "eyJhbGciOiJIUzI1NiIs..."
+}
+
+Step 5️⃣ → Spring fetches user info from Google
+👉 User info API:
+https://www.googleapis.com/oauth2/v3/userinfo
+
+6️⃣ → User authenticated ✅
+Spring Security creates a OAuth2AuthenticationToken and logs the user in.
+
+
+7️⃣ Basic Configuration in Spring Boot
+Dependencies (pom.xml):
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+🔗 application.yml
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope:
+              - email
+              - profile
+✔️ Spring Security auto-configures /oauth2/authorization/google and /login/oauth2/code/google.
+
+🔄 Security Configuration
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/home").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2Login(Customizer.withDefaults())  // enable login with Google
+            .logout(logout -> logout
+                .logoutSuccessUrl("/").permitAll()
+            );
+        return http.build();
+    }
+}
+✔️ Spring handles all redirections, token exchanges, and user info retrieval automatically.
+
+
+8️⃣ How Spring Security Manages OAuth2
+When user logs in:
+➤ Spring fetches the tokens and stores them in a SecurityContext.
+➤ It creates:
+    ✔️ OAuth2User → contains user info (email, name, picture)
+    ✔️ OAuth2AuthenticationToken → represents logged-in session
+
+➤ You can access them in controller:
+@GetMapping("/user")
+public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+    return principal.getAttributes();
+}
+
+9️⃣ Role of OAuth2 in Microservices
+In microservices, OAuth2 is often used for:
+✅ Single Sign-On (SSO) — one login for multiple apps.
+✅ Service-to-Service authentication (client credentials flow).
+✅ API Gateway security — verifying access tokens at gateway.
+✔️ Usually implemented with Keycloak, Auth0, or Spring Authorization Server.
+
+
+🔄Spring Authorization Server
+➤ If you want your own Google-like login system, use:
+
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-authorization-server</artifactId>
+</dependency>
+👉 It lets you:
+✔️ Issue JWTs
+✔️ Manage client apps
+✔️ Implement all OAuth2 flows
+👉 Used in microservices as a central auth service.
+
+
+4️⃣ OAuth2 in Microservices Architecture
+Typical layout:
+
+[Auth Server] → issues JWT access tokens
+   ↓
+[API Gateway] → validates JWT before forwarding
+   ↓
+[Microservices] → act as Resource Servers
+👉 Each microservice:
+✔️ doesn’t handle login directly
+✔️ just validates the JWT → ensures scalability and central security.
+
+
+🔷 If want to configure OAuth with Github.com
+1️⃣ You can use the following dependency:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>
+
+2️⃣ Register Your App on GitHub
+➤ Go to https://github.com/settings/developers
+➤ Click “New OAuth App”
+➤ Fill out the form:
+    ✔️ Application name: SpringBoot GitHub OAuth
+    ✔️ Homepage URL: http://localhost:8080
+    ✔️ Authorization callback URL: http://localhost:8080/login/oauth2/code/github
+        This callback URL must exactly match your Spring Boot redirect URI.
+➤ Once created, you’ll get:
+    ✔️ Client ID
+    ✔️ Client Secret
+👉 Keep these safe — you’ll use them in your application.yml.
+
+
+3️⃣ Configure application.yml
+👉 Create src/main/resources/application.yml and add:
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: your_client_id_here
+            client-secret: your_client_secret_here
+            scope: user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: GitHub
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: login
+server:
+  port: 8080
+
+👉 Explanation:
+➤ registration.github → defines the OAuth app registration (client details).
+➤ provider.github → defines GitHub-specific OAuth endpoints.
+➤ redirect-uri → must match what you registered in GitHub Developer settings.
+
+
+4️⃣ Create Security Configuration
+👉 Spring Boot can automatically configure OAuth2 login, but for more control, define a SecurityConfig:
+
+package com.example.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/login").permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth -> oauth
+                .loginPage("/login")
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/")
+                .permitAll()
+            );
+
+        return http.build();
+    }
+}
+👉 Explanation:
+✔️ /login → public route for manual login.
+✔️ All other routes require authentication.
+✔️ .oauth2Login() automatically configures the OAuth2 flow.
+
+5️⃣ Create a Controller
+package com.example.controller;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HomeController {
+
+    @GetMapping("/")
+    public String home() {
+        return "index";
+    }
+
+    @GetMapping("/user")
+    public String user(@AuthenticationPrincipal OAuth2User user, Model model) {
+        model.addAttribute("name", user.getAttribute("name"));
+        model.addAttribute("login", user.getAttribute("login"));
+        model.addAttribute("avatar", user.getAttribute("avatar_url"));
+        return "user";
+    }
+}
+
+
+🔷 JWT + SpringBoot
+JWT (JSON Web Token) is a compact, URL-safe way to represent claims (user data or permissions) between two parties — typically client and server — in a secure and stateless way.
+
+➤ JWT is a string-based token.
+➤ It’s digitally signed using HMAC (symmetric) or RSA (asymmetric) algorithms.
+➤ It helps the server authenticate and authorize users without maintaining sessions.
+
+
+2️⃣ Structure of a JWT
+A JWT has 3 parts, separated by dots (.):
+🔗 xxxxx.yyyyy.zzzzz
+
+➤ Header → metadata
+➤ Payload → actual user data
+➤ Signature → to verify integrity
+
+✅ Example:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.      → Header (Base64)
+eyJzdWIiOiJhbmF1ciIsImlhdCI6MTY3NDAxMzM1NSwiZXhwIjoxNjc0MDEzNjU1fQ.  → Payload (Base64)
+OHkHac4ZsnbnT7dbDLyJo4sP0wvZ6Oey_cwe5UB0kX8  → Signature
+
+3️⃣ What’s Inside?
+➤ Header (JSON)
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+➤ Payload (JSON)
+{
+  "sub": "ankur",
+  "role": "ADMIN",
+  "iat": 1731018800,
+  "exp": 1731022400
+}
+| Field  | Meaning                   |
+| ------ | ------------------------- |
+| `sub`  | Subject (user identifier) |
+| `role` | User’s role               |
+| `iat`  | Issued at (timestamp)     |
+| `exp`  | Expiration time           |
+
+➤ Signature
+👉 Created by signing the header + payload using a secret key:
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  secret
+)
+
+
+4️⃣ Why Use JWT?
+| Feature         | Explanation                                           |
+| --------------- | ----------------------------------------------------- |
+| ✅ Stateless     | Server doesn’t store sessions; token carries all info |
+| ✅ Scalable      | Ideal for microservices and distributed systems       |
+| ✅ Secure        | Signed (and optionally encrypted)                     |
+| ✅ Interoperable | JSON-based, used across languages                     |
+
+🔄 JWT Flow in Spring Boo
+Here’s how JWT authentication works inside SpringBoot:
+
+     +------------+         +-----------------+
+     |   Client   |  --->   |  /login (Auth)  |
+     +------------+         +-----------------+
+             |                      |
+             |   POST credentials    |
+             |--------------------->|
+             |                      |
+             |   JWT issued         |
+             |<---------------------|
+             |                      |
+             |   Send JWT in Header |
+             |--------------------->|
+             |   Access /api/...    |
+             |                      |
+👉 Steps:
+➤ User sends username/password to /authenticate endpoint.
+➤ Server validates credentials.
+➤ Server creates a JWT token signed with a secret key.
+➤ Token is sent back to client.
+➤ For every next request → client includes JWT in the Authorization header:
+    🔗 Authorization: Bearer <token>
+➤ Server verifies signature → grants access.
+
+
+6️⃣ Implementation in Spring Boot
+1️⃣ Add Dependencies
+👉 Add to pom.xml:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.11.5</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.11.5</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.11.5</version>
+    <scope>runtime</scope>
+</dependency>
+
+
+2️⃣ JWT Utility Class
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import java.util.*;
+import java.security.Key;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtUtil {
+    private static final String SECRET_KEY = "mysecretkey1234567890mysecretkey";
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException ex) {
+            return false;
+        }
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+}
+
+3️⃣ Authentication Filter
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
+        String username = null;
+        String token = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            username = jwtUtil.extractUsername(token);
+        }
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            var userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtUtil.validateToken(token)) {
+                var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}
+
+4️⃣ Security Configuration
+import org.springframework.context.annotation.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final JwtAuthFilter jwtAuthFilter;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/authenticate").permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    } 
+}
+
+5️⃣ Authentication Controller
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import lombok.RequiredArgsConstructor; 
+
+@RestController
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthenticationManager authManager;
+    private final JwtUtil jwtUtil;
+
+
+    @PostMapping("/authenticate")
+    public String authenticate(@RequestParam String username, @RequestParam String password) {
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        return jwtUtil.generateToken(username);
+    }
+}
+

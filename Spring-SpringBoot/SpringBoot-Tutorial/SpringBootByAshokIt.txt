@@ -999,3 +999,314 @@ If multiple exception handlers match:
         ➤ @ExceptionHandler in UserController, OR
         ➤ global @ControllerAdvice, OR
         ➤ default Spring error JSON if none found
+
+
+
+🔷 Spring Batch
+➤ Spring Batch is a lightweight, robust, and scalable batch processing framework built on top of the Spring framework.
+➤ It is used for automating large-volume, repetitive, or scheduled data processing tasks — such as reading data from a database or file, processing it, and writing the output elsewhere.
+
+➤ “Spring Batch is used to handle large amounts of data in batch jobs — with features like transaction management, chunk processing, job scheduling, and restart capabilities.”
+
+
+🔄 Why We Use Spring Batch
+| Purpose                    | Explanation                                                             |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **Automation**             | Run repetitive jobs (e.g., daily report generation, data cleanup).      |
+| **Bulk Processing**        | Process millions of records efficiently.                                |
+| **Transaction Management** | Each chunk is processed transactionally — rollback if any failure.      |
+| **Restart Capability**     | Resume job from where it failed.                                        |
+| **Scalability**            | Supports multi-threaded and parallel processing.                        |
+| **Integration**            | Works easily with Spring Boot, Spring Data, JPA, JDBC, etc.             |
+| **Monitoring**             | Tracks job metadata (start time, end time, status, etc.) automatically. |
+
+🔄 Real-World Use Cases
+| Use Case                       | Example                                                |
+| ------------------------------ | ------------------------------------------------------ |
+| Data migration                 | Migrate records from one database to another.          |
+| ETL (Extract, Transform, Load) | Extract data from CSV, transform it, and load into DB. |
+| Report generation              | Generate PDF/Excel reports daily.                      |
+| Log processing                 | Process and summarize server logs.                     |
+| Invoice generation             | Generate bills for customers periodically.             |
+
+🔄 Key Concepts in Spring Batch
+| Concept           | Description                                                         |
+| ----------------- | ------------------------------------------------------------------- |
+| **Job**           | Represents the entire batch process (contains one or more steps).   |
+| **Step**          | A single phase of the job — e.g., read → process → write.           |
+| **ItemReader**    | Reads data (from file, DB, API, etc.).                              |
+| **ItemProcessor** | Processes/transforms the data (e.g., filtering, mapping).           |
+| **ItemWriter**    | Writes data to a destination (DB, file, etc.).                      |
+| **JobRepository** | Stores metadata about job execution (status, start/end time, etc.). |
+| **JobLauncher**   | Used to start the batch job.                                        |
+| **JobParameters** | External inputs to a batch job (e.g., file path, date).             |
+
+🔄 How Spring Batch Works (Flow Diagram)
+        ┌─────────────────────────────┐
+        │         JobLauncher         │
+        └─────────────┬───────────────┘
+                      │
+                (launch job)
+                      ↓
+             ┌──────────────────┐
+             │       Job         │
+             └──────────────────┘
+                      │
+            ┌─────────┴─────────┐
+            │                   │
+          Step 1              Step 2
+     ┌───────────────┐   ┌───────────────┐
+     │ ItemReader     │   │ ItemReader     │
+     │ ItemProcessor  │   │ ItemProcessor  │
+     │ ItemWriter     │   │ ItemWriter     │
+     └───────────────┘   └───────────────┘
+
+🔄 Spring Batch Workflow in Simple Terms
+➤ JobLauncher starts the Job.
+➤ A Job consists of one or more Steps.
+➤ Each Step performs:
+    ✔️ Read → Process → Write.
+➤ Metadata is saved in JobRepository.
+➤ If a job fails midway, you can restart from the last checkpoint.
+
+
+🔄 Chunk-Oriented Processing
+One of the key concepts in Spring Batch.
+Data is processed in small "chunks" instead of all at once — improving memory efficiency.
+
+✅ Example:
+chunk-size: 10
+
+👉 Process flow:
+Read 10 items → Process → Write → Commit Transaction → Repeat
+
+👉 If something fails in that chunk, only that chunk rolls back.
+
+
+🔄 Spring Batch Example
+1️⃣ Add Dependencies (Maven)
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-batch</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.hsqldb</groupId>
+    <artifactId>hsqldb</artifactId>
+    <scope>runtime</scope>
+</dependency>
+
+
+2️⃣ Define a Batch Configuration
+@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    public ItemReader<String> reader() {
+        return new ListItemReader<>(List.of("A", "B", "C", "D"));
+    }
+
+    @Bean
+    public ItemProcessor<String, String> processor() {
+        return item -> item.toLowerCase(); // Convert to lowercase
+    }
+
+    @Bean
+    public ItemWriter<String> writer() {
+        return items -> items.forEach(System.out::println);
+    }
+
+    @Bean
+    public Step step() {
+        return stepBuilderFactory.get("step1")
+                .<String, String>chunk(2)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer())
+                .build();
+    }
+
+    @Bean
+    public Job job() {
+        return jobBuilderFactory.get("myJob")
+                .start(step())
+                .build();
+    }
+}
+
+
+3️⃣Run the Batch
+👉 You can trigger it:
+➤ Automatically at startup (default)
+➤ Programmatically using JobLauncher
+
+@Autowired
+private JobLauncher jobLauncher;
+
+@Autowired
+private Job job;
+
+@PostConstruct
+public void runJob() throws Exception {
+    JobParameters params = new JobParametersBuilder()
+            .addLong("time", System.currentTimeMillis())
+            .toJobParameters();
+
+    jobLauncher.run(job, params);
+}
+
+
+🔄 Advanced Features
+| Feature                      | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| **Job Restartability**       | Resume job from last successful step using job metadata.     |
+| **Job Scheduling**           | Combine with Spring Scheduler / Quartz to run periodically.  |
+| **Parallel Steps**           | Run multiple steps in parallel threads.                      |
+| **Partitioning**             | Split data into multiple partitions for parallel processing. |
+| **Skip and Retry Logic**     | Skip or retry items that fail processing.                    |
+| **Listeners**                | Hook into lifecycle events (before/after job or step).       |
+| **Database-backed Metadata** | Stores job execution data in DB via `JobRepository`.         |
+
+
+🔷 Reactive Programming
+Reactive Programming is a programming paradigm that focuses on asynchronous data streams and non-blocking communication.
+
+Instead of executing tasks sequentially and blocking threads (like traditional Spring MVC), it works by reacting to events (like incoming data, user requests, or errors).
+
+
+🔄 Traditional vs Reactive Thinking
+| Type             | Traditional (Imperative)       | Reactive (Declarative)                 |
+| ---------------- | ------------------------------ | -------------------------------------- |
+| **Thread Model** | One thread per request         | Few threads handle many requests       |
+| **I/O Calls**    | Blocking (waits for response)  | Non-blocking (reacts when ready)       |
+| **Processing**   | Sequential                     | Event-driven & Stream-based            |
+| **Example**      | Waiting for DB query to finish | Subscribes to DB result when available |
+
+🔄 Why Reactive Programming?
+Reactive programming helps when your system:
+    ✔️ Handles a large number of concurrent requests (like Netflix, LinkedIn, etc.)
+    ✔️ Waits a lot on I/O operations (DB, REST APIs, file reads, etc.)
+    ✔️ Needs to be scalable with minimal resource usage
+    ✔️ Requires streaming data processing (live dashboards, event processing)
+
+
+🔄 Core Concepts of Reactive Programming 
+| Concept          | Description                                    | Analogy                         |
+| ---------------- | ---------------------------------------------- | ------------------------------- |
+| **Publisher**    | Emits data asynchronously (like a data source) | “Person who speaks”             |
+| **Subscriber**   | Listens to data from Publisher                 | “Person who listens”            |
+| **Subscription** | Connection between Publisher & Subscriber      | “Phone call between two people” |
+| **Backpressure** | Mechanism to control data flow rate            | “Listener says – speak slower!” |
+
+🔄 Reactive Streams Specification (4 Interfaces)
+Spring implements Reactive Streams, which has four interfaces:
+    ✔️ Publisher → Emits data
+    ✔️ Subscriber → Consumes data
+    ✔️ Subscription → Controls data request/cancel
+    ✔️ Processor → Acts as both publisher and subscriber
+
+🔄 Reactive in Spring Boot — The Spring WebFlux Module
+Spring Boot provides Spring WebFlux — a reactive alternative to Spring MVC.
+
+| Framework          | Type         | I/O Model    |
+| ------------------ | ------------ | ------------ |
+| **Spring MVC**     | Synchronous  | Blocking     |
+| **Spring WebFlux** | Asynchronous | Non-Blocking |
+
+👉 WebFlux is built on:
+➤ Project Reactor → core reactive library used internally.
+➤ Netty / Undertow → non-blocking servers (instead of Tomcat).
+
+Core Types in Project Reactor
+| Type        | Description                                   | Example      |
+| ----------- | --------------------------------------------- | ------------ |
+| **Mono<T>** | Emits **0 or 1** item (for single responses)  | `Mono<User>` |
+| **Flux<T>** | Emits **0 or many** items (for streams/lists) | `Flux<User>` |
+These replace the traditional User or List<User> in reactive code.
+
+✅ Example: Reactive Controller
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    // Returns single user (Mono)
+    @GetMapping("/{id}")
+    public Mono<User> getUser(@PathVariable String id) {
+        return userService.findById(id);
+    }
+
+    // Returns multiple users (Flux)
+    @GetMapping
+    public Flux<User> getAllUsers() {
+        return userService.findAll();
+    }
+}
+✔️ No thread blocks waiting for DB or API responses — results are streamed asynchronously.
+
+🔄 Reactive Repository
+When using MongoDB or R2DBC, you can use Reactive Repositories:
+public interface UserRepository extends ReactiveCrudRepository<User, String> {
+    Flux<User> findByAgeGreaterThan(int age);
+}
+
+✔️ ReactiveCrudRepository replaces JpaRepository
+✔️ Returns Mono or Flux
+
+🔄 End-to-End Reactive Flow
+Client → Reactive Controller → Reactive Service → Reactive Repository → DB/External API
+
+✔️ Each layer returns Mono or Flux
+✔️ Execution is non-blocking
+✔️ Uses event loop threads (like Netty)
+
+🔄 Advantages
+| Advantage                         | Explanation                                                  |
+| --------------------------------- | ------------------------------------------------------------ |
+| 🚀 **High Scalability**           | Handles thousands of concurrent connections with few threads |
+| ⚡ **Better Resource Utilization** | No blocking → less thread overhead                           |
+| 🔄 **Asynchronous**               | Data flows as streams, not as fixed responses                |
+| 📡 **Streaming Data Support**     | Perfect for real-time dashboards, notifications, etc.        |
+| ⚙️ **Resilient Systems**          | Built-in error handling and backpressure support             |
+
+🔄Limitations / When Not to Use
+➤ When application is CPU-bound (heavy computation, not I/O waiting)
+➤ When integrating with legacy blocking APIs
+➤ Learning curve — debugging reactive flows can be tricky
+➤ For small, simple apps — traditional Spring MVC is enough
+
+
+🔄 Integration with Other Modules
+| Integration                      | Example                                                 |
+| -------------------------------- | ------------------------------------------------------- |
+| **Spring Data R2DBC**            | Reactive DB access (MySQL, PostgreSQL)                  |
+| **Spring Data MongoDB Reactive** | Non-blocking Mongo queries                              |
+| **Reactive Kafka**               | Consuming Kafka streams reactively                      |
+| **WebClient**                    | Non-blocking HTTP client (replacement for RestTemplate) |
+
+✅ Example with WebClient (Reactive REST Calls)
+WebClient webClient = WebClient.create("https://api.github.com");
+
+Flux<Repository> repos = webClient.get()
+        .uri("/users/ankur-verma30/repos")
+        .retrieve()
+        .bodyToFlux(Repository.class);
+
+✔️ Non-blocking HTTP call
+✔️ WebClient replaces RestTemplate
+
+🔄 Real-world Use Cases
+➤ Live chat systems
+➤ Real-time stock tickers or dashboards
+➤ Reactive microservices communicating via WebFlux + Kafka
+➤ IoT sensor data streaming
+➤ Notification systems
