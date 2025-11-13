@@ -154,4 +154,707 @@ Allows dynamic changes in handling order.
 ➤ Request may pass through many handlers, reducing performance.
 ➤ Harder to debug and trace flow. 
 
+
+🔷 Iterator Design Pattern
+The Iterator Design Pattern provides a way to access elements of a collection sequentially without exposing the underlying representation (like array, list, tree, etc.).
+
+👉 It allows you to traverse a collection object without exposing its internal structure.
+
+🔄 Intent
+➤ To traverse elements of a collection object in a uniform way.
+➤ To separate the logic of iteration from the collection’s internal implementation.
+➤ To support multiple traversal strategies (forward, backward, filtered, etc.).
+
+
+🔄 Structure
+1️⃣ Iterator (Interface) — defines methods like hasNext(), next().
+2️⃣ Concrete Iterator — implements iteration logic.
+3️⃣ Aggregate (Collection) — defines an interface to create an iterator.
+4️⃣ Concrete Aggregate (Concrete Collection) — implements creation of iterator.
+
+✅ Example:
+Let’s build our own iterator for a collection of Song objects.
+
+1️⃣ Iterator interface
+interface Iterator<T> {
+    boolean hasNext();
+    T next();
+}
+
+2️⃣ Aggregate interface
+interface SongCollection {
+    Iterator<String> createIterator();
+}
+
+3️⃣ Concrete Aggregate
+class Playlist implements SongCollection {
+    private final String[] songs;
+    private int index = 0;
+
+    public Playlist(String[] songs) {
+        this.songs = songs;
+    }
+
+    @Override
+    public Iterator<String> createIterator() {
+        return new PlaylistIterator(songs);
+    }
+}
+
+4️⃣ Concrete Iterator
+class PlaylistIterator implements Iterator<String> {
+    private final String[] songs;
+    private int position = 0;
+
+    public PlaylistIterator(String[] songs) {
+        this.songs = songs;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return position < songs.length;
+    }
+
+    @Override
+    public String next() {
+        return songs[position++];
+    }
+}
+
+
+5️⃣ Client code
+public class IteratorPatternDemo {
+    public static void main(String[] args) {
+        String[] songs = {"Believer", "Thunder", "Demons"};
+        Playlist playlist = new Playlist(songs);
+        Iterator<String> iterator = playlist.createIterator();
+
+        while (iterator.hasNext()) {
+            System.out.println("Now playing: " + iterator.next());
+        }
+    }
+}
+✅ Output
+Now playing: Believer
+Now playing: Thunder
+Now playing: Demons
+
+  
+✅ Example in Java Collections Framework
+Java’s entire Collection API uses this pattern.
+
+List<String> names = List.of("Ankur", "Ravi", "Karan");
+
+Iterator<String> it = names.iterator();
+while (it.hasNext()) {
+    System.out.println(it.next());
+}
+👉 Here:
+➤ List is the Concrete Aggregate.
+➤ Iterator is the Iterator Interface.
+➤ ArrayList.Itr is the Concrete Iterator.
+
+So yes —
+✅ All Java Collections (ArrayList, HashSet, TreeMap, etc.) follow the Iterator pattern.
+
+
+🔄 Iterator Methods in Java
+| Method               | Description                                   |
+| -------------------- | --------------------------------------------- |
+| `hasNext()`          | Checks if there are more elements             |
+| `next()`             | Returns next element                          |
+| `remove()`           | Removes current element (optional)            |
+| `forEachRemaining()` | Performs an action for each remaining element |
+
+🔄 In Spring Boot
+The Iterator pattern is indirectly used in:
+✔️ BeanFactory and ApplicationContext (for iterating over beans)
+✔️ JdbcTemplate result sets
+✔️ Environment properties iteration
+✔️ Spring Data Repositories when iterating over query results
+
+✅Example:
+@Autowired
+private ApplicationContext context;
+
+public void listBeans() {
+    for (String beanName : context.getBeanDefinitionNames()) {
+        System.out.println("Bean: " + beanName);
+    }
+}
+👉 Here, Spring internally uses the Iterator Pattern to traverse bean definitions.
+
+
+🔄 Where to Use It in Projects
+✔️ When you want a uniform traversal mechanism across different collections.
+✔️ When internal representation (array, linked list, tree) should be hidden.
+✔️ When multiple traversal types are needed (e.g., forward/backward).
+✔️ When you want to support iteration over custom data structures.
+
+
+🔄 Advantages
+➤ Decouples iteration logic from collection class.
+➤ Supports multiple traversal strategies.
+➤ Consistent interface for all collections.
+
+
+🔄 Disadvantages
+➤ May increase number of classes (extra iterator class).
+➤ Complex for nested or bidirectional traversals.
+
+
+🔷 Observer Design Pattern
+The Observer Design Pattern defines a one-to-many dependency between objects, so that when one object (subject) changes its state, all its dependents (observers) are notified and updated automatically.
+
+🔄 Intent
+➤ To achieve loose coupling between objects.
+➤ To allow automatic notification when the state of one object changes.
+➤ To easily add or remove observers without changing the subject.
+
+🔄 Real-world Analogy
+Think of a YouTube channel:
+➤ The channel = Subject
+➤ The subscribers = Observers
+➤ When the channel uploads a new video, all subscribers get notified automatically.
+
+🔄 Structure
+1️⃣ Subject (Observable)
+    ✔️ Maintains a list of observers
+    ✔️ Notifies them about state changes
+2️⃣ Observer (Subscriber)
+    ✔️ Defines the update method
+3️⃣ ConcreteSubject
+    ✔️ Implements Subject and triggers notifications
+4️⃣ ConcreteObserver
+    ✔️ Implements the Observer and updates itself upon notification
+
+✅ Java Example
+import java.util.ArrayList;
+import java.util.List;
+
+🔁 Observer Interface
+interface Observer {
+    void update(String message);
+}
+
+🔁 Subject Interface
+interface Subject {
+    void attach(Observer o);
+    void detach(Observer o);
+    void notifyObservers(String message);
+}
+
+🔁 Concrete Subject
+class YouTubeChannel implements Subject {
+    private final List<Observer> subscribers = new ArrayList<>();
+
+    @Override
+    public void attach(Observer o) {
+        subscribers.add(o);
+    }
+
+    @Override
+    public void detach(Observer o) {
+        subscribers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers(String message) {
+        for (Observer o : subscribers) {
+            o.update(message);
+        }
+    }
+
+    public void uploadVideo(String title) {
+        System.out.println("Channel uploaded a new video: " + title);
+        notifyObservers("New video uploaded: " + title);
+    }
+}
+
+🔁 Concrete Observers
+class Subscriber implements Observer {
+    private final String name;
+
+    public Subscriber(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void update(String message) {
+        System.out.println(name + " received notification → " + message);
+    }
+}
+
+🔁 Client
+public class ObserverPatternDemo {
+    public static void main(String[] args) {
+        YouTubeChannel channel = new YouTubeChannel();
+
+        Observer s1 = new Subscriber("Ankur");
+        Observer s2 = new Subscriber("Isha");
+        Observer s3 = new Subscriber("Deepak");
+
+        channel.attach(s1);
+        channel.attach(s2);
+        channel.attach(s3);
+
+        channel.uploadVideo("Design Patterns in Java");
+    }
+}
+
+✅ Output
+Channel uploaded a new video: Design Patterns in Java
+Ankur received notification → New video uploaded: Design Patterns in Java
+Isha received notification → New video uploaded: Design Patterns in Java
+Deepak received notification → New video uploaded: Design Patterns in Java
+
+
+🔄 Example in Java
+Java provides the Observer pattern built-in (though deprecated since Java 9):
+
+import java.util.Observable;
+import java.util.Observer;
+
+class NewsAgency extends Observable {
+    void setNews(String news) {
+        setChanged();
+        notifyObservers(news);
+    }
+}
+
+class NewsChannel implements Observer {
+    private String news;
+
+    public void update(Observable o, Object arg) {
+        this.news = (String) arg;
+        System.out.println("News Updated: " + news);
+    }
+}
+Even though this approach is deprecated, it’s the classic example of the pattern built into Java.
+
+🔄 Spring Boot Example (Real-world Use Case)
+Spring’s ApplicationEventPublisher and @EventListener mechanism is a perfect implementation of the Observer Pattern.
+
+1️⃣ Define a custom event
+import org.springframework.context.ApplicationEvent;
+
+public class UserRegisteredEvent extends ApplicationEvent {
+    private final String username;
+
+    public UserRegisteredEvent(Object source, String username) {
+        super(source);
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}
+
+2️⃣ Publish the event
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    public void registerUser(String username) {
+        System.out.println("Registering user: " + username);
+        publisher.publishEvent(new UserRegisteredEvent(this, username));
+    }
+}
+
+3️⃣ Listen for the event
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EmailNotificationListener {
+
+    @EventListener
+    public void handleUserRegistered(UserRegisteredEvent event) {
+        System.out.println("Sending welcome email to " + event.getUsername());
+    }
+}
+
+✅ Output
+Registering user: Ankur
+Sending welcome email to Ankur
+
+👉 Here:
+➤ UserService → Subject
+➤ EmailNotificationListener → Observer
+➤ Spring Event System → Automatically handles notification and decoupling
+
+🔄 Where to Use in Projects
+✔️ When multiple components depend on a single event source
+✔️ For event-driven architectures (e.g., Spring Event System, Kafka, RabbitMQ)
+✔️ For notification systems (email, logs, analytics)
+✔️ For GUI listeners (like ActionListener in Swing/JavaFX)
+✔️ For reactive programming (RxJava, Reactor)
+
+🔄 Java Classes That Use Observer Pattern
+java.util.Observer and java.util.Observable
+javax.servlet.http.HttpSessionBindingListener
+java.awt.event.ActionListener
+Spring’s ApplicationEventPublisher and @EventListener
+
+🔄 Advantages
+Loose coupling between components
+Easy to add/remove observers dynamically
+Promotes event-driven system design
+
+🔄 Disadvantages
+Memory leaks if observers are not properly removed
+Unexpected update sequences if too many observers
+Can get complex when there are multiple chains of notifications
+
+
+🔷 Strategy Design Pattern
+The Strategy Design Pattern defines a family of algorithms,
+encapsulates each one, and makes them interchangeable.
+The client can choose which strategy (algorithm) to use at runtime without changing the code that uses it.
+
+🔄 Intent
+➤ To define a set of interchangeable behaviors (algorithms).
+➤ To decouple algorithms from the classes that use them.
+➤ To easily switch between different algorithms at runtime.
+
+🔄 Real-World Analogy
+Think of a payment system:
+➤ Payment can be done by Credit Card, PayPal, or UPI.
+➤ Each is a different strategy for processing payment.
+➤ The ShoppingCart class doesn’t need to know how the payment is processed — it just calls the chosen strategy.
+
+🔄 Structure
+1️⃣ Strategy (Interface) — declares a common interface for all supported algorithms.
+2️⃣ Concrete Strategies — implement different versions of the algorithm.
+3️⃣ Context — maintains a reference to a Strategy object and delegates the execution to it.
+
+✅ Java Example — Payment System
+1️⃣ Strategy Interface
+interface PaymentStrategy {
+    void pay(int amount);
+}
+
+2️⃣ Concrete Strategies
+class CreditCardPayment implements PaymentStrategy {
+    @Override
+    public void pay(int amount) {
+        System.out.println("Paid ₹" + amount + " using Credit Card.");
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    @Override
+    public void pay(int amount) {
+        System.out.println("Paid ₹" + amount + " using PayPal.");
+    }
+}
+
+class UPIPayment implements PaymentStrategy {
+    @Override
+    public void pay(int amount) {
+        System.out.println("Paid ₹" + amount + " using UPI.");
+    }
+}
+
+3️⃣ Context Class
+class ShoppingCart {
+    private PaymentStrategy paymentStrategy;
+
+    // Set strategy at runtime
+    public void setPaymentStrategy(PaymentStrategy paymentStrategy) {
+        this.paymentStrategy = paymentStrategy;
+    }
+
+    public void checkout(int amount) {
+        if (paymentStrategy == null) {
+            throw new IllegalStateException("Payment method not set!");
+        }
+        paymentStrategy.pay(amount);
+    }
+}
+
+4️⃣ Client Code
+public class StrategyPatternDemo {
+    public static void main(String[] args) {
+        ShoppingCart cart = new ShoppingCart();
+
+        cart.setPaymentStrategy(new CreditCardPayment());
+        cart.checkout(500);
+
+        cart.setPaymentStrategy(new UPIPayment());
+        cart.checkout(250);
+    }
+}
+✅ Output
+Paid ₹500 using Credit Card.
+Paid ₹250 using UPI.
+
+
+🔄 In Java Frameworks
+✔️ The Strategy Pattern is used heavily inside the Java and Spring frameworks.
+
+✅ Java Examples
+✔️ java.util.Comparator — you pass a comparator (strategy) to sort data differently.
+
+Collections.sort(list, Comparator.comparing(Student::getName));
+
+✔️ Here, different comparators = different sorting strategies.
+✔️ javax.servlet.http.HttpServlet — doGet(), doPost(), etc. act as different strategies for handling requests.
+
+✅ Spring Boot Example
+Spring uses the Strategy pattern extensively — especially for:
+✔️ ResourceResolvers
+✔️ CacheStrategies
+✔️ DataSource selection
+✔️ AuthenticationProvider (Spring Security)
+✔️ ViewResolver, MessageConverter, etc.
+
+👉 Let’s see a simple Spring Boot Strategy Example 👇
+🔄 Payment Strategy in Spring
+1️⃣ Define the strategy interface
+public interface PaymentStrategy {
+    void pay(double amount);
+}
+
+2️⃣ Implement concrete strategies
+import org.springframework.stereotype.Component;
+
+@Component("creditCard")
+public class CreditCardPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Paid ₹" + amount + " using Credit Card.");
+    }
+}
+
+@Component("upi")
+public class UPIPayment implements PaymentStrategy {
+    public void pay(double amount) {
+        System.out.println("Paid ₹" + amount + " using UPI.");
+    }
+}
+
+3️⃣ Context class (using Spring to inject the strategy)
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PaymentService {
+    private final PaymentStrategy paymentStrategy;
+
+    @Autowired
+    public PaymentService(@Qualifier("upi") PaymentStrategy paymentStrategy) {
+        this.paymentStrategy = paymentStrategy;
+    }
+
+    public void processPayment(double amount) {
+        paymentStrategy.pay(amount);
+    }
+}
+
+4️⃣ Controller or main class
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class StrategyPatternApp implements CommandLineRunner {
+    @Autowired
+    private PaymentService paymentService;
+
+    public static void main(String[] args) {
+        SpringApplication.run(StrategyPatternApp.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        paymentService.processPayment(1000);
+    }
+}
+✅ Output
+Paid ₹1000 using UPI.
+
+
+🔄 Where to Use in Projects
+➤ When multiple algorithms can perform the same task (e.g., sorting, payment, compression, authentication).
+➤ When algorithms may change independently of the client.
+➤ When you want to choose behavior at runtime.
+➤ When you want to eliminate large if-else or switch statements.
+
+🔄 Java Classes That Use Strategy Pattern
+| Class                            | Strategy Used             |
+| -------------------------------- | ------------------------- |
+| `java.util.Comparator`           | Sorting strategy          |
+| `javax.servlet.http.HttpServlet` | Request handling strategy |
+| `java.util.zip.Deflater`         | Compression strategy      |
+| `Spring AuthenticationProvider`  | Authentication strategy   |
+
+
+🔄 Advantages
+➤ Promotes Open/Closed Principle (add new strategies without modifying context).
+➤ Simplifies code by removing complex conditional logic.
+➤ Allows dynamic behavior change at runtime.
+➤ Easy to unit test each strategy independently.
+
+🔄 Disadvantages
+➤ Increases the number of classes.
+➤ Client must know which strategy to choose.
+➤ Can become overkill if there are very few variations.
+
+
+🔷 Template Design Pattern
+The Template Method Pattern defines the skeleton (blueprint) of an algorithm in a base (abstract) class but lets subclasses override specific steps of the algorithm without changing its structure.
+
+It promotes code reuse and inversion of control — the base class controls the overall process, and subclasses fill in the details.
+
+
+🔄 Structure
+1️⃣ Abstract Class (Template)
+✔️ Defines the template method (final method) which outlines steps of an algorithm.
+✔️ Implements common steps.
+✔️ Declares abstract methods for steps that subclasses must implement.
+
+2️⃣ Concrete Subclasses
+✔️ Implement the abstract steps defined by the template class.  
+
+
+✅ Java Example: Template Method Pattern in Java
+We’ll take an example of building a house — every house has a standard build process, but details differ for wooden and concrete houses.
+
+1️⃣ Create the Abstract Template Class
+abstract class HouseTemplate {
+
+    👉 template method (final to prevent overriding)
+    public final void buildHouse() {
+        buildFoundation();
+        buildPillars();
+        buildWalls();
+        buildWindows();
+        System.out.println("House construction completed.\n");
+    }
+
+    private void buildFoundation() {
+        System.out.println("Building foundation with cement, iron rods, and sand");
+    }
+
+    👉 abstract methods to be implemented by subclasses
+    protected abstract void buildPillars();
+    protected abstract void buildWalls();
+
+    private void buildWindows() {
+        System.out.println("Building Glass Windows");
+    }
+}
+
+2️⃣ Create Concrete Implementations
+class WoodenHouse extends HouseTemplate {
+    @Override
+    protected void buildPillars() {
+        System.out.println("Building Pillars with Wood coating");
+    }
+
+    @Override
+    protected void buildWalls() {
+        System.out.println("Building Wooden Walls");
+    }
+}
+
+class ConcreteHouse extends HouseTemplate {
+    @Override
+    protected void buildPillars() {
+        System.out.println("Building Pillars with Cement and Iron");
+    }
+
+    @Override
+    protected void buildWalls() {
+        System.out.println("Building Concrete Walls");
+    }
+}
+
+3️⃣ Client Code
+public class TemplatePatternDemo {
+    public static void main(String[] args) {
+        HouseTemplate houseType = new WoodenHouse();
+        System.out.println("Building Wooden House...");
+        houseType.buildHouse();
+
+        houseType = new ConcreteHouse();
+        System.out.println("Building Concrete House...");
+        houseType.buildHouse();
+    }
+}
+
+✅ Output
+Building Wooden House...
+Building foundation with cement, iron rods, and sand
+Building Pillars with Wood coating
+Building Wooden Walls
+Building Glass Windows
+House construction completed.
+
+Building Concrete House...
+Building foundation with cement, iron rods, and sand
+Building Pillars with Cement and Iron
+Building Concrete Walls
+Building Glass Windows
+House construction completed.
+
+🔄 Real-Life Example in Java & Spring
+✅ In Java:
+java.util.AbstractList, java.util.AbstractSet, java.util.AbstractMap —
+
+👉 They provide partial implementations and let subclasses define specific behavior.
+
+✅ Example:
+public abstract class AbstractList<E> implements List<E> {
+    public boolean add(E e) {
+        add(size(), e);  // Template method
+        return true;
+    }
+    public abstract void add(int index, E element);
+}
+👉 Here, add(E e) is a template method, and subclasses like ArrayList define add(int index, E element).
+
+🔄 In Spring Framework:
+Spring uses Template Pattern heavily in multiple places, for example:
+➤ JdbcTemplate, RestTemplate, JpaTemplate, etc.
+These templates define the workflow of database or REST operations, while users provide specific callback implementations (like RowMapper, ResponseExtractor).
+
+✅ Example:
+jdbcTemplate.query("SELECT * FROM users", new RowMapper<User>() {
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new User(rs.getString("name"), rs.getInt("age"));
+    }
+});
+👉 Here, JdbcTemplate defines the template method, and you only fill in the variable part (how to map rows).
+
+🧰 Where to Use
+➤ When you want to define the skeleton of an algorithm once and let subclasses customize steps.
+➤ When you want consistent workflow but flexible implementation for certain parts.
+
+🔄 Advantages
+✔️ Code reuse — common logic in one place.
+✔️ Control algorithm steps order.
+✔️ Enforces consistency across subclasses.
+
+🔄 Disadvantages
+✔️ Tight coupling between base and subclasses.
+✔️ Hard to modify the flow dynamically at runtime.
+
+
+🔄
+🔄
+🔄
+🔄
+🔄
+🔄
+🔄
+🔄
 🔄

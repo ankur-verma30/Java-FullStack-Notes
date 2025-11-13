@@ -86,7 +86,6 @@ public class ReflectionBreaker {
 
 🛡️ Prevention:
 ➤ Add a check in the constructor:
-
 private Singleton() {
     if (instance != null) {
         throw new RuntimeException("Use getInstance() method to create object");
@@ -452,7 +451,7 @@ java.lang.ClassFormatError: Invalid magic number
 
 Hence, Magic number check → Ensures the file is a valid .class file (starts with CAFEBABE) before the JVM loads it.
 
-
+  
 🔷 Factory Design Pattern
 ➤ Factory Design Pattern is a Creational Design Pattern that provides a way to create objects without exposing the object creation logic to the client and refers to the newly created object using a common interface.
 
@@ -705,7 +704,7 @@ In Spring Boot, Lombok’s @Builder is a direct application of the Builder patte
 
 ➤ If you annotate certain fields with @NonNull, Lombok will add null-checks in the builder’s build() method.
 ➤ If a required field is missing, a NullPointerException is thrown at build-time (not compile-time).
-
+  
 
 🔄 Real Java Classes Using Builder Pattern
 ➤ StringBuilder (though it’s mutable, not a strict builder)
@@ -736,4 +735,280 @@ In Spring Boot, Lombok’s @Builder is a direct application of the Builder patte
 ➤ Slightly more boilerplate (if not using Lombok).
 ➤ Increases number of classes.
 
+
+🔷 Prototype Design Pattern
+The Prototype Design Pattern is used when the cost of creating a new object is high (e.g., complex object initialization, expensive database calls, or network calls).
+
+Instead of creating a new instance, we clone an existing object (the prototype) and modify it if needed.
+🧬 “Don’t build from zero — copy what already works.”
+
+
+🔄 Structure
+1️⃣ Prototype Interface / Abstract Class
+    Declares a clone() method to create object copies.
+2️⃣ Concrete Prototype Classes
+    Implements the clone() method to return a copy of itself.
+3️⃣ Client
+    Uses the prototype to create new objects without depending on their concrete classes.
+
+✅ Example — Prototype Pattern in Java
+Let’s take an example of creating Employee objects with deep attributes (like address). Instead of creating new objects repeatedly, we clone an existing one.
+
+1️⃣ Define the Prototype Interface
+public interface Prototype extends Cloneable {
+    Prototype clone();
+}
+
+2️⃣ Create the Concrete Prototype Class
+class Employee implements Prototype {
+    private int id;
+    private String name;
+    private String department;
+
+    public Employee(int id, String name, String department) {
+        this.id = id;
+        this.name = name;
+        this.department = department;
+    }
+
+    👉 getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    @Override
+    public Prototype clone() {
+        try {
+            return (Employee) super.clone();  // shallow copy
+            return new Employee(this.id, this.name, this.department); // deep copy alternative 
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Clone not supported", e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Employee [id=" + id + ", name=" + name + ", department=" + department + "]";
+    }
+}
+
+3️⃣ Client Code
+public class PrototypePatternDemo {
+    public static void main(String[] args) {
+        Employee original = new Employee(1, "Ankur", "Development");
+
+        // Clone the original employee
+        Employee cloned = (Employee) original.clone();
+
+        cloned.setName("Rahul"); // modify the clone
+
+        System.out.println("Original Employee: " + original);
+        System.out.println("Cloned Employee: " + cloned);
+    }
+}
+✅ Output
+Original Employee: Employee [id=1, name=Ankur, department=Development]
+Cloned Employee: Employee [id=1, name=Rahul, department=Development]
+
+
+🔄 Deep Copy vs Shallow Copy
+✔️ Shallow Copy:
+Copies only primitive fields and object references (default behavior of Object.clone()).
+
+✔️ Deep Copy:
+Copies the object and all nested objects (requires manual implementation).
+
+✅ Example (Deep Copy using Serialization or Manual Cloning):
+@Override
+public Prototype clone() {
+    return new Employee(this.id, this.name, this.department);
+}
+
+
+🔄 Real-Life Example in Java
+👉 In Java API
+Object.clone() — The core implementation of Prototype Pattern.
+
+Classes like java.lang.Cloneable, java.lang.Object#clone() directly follow this pattern.
+
+👉 In Frameworks
+Spring Framework’s Bean Scopes:
+    ✔️ When you define a bean with @Scope("prototype"), Spring returns a new instance (clone) every time it’s requested.
+    ✔️ While not literally using clone(), the concept is the same — Prototype scope ensures new object creation without shared state.
+
+✅ Example:
+@Component
+@Scope("prototype")
+public class NotificationService {
+    // Each injection will create a new instance (like cloning)
+}
+
+🔄 Where to Use Prototype Pattern
+➤ When object creation is resource-intensive.
+➤ When the system should be independent of how objects are created.
+➤ When you want different configurations of similar objects quickly.
+
+✅ Examples:
+➤ Creating objects representing UI elements, shapes, or configurations.
+➤ Caching and cloning objects in game development or configuration systems.
+
+🔄 Advantages
+➤ Reduces cost of creating new objects.
+➤ Simplifies object creation for complex objects.
+➤ Provides flexibility — new objects can be customized easily.
+
+🔄 Disadvantages
+➤ Cloning complex objects with deep hierarchies can be tricky.
+➤ Must handle deep vs shallow copy carefully.
+➤ Requires Cloneable interface and proper handling of exceptions.
+
+
+🔷 Abstract Factory Design Pattern
+The Abstract Factory Pattern provides an interface for creating families of related or dependent objects without specifying their concrete classes.
+
+It’s often called a “factory of factories”.
+
+So if the Factory Method Pattern is about creating one type of object,the Abstract Factory Pattern is about creating multiple related objects that belong to the same “family”.
+
+🔄 Structure
+1️⃣ AbstractFactory (Interface)
+    ✔️ Declares methods to create abstract product families.
+2️⃣ ConcreteFactory
+    ✔️ Implements creation of specific product families.
+3️⃣ AbstractProduct (Interface)
+    ✔️ Declares product interfaces.
+4️⃣ ConcreteProduct
+    ✔️ Implements actual product behavior.
+5️⃣ Client
+    ✔️ Uses AbstractFactory and AbstractProduct interfaces, never directly instantiates concrete classes.
+
+✅ Example — GUI Theme Factory
+Imagine you’re developing a GUI library that supports two themes: Dark and Light.
+Each theme has its own style of Button and Checkbox.
+
+You want to create themed components without knowing their exact classes.
+
+1️⃣ — Define Product Interfaces
+interface Button {
+    void paint();
+}
+
+interface Checkbox {
+    void paint();
+}
+
+2️⃣ — Create Concrete Product Implementations
+👉 Light theme products
+class LightButton implements Button {
+    public void paint() {
+        System.out.println("Rendering a Light Button");
+    }
+}
+
+class LightCheckbox implements Checkbox {
+    public void paint() {
+        System.out.println("Rendering a Light Checkbox");
+    }
+}
+
+👉 Dark theme products
+class DarkButton implements Button {
+    public void paint() {
+        System.out.println("Rendering a Dark Button");
+    }
+}
+
+class DarkCheckbox implements Checkbox {
+    public void paint() {
+        System.out.println("Rendering a Dark Checkbox");
+    }
+}
+
+3️⃣ — Define Abstract Factory
+interface GUIFactory {
+    Button createButton();
+    Checkbox createCheckbox();
+}
+
+4️⃣ — Implement Concrete Factories
+class LightThemeFactory implements GUIFactory {
+    public Button createButton() {
+        return new LightButton();
+    }
+
+    public Checkbox createCheckbox() {
+        return new LightCheckbox();
+    }
+}
+
+class DarkThemeFactory implements GUIFactory {
+    public Button createButton() {
+        return new DarkButton();
+    }
+
+    public Checkbox createCheckbox() {
+        return new DarkCheckbox();
+    }
+}
+
+5️⃣ — Client Code
+public class AbstractFactoryDemo {
+    public static void main(String[] args) {
+        GUIFactory factory = new DarkThemeFactory(); // or LightThemeFactory
+        Button button = factory.createButton();
+        Checkbox checkbox = factory.createCheckbox();
+
+        button.paint();
+        checkbox.paint();
+    }
+}
+✅ Output
+Rendering a Dark Button
+Rendering a Dark Checkbox
+
+➤ The Factory Method Pattern makes one type of object.
+➤ The Abstract Factory Pattern makes a set of related objects.
+
+
+🔄 Real-Life Example in Java
+1️⃣ Java AWT / Swing
+👉 Java GUI toolkit uses Abstract Factory internally:
+Toolkit toolkit = Toolkit.getDefaultToolkit();
+Button button = new Button();  // internally delegates creation to platform factory
+
+➤ Toolkit acts as the Abstract Factory.
+➤ Different OS implementations (Windows, Mac, etc.) provide Concrete Factories.
+
+2️⃣ Spring Framework Analogy
+👉 Spring’s BeanFactory and ApplicationContext follow Abstract Factory principles.
+
+✅ Example:
+ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+MyService service = context.getBean(MyService.class);
+
+➤ ApplicationContext → Abstract Factory
+➤ Each configuration (XML, annotation, JavaConfig) → Concrete Factory
+➤ Beans → Products
+
+3️⃣ Hibernate Dialects
+In Hibernate, different dialects (MySQL, PostgreSQL, Oracle) are created via abstract factories that produce related SQL behavior objects.
+
+🔄 When to Use
+➤ When you need to create families of related objects.
+➤ When you want to ensure products created are compatible with each other.
+➤ When object creation logic is complex or environment-dependent.
+
+🔄 Advantages
+➤ Ensures product consistency across families.
+➤ Makes code extensible for new product families.
+➤ Encapsulates object creation — low coupling.
+
+🔄 Disadvantages
+➤ Difficult to support new product types (need to modify all factories).
+➤ Increases complexity due to multiple classes/interfaces.
 

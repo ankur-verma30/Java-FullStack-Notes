@@ -1,3 +1,153 @@
+🔷 Linux Commands 
+1️⃣ free — Check RAM (Memory) Usage
+Displays information about system memory — total, used, and free RAM & swap.
+
+🔄 Syntax:
+🔗 free
+🔗 free -m   # Show in MB
+🔗 free -g   # Show in GB
+
+✅ Example:
+🔗 free -g
+
+✅ Output Example:
+              total        used        free      shared  buff/cache   available
+Mem:              8           2           3           0           2           5
+Swap:             2           0           2
+
+👉 Meaning:
+✔️ total → Total RAM in the system
+✔️ used → RAM currently used
+✔️ free → RAM available
+✔️ buff/cache → Memory used by kernel buffers & cache
+✔️ available → Memory available for new processes
+
+⚡Use in scripts:
+To check if a server has enough memory before deploying or running a heavy service.
+
+2️⃣ nproc — Get Number of CPU Cores
+Displays the number of CPU cores available for processing.
+
+✅ Syntax: nproc
+✅ Example Output: 4
+
+👉 The system has 4 CPU cores (useful for tuning multi-threaded tasks or Docker containers).
+
+👉 Use in scripts:
+Automatically detect CPU cores to parallelize builds or workloads.
+✅ Example: make -j$(nproc)
+→ Compiles code using all available CPU cores.
+
+
+3️⃣ df -h — Check Disk Usage
+Shows disk space usage on all mounted file systems.
+
+✅ Syntax: df -h
+
+✅ Example Output:
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1       30G   10G   18G  36% /
+tmpfs           1.9G     0  1.9G   0% /dev/shm
+
+✔️ Filesystem → Name of the disk/partition
+✔️ Size → Total disk size
+✔️ Used → Space already used
+✔️ Avail → Free space available
+✔️ Use% → Percentage of disk used
+✔️ Mounted on → Directory where the disk is attached
+
+👉 Check if there’s enough disk space before uploading files, running backups, or installing packages.
+
+🔷 top Command — Real-Time Process & Resource Monitor
+
+🔄 Purpose:
+Shows real-time information about:
+1️⃣ Running processes
+2️⃣ CPU & memory usage
+3️⃣ System load
+4️⃣ Uptime
+5️⃣ Process IDs (PIDs)
+6️⃣ Users running those processes
+👉 It’s like Task Manager in Windows — but for Linux CLI.
+
+👉 Syntax : top
+
+👉 can also use:
+🔗 top -u <username>     # Show processes of a specific user
+🔗 top -p <pid>          # Monitor a specific process ID
+🔗 top -n 1              # Show output only once and exit
+
+
+✅ Sample Output:
+top - 10:12:36 up 3 days,  2:04,  1 user,  load average: 0.07, 0.03, 0.01
+Tasks: 120 total,   1 running, 119 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  2.3 us,  1.2 sy,  0.0 ni, 96.2 id,  0.2 wa,  0.0 hi,  0.1 si,  0.0 st
+MiB Mem :   7982.4 total,   2345.1 free,   1223.5 used,   4413.8 buff/cache
+MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6037.3 avail Mem 
+
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+1234 ec2-user  20   0  123456  5678  1234 S   1.3  0.2   0:02.34 java
+5678 root      20   0  87654  4321  3210 S   0.7  0.1   0:01.45 sshd
+
+
+🔄 Output Breakdown:
+| Field                | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| **PID**              | Process ID                                           |
+| **USER**             | Owner of the process                                 |
+| **PR / NI**          | Process priority & nice value                        |
+| **VIRT / RES / SHR** | Virtual, Resident & Shared memory usage              |
+| **S**                | Process status (`R` = running, `S` = sleeping, etc.) |
+| **%CPU / %MEM**      | CPU and memory usage of the process                  |
+| **TIME+**            | Total CPU time used                                  |
+| **COMMAND**          | Command/program name                                 |
+
+
+🔄 Top Section Details: 
+1️⃣ Uptime & Load Average
+load average: 0.07, 0.03, 0.01
+➤ Indicates system load in the last 1, 5, and 15 minutes.
+(Lower is better; if load > number of CPUs, system is overloaded.)
+
+2️⃣ Tasks
+Tasks: 120 total, 1 running, 119 sleeping
+➤ Shows how many processes are running, sleeping, or stopped.
+
+3️⃣ CPU Usage
+%Cpu(s): 2.3 us, 1.2 sy, 96.2 id
+✔️ us = user processes
+✔️ sy = system processes
+✔️ id = idle time
+✔️ wa = waiting for I/O
+
+4️⃣ Memory Usage
+Mem: 7982 total, 1223 used, 4413 buff/cache
+➤ Monitors RAM and swap usage in real-time.
+
+🔄 Top Command Shortcuts
+| Key           | Function                                 |
+| ------------- | ---------------------------------------- |
+| **q**         | Quit `top`                               |
+| **k**         | Kill a process (you’ll be asked for PID) |
+| **r**         | Renice (change process priority)         |
+| **M**         | Sort by memory usage                     |
+| **P**         | Sort by CPU usage                        |
+| **1**         | Show CPU usage for each core             |
+| **u**         | Filter processes by user                 |
+| **Shift + E** | Change memory units (KB → MB → GB)       |
+
+
+🔄 In Shell Scripts
+You usually don’t use top directly in scripts (since it’s interactive),
+but you can use:
+🔗 top -b -n 1
+
+👉 This runs top in batch mode (non-interactive) → useful for automation or logging.
+
+✅ Example:
+🔗 top -b -n 1 | head -15 > system_report.txt
+→ Saves top 15 lines of top output into a file.
+
 🔷 Shell Scripting
 A shell script is a file containing a series of Linux commands that the shell (command-line interpreter) executes one after another automatically.
 
@@ -11,3 +161,71 @@ Think of it like:
 
 Creating a Shell Script
 🔗 nano script.sh --> file should be of .sh extension 
+
+
+🔄 Shebang (#! ) in Shell Scripting
+A shebang (#!) is the first line in a shell script that tells the system which interpreter should be used to execute the script.
+
+✅ Syntax:
+🔗 #!/bin/
+
+ ✅Example 1 — Bash Script
+#!/bin/bash
+echo "Hello, World!"
+➡️ This tells Linux:
+"Use the bash shell (located at /bin/bash) to run this script."
+
+🔄 Why Shebang is Important
+➤ Specifies interpreter explicitly — ensures script runs the same way everywhere.
+➤ Avoids confusion — even if a user’s default shell is different (like zsh or fish).
+
+⚡ Used by system to know how to execute when you run:
+./script.sh
+⚡ save the file in vim editor and exit by :wq
+
+Running a Shell Script
+1️⃣ Can use sh prefix to run a script.
+🔗 sh script.sh
+
+2️⃣ Or make it executable and run directly:
+🔗 chmod +x script.sh   # Make it executable
+
+
+🔄 Always write metadata information about the script before writing the script
+##########################
+# Author: Ankur
+# Date: 12/11/2025
+#
+# This scripts outputs the node health
+#
+# Version:v1
+#####################################
+
+
+🔷 Writing shell script to check the health of the VM Machines
+🔄 Method 1: Using echo command to write the readabe scripts 
+#!/bin/bash
+
+
+echo "Print the disk space"
+🔗 df -h
+
+echo "Print the memory"
+🔗 free -g
+
+
+echo "Print the number of CPU"
+🔗 nproc
+➤ However for large and complex scripts writing echo is not a good idea and its a very cumbersome task
+
+🔄 Method 2: use Debug mode to write the script
+
+#!/bin/bash
+🔗 set -x   # Enable debug mode
+🔗 df -h
+🔗 free -g
+🔗 nproc
+
+➤ The set -x command enables debug mode, which prints each command and its arguments to the terminal as they are executed.
+➤ This makes it easier to write and troubleshoot the script since you can see exactly what commands are being run.
+

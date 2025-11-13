@@ -203,7 +203,583 @@ Promotes composition over inheritance.
 Increases number of small objects.
 Can become hard to debug if too many decorators wrap each other.
 Order of decorators matters.
-🔄
 
-🔄
-🔄
+ 
+🔷 Adapter Design Pattern
+➤ The Adapter pattern allows two incompatible interfaces to work together.
+➤ It acts as a bridge between a client expecting one type of interface and a class having a different interface.
+
+👉 Purpose:
+To make incompatible classes compatible without changing their source code.
+
+🔄 Real-world Analogy
+➤ Think of a mobile charger adapter 🔌:
+➤ Your phone expects a Type-C port.
+➤ But the wall socket is AC power.
+➤ The charger adapter converts AC → DC (interface translation).
+
+Similarly, the Adapter pattern converts one interface into another expected by the client.
+
+⚙️ Structure
+Target Interface: The interface the client expects to use.
+Adaptee: The existing class with an incompatible interface.
+Adapter: A class that bridges the gap by implementing the Target and internally using the Adaptee.
+Client: Uses the Target interface to interact with the Adaptee indirectly.
+
+✅ Java Example: Media Player
+1️⃣ Target Interface
+interface MediaPlayer {
+    void play(String audioType, String fileName);
+}
+
+2️⃣ Adaptee
+class AdvancedMediaPlayer {
+    public void playVlc(String fileName) {
+        System.out.println("Playing vlc file: " + fileName);
+    }
+    public void playMp4(String fileName) {
+        System.out.println("Playing mp4 file: " + fileName);
+    }
+}
+
+3️⃣ Adapter
+class MediaAdapter implements MediaPlayer {
+    private AdvancedMediaPlayer advancedMediaPlayer = new AdvancedMediaPlayer();
+
+    @Override
+    public void play(String audioType, String fileName) {
+        if (audioType.equalsIgnoreCase("vlc")) {
+            advancedMediaPlayer.playVlc(fileName);
+        } else if (audioType.equalsIgnoreCase("mp4")) {
+            advancedMediaPlayer.playMp4(fileName);
+        }
+    }
+}
+
+4️⃣ Concrete Target Implementation (using Adapter)
+class AudioPlayer implements MediaPlayer {
+    private MediaAdapter mediaAdapter;
+
+    @Override
+    public void play(String audioType, String fileName) {
+        if (audioType.equalsIgnoreCase("mp3")) {
+            System.out.println("Playing mp3 file: " + fileName);
+        } else if (audioType.equalsIgnoreCase("vlc") || audioType.equalsIgnoreCase("mp4")) {
+            mediaAdapter = new MediaAdapter();
+            mediaAdapter.play(audioType, fileName);
+        } else {
+            System.out.println("Invalid media type: " + audioType);
+        }
+    }
+}
+
+5️⃣ Client
+public class AdapterPatternDemo {
+    public static void main(String[] args) {
+        AudioPlayer player = new AudioPlayer();
+        player.play("mp3", "song1.mp3");
+        player.play("mp4", "movie.mp4");
+        player.play("vlc", "video.vlc");
+        player.play("avi", "old.avi");
+    }
+}
+
+✅ Output
+Playing mp3 file: song1.mp3
+Playing mp4 file: movie.mp4
+Playing vlc file: video.vlc
+Invalid media type: avi
+
+
+🔄 Where Used in Java
+| Java API                                                            | Role                                  |
+| ------------------------------------------------------------------- | ------------------------------------- |
+| `java.util.Arrays#asList()`                                         | Adapts arrays → List                  |
+| `java.io.InputStreamReader`                                         | Adapts `InputStream` → `Reader`       |
+| `java.io.OutputStreamWriter`                                        | Adapts `OutputStream` → `Writer`      |
+| `java.util.Enumeration` → `Iterator` adapter (`Collections.list()`) |                                       |
+| `javax.xml.bind.annotation.adapters.XmlAdapter`                     | Converts between XML and Java objects |
+
+
+✅ Example:
+Reader reader = new InputStreamReader(new FileInputStream("file.txt"));
+👉 InputStreamReader acts as an Adapter between byte streams and character streams.
+
+🔄 Spring Boot 
+In Spring, adapters are used extensively for integration between different interfaces.
+
+✅ Example 1: HandlerAdapter in Spring MVC
+Spring MVC uses the Adapter pattern internally to allow different types of controllers to be processed uniformly.
+
+➤ DispatcherServlet doesn’t know about specific controller types.
+➤ It uses a HandlerAdapter to adapt each controller type into a standard format.
+
+public interface HandlerAdapter {
+    boolean supports(Object handler);
+    ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler);
+}
+✅ Example:
+➤ SimpleControllerHandlerAdapter adapts Controller interface-based controllers.
+➤ RequestMappingHandlerAdapter adapts @RequestMapping annotated controllers.
+So Spring Boot internally uses the Adapter pattern to make DispatcherServlet independent of controller types.
+
+
+✅ Example 2: Custom Adapter in a Project
+Suppose your app needs to integrate with two payment APIs (different formats).
+You can use the Adapter pattern to unify them.
+
+1️⃣ Target
+public interface PaymentGateway {
+    void pay(double amount);
+}
+
+2️⃣ Adaptee 1 - Razorpay API
+class RazorpayAPI {
+    public void makePayment(double amount) {
+        System.out.println("Payment of ₹" + amount + " done via Razorpay.");
+    }
+}
+
+3️⃣ Adapter
+@Component
+class RazorpayAdapter implements PaymentGateway {
+    private final RazorpayAPI razorpayAPI = new RazorpayAPI();
+
+    @Override
+    public void pay(double amount) {
+        razorpayAPI.makePayment(amount);
+    }
+}
+
+4️⃣ Service using Target interface
+@Service
+public class PaymentService {
+    private final PaymentGateway paymentGateway;
+
+    @Autowired
+    public PaymentService(PaymentGateway paymentGateway) {
+        this.paymentGateway = paymentGateway;
+    }
+
+    public void processPayment(double amount) {
+        paymentGateway.pay(amount);
+    }
+}
+✅ This approach lets you easily switch adapters (e.g., Stripe, PayPal) without changing service logic.
+
+
+🔄 Adapter 🆚 Decorator vs Bridge
+| Pattern       | Purpose                                  | Example             |
+| ------------- | ---------------------------------------- | ------------------- |
+| **Adapter**   | Convert one interface to another         | `InputStreamReader` |
+| **Decorator** | Add new behavior dynamically             | `BufferedReader`    |
+| **Bridge**    | Separate abstraction from implementation | JDBC Drivers        |
+
+
+🔄 Where to Use in Projects
+✔️ When integrating legacy systems with new APIs
+✔️ When using third-party libraries that don’t match your app interface
+✔️ When you want to reuse existing classes without modifying them
+✔️ When standardizing APIs (e.g., multiple payment or messaging gateways)
+
+
+🔄 Advantages
+➤ Promotes code reusability (no need to rewrite incompatible classes).
+➤ Enables integration between legacy and new systems.
+➤ Follows Open/Closed Principle — no modification to existing classes.
+
+🔄 Disadvantages
+➤ Adds extra layers (slight performance overhead).
+➤ Can become complex if overused.
+➤ Adapter logic might hide real implementation details.
+
+
+🔄 Adapter = Backward Compatibility Layer
+👉 Purpose Recap:
+The Adapter Pattern acts as a bridge between two incompatible interfaces —
+it lets old code work with new code (or vice versa) without modifying existing logic.
+
+
+🔄 How It Enables Backward Compatibility
+Imagine a scenario:
+
+➤ You have old client code using interface OldPaymentGateway.
+➤ A new system introduces NewPaymentGateway, which works differently.
+➤ You can’t change all existing client code — it’s already in production.
+
+✅ Solution:
+You create an Adapter that implements the OldPaymentGateway interface but internally calls the NewPaymentGateway.
+
+So —
+The adapter acts as a translator between old and new interfaces, ensuring that older clients can continue working even after system upgrades.
+
+
+✅ Example (Backward Compatibility in Java)
+// Old Interface (used by existing code)
+interface OldPaymentGateway {
+    void makePayment(int amount);
+}
+
+// New class (new API or upgraded service)
+class NewPaymentGateway {
+    public void processPayment(double amountInRupees) {
+        System.out.println("Processing payment of ₹" + amountInRupees + " via New Gateway");
+    }
+}
+
+// Adapter to connect old system to new one
+class PaymentAdapter implements OldPaymentGateway {
+    private final NewPaymentGateway newGateway;
+
+    public PaymentAdapter(NewPaymentGateway newGateway) {
+        this.newGateway = newGateway;
+    }
+
+    @Override
+    public void makePayment(int amount) {
+        newGateway.processPayment(amount); // adapts call
+    }
+}
+
+// Client (old code)
+public class Client {
+    public static void main(String[] args) {
+        OldPaymentGateway gateway = new PaymentAdapter(new NewPaymentGateway());
+        gateway.makePayment(500);  // Old method call, new system works!
+    }
+}
+✅ Output:
+Processing payment of ₹500.0 via New Gateway
+
+🧩 In Frameworks (like Spring / Java APIs)
+Yes — many frameworks use adapters for compatibility and extension without breaking old code:
+
+✅Examples:
+1️⃣ Spring MVC Adapters —
+➤ HandlerAdapter adapts different controller types (e.g., @Controller, @RestController, or legacy ones).
+➤ Allows Spring to evolve without breaking existing controllers.
+
+2️⃣ Java JDBC Drivers —
+➤ Adapters let newer JDBC versions work with older driver implementations.
+
+3️⃣ Java I/O Streams —
+➤ InputStreamReader acts as an adapter between byte streams and character streams.
+
+🔄  Why It’s Important in Technology Evolution
+➤ Technologies evolve (e.g., Java 8 → 17, Spring 4 → 6).
+➤ But millions of projects still depend on older APIs.
+➤ Rather than forcing developers to rewrite everything, frameworks introduce adapters or wrappers —
+so new internal implementations can still support legacy interfaces.
+👉 Adapters = Smooth upgrade path without breaking old functionality
+
+
+
+🔷 Facade Design Pattern
+The Facade Pattern provides a unified and simplified interface to a complex subsystem of classes, libraries, or APIs.
+
+Think of it as a “front desk” of a hotel — you don’t deal with room service, billing, and cleaning directly — the reception desk (facade) handles everything for you.
+
+
+🔄 Intent
+➤ To hide system complexity
+➤ To decouple client code from subsystems
+➤ To make the API cleaner and easier to use
+
+
+🔄 Structure
+1️⃣ Facade Class
+    ✔️ Provides high-level, easy-to-use methods.
+    ✔️ Internally delegates calls to multiple complex subsystem classes.
+2️⃣ Subsystem Classes
+    ✔️ Implement actual logic and complex workflows.
+3️⃣ Client
+    ✔️ Uses the Facade interface instead of interacting with all subsystems directly.
+
+✅ Example — Banking System
+Imagine a banking application where multiple operations are needed to open an account (e.g., KYC verification, document checking, account creation, notification).
+
+Instead of letting the user call each of them, we’ll create a BankService Facade that simplifies it.
+
+1️⃣ Subsystem Classes
+class KYCService {
+    public void verifyDocuments(String name) {
+        System.out.println("Verifying KYC documents for: " + name);
+    }
+}
+
+class AccountService {
+    public void createAccount(String name) {
+        System.out.println("Creating account for: " + name);
+    }
+}
+
+class NotificationService {
+    public void sendWelcomeMessage(String name) {
+        System.out.println("Sending welcome message to: " + name);
+    }
+}
+
+2️⃣ Facade Class
+class BankServiceFacade {
+    private final KYCService kycService;
+    private final AccountService accountService;
+    private final NotificationService notificationService;
+
+    public BankServiceFacade() {
+        this.kycService = new KYCService();
+        this.accountService = new AccountService();
+        this.notificationService = new NotificationService();
+    }
+
+    public void openAccount(String name) {
+        kycService.verifyDocuments(name);
+        accountService.createAccount(name);
+        notificationService.sendWelcomeMessage(name);
+        System.out.println("Account successfully opened for " + name + "\n");
+    }
+}
+
+3️⃣ Client Code
+public class FacadePatternDemo {
+    public static void main(String[] args) {
+        BankServiceFacade bankService = new BankServiceFacade();
+        bankService.openAccount("Ankur Verma");
+    }
+}
+✅ Output
+Verifying KYC documents for: Ankur Verma
+Creating account for: Ankur Verma
+Sending welcome message to: Ankur Verma
+Account successfully opened for Ankur Verma
+
+
+🔄 Real-Life Example in Java
+1️⃣ JDBC API
+👉 When we use JDBC:
+
+Connection con = DriverManager.getConnection(url, user, password);
+
+➤ DriverManager acts as a Facade.
+➤ Internally, it talks to different JDBC drivers, connection pools, etc.
+
+2️⃣ Spring Framework
+In Spring Boot, the Facade Pattern is used heavily:
+
+➤ Spring’s JdbcTemplate, RestTemplate, KafkaTemplate, JmsTemplate are all facades.
+➤ They simplify complex subsystems (like handling connections, exceptions, serialization).
+
+restTemplate.getForObject("https://api.github.com/users/ankur-verma30", String.class);
+
+👉 Internally, it handles:
+✔️ HTTP connection creation
+✔️ Request/response mapping
+✔️ Error handling
+✔️ Deserialization
+➤ All hidden behind one simple method — classic Facade.
+
+3️⃣ Spring Security
+SecurityContextHolder acts as a Facade to simplify authentication and authorization details.
+
+4️⃣ Hibernate
+SessionFactory and EntityManager act as Facades to hide complex ORM logic and SQL execution.
+
+
+🔄 Where to Use
+➤ When you have a large system with multiple subsystems.+
+➤ When you want to simplify API usage for higher layers (like Controllers or Services).+
+➤ When you want to reduce coupling between client and system components.
+
+⚖️ Advantages
+➤ Simplifies usage of complex systems.
+➤ Improves code readability and maintainability.
+➤ Reduces coupling between client and subsystems.
+➤ Makes system easier to test and mock.
+
+🚫 Disadvantages
+❌ Can become a “god class” if overloaded with too many responsibilities.
+❌ Hiding details may reduce flexibility for advanced users.
+
+
+🔷 Proxy Design Pattern
+➤ The Proxy Pattern provides a surrogate (substitute) or placeholder object that controls access to another object — known as the real subject.
+➤ Instead of calling the real object directly, you call a proxy,
+➤ The proxy adds some extra behavior (like logging, caching, security checks, or lazy initialization),
+
+Then optionally delegates the call to the real object.
+
+🔄 Intent
+➤ To control access to an object
+➤ To add functionality without changing the original class
+➤ To manage lifecycle or performance (like lazy loading)
+
+🔄 Structure
+1️⃣ Subject (Interface)
+    ✔️ Common interface shared by both RealObject and Proxy.
+2️⃣ RealSubject (Actual Class)
+    ✔️ The real object that performs the actual logic.
+3️⃣ Proxy (Substitute Class)
+    ✔️ Implements the same interface as RealSubject.
+    ✔️ Controls access, performs extra tasks, or defers object creation.
+4️⃣ Client
+    ✔️ Uses the Subject interface; doesn’t know whether it’s talking to the real object or proxy.
+
+✅ Example — Internet Access Proxy
+Let’s say an organization wants to restrict internet access for employees.
+Employees should only access certain websites, and all requests must pass through a proxy.
+
+1️⃣ Define the Subject Interface
+interface Internet {
+    void connectTo(String serverHost) throws Exception;
+}
+
+2️⃣ Real Object
+class RealInternet implements Internet {
+    @Override
+    public void connectTo(String serverHost) {
+        System.out.println("Connecting to " + serverHost);
+    }
+}
+
+3️⃣ Proxy Class
+import java.util.ArrayList;
+import java.util.List;
+
+class ProxyInternet implements Internet {
+    private Internet realInternet = new RealInternet();
+    private static List<String> bannedSites;
+
+    static {
+        bannedSites = new ArrayList<>();
+        bannedSites.add("abc.com");
+        bannedSites.add("xyz.com");
+    }
+
+    @Override
+    public void connectTo(String serverHost) throws Exception {
+        if (bannedSites.contains(serverHost.toLowerCase())) {
+            throw new Exception("Access Denied to " + serverHost);
+        }
+        realInternet.connectTo(serverHost);
+    }
+}
+
+4️⃣ Client Code
+public class ProxyPatternDemo {
+    public static void main(String[] args) {
+        Internet internet = new ProxyInternet();
+        try {
+            internet.connectTo("openai.com");
+            internet.connectTo("abc.com");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+✅ Output
+Connecting to openai.com
+Access Denied to abc.com
+
+
+🔄 Types of Proxies
+| Type                 | Description                                                     | Example                   |
+| -------------------- | --------------------------------------------------------------- | ------------------------- |
+| **Virtual Proxy**    | Controls access to resource-heavy objects (lazy initialization) | Hibernate Lazy Loading    |
+| **Remote Proxy**     | Represents an object in another address space                   | RMI, Web Services         |
+| **Protection Proxy** | Adds access control                                             | Security layers in Spring |
+| **Caching Proxy**    | Stores results to reduce load                                   | Redis, Caffeine caching   |
+| **Logging Proxy**    | Adds logging/tracing before and after real calls                | Spring AOP @Before/@After |
+
+
+✅ Real-Life Examples in Java
+1️⃣ Java RMI (Remote Proxy)
+When you use Java RMI:
+MyRemoteService service = (MyRemoteService) Naming.lookup("//localhost/Service");
+👉 You actually get a proxy that represents the remote object, not the real one.
+
+2️⃣ Spring AOP (Dynamic Proxy)
+Spring internally uses JDK Dynamic Proxies (for interfaces) or CGLIB Proxies (for classes) for:
+    ✔️ Logging
+    ✔️ Transaction management
+    ✔️ Security checks
+    ✔️ Performance monitoring
+
+✅ Example:
+@Service
+public class PaymentService {
+    @Transactional  // Proxy handles transaction begin/commit/rollback
+    public void processPayment() {
+        System.out.println("Processing payment...");
+    }
+}
+👉 Here, @Transactional creates a proxy around PaymentService which:
+1️⃣ Starts a transaction before the method call.
+2️⃣ Invokes the real method.
+3️⃣ Commits or rolls back transaction afterward.
+
+👉 So your class never directly manages transactions — the proxy handles it.
+
+3️⃣ Hibernate Lazy Loading
+When you call entity.getOrders(), Hibernate returns a proxy object that loads the data only when accessed — a Virtual Proxy.
+
+⚖️ Advantages
+➤ Adds functionality without changing original code.
+➤ Helps implement lazy loading, security, caching, logging easily.
+➤ Reduces system load by controlling access.
+
+🚫 Disadvantages
+❌ Adds extra layer — slight performance overhead.
+❌ Complex to debug sometimes (especially in Spring AOP).
+❌ Harder to trace stack calls if many proxies are chained.
+
+✅ Spring Boot Example — Logging Proxy
+Let’s create a manual proxy that adds logging before calling the real service.
+
+🔁 Service Interface
+public interface PaymentService {
+    void pay(double amount);
+}
+
+🔁 Real Service Implementation
+@Service
+public class PaymentServiceImpl implements PaymentService {
+    public void pay(double amount) {
+        System.out.println("Processing payment of Rs." + amount);
+    }
+}
+
+🔁 Proxy Implementation (Manual)
+@Component
+public class PaymentServiceProxy implements PaymentService {
+    private final PaymentService paymentService;
+
+    @Autowired
+    public PaymentServiceProxy(PaymentServiceImpl paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("[LOG] Payment started...");
+        paymentService.pay(amount); // delegate
+        System.out.println("[LOG] Payment completed.");
+    }
+}
+
+🔁 Controller
+@RestController
+@RequestMapping("/payment")
+public class PaymentController {
+
+    @Autowired
+    private PaymentService paymentService; // Will be proxy
+
+    @PostMapping("/{amount}")
+    public String process(@PathVariable double amount) {
+        paymentService.pay(amount);
+        return "Payment Success!";
+    }
+}
+✅ Output
+[LOG] Payment started...
+Processing payment of Rs.5000.0
+[LOG] Payment completed.
