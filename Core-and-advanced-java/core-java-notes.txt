@@ -4,7 +4,43 @@ Java is a pure object-oriented language (except for primitive types). To overcom
 Properties (State) – Data/attributes
 Methods (Behavior) – Functions/actions
 
-🎯 Key Goals of OOPs:
+
+🔷 Features of Java
+1️⃣ Object-Oriented
+➤ Everything is modeled as objects with clear abstraction.
+➤ Key OOP principles supported: Abstraction, Encapsulation, Inheritance, Polymorphism.
+
+2️⃣ Platform Independent
+➤ Java code → compiled to bytecode → runs on JVM, not on OS.
+➤ “Write Once, Run Anywhere (WORA)” using JVM architecture.
+
+3️⃣ Secure
+➤ No explicit pointers → prevents memory corruption.
+➤ Bytecode verification, sandboxing, and Security Manager protect against malicious code.
+➤ Strong support for cryptography, secure classloading, JVM-level security.
+
+4️⃣ Multithreaded
+➤ Built-in support for creating and managing threads.
+➤ Provides high-level APIs:
+	✔️ Thread class, Runnable interface
+	✔️ Executors framework
+	✔️ Concurrent API (java.util.concurrent)
+
+5️⃣ High Performance
+➤ Bytecode runs faster than traditional interpreted languages.
+➤ JIT (Just-In-Time) Compiler optimizes bytecode to machine code at runtime.
+➤ JVM uses adaptive optimizations and advanced garbage collectors.
+
+6️⃣ Dynamic
+➤ Java can dynamically load classes at runtime (class loaders).
+➤ Reflection API allows runtime inspection and modification of classes.
+➤ JVM supports dynamic linking of class libraries.
+
+7️⃣ Automatic Memory Management (Garbage Collection)
+➤ JVM automatically allocates and releases memory.
+➤ Developers don’t need to manually free memory (unlike C/C++).
+
+🔷 Key Goals of OOPs:
 ➤ Code reusability
 ➤ Modularity
 ➤ Data hiding and security
@@ -1923,6 +1959,95 @@ public class Test {
 
 ❓ Why do you use the final for references?
 To prevent reassignment, ensure safe dependency injection, and make code more thread-safe and readable. It’s also a key part of writing immutable classes and predictable lambdas.
+
+
+🔷 How to Make a Class Immutable in Java
+To make class immutable, follow these 7 rules:
+1️⃣ Declare the class as final
+Prevents subclassing (inheriting) because subclass can add setters and break immutability.
+
+public final class Student { ... }
+
+2️⃣ Make all fields private and final
+➤ private → no direct access from outside.
+➤ final → value assigned only once, in constructor.
+
+private final String name;
+
+
+3️⃣ Don’t provide any setter methods
+Only allow initialization through constructor.
+
+
+4️⃣ Initialize all fields through a constructor
+Constructor assigns values once, cannot be changed later.
+
+public Student(String name, int age) {
+    this.name = name;
+    this.age = age;
+}
+
+
+5️⃣ Ensure deep copy for mutable fields
+If a field is mutable (e.g., Date, List, Map) never expose the original reference.
+
+👉 Why?
+If you expose the original object, someone can change it → your class is no longer immutable.
+
+✅ Solution
+Clone the object inside the constructor.
+Clone again inside the getter.
+
+✅ Example:
+this.joiningDate = new Date(joiningDate.getTime()); // deep copy
+
+✅ Getter:
+public Date getJoiningDate() {
+    return new Date(joiningDate.getTime()); // return copy
+}
+
+
+6️⃣ Don’t allow subclasses to override methods
+Already solved with final class, but if class is not final:
+	✔️ Make methods final or
+	✔️ Make constructor private and use static factory.
+
+
+7️⃣ Don’t expose internal references
+➤ Never return internal collections directly.
+➤ Return unmodifiable:
+
+return Collections.unmodifiableList(new ArrayList<>(subjects));
+
+✅Example:
+public final class Student {
+
+    private final String name;
+    private final int age;
+    private final Date joiningDate; // mutable field
+
+    public Student(String name, int age, Date joiningDate) {
+        this.name = name;
+        this.age = age;
+
+        // Deep copy for mutable field
+        this.joiningDate = new Date(joiningDate.getTime());
+    }
+
+    public String getName() {
+        return name; // immutable
+    }
+
+    public int getAge() {
+        return age;  // immutable
+    }
+
+    public Date getJoiningDate() {
+        // Return a new copy to avoid modification
+        return new Date(joiningDate.getTime());
+    }
+}
+
 
 🔷 Interfaces in Java - Abstraction
 Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
