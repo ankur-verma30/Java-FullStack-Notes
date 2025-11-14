@@ -1,4 +1,4 @@
-🧠 What is OOP in Java?
+🔷 What is OOP in Java?
 Object-Oriented Programming (OOP) is a programming paradigm that organizes code using objects, which are instances of classes.
 Java is a pure object-oriented language (except for primitive types). To overcome the lack of object orientation in primitives, Java provides Wrapper Classes.
 Properties (State) – Data/attributes
@@ -2045,6 +2045,175 @@ public final class Student {
     public Date getJoiningDate() {
         // Return a new copy to avoid modification
         return new Date(joiningDate.getTime());
+    }
+}
+
+🔷 Inner Class
+An inner class is a class declared inside another class.
+
+❓ Why Inner Class?
+➤ To logically group classes used only by one outer class
+➤ To access private members of outer class
+➤ To write more readable and maintainable code
+➤ To implement data-hiding
+
+🔄 Types of Inner Classes
+1️⃣ Non-static Inner Class (Member Inner Class)
+➤ Declared inside class but outside methods
+➤ Cannot define static members inside it
+➤ Has access to all outer class members (even private)
+
+✅Example:
+class Outer {
+    private int data = 10;
+
+    class Inner {
+        void show() {
+            System.out.println("Data = " + data);
+        }
+    }
+
+    public static void main(String[] args) {
+        Outer o = new Outer();
+        Inner i = o.new Inner();
+        i.show();
+    }
+}
+
+2️⃣ Static Inner Class
+➤ Declared as static
+➤ Does NOT need outer class object
+➤ Cannot access non-static members of outer class
+
+✅Example:
+class Outer {
+    static int x = 100;
+
+    static class Inner {
+        void show() {
+            System.out.println(x);
+        }
+    }
+
+    public static void main(String[] args) {
+        Outer.Inner i = new Outer.Inner();
+        i.show();
+    }
+}
+
+3️⃣ Local Inner Class
+➤ Class declared inside a method
+➤ Scope restricted only to method
+➤ Cannot have access modifiers
+➤ Can access final or effectively final variables of method
+
+✅Example:
+class Outer {
+    void display() {
+        int x = 10; // effectively final
+
+        class Inner {
+            void show() { System.out.println(x); }
+        }
+
+        new Inner().show();
+    }
+}
+
+4️⃣ Anonymous Inner Class
+➤ Class without a name
+➤ Used when we need one-time implementation
+➤ Commonly used for interfaces, abstract classes, and event handling
+
+✅Example implementing interface:
+interface A { void show(); }
+
+class Test {
+    public static void main(String[] args) {
+        A obj = new A() {
+            public void show() {
+                System.out.println("Anonymous class implementation");
+            }
+        };
+        obj.show();
+    }
+}
+
+
+🔷 Inner Interface
+An interface declared inside a class or interface.
+
+🔁 Rules
+➤ Can be public, private, protected
+➤ Usually used to group interfaces logically
+➤ Accessed using Outer.Interface
+
+✅Example:
+class Outer {
+    interface Inner {
+        void show();
+    }
+}
+
+class Test implements Outer.Inner {
+    public void show() {
+        System.out.println("Inner interface implemented");
+    }
+}
+
+
+🔷 Anonymous Class
+A class created without a name, used to provide instant implementation.
+
+👉 Used for:
+➤ When making a class only once
+➤ When overriding methods quickly
+➤ In event listeners
+➤ In comparator logic
+➤ For implementing Runnable in threads
+
+1️⃣ Anonymous Class extending a class
+class A {
+    void show() { System.out.println("A show"); }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        A a = new A() {
+            void show() {
+                System.out.println("Anonymous override");
+            }
+        };
+        a.show();
+    }
+}
+
+
+2️⃣ Anonymous Class implementing an interface
+interface B {
+    void run();
+}
+
+public class Test {
+    public static void main(String[] args) {
+        B b = new B() {
+            public void run() {
+                System.out.println("Anonymous interface implementation");
+            }
+        };
+        b.run();
+    }
+}
+
+
+3️⃣ Anonymous Runnable in Thread
+public class Demo {
+    public static void main(String[] args) {
+        new Thread(new Runnable() {
+            public void run() {
+                System.out.println("Thread running");
+            }
+        }).start();
     }
 }
 

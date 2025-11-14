@@ -3406,54 +3406,108 @@ What is Mutable and Immutable class
 | Performance     | Slower (new object on change)               | Faster for frequent modifications         |
 | Common Use Case | Constant values, keys in Map                | Dynamic strings in loops or editors       |
 
-🔐 How to Design Immutable Classes in Java
-An immutable class is one whose state cannot be changed after it is created.
 
-🧱 Design Principles:
-✅ Private and Final Fields
-Declare all class fields as private final.
-This ensures that fields are set only once and not modified later.
-private final String name;
+🔷 StringBuilder and StringBuffer
+| Feature                 | **StringBuilder**                             | **StringBuffer**                       |
+| ----------------------- | --------------------------------------------- | -------------------------------------- |
+| **Mutability**          | Mutable                                       | Mutable                                |
+| **Thread Safety**       | ❌ Not thread-safe                            | ✔️ Thread-safe (synchronized)         |
+| **Performance**         | Faster                                        | Slower (sync overhead)                 |
+| **Use Case**            | Single-thread environment                     | Multi-thread environment               |
+| **Synchronization**     | No                                            | Yes (all methods synchronized)         |
+| **Introduced In**       | Java 5 (JDK 1.5)                              | Java 1.0                               |
+| **Default Capacity**    | 16 chars                                      | 16 chars                               |
+| **Expansion Mechanism** | `(oldCapacity * 2) + 2`                       | Same                                   |
+| **Efficiency in Loops** | More efficient                                | Less efficient due to locking          |
+| **toString() Behavior** | Returns string of internal buffer             | Same                                   |
+| **Suitable For**        | Heavy modifications in single-thread programs | Modifications in multi-thread programs |
 
-❌ No Setters
-Do not provide any setter methods.
-Prevents modification of field values after object creation.
 
-✅ Initialize via Constructor
-All fields must be initialized in the constructor.
-Ensures object is in a valid state when created.
+✅ Code Example Showing StringBuilder Functioning (Fast, Non-Synchronized)
+public class StringBuilderDemo {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello");
 
-🛡️ Final Class (Optional but Recommended)
-Mark the class as final to prevent inheritance (which might introduce mutability).
-public final class Student { ... }
+        sb.append(" World");
+        sb.insert(5, ",");
+        sb.delete(0, 1);
+        sb.reverse();
 
-🛡️ Defensive Copying (if using mutable fields like arrays, lists)
-If the class contains mutable objects (like List, Date, arrays), return a copy instead of the original in getters.
-
-✅ Example of an Immutable Class:
-public final class Student {
-    private final String name;
-    private final int rollNo;
-
-    public Student(String name, int rollNo) {
-        this.name = name;
-        this.rollNo = rollNo;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getRollNo() {
-        return rollNo;
+        System.out.println("Final Output Using StringBuilder: " + sb);
     }
 }
+➤ No locking/synchronization → fastest performance.
+➤ Used where only one thread modifies the data.
 
-🌟 Benefits of Immutable Classes
-✅ Thread-Safe: No synchronization needed; safe to use in multithreaded environments.
-✅ Reliable & Predictable: Once created, the object remains in the same state.
-✅ Caching & Reuse: Can be safely cached or reused without side effects.
-✅ HashCode Stability: Good for keys in hash-based collections (HashMap, HashSet).
+✅ Code Example Showing StringBuffer Functioning (Thread-Safe via Synchronization)
+public class StringBufferDemo {
+    public static void main(String[] args) {
+        StringBuffer sbf = new StringBuffer("Hello");
+
+        sbf.append(" World");
+        sbf.insert(5, ",");
+        sbf.delete(0, 1);
+        sbf.reverse();
+
+        System.out.println("Final Output Using StringBuffer: " + sbf);
+    }
+}
+➤ Same methods as StringBuilder.
+➤ Each method is synchronized, making operations thread-safe but slower.
+
+✅ Multi-threading Example to Show the Real Difference
+✔️ StringBuilder (Not Safe)
+public class BuilderThreadDemo {
+    static StringBuilder sb = new StringBuilder();
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) sb.append("A");
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) sb.append("B");
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("StringBuilder length = " + sb.length());
+        System.out.println("Output (Corrupted): " + sb);
+    }
+}
+✅Output:
+Output may be corrupted or inconsistent.
+Race conditions occur because both threads modify the same object without sync.
+
+✔️ StringBuffer (Safe Output)
+public class BufferThreadDemo {
+    static StringBuffer sbf = new StringBuffer();
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) sbf.append("A");
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) sbf.append("B");
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("StringBuffer length = " + sbf.length());
+        System.out.println("Output (Non-corrupted): " + sbf);
+    }
+}
+✅Output:
+➤ Always consistent because methods are synchronized.
+➤ State remains safe even when both threads modify simultaneously.
+
 
 ✂️ substring() Method in Java
 The substring() method is used to extract a part of the string.
