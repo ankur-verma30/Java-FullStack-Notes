@@ -60,6 +60,8 @@ Methods (Behavior) – Functions/actions
 ➡️ Interview Insight:
 Many confuse JVM = Java compiler → Wrong! Compiler (javac) converts Java code → bytecode; JVM executes that bytecode.
 
+ The purpose of the JIT (Just-In-Time) compiler in the JVM is to improve the performance of Java programs by compiling bytecode into native machine code at runtime. While the Java compiler (javac) converts Java source code into platform-independent bytecode, it is the JVM that executes this bytecode. 
+
 🔹 2. JRE (Java Runtime Environment)
 ➤ JRE provides libraries, JVM, and other components to run Java applications.
 
@@ -1248,36 +1250,6 @@ A private constructor is a constructor that cannot be accessed outside its class
 🔁 Singleton Pattern Implementation
 ➤ A Singleton pattern is a design pattern that ensures that a class has only one instance, and provides a global point of access to it.
 
-✅Code Implementation
-// Singleton Class
-public class Singleton {
-
-    // Step 1: Private static instance of the same class
-    private static Singleton instance;
-
-    // Step 2: Private constructor to prevent instantiation
-    private Singleton() {
-        System.out.println("Singleton instance created!");
-    }
-
-    // Step 3: Public static method to provide global access point
-    public static Singleton getInstance() {
-        if (instance == null) {  // Lazy initialization
-            instance = new Singleton();
-        }
-        return instance;
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Singleton obj1 = Singleton.getInstance();
-        Singleton obj2 = Singleton.getInstance();
-
-        System.out.println(obj1 == obj2);  // true (both point to same instance)
-    }
-}
-❗ The above version is not thread-safe. For multithreading, use synchronized in getInstance() or the double-checked locking approach.
 
 ✅ Example 1:
 package p1;
@@ -1411,47 +1383,6 @@ package p2;
 import p1.A;
 public class C extends A {}
 
-🌟Public Constructor
-➤ If a constructor is made public, then its object can be created in the same class/same package, and outside the package also
-
-✅ Example 1:
-package p1;
-public class A {
-	public A() {}
-	public static void main(String[] args) {
-		 A a1 = new A();
-	}
-}
-
-package p1;
-public class B  {
-	public static void main(String[] args) {
-		 A a1 = new A();
-	}
-}
-
-package p2;
-import p1.A;
-public class C  {
-	public static void main(String[] args) {
-		 A a1 = new A();
-	}
-}
-
-➤ When a constructor is made public, then inheritance of that class is allowed in the same package / outside the package (both)
-
-✅ Example 2:
-package p1;
-public class A {
-	public A() {}
-}
-
-package p1;
-public class B extends A {}
-
-package p2;
-import p1.A;
-public class C extends A {}
 
 ✅ Access Specifiers on Top-Level Classes:
 Access Specifier				Usage							Visibility
@@ -1464,12 +1395,10 @@ protected
 
 🔍 Reason: Java's Design Philosophy
 ✅ 1. Top-level classes must be accessible to the JVM & compiler
-
 ➤ If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
 ➤ That breaks the point of having it at the top level — it becomes useless.
 
 ✅ 2. Protected and private only make sense in class hierarchies
-
 ➤ Protected is meaningful only within inheritance (i.e., subclass access).
 ➤ Private is meaningful only within the enclosing class.
 ➤ For a top-level class, there is no enclosing class, so these modifiers make no logical sense.
@@ -1509,21 +1438,7 @@ public class C {
 	}
 }
 
-What happens when a class is made public?
-➤ Its object can be created in the same class/same package & inside a different package
-➤ Inheritance is allowed in the same package & inside different packages
-
-✅ Example :
-package p1;
-public class A {}
-
-package p1;
-public class B extends A{}
-
-package p2;
-import p1.A;
-public class C extends A{}
-
+🔷 Java Compilation and Execution Process
 🔗 Compile Time
 ➤ This is the phase where source code is checked and translated into bytecode.
 ➤ Java source files (.java) are compiled by the Java Compiler (javac).
@@ -1621,12 +1536,6 @@ HelloWorld.java
 // Compiled by javac to
 HelloWorld.class (bytecode)
 
-Bytecode is the key to platform independence — it's the same for all operating systems.
-
-🔑 2. Java Virtual Machine (JVM)
-JVM is platform-dependent (a different version exists for Windows, Linux, Mac, etc.).
-It executes the bytecode by converting it into native machine code at runtime.
-Since every OS has its own JVM, the same bytecode can run on any system with a compatible JVM.
 
 🔄 Polymorphism
 Two types of polymorphism:
