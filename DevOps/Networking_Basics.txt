@@ -1,0 +1,176 @@
+A network is simply a collection of devices (computers, mobiles, servers, routers) that communicate with each other.
+To communicate, every device must have a unique identifier.
+This identifier is called an IP Address.
+
+
+🔷 IP Address (Internet Protocol Address)
+An IP address is a unique numerical label assigned to each device connected to a network (Internet or private network).
+It serves two main purposes:
+
+1️⃣ Identification → Who the device is
+2️⃣ Location addressing → Where the device is located in the network
+
+Think of it like a home address used for delivering data packets instead of mail.
+
+🔄 Why Do We Need an IP Address?
+✔️ To uniquely identify each device on a network
+✔️ To route data between devices
+✔️ To ensure messages reach the correct destination
+✔️ To differentiate between internal network devices and external devices
+✔️ To enable communication between networks
+
+
+🔄 Types of IP Addresses
+🌟 Based on Version
+1️⃣ IPv4
+    ✔️ Oldest & most widely used
+    ✔️ 32-bit address
+    ✔️ Written as: A.B.C.D (4 octets)
+        ✅ Example: 192.168.1.20
+    ✔️ Total possible addresses:
+        🔗 2³² = 4.29 billion
+    ✔️ Problem → IP exhaustion (not enough addresses)
+
+2️⃣ IPv6
+    ➤ New version to fix IPv4 shortage
+    ➤ 128-bit address
+    ➤ Written in hexadecimal
+        ✅ Example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+    ➤ Total possible addresses:
+        🔗 2¹²⁸ (almost infinite)
+    ➤ Provides:
+        ✔️ Better security (IPsec mandatory)
+        ✔️ Auto-configuration
+        ✔️ No NAT required
+
+🌟 Types Based on Scope
+1️⃣ Public IP
+➤ Provided by ISP
+➤ Can be accessed over the Internet
+➤ Unique globally
+✅ Example: IP of your WiFi router’s WAN interface
+
+2️⃣ Private IP
+➤ Used inside home/office LAN
+➤ Not accessible from internet directly
+➤ Range (IPv4):
+    🔗 10.0.0.0 – 10.255.255.255
+    🔗 172.16.0.0 – 172.31.255.255
+    🔗 192.168.0.0 – 192.168.255.255
+✅ Example: 192.168.1.10
+
+🌟 Static vs Dynamic IP
+1️⃣ Static IP
+➤ Manually assigned
+➤ Permanent
+➤ Used for servers
+✅ Example: Web server, database server
+
+2️⃣ Dynamic IP
+➤ Assigned automatically using DHCP Server
+➤ Changes periodically
+➤ Used for laptops, phones, home networks
+
+
+🔄 Classful IPv4 Addressing
+Used earlier for easy address allocation:
+| Class | Range                       | Usage           |
+| ----- | --------------------------- | --------------- |
+| A     | 0.0.0.0 – 127.255.255.255   | Large networks  |
+| B     | 128.0.0.0 – 191.255.255.255 | Medium networks |
+| C     | 192.0.0.0 – 223.255.255.255 | Small networks  |
+| D     | 224.0.0.0 – 239.255.255.255 | Multicasting    |
+| E     | 240.0.0.0 – 255.255.255.255 | Research        |
+
+
+🔄 IP Address Format
+1️⃣ IPv4
+➤ 32 bits → 4 octets (8 bits each)
+✅ Example: 11000000.10101000.00000001.00010100 (binary)
+= 192.168.1.20 (decimal)
+
+2️⃣ IPv6
+➤ 128 bits
+➤ Divided into 8 blocks of 16 bits
+➤ Hexadecimal
+
+🔄 Subnet Mask & IP Address
+➤ Subnet Mask helps to divide network into smaller networks.
+➤ It determines:
+    ✔️ Network portion of IP
+    ✔️ Host portion of IP
+
+✅ Example:
+🔗 IP: 192.168.1.10
+🔗 Subnet mask: 255.255.255.0
+
+🔗 Network part → 192.168.1
+🔗 Host part → 10
+
+🔄 NAT & IP Address
+➤ Since IPv4 addresses are limited:
+    ✔️ Private IPs are used inside LAN
+    ✔️ Router converts private → public IP using NAT (Network Address Translation)
+➤ This allows thousands of devices to share one public IP.
+
+✅ 10. How IP Works (Simple Flow)
+You send a request (e.g., google.com).
+DNS converts domain → IP Address.
+Router checks where to send the packet.
+Packet travels through multiple routers.
+Google’s server receives it using its IP.
+Server responds back to your IP.
+
+
+🔷 Subnet & Subnetting
+A subnet (short for subnetwork) is a smaller part of a larger network, created by dividing an IP network into multiple logical segments.
+
+In simple terms:
+👉 A subnet is like dividing a big classroom into smaller groups so communication becomes easier and faster.
+
+🧠 Why Do We Use Subnets?
+➤ Reduce network congestion (less broadcast traffic)
+➤ Improve security (separate departments: HR, Finance, Dev)
+➤ Better IP address management
+➤ Faster routing inside networks
+➤ Avoid wastage of IP addresses
+
+📌 How Subnet Actually Works
+Every IP address has 2 parts:
+
+🔗 Network Portion | Host Portion
+Subnetting changes the boundary between network and host portions.
+
+✅ Example:
+🔗 IP: 192.168.1.10
+🔗 Subnet Mask: 255.255.255.0
+
+👉 Here:
+🔗 Network = 192.168.1
+🔗 Host = .10
+
+➤ If we subnet further using: 255.255.255.128
+➤ This divides the network into 2 smaller subnets.
+
+🔢 Subnet Mask
+A subnet mask tells which part of the IP is network and which part is host.
+
+✅ Example masks:
+255.255.255.0 → /24
+255.255.255.128 → /25
+255.255.255.192 → /26
+
+🔄 CIDR Notation
+This is a short form of subnet mask:
+/24, /25, /26
+
+✅ Subnet Example 
+Suppose you have 192.168.1.0/24
+It means 256 IPs (0–255)
+
+If you divide it into two subnets:
+➤ Subnet 1: 192.168.1.0/25 → 128 IPs
+➤ Subnet 2: 192.168.1.128/25 → 128 IPs
+👉 Now instead of one big network, you have two smaller logical networks.
+
+

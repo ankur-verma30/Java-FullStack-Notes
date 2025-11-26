@@ -849,8 +849,127 @@ jdbcTemplate.query("SELECT * FROM users", new RowMapper<User>() {
 ✔️ Hard to modify the flow dynamically at runtime.
 
 
-🔄
-🔄
+🔷 Momento Design Pattern
+The Memento Pattern allows an object to capture its internal state and restore it later, without violating encapsulation.
+
+It involves three main roles:
+1️⃣ Originator – the object whose state needs to be saved/restored.
+2️⃣ Memento – the object that stores the snapshot of the originator’s state.
+3️⃣ Caretaker – manages saving and restoring mementos but doesn’t modify them.
+
+Think of it like Ctrl+Z (Undo) in text editors:
+The editor = Originator
+Snapshot = Memento
+Undo stack = Caretaker
+
+🔄 Structure
+Originator -----> Memento
+     ^
+     |
+Caretaker
+
+➤ Originator creates a Memento containing its current state and uses it to restore state later.
+➤ Caretaker stores Mementos but never modifies their contents.
+
+✅ Java Example: Text Editor Undo
+1️⃣ Memento Class
+// Memento
+public class TextEditorMemento {
+    private final String content;
+
+    public TextEditorMemento(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+}
+
+2️⃣ Originator Class
+// Originator
+public class TextEditor {
+    private String content = "";
+
+    public void type(String words) {
+        content += words;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public TextEditorMemento save() {
+        return new TextEditorMemento(content); // snapshot
+    }
+
+    public void restore(TextEditorMemento memento) {
+        content = memento.getContent(); // restore snapshot
+    }
+}
+
+3️⃣ Caretaker Class
+import java.util.ArrayList;
+import java.util.List;
+
+public class Caretaker {
+    private List<TextEditorMemento> history = new ArrayList<>();
+
+    public void addMemento(TextEditorMemento memento) {
+        history.add(memento);
+    }
+
+    public TextEditorMemento getMemento(int index) {
+        return history.get(index);
+    }
+}
+
+4️⃣ Client Code
+public class MementoPatternDemo {
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        Caretaker caretaker = new Caretaker();
+
+        editor.type("Hello ");
+        caretaker.addMemento(editor.save());
+
+        editor.type("World!");
+        caretaker.addMemento(editor.save());
+
+        System.out.println("Current Content: " + editor.getContent());
+
+        // Undo last action
+        editor.restore(caretaker.getMemento(0));
+        System.out.println("After Undo: " + editor.getContent());
+    }
+}
+
+✅ Output
+Current Content: Hello World!
+After Undo: Hello 
+
+🧠 Real-Life Examples in Java & Spring
+1️⃣ Java
+java.util.Date and java.util.Calendar allow snapshots of state (conceptually similar).
+JTextComponent in Swing uses UndoManager which internally follows Memento pattern.
+
+2️⃣ Spring Boot
+Versioning of entity states or rollback operations can use Memento-like logic.
+
+✅ Example: Implementing an undo feature in a form:
+➤ Save snapshots of DTOs in memory or DB.
+➤ Restore previous state on user request.
+
+⚖️ Advantages
+➤ Encapsulates object state without exposing internal structure.
+➤ Enables undo/redo functionality.
+➤ Supports versioning or rollback mechanisms.
+
+🚫 Disadvantages
+❌ Can consume large memory if many snapshots are stored.
+❌ Overhead if object state is large or complex.
+❌ Complexity increases if deep copying is required for nested objects.
+
 🔄
 🔄
 🔄

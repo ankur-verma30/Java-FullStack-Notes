@@ -1,0 +1,501 @@
+JUnit is a popular unit testing framework for Java used to write and run automated tests.
+It helps developers verify that small pieces of code (methods, classes) work correctly before integrating them into the full system.
+
+⚡ Think of it as a tool that lets you:
+➤ Test your code automatically
+➤ Detect bugs early
+➤ Ensure that future code changes don’t break existing features (regression testing)
+➤ Improve code quality and reliability
+
+JUnit is part of the xUnit family of testing frameworks and is widely used in Java development, Spring Boot, Microservices, and CI/CD pipelines.
+
+🔥 Why JUnit is Important
+➤ Ensures code correctness
+➤ Makes code maintainable
+➤ Helps in TDD (Test-Driven Development)
+➤ Supports automation (Maven/Gradle, Jenkins, GitHub Actions)
+➤ Very helpful in Spring Boot application testing
+
+🔄 JUnit Lifecycle Annotations
+| Annotation    | Meaning                             |
+| ------------- | ----------------------------------- |
+| `@BeforeAll`  | Runs once before all tests (static) |
+| `@BeforeEach` | Runs before each test               |
+| `@Test`       | The actual test                     |
+| `@AfterEach`  | Runs after each test                |
+| `@AfterAll`   | Runs once after all tests           |
+
+
+🔄 Where JUnit is Used in Real Development
+➤ Spring Boot REST API testing
+➤ DAO/Repository layer testing
+➤ Service layer testing + Mockito
+➤ Testing microservices workflows
+➤ CI/CD to block broken builds
+➤ TDD-based development
+
+
+🧪 Basic Concepts in JUnit
+1️⃣ Test Case: A method that tests a specific functionality.
+2️⃣ Test Suite: A group of test cases.
+
+3️⃣ Assertions: Used to check expected results
+1️⃣ assertEquals(expected, actual)
+✔️ Checks that two values are equal.
+✔️ Use-case: Testing return values of functions.
+
+assertEquals(10, calc.add(7, 3));
+
+2️⃣ assertNotEquals(unexpected, actual)
+✔️ Fails if both values are equal.
+✔️ Use-case: Ensure method does NOT return something.
+
+assertNotEquals(0, divide(10, 2));
+
+3️⃣ assertTrue(condition)
+✔️ Passes if the condition is true.
+✔️ Use-case: Validating boolean expressions.
+
+assertTrue(age > 18);
+
+4️⃣ assertFalse(condition)
+✔️ Passes if the condition is false.
+✔️ Use-case: Ensuring invalid states or flags.
+
+assertFalse(list.isEmpty());
+
+5️⃣ assertNull(actual)
+✔️ Passes if the value is null.
+✔️ Use-case: When a repository returns nothing.
+
+assertNull(userRepository.find(99));
+
+6️⃣ assertNotNull(actual)
+✔️ Passes if the value is NOT null.
+✔️ Use-case: Dependency or service must not be null.
+
+assertNotNull(service.getUser(1));
+
+7️⃣ assertSame(expected, actual)
+✔️ Checks if two references point to the same object (==).
+✔️ Use-case: Singleton pattern, object identity tests.
+
+assertSame(singletonObj, Singleton.getInstance());
+
+8️⃣ assertNotSame(unexpected, actual)
+✔️ Checks if two references are not the same object.
+✔️ Use-case: Ensure new objects are created each time.
+
+assertNotSame(user1, user2);
+
+9️⃣assertArrayEquals(expected[], actual[])
+✔️ Checks if two arrays contain same elements in same order.
+✔️ Use-case: Sorting, conversions, splitting.
+
+assertArrayEquals(new int[]{1,2,3}, sortArray(input));
+
+1️⃣0️⃣ assertIterableEquals(expectedIterable, actualIterable)
+✔️ Checks two iterables (List, Set, etc.) element-by-element.
+✔️ assertIterableEquals(List.of(1,2,3), resultList);
+
+
+1️⃣1️⃣ assertLinesMatch(expectedLines, actualLines)
+✔️ Used to match multi-line text or outputs.
+✔️ Use-case: Comparing long strings (logs, files).
+
+assertLinesMatch(List.of("Hello", "World"), lines);
+
+1️⃣2️⃣ assertThrows(ExceptionClass, executable)
+✔️ Checks if a method throws a specific exception.
+✔️ Use-case: Testing error flows.
+
+assertThrows(ArithmeticException.class, () -> divide(10, 0));
+
+1️⃣3️⃣ assertDoesNotThrow(executable)
+✔️ Passes when the code block does not throw exception.
+✔️ Use-case: Validating safe operations.
+
+assertDoesNotThrow(() -> service.saveUser(user));
+
+1️⃣4️⃣ assertTimeout(Duration, executable)
+✔️ Fails if execution exceeds given time.
+✔️ Use-case: Performance constraints.
+
+assertTimeout(Duration.ofMillis(200), () -> service.process());
+
+1️⃣5️⃣ assertTimeoutPreemptively(Duration, executable)
+✔️ Similar to above but interrupts the task when timeout occurs.
+✔️ Use-case: Strict performance testing.
+
+assertTimeoutPreemptively(Duration.ofSeconds(1), () -> longTask());
+
+1️⃣6️⃣ fail(message)
+✔️ Explicitly fails a test.
+✔️ Use-case: When code should never reach a specific point.
+
+if (status == INVALID) {
+    fail("Invalid status reached!");
+}
+
+
+4️⃣ Annotations
+1️⃣ @Test
+✔️ Marks a method as a test case.
+
+@Test
+void testMethod() { }
+
+2️⃣ @BeforeEach
+✔️ Runs before every test method.
+✔️ Used for setting up test data.
+
+@BeforeEach
+void setup() { }
+
+3️⃣ @AfterEach
+✔️ Runs after every test method.
+✔️ Used for cleanup.
+
+@AfterEach
+void cleanup() { }
+
+4️⃣ @BeforeAll
+✔️ Runs once before all test methods (must be static).
+✔️ Used to initialize shared resources.
+
+@BeforeAll
+static void initAll() { }
+
+5️⃣ @AfterAll
+✔️ Runs once after all tests finish (must be static).
+✔️ Used to release shared resources.
+
+@AfterAll
+static void tearDownAll() { }
+
+6️⃣ @DisplayName
+✔️ Gives a custom readable name for a test.
+
+@DisplayName("Testing addition method")
+void testAdd() {}
+
+7️⃣ @Disabled
+✔️ Disables a test or a class from execution.
+
+@Disabled("Feature not ready")
+void testFeature() { }
+
+8️⃣ @Timeout
+✔️ Fails the test if it runs longer than the specified time.
+
+@Timeout(2) // fails if takes > 2 seconds
+void testTimeout() { }
+
+9️⃣ @Tag
+✔️ Used to group and filter tests.
+
+@Tag("integration")
+void testDb() { }
+
+1️⃣0️⃣ @RepeatedTest
+✔️ Runs a test multiple times.
+
+@RepeatedTest(5)
+void repeatTest() { }
+
+1️⃣1️⃣ @Nested
+✔️ Creates logical grouping inside test classes.
+
+ @Nested
+class InnerTests { }
+
+1️⃣2️⃣@ParameterizedTest
+✔️ Runs the same test with multiple input values.
+
+1️⃣3️⃣ @ValueSource
+✔️ Provides single-parameter values to a test.
+
+@ParameterizedTest
+@ValueSource(ints = {1, 2, 3})
+void runMultiple(int num) { }
+
+1️⃣4️⃣ @CsvSource
+✔️ Provides multiple parameters using CSV format.
+
+@ParameterizedTest
+@CsvSource({"2,4", "3,6"})
+void testMultiply(int input, int expected) { }
+
+1️⃣5️⃣ @EnumSource
+✔️ Provides enum constants.
+
+@ParameterizedTest
+@EnumSource(TimeUnit.class)
+void testEnums(TimeUnit unit) { }
+
+1️⃣6️⃣ @MethodSource
+✔️ Provides parameters using a static method.
+
+static Stream<Integer> data() { return Stream.of(1,2,3); }
+
+@ParameterizedTest
+@MethodSource("data")
+void testMethodSource(int num) { }
+
+1️⃣7️⃣ @ExtendWith
+✔️ Adds JUnit extensions (Mockito, Spring, etc.)
+
+@ExtendWith(MockitoExtension.class)
+class TestClass { }
+
+1️⃣8️⃣ @TestInstance
+✔️ Controls test instance lifecycle.
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TestClass { }
+
+1️⃣9️⃣ @TestMethodOrder
+✔️ Controls order of test execution.
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class TestClass { }
+
+2️⃣0️⃣ @Order
+✔️ Specifies test priority/order.
+
+@Test
+@Order(1)
+void testFirst() { }
+
+2️⃣1️⃣ @TempDir
+✔️ Provides a temporary directory for testing I/O operations.
+
+@TempDir
+Path tempDir;
+
+2️⃣2️⃣ @RegisterExtension
+✔️ Manually registers an extension.
+
+ @Assertions (Not annotation, but used)
+Used inside tests to verify results.
+
+
+🔷 Mockito
+Mockito is a mocking framework used with JUnit that helps you:
+➤ Mock dependencies
+➤ Avoid calling real DB, APIs, files, or external services
+➤ Test only the business logic
+➤ Perform Unit testing (not integration testing)
+
+Mockito creates fake objects (mocks) that imitate real classes.
+
+🔄 Why Mockito is Used?
+To isolate and test only the class under test by replacing:
+➤ Service → mock repository
+➤ Controller → mock service
+➤ Business logic → mock API calls
+➤ Microservices → mock HTTP calls
+
+This avoids actual database/API calls and speeds up testing.
+
+✅ Example of When Mockito Helps
+Suppose you test a UserService, which needs a UserRepository.
+
+In real world:
+➤ Repository → hits database
+➤ APIClient → hits external server
+
+In unit test:
+❌ This is slow and unnecessary.
+✔ Mockito gives you a fake repository so the service can be tested alone.
+
+
+🔄Core Mockito Concepts (Super Important)
+1️⃣ Mock
+➤ A fake object that imitates real behavior.
+
+@Mock
+UserRepository repo;
+
+2️⃣ InjectMocks
+➤ Creates the object under test and injects @Mock objects into it.
+
+@InjectMocks
+UserService service;
+
+3️⃣ Stubbing
+➤ Defining what a mock should return when called.
+
+when(repo.findById(1)).thenReturn(new User(1, "John"));
+
+4️⃣ Verification
+➤ Check if a method was called.
+
+verify(repo, times(1)).save(any());
+
+5️⃣ Argument Matchers
+➤ Flexible input matching.
+
+when(repo.findByName(anyString())).thenReturn(user);
+
+Common matchers:
+    ✔️ anyInt()
+    ✔️ anyString()
+    ✔️ any()
+    ✔️ eq(value)
+
+6️⃣ Spies
+➤ Partial mocks → real methods + override specific ones.
+
+@Spy
+List<String> spyList = new ArrayList<>();
+
+🔄 All JUnit + Mockito Annotations
+| Annotation                            | Framework | Meaning                                 |
+| ------------------------------------- | --------- | --------------------------------------- |
+| `@ExtendWith(MockitoExtension.class)` | Mockito   | Enables Mockito in JUnit 5              |
+| `@Mock`                               | Mockito   | Creates a mock object                   |
+| `@InjectMocks`                        | Mockito   | Injects mocks into the class under test |
+| `@Spy`                                | Mockito   | Creates a spy (partial mock)            |
+| `@Captor`                             | Mockito   | Captures method arguments               |
+| `@Test`                               | JUnit     | Marks a test case                       |
+| `@BeforeEach`                         | JUnit     | Setup before each test                  |
+| `@AfterEach`                          | JUnit     | Cleanup after each                      |
+| `@DisplayName`                        | JUnit     | Custom test name                        |
+| `@Disabled`                           | JUnit     | Skip test                               |
+| `@Order`                              | JUnit     | Controls test order                     |
+
+
+✅Example: JUnit + Mockito in Action
+public class UserService {
+
+    private final UserRepository repo;
+
+    public UserService(UserRepository repo) {
+        this.repo = repo;
+    }
+
+    public User getUser(int id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    public User saveUser(User user) {
+        return repo.save(user);
+    }
+}
+
+✅ Repository
+public interface UserRepository {
+    Optional<User> findById(int id);
+    User save(User user);
+}
+
+
+✅ JUnit + Mockito Test Class
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.Captor;
+import org.mockito.ArgumentCaptor;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+
+    @Mock
+    UserRepository repo;   // Fake object
+
+    @InjectMocks
+    UserService service;   // Injects repo into service
+
+    @Captor
+    ArgumentCaptor<User> userCaptor; // Captures parameters
+
+    @Spy
+    UserService spyService = new UserService(repo);  // Partial mock
+
+    @BeforeEach
+    void setup() {
+        System.out.println("Before each test");
+    }
+
+    @Test
+    @DisplayName("Test get user by ID")
+    void testGetUser() {
+        User mockUser = new User(1, "Ankur");
+
+        when(repo.findById(1)).thenReturn(Optional.of(mockUser));
+
+        User result = service.getUser(1);
+
+        assertEquals("Ankur", result.getName());
+        verify(repo, times(1)).findById(1);
+    }
+
+    @Test
+    @DisplayName("Test saving user")
+    void testSaveUser() {
+        User user = new User(2, "Rahul");
+
+        when(repo.save(any(User.class))).thenReturn(user);
+
+        service.saveUser(user);
+
+        verify(repo).save(userCaptor.capture());
+
+        assertEquals(2, userCaptor.getValue().getId());
+    }
+
+    @Test
+    @DisplayName("Spy object test")
+    void testSpy() {
+        when(repo.findById(10)).thenReturn(Optional.of(new User(10, "SpyTest")));
+
+        User result = spyService.getUser(10);
+
+        assertEquals("SpyTest", result.getName());
+    }
+}
+✅ Explanation of What Happened in This Code
+✔️ @Mock
+➤ Created fake repository.
+
+✔️ @InjectMocks
+➤ Created real UserService with the mock repo injected automatically.
+
+✔️ when(...)
+➤ Stubs behavior → “If repo.findById(1) called ⇒ return mock user”.
+
+✔️ verify(...)
+➤ Ensures repository methods are actually called.
+
+✔️ @Captor
+➤ Captured what repo.save() actually received.
+
+✔️ @Spy
+➤ Created partial mock to test combination of real + mocked behavior.
+
+
+🔄 Mockito Cheat Sheet (Important Commands)
+👉 Stubbing
+when(mock.method()).thenReturn(value);
+when(mock.method()).thenThrow(new RuntimeException());
+
+👉 Argument matchers
+when(repo.findById(anyInt())).thenReturn(Optional.of(user));
+
+👉 Verification
+verify(repo).save(any());
+verify(repo, times(2)).findAll();
+verify(repo, never()).deleteById(1);
+
+👉 Capturing arguments
+verify(repo).save(userCaptor.capture());
+
+👉 Spy
+doReturn(value).when(spy).method();

@@ -289,9 +289,362 @@ AWS CLI is a command-line tool that allows you to interact with AWS services dir
 🔗 aws s3 ls
 🔗 aws ec2 stop-instances --instance-ids i-0abcd1234ef5678gh
 
-
 📝 AWS CLI Command Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-instances.html
-
 📝 AWS Cloud Formation Template Example: https://github.com/aws-cloudformation/aws-cloudformation-templates
-
 📝 AWS Python Boto3 Example: https://gist.github.com/mda590/679aba60ca03699d5b12a32314debdc0
+
+
+🔷 Version Control System (VCS)
+A Version Control System tracks changes in code/files, enables collaboration, and keeps history of all modifications.
+
+Two major types:
+1️⃣ Centralized VCS (CVCS)
+2️⃣ Decentralized / Distributed VCS (DVCS)
+
+🔵 Centralized Version Control System (CVCS)
+A centralized VCS has a single central server that stores the entire codebase and its history.
+Developers connect to this server to commit, update, and retrieve code.
+
+✅ Examples
+➤ SVN (Subversion)
+➤ CVS
+➤ Perforce
+
+🔄 How it works
+➤ One central repository lives on a server.
+➤ Developers only keep a working copy, not full history.
+➤ If the server is down → no commits, no history access.
+
+🔄 Advantages
+➤ Simple to understand
+➤ Centralized control (good for enterprises)
+➤ Easy to maintain permissions
+
+🔄 Disadvantages
+➤ Single point of failure (Server crash = work stops)
+➤ Slow operations (network-dependent)
+➤ Limited offline work
+➤ Server load is high
+
+🟢  Decentralized / Distributed Version Control System (DVCS)
+A distributed VCS gives every developer a complete copy of the entire repository, including full history.
+
+✅ Examples
+✔️ Git (Most widely used today)
+✔️ Mercurial
+✔️ Bazaar
+
+🔄 How it works
+➤ Every developer has a local repo (local copy of full history).
+➤ Commits, branching, merging happen locally.
+➤ Pushing/pulling happens with a remote like GitHub/GitLab.
+
+🔄 Advantages
+➤ No single point of failure
+➤ Almost everything can be done offline
+➤ Fast operations (local)
+➤ Easier branching & merging
+➤ Highly scalable for large teams
+
+🔄 Disadvantages
+➤ Slightly more complex to understand
+➤ Requires more local storage (full history stored locally)
+
+
+🔷 Git Branching Strategy
+A Git branching strategy defines how teams create, use, and merge branches in a project.
+It ensures:
+➤ Clean and predictable workflow
+➤ Easy collaboration
+➤ Safe deployment
+➤ Reduced merge conflicts
+➤ Stable production releases
+
+🔥 Why Do We Need a Branching Strategy?
+➤ Because without a strategy:
+➤ Developers overwrite each other’s work
+➤ Releases become unstable
+➤ Hard to review code
+➤ Hotfixes break existing code
+➤ Production gets messy
+
+Branching strategies bring discipline and structure to teamwork.
+
+🧱 Popular Git Branching Strategies
+1️⃣ Git Flow (Most Traditional & Full-featured)
+Used in large, release-focused projects.
+
+🔗 Main Branches
+  ✔️ main → always production-ready
+  ✔️ develop → integration branch for features
+
+🔗 Supporting Branches
+  ✔️ feature/* → new features
+  ✔️ release/* → preparing new release
+  ✔️ hotfix/* → emergency fixes in production
+
+🔄 Flow Summary
+feature → develop → release → main → tag version
+                      ↑
+                 hotfix → main
+
+⚡ Pros
+➤ Great for large teams
+➤ Very structured
+➤ Supports multiple releases
+
+❌ Cons
+➤ Too heavy for small/fast-moving teams
+
+2️⃣ GitHub Flow (Simple & Best for Continuous Deployment)
+Used in modern web companies (GitHub, Facebook, etc.)
+
+🔄 Structure
+➤ Only one main branch: main
+➤ New work → feature-branch
+➤ After work is done → Open Pull Request → Review → Merge to main
+➤ Deployment happens after merge
+
+⚡ Pros
+➤ Very simple
+➤ Works great with CI/CD
+➤ Fast iterations
+
+❌Cons
+➤ No separate develop or release branches
+➤ Not suitable for complex release cycles
+
+3️⃣ GitLab Flow (Hybrid of Git Flow + GitHub Flow)
+Mixes environment branches (like staging, production).
+
+🔄 Common Flow
+feature → main → staging → production
+
+⚡Pro
+➤ Supports environments (QA, staging).
+➤ Balanced between complexity and simplicity
+
+❌ Cons
+➤ Slightly more complex than GitHub Flow
+
+4️⃣ Trunk-Based Development (Used by Google, Netflix)
+Very fast and extreme Agile.
+
+🔄 Rules
+  ✔️ Only one main branch → main
+  ✔️ Developers create short-lived feature branches
+  ✔️ Merge into main daily or several times a day
+  ✔️ Requires feature flags to hide incomplete features
+
+⚡ Pros
+➤ Very fast releases
+➤ Minimal merge conflicts
+➤ Perfect for DevOps
+
+❌ Cons
+➤ Requires high discipline
+➤ Needs strong automation & CI/CD
+
+⭐ Which Branching Strategy Should You Use? (Interview Answer)
+➤ Small teams / startups: GitHub Flow
+➤ Large enterprise projects: Git Flow
+➤ CI/CD-heavy teams (DevOps): Trunk-Based Development
+➤ Teams with environments (QA, staging): GitLab Flow
+
+
+🔷 AWS services For DevOps
+1️⃣ EC2 (Elastic Compute Cloud)
+2️⃣ VPC (Virtual Private Cloud)
+3️⃣ EBS (Elastic Block Store)
+4️⃣ S3 (Simple Storage Service)
+5️⃣ IAM (Identity and Access Management)
+6️⃣ CloudWatch (Monitoring and Logging)
+7️⃣ Lambda (Serverless Computing) 
+8️⃣ CodeBuild (Build Service)
+  1️⃣ AWS CodePipeline (CI/CD Service)
+  2️⃣ AWS CodeBuild (Build Service)
+  3️⃣ AWS CodeDeploy (Deployment Service)
+9️⃣ AWS Configuration Manager (AWS Config)
+1️⃣0️⃣ Billing and Cost Management
+1️⃣1️⃣ AWS KMS (Key Management Service)
+1️⃣2️⃣ AWS CloudTrail (Audit and Compliance)
+1️⃣3️⃣ AWS EKS (Elastic Kubernetes Service)
+1️⃣4️⃣ Fargate, ECS 
+1️⃣5️⃣ ELK Stack (Elasticsearch, Logstash, Kibana)
+
+
+🔷Configuration Management With Ansible
+Configuration Management (CM) is the process of automating the setup, configuration, and management of servers so they remain consistent across environments.
+
+🔄 Why do we need CM?
+✔️ Avoid manual configuration
+✔️ Ensure consistency across Dev, QA, Prod
+✔️ Reduce human errors
+✔️ Automate deployments & scaling
+✔️ Improve reliability for infrastructure
+
+🌟 Configuration Management with Ansible
+Ansible is a simple, agentless, open-source configuration management and automation tool.
+
+🔄 It automates:
+➤  Server configuration
+➤  Application deployment
+➤  Orchestration
+➤  Cloud provisioning
+
+🔁 Key Features
+➤ Agentless (No software installation on client machines)
+➤ Uses SSH for communication
+➤ YAML-based Playbooks (simple to read and write)
+➤ Idempotent (same script can run multiple times without breaking anything)
+
+
+🔄 Components of Ansible
+1️⃣ Control Node
+  ✔️ Where Ansible is installed
+  ✔️ Executes Playbooks
+2️⃣ Managed Nodes
+  ✔️ Target servers
+  ✔️ No agent required
+3️⃣ Inventory File
+  ✔️ List of hosts (IP or domain)
+4️⃣ Playbooks (YAML)
+  ✔️ Written instructions for tasks
+
+✅ Example Inventory:
+[webservers]
+192.168.1.10
+192.168.1.11
+
+✅ Example Playbook:
+- hosts: webservers
+  tasks:
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
+
+
+🆚 Puppet vs Ansible
+| Feature              | **Puppet**                     | **Ansible**                                     |
+| -------------------- | ------------------------------ | ----------------------------------------------- |
+| **Type**             | Configuration Management       | Configuration Management + Orchestration        |
+| **Language**         | DSL (Domain Specific Language) | YAML (Easy)                                     |
+| **Agent**            | **Agent-based**                | **Agentless**                                   |
+| **Communication**    | Client-Agent Architecture      | SSH / WinRM                                     |
+| **Setup Complexity** | High                           | Very Easy                                       |
+| **Learning Curve**   | Steep                          | Beginner-friendly                               |
+| **Ease of Use**      | Medium                         | Very High                                       |
+| **Speed**            | Slower initial setup           | Faster setup + execution                        |
+| **Push/Pull Model**  | Pull (Clients pull configs)    | Push (Control pushes configs)                   |
+| **Best For**         | Large enterprise environments  | Small to medium teams; also used in enterprises |
+| **Scaling**          | Very powerful                  | Scales decently                                 |
+
+🔁 Puppet
+➤ Follows a client–server model
+➤ Each node runs a Puppet Agent
+➤ Agents connect to Puppet Master to fetch configuration
+➤ Uses its own scripting language (Puppet DSL)
+➤ Suitable for large enterprises with complex infrastructures
+
+🔁 Ansible
+➤ No agent required on target machines
+➤ Uses SSH, which is built in everywhere
+➤ Easier to start & maintain
+➤ Playbooks written in YAML (very readable)
+➤ Very popular in DevOps & Cloud automation
+➤ Faster to adopt and integrate with CI/CD
+
+
+🔷 How to Setup Ansible in EC2 instance
+🟦 Step 1: Launch EC2 Instances
+You need at least 2 EC2 instances:
+
+1️⃣ Control Node
+Ansible will be installed here
+OS: Ubuntu is recommended
+
+2️⃣ Managed Node(s)
+Ansible will configure these
+Can be Ubuntu / Amazon Linux / CentOS
+You can have 1 or more managed nodes.
+
+🟦 Step 2: Connect to the Control Node
+👉 SSH into the control node:
+🔗 ssh -i your-key.pem ubuntu@public-ip
+
+👉 Update system:
+🔗 sudo apt update -y
+
+🟢 Step 3: Install Ansible on Control Node
+👉 For Ubuntu:
+🔗 sudo apt install ansible -y
+
+👉 Check version:
+🔗 ansible --version
+
+use command:
+ssh-keygen
+generates public key in path /home/ubuntu/.ssh/id_ed25519.pub and private key in path /home/ubuntu/.ssh/id_ed25519
+
+🟦 Step 4: Create an Inventory File
+Ansible uses an inventory to know which servers to manage.
+
+👉 Create a directory:
+🔗 mkdir ansible-setup
+🔗 cd ansible-setup
+
+👉 Create inventory file:
+🔗 nano inventory
+
+Add your managed node IPs:
+[webservers]
+✔️ ec2-user@<managed-node-1-public-ip>
+✔️ ec2-user@<managed-node-2-public-ip>
+※ If using Ubuntu as managed nodes, replace ec2-user with ubuntu.
+
+🟢 Step 5: Copy SSH Key to Control Node
+You must move your .pem key to the control node:
+
+👉 On your laptop:
+🔗 scp -i your-key.pem your-key.pem ubuntu@control-node-ip:/home/ubuntu/
+
+👉 Inside control node:
+🔗 chmod 400 your-key.pem
+
+🟦 Step 6: Test Connection from Ansible to Managed Node
+
+👉 Run:
+🔗 ansible -i inventory webservers -m ping --private-key your-key.pem
+
+👉 Expected output if successful:
+managed-node-ip | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+🟢 Step 7: Create a Playbook (Optional but Recommended)
+Example: Install NGINX on nodes.
+
+👉 Create a playbook:
+🔗 nano install-nginx.yml
+
+
+👉 Add:
+🔗 - hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+👉 Run playbook:
+🔗 ansible-playbook -i inventory install-nginx.yml --private-key your-key.pem
+
+🟦 Step 8: Verify on Managed Nodes
+👉 SSH into managed node:
+🔗 ssh -i your-key.pem ubuntu@managed-node-ip
+
+👉 Check Nginx:
+🔗 systemctl status nginx

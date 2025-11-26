@@ -229,3 +229,648 @@ echo "Print the number of CPU"
 ➤ The set -x command enables debug mode, which prints each command and its arguments to the terminal as they are executed.
 ➤ This makes it easier to write and troubleshoot the script since you can see exactly what commands are being run.
 
+
+🔷 ps -ef Command- Process status
+ps -ef shows a complete list of all running processes on a Linux system in full detail.
+It is one of the most common commands used in DevOps, EC2, Docker, Kubernetes, troubleshooting
+
+Breakdown of Operations
+ps → Process Status
+-e → Show all processes
+-f → Show full-format listing (detailed)
+
+🔷 Difference between ps and top
+| Command    | Purpose                                           |
+| ---------- | ------------------------------------------------- |
+| **ps -ef** | Shows a one-time snapshot of all processes        |
+| **top**    | Shows real-time updates of CPU, memory, processes |
+
+1️⃣ Check if a process is running
+🔗 ps -ef | grep nginx
+
+2️⃣ Find a process by port (with netstat/lsof)
+🔗 sudo lsof -i :8080
+
+3️⃣ then kill it:
+🔗 kill -9 <PID>
+
+4️⃣ Find parent-child process relationships
+🔗 ps -ef --forest
+ 
+5️⃣ Kill a specific running process
+🔗 kill -9 <PID>
+
+5️⃣ Check JVM, MySQL, Python processes
+🔗 ps -ef | grep java
+🔗 ps -ef | grep python
+
+🔄 Working of awk command
+awk is a powerful text-processing tool used to:
+    ✔️ Search text
+    ✔️ Filter data
+    ✔️ Extract columns
+    ✔️ Perform calculations
+    ✔️ Format output
+    ✔️ Process logs
+It works line by line and splits each line into fields (columns).
+
+🔄 Basic Syntax
+awk 'pattern { action }' filename
+
+➤ pattern → what to search for
+➤ action → what to do when pattern matches
+➤ $1, $2, $3... → columns
+➤ $0 → whole line
+
+✔️ $1 → first column
+✔️ $2 → second column
+✔️ $0 → entire line
+✔️ NF → number of fields
+✔️ NR → line number
+
+✅ Example:
+ps -ef | grep amazon | awk -F" " '{print $2}' 
+
+
+🔷 set commands
+| Option        | Meaning                            |
+| ------------- | ---------------------------------- |
+| `-e`          | Exit on any error                  |
+| `-u`          | Exit on using undefined variables  |
+| `-o pipefail` | Fail pipeline if any command fails |
+
+✅Example:
+set -euo pipefail  # in almost all professional scripts this is used
+
+
+🔷 curl command
+curl (Client URL) is a command-line tool used to send HTTP requests and interact with APIs, servers, URLs.
+
+Supports many protocols: HTTP, HTTPS, FTP, SCP, SFTP, SMTP, etc.
+
+Very commonly used in DevOps, automation, shell scripting, backend testing, CI/CD pipelines.
+
+🔄 Basic curl Commands (Most Used)
+1️⃣ GET request (default)
+🔗 curl https://api.example.com/users
+
+2️⃣ Save output to a file
+🔗 curl -o output.json https://api.example.com/users
+
+3️⃣ Follow redirects
+🔗 curl -L https://example.com
+
+4️⃣ Show only HTTP response code
+🔗 curl -o /dev/null -w "%{http_code}\n" -s https://example.com
+
+5️⃣ Send a POST request with JSON body
+🔗 curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ankur", "role":"DevOps"}' \
+  https://api.example.com/create
+
+🔄 Headers in curl
+Add a custom header
+🔗 curl -H "Authorization: Bearer <token>" https://api.example.com/data
+
+🔄 Download a file
+🔗 curl -O https://example.com/file.zip
+
+🔄 Upload a file
+🔗 curl -F "file=@/path/to/file.txt" https://api.example.com/upload
+
+🔄 Verbose Mode (Debugging APIs)
+🔗 curl -v https://example.com
+👉 Shows:
+➤ request headers
+➤ response headers
+➤ SSL details
+
+🔄 Check only response headers
+🔗 curl -I https://example.com
+
+🔄 Send form data (like HTML form)
+🔗 curl -X POST -F "username=ankur" -F "password=1234" https://example.com/login
+
+🔄 Use curl with authentication
+Basic Auth
+🔗 curl -u user:password https://example.com
+
+🔄 Send multiple headers
+🔗 curl -H "Accept: application/json" \
+     -H "X-API-KEY: 12345" \
+     https://example.com
+
+🔄 Test API speed
+🔗 curl -w "@curl-format.txt" -o /dev/null -s https://example.com
+
+🔄 wget Command
+🔗 wget dummylog.log 
+➤ It downloads the log file into your local machine.
+
+🔄 find command
+➤ find is used to search files and directories in a directory hierarchy.
+➤ You can search by name, type, size, extension, time, permissions, owner, etc.
+➤ Supports powerful actions: delete, move, exec 
+
+
+🔷 If else and for loop in Shell scripting
+1️⃣ IF Statement
+👉 Syntax
+if [ condition ]; then
+    commands
+fi
+
+✅ Example
+num=10
+if [ $num -gt 5 ]; then
+    echo "Number is greater than 5"
+fi
+
+2️⃣ IF–ELSE Statement
+👉 Syntax
+if [ condition ]; then
+    commands
+else
+    commands
+fi
+
+✅ Example
+n=3
+if [ $n -eq 3 ]; then
+    echo "Matched"
+else
+    echo "Not matched"
+fi
+
+3️⃣ IF–ELIF–ELSE Ladder (else-if)
+👉 Syntax
+if [ condition1 ]; then
+    commands
+elif [ condition2 ]; then
+    commands
+else
+    commands
+fi
+
+✅ Example
+marks=90
+
+if [ $marks -ge 90 ]; then
+    echo "Grade A"
+elif [ $marks -ge 80 ]; then
+    echo "Grade B"
+else
+    echo "Grade C"
+fi
+
+🔄 Common Conditions in Shell
+⚡ Numeric:
+-eq   # equal
+-ne   # not equal
+-gt   # greater than
+-lt   # less than
+-ge   # greater or equal
+-le   # less or equal
+
+⚡ Strings:
+=     # equal
+!=    # not equal
+-z    # empty string
+-n    # non-empty string
+
+⚡ Files:
+-e file   # exists
+-f file   # regular file
+-d dir    # directory
+-r        # readable
+-w        # writable
+-x        # executable
+
+✅ FOR Loop in Shell Scripting
+1️⃣ Basic FOR Loop
+for i in 1 2 3 4 5
+do
+    echo "Number: $i"
+done
+
+2️⃣ FOR Loop with Range
+for i in {1..10}
+do
+    echo $i
+done
+
+3️⃣ FOR Loop with Step Size
+for i in {1..10..2}
+do
+    echo $i
+done
+
+4️⃣ FOR Loop Through Files
+for file in *.sh
+do
+    echo "File: $file"
+done
+
+5️⃣ FOR Loop in Classic C-Style (Most used in DevOps)
+for ((i=1; i<=5; i++))
+do
+    echo "Iteration: $i"
+done
+
+🔄 IF inside a FOR Loop 
+for file in *.log
+do
+    if [ -s $file ]; then
+        echo "$file is not empty"
+    else
+        echo "$file is empty"
+    fi
+done
+
+
+🔷 trap command
+trap is used to catch and handle signals in a shell script.
+It allows you to run a custom command before the script exits, when it receives an interrupt, or when an error occurs.
+
+🔄 Important signals 
+| Signal    | Number | Meaning                                |
+| --------- | ------ | -------------------------------------- |
+| `SIGINT`  | 2      | Ctrl + C interrupt                     |
+| `SIGTERM` | 15     | Termination request                    |
+| `EXIT`    | 0      | Script exiting                         |
+| `ERR`     | —      | When any command fails (with `set -e`) |
+
+✅Example:
+trap "echo 'You pressed Ctrl+C. Stopping script...'" SIGINT
+
+✅ Example: Write the script to count the number of s in the letter mississipi
+1️⃣ Method 1: using for loop and if condition
+#!/bin/bash
+count=0
+for letter in mississipi
+do
+    if [ "$letter" == "s" ]; then
+        count=$((count+1))
+    fi
+done
+echo "Number of s's: $count"
+
+2️⃣ Using grep + wc -l
+#!/bin/bash
+count=$(echo "mississipi" | grep -o "s" | wc -l)
+echo "Number of s's: $count"
+
+1️⃣ echo "mississipi"
+➤ Prints the string mississipi to standard output.
+
+2️⃣ | grep -o "s"
+➤ grep -o prints each matching "s" on a new line.
+✅ Output becomes:
+s
+s
+s
+s
+(4 lines because "s" occurs 4 times)
+
+3️⃣ | wc -l
+➤ wc -l counts the number of lines.
+➤ Here, each "s" is one line → 4.
+
+5️⃣ count=$( ... )
+➤ Stores the output (number 4) into the count variable.
+
+6️⃣ echo "Number of s's: $count"
+➤ Prints the final count.
+
+3️⃣ Using “<<<” Here-String Operator
+#!/bin/bash
+x="mississipi"
+
+grep -o "s" <<< "$x" | wc -l
+
+❓ What is <<< ?
+➤ <<< is called a here-string.
+➤ It sends the content of a variable as input to a command.
+
+Equivalent to:
+echo "$x" | command
+
+1️⃣ x="mississipi"
+➤ Stores the string in variable x.
+
+2️⃣ grep -o "s" <<< "$x"
+➤ Takes the string directly from the variable and passes it to grep.
+➤ Again, grep -o prints each "s" on a separate line.
+
+3️⃣ | wc -l
+➤ Counts the number of lines → number of occurrences of s.
+
+Thus output is 4.
+
+🔄 Difference between Method 2 and Method 3
+| Method            | How Input is Passed | When to Use             |                            |
+| ----------------- | ------------------- | ----------------------- | -------------------------- |
+| **echo "text"     | grep**              | Through a pipeline      | Good for hardcoded strings |
+| **grep <<< "$x"** | Via here-string     | Best for variable input |                            |
+
+
+🔷 Crontab
+📌 Crontab = Cron Table
+➤ It is a file that contains scheduled commands.
+➤ These commands run automatically at specific times/dates.
+➤ Cron is the time-based job scheduler in Linux.
+
+🔄 Why is Crontab used?
+To automate tasks such as:
+✔️ Backup files
+✔️ Clean logs
+✔️ Start/stop services
+✔️ Run scripts at fixed intervals
+✔️ Send reports or emails
+✔️ Trigger monitoring or health checks
+✔️ Rotate logs
+✔️ Automate deployments (rare but possible)
+
+❓ Where is it used in DevOps?
+✔️ CI/CD automation
+✔️ Data pipeline scheduling
+✔️ Server maintenance
+✔️ EC2 instance tasks
+✔️ Kubernetes node scripts
+✔️ Managing cron jobs in Docker containers
+✔️ Log cleanup on servers
+
+🔄 Crontab Syntax
+A cron job has 5 time fields + command:
+*  *  *  *  *    command
+│  │  │  │  │
+│  │  │  │  └── Day of week (0–6)  Sun=0
+│  │  │  └───── Month (1–12)
+│  │  └──────── Day of month (1–31)
+│  └─────────── Hour (0–23)
+└────────────── Minute (0–59)
+
+🔄 Basic Crontab Commands
+👉 Edit cron jobs:
+🔗 crontab -e
+
+👉 View cron jobs:
+🔗 crontab -l
+
+👉 Delete all jobs:
+🔗 crontab -r
+
+🔄 How to open a read-only file?
+🔗 vim -r test.txt
+
+🔷 Difference between soft link and hard-link?
+1️⃣ Soft Link (Symbolic Link)
+➤ Works like a shortcut or pointer to another file.
+➤ Stores the path of the original file.
+➤ If original file is deleted → soft link breaks (becomes unusable).
+➤ Can link directories.
+➤ Can link across different file systems (partitions/disks).
+➤ Has a different inode number from the original.
+➤ Size is small (stores only file path).
+
+🔄 Create soft link:
+🔗 ln -s original.txt softlink.txt
+
+
+2️⃣ Hard Link
+➤ A duplicate directory entry pointing to the same underlying file.
+➤ Both original and hard link share the same inode number.
+➤ If original file is deleted → hard link still works
+(because data still exists).
+➤ Cannot link directories.
+➤ Cannot link across different file systems.
+➤ Acts like a copy, but does not take extra space (until content changes).
+➤ Content is the same for both.
+
+🔄 Create hard link:
+🔗 ln original.txt hardlink.txt
+
+🆚 Comparison between soft link and hard-link?
+| Feature                     | Soft Link (Symbolic) | Hard Link                   |
+| --------------------------- | -------------------- | --------------------------- |
+| Link Type                   | Shortcut             | Actual mirror pointer       |
+| Inode Number                | Different            | Same inode as original      |
+| Breaks if original deleted? | ❌ Yes                | ✔ No                        |
+| Can link directories?       | ✔ Yes                | ❌ No                        |
+| Can cross file systems?     | ✔ Yes                | ❌ No                        |
+| File size                   | Small (path only)    | Same as file (shares inode) |
+| Acts like                   | Shortcut             | Real file clone             |
+
+
+🔷 Disadvantages of Shell Scripting
+1️⃣ Hard to Debug
+➤ Error messages are not always clear.
+➤ Debugging large shell scripts is difficult.
+
+2️⃣ Not Portable Across Shells
+➤ Bash script may not run the same in sh, zsh, or dash.
+➤ Different OS versions behave differently.
+
+3️⃣ Poor Error Handling
+➤ No strong exception-handling mechanism.
+➤ Small mistakes can break the entire script.
+
+4️⃣ Difficult to Maintain Large Scripts
+➤ Not suitable for large, complex programs.
+➤ Code becomes messy without strict structure.
+
+5️⃣ Security Risks
+➤ Easy to accidentally expose secrets (passwords, keys).
+➤ Unsafe use of eval, input parameters, or file paths can cause vulnerabilities.
+
+6️⃣ Performance Limitations
+➤ Slower than compiled languages (C, Go, Java).
+➤ Not good for CPU-heavy tasks.
+
+7️⃣ Weak Typing
+➤ No strong data types → errors occur silently.
+➤ Strings and numbers mix easily without warnings.
+
+8️⃣ Limited Functionality
+➤ Cannot create advanced applications (APIs, microservices).
+➤ Mostly useful only for automation, file operations, and system tasks.
+
+9️⃣ Error-Prone Syntax
+➤ Brackets must be spaced correctly: [ $a -eq $b ]
+➤ Quotes, spaces, tabs → small mistakes break script.
+
+🔟 No Standard Library
+➤ Must use external tools (grep, awk, sed) for many operations.
+
+
+1️⃣ Traceroute Command 
+➤ traceroute shows the path (hops) your packet takes from your machine to a destination (server/website).
+➤ Each "hop" is a router or network device.
+➤ Used to diagnose network issues like high latency, packet loss, or routing loops.
+
+✅ How it works
+➤ Sends packets with increasing TTL (Time-To-Live).
+➤ Each router along the path reduces the TTL.
+➤ When TTL becomes zero, the router returns an ICMP Time Exceeded message.
+➤ Traceroute uses these messages to map the entire route.
+
+🧪 Example
+traceroute google.com
+Output shows:
+    ✔️ Hop number
+    ✔️ Router IP
+    ✔️ Time taken in ms (latency)
+
+🎯 Why DevOps uses traceroute
+➤ Checking connectivity between EC2 → RDS, local → server.
+➤ Diagnosing slow network issues.
+➤ Troubleshooting VPC networking problems.
+➤ Identifying firewall or routing issues.
+
+2️⃣ Logrotate — DevOps Notes
+A Linux utility that automatically manages log files by:
+    ✔️ Rotating (renaming old logs)
+    ✔️ Compressing (gzip)
+    ✔️ Deleting old logs
+    ✔️ Setting retention policies
+    ✔️ Scheduling (daily/weekly/monthly)
+    ✔️ Ensuring logs don't fill the disk
+
+🔄 🛠 Why DevOps Needs Logrotate
+Because logs can grow very large and crash servers by consuming disk space.
+
+You use logrotate to:
+    ✔️ Prevent /var/log/ from filling
+    ✔️ Maintain system logs
+    ✔️ Manage application logs (Nginx, Apache, custom logs)
+    ✔️ Auto delete logs older than X days
+
+📌 Default Config File Locations
+👉 Global config file:
+🔗 /etc/logrotate.conf
+
+👉 Service-specific configs:
+🔗 /etc/logrotate.d/
+
+✅ Example logrotate Configuration
+👉 Create a file:
+🔗 /etc/logrotate.d/myapp
+
+👉 Add:
+🔗 /var/log/myapp/*.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    create 0640 root root
+}
+
+✔️ daily → rotate logs every day
+✔️ rotate 7 → keep last 7 logs
+✔️ compress → compress old logs
+✔️ missingok → ignore if file is missing
+✔️ notifempty → don’t rotate empty logs
+✔️ create → create new log with permissions
+
+📌 Run logrotate manually
+🔗 logrotate /etc/logrotate.conf
+
+
+🔷 Write a script to report the usage of AWS in your project?
+!/bin/bash
+
+##########
+#Author :Ankur Verma
+#Date : 20/11/2025
+
+# Version : V1
+
+# This script is about the resource checking of aws"
+#####################################
+
+#AWS S3
+#AWS EC2
+#AWS Lambda
+#AWS IAM
+
+# To run the script in debug mode
+set -x
+
+set -euo pipefail
+
+# list s3 buckets
+echo "Print list of s3 buckets"
+aws s3 ls > resourceTracker
+
+# list EC-2 instances
+echo "Print list of ec-2"
+aws ec2 describe-instances | jq '.Reservations[].Instances[].InstanceId' >> resourceT>
+
+#list Lambda functions
+echo "Print list of lambda functions"
+aws lambda list-functions >> resourceTracker
+
+#list IAM users
+echo "Print list of IAM users"
+
+
+🔷 Script used to write the github uses listed in the collaborations
+#!/bin/bash
+
+helper()
+
+set -x
+set -euo pipefail
+
+# Github API URL
+API_URL="https://api.github.com"
+
+# Github username and personal access token (must be exported in env)
+USERNAME="$username"
+TOKEN="$token"
+
+# User and Repository information from command line args
+REPO_OWNER="$1"
+REPO_NAME="$2"
+
+# Function to make a GET request to the Github API
+function github_api_get() {
+    local endpoint="$1"
+    local url="${API_URL}/${endpoint}"
+
+    # Send a GET request with authentication
+    curl -s -u "${USERNAME}:${TOKEN}" "$url"
+}
+
+# Function to list users with read access
+function list_users_with_read_access() {
+    local endpoint="repos/${REPO_OWNER}/${REPO_NAME}/collaborators"
+
+    # Fetch collaborators with read permission
+    collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.pull == true) | .login')"
+
+    if [[ -z "$collaborators" ]]; then
+        echo "No users with read access found for ${REPO_OWNER}/${REPO_NAME}."
+    else
+        echo "Users with read access to ${REPO_OWNER}/${REPO_NAME}:"
+        echo "$collaborators"
+    fi
+}
+
+# Helper function for argument validation
+function helper() {
+    expected_cmd_args=2
+    if [ $# -ne $expected_cmd_args ]; then
+        echo "Error: Missing required arguments."
+        echo "Usage: $0 <repo-owner> <repo-name>"
+        exit 1
+    fi
+}
+
+
+# Main script
+echo "Listing users with read access to ${REPO_OWNER}/${REPO_NAME}..."
+list_users_with_read_access
+echo "Done."
