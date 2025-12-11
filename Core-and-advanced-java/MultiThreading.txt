@@ -4,7 +4,7 @@ A Program is a set of instructions written in a programming language that tells 
 
 Process❓
 A process is an instance of a program that is being executed. When a program runs, the operating system creates a process to manage its execution.
-When we open Microsoft Word, it becomes a process in the operating system.          
+When we open Microsoft Word, it becomes a process in the operating system.
 
 Thread❓
 A thread is the smallesst unit of execution within a process. A process can have multiple threads, which share the same resources but can run independently.
@@ -31,7 +31,7 @@ Both threads and processes can run in true parallelism, with tasks distributed a
 
 🔷 Thread Creation Techniques
 
-1. Using Thread Class
+1️⃣ Using Thread Class
 
 package p1;
 
@@ -62,7 +62,7 @@ public class intro {
 ➤ The run method is overridden to define the code constitutes the new thread.
 ➤ start method is called to initiate the new thread.
 
-2. Using Runnable Interface
+2️⃣ Using Runnable Interface
 
 package p1;
 
@@ -87,11 +87,51 @@ public class intro {
         }
     }
 }
+
 🔗 Steps:
 ➤ A new class World is created that implements Runnable.
 ➤ The run method is overridden to define the code constitutes the new thread.
 ➤ A Thread object is created by passing an instance of the World class to the Thread constructor.
 ➤ The start method is called to initiate the new thread.
+
+
+3️⃣ Thread creating using Callable Interface + Future Task
+➤ You cannot directly pass Callable to Thread.
+➤ Callable must be wrapped inside a FutureTask.
+
+🔄 Execution flow:
+1️⃣ Define Callable → work to be done
+2️⃣ Wrap in FutureTask → manages result
+3️⃣ Pass FutureTask to Thread → runs asynchronously
+4️⃣ Call future.get() → retrieve output
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+
+public class CallableThreadExample {
+
+    public static void main(String[] args) throws Exception {
+
+        // Step 1: Define Callable
+        Callable<Integer> task = () -> {
+            System.out.println("Task executed by: " + Thread.currentThread().getName());
+            Thread.sleep(1000);
+            return 42; // return some result
+        };
+
+        // Step 2: Wrap in FutureTask
+        FutureTask<Integer> futureTask = new FutureTask<>(task);
+
+        // Step 3: Create and start thread
+        Thread t = new Thread(futureTask);
+        t.start();
+
+        // Step 4: Get result (blocks until thread finishes)
+        int result = futureTask.get();
+        System.out.println("Result: " + result);
+    }
+}
+
 
 
 🔷 Thread Lifecycle

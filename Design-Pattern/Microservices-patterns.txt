@@ -1,0 +1,316 @@
+🔷 Saga Design Pattern
+Saga is a microservices transaction management pattern used when a distributed transaction spans multiple services.
+Instead of using a global transaction (which is impossible across microservices), Saga breaks the workflow into a sequence of local transactions, each with a compensating transaction to undo its effect if anything fails.
+
+Simple idea:
+Each microservice completes its step and triggers the next. If any step fails, compensating actions undo the previous successful steps.
+
+❓ Why Do We Need Saga (Interview Points)
+➤ No distributed ACID transactions across microservices
+➤ Ensures eventual consistency
+➤ Avoids 2-Phase Commit (2PC) which is slow & blocking
+➤ Suitable for long-running business transactions
+➤ Allows failure recovery without rolling back DB transactions
+
+
+✅ 3. Types of Saga
+🔄 Choreography Saga (Event-driven)
+➤ No central orchestrator.
+➤ Each service listens to events and publishes new events.
+
+🔄 Flow:
+Order Service → OrderCreatedEvent
+        ↓
+Payment Service → PaymentCompletedEvent
+        ↓
+Inventory Service → InventoryReservedEvent
+
+
+🔄 If Inventory fails:
+Inventory Service → InventoryFailedEvent
+        ↓
+Payment Service → Compensate Payment (Refund)
+        ↓
+Order Service → Cancel Order
+
+🔄 Pros
+✔️ Simple
+✔️ Fully decoupled
+✔️ Scales well
+
+🔄 Cons
+✔️ Hard to manage complex flows
+✔️ Event chains become messy (“event spaghetti”)
+
+
+🔄  Orchestration Saga
+A central orchestrator decides what to call next.
+
+🔄 Flow:
+Saga Orchestrator
+   ⬇         ⬆ (compensation)
+Order Service
+   ⬇
+Payment Service
+   ⬇
+Inventory Service
+
+🔄 Pros
+✔️ Clear control
+✔️ Easy to modify workflow
+✔️ Easier debugging
+
+🔄 Cons
+✔️ Orchestrator ≈ God service (too much responsibility)
+
+
+🔄 Real-World Use Case — E-Commerce Order Processing
+Scenario: User places an order
+
+👉 Saga workflow:
+1️⃣ Order Service creates order
+2️⃣ Payment Service processes payment
+3️⃣ Inventory Service reserves stock
+4️⃣ Shipping Service schedules delivery
+5️⃣ If inventory fails, Saga triggers compensations:
+6️⃣ Shipping → cancel
+7️⃣Inventory → no-op
+8️⃣ Payment → refund
+9️⃣ Order → mark as failed
+
+
+🔷 Orchestration Saga
+Dependencies
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+
+There are two approaches:
+1️⃣ Choreography: event-driven, decentralized
+2️⃣ Orchestration: central coordinator controls the flow
+
+✅ Real example: Order → Payment → Inventory → Shipping.
+If inventory fails, Saga triggers refund + order cancellation.
+
+🌟 Advantages
+➤ No distributed locks
+➤ Ensures eventual consistency
+➤ Fault-tolerant
+➤ Works naturally in microservices
+➤ Local transactions → faster
+
+❌ Disadvantages
+➤ Hard to debug
+➤ Needs compensating logic for each step
+➤ Event choreography becomes complex
+➤ Temporary inconsistency exists
+
+
+🔄 Quick Text Diagram (Orchestrator)
+[Order Service] 
+     ↓
+[Orchestrator] → calls Payment → OK
+     ↓
+[Orchestrator] → calls Inventory → FAIL
+     ↓
+[Compensating Actions Triggered]
+Payment → refund
+Order → cancel
+
+✅ Example:
+Choreography Saga Pattern (Event-Driven)
+
+👉 We’ll build 3 services:
+1️⃣Order Service
+2️⃣ Payment Service
+3️⃣ Inventory Service
+
+Events:
+1️⃣OrderCreatedEvent
+2️⃣ PaymentCompletedEvent
+3️⃣ InventoryReservedEvent
+4️⃣ Failure events: PaymentFailedEvent, InventoryFailedEvent
+
+🔁 Choreography — Order Service  →  OrderCreatedEvent
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderCreatedEvent {
+    private Long orderId;
+    private double amount;
+}
+
+🔁 Producer: Publish OrderCreatedEvent
+@Service
+public class OrderService {
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    public void createOrder(Long orderId, double amount) {
+        OrderCreatedEvent event = new OrderCreatedEvent(orderId, amount);
+        kafkaTemplate.send("order-created", event);
+
+        System.out.println("OrderCreatedEvent sent: " + event);
+    }
+}
+
+🔁 Choreography — Payment Service
+1️⃣ Listener for OrderCreatedEvent
+@Service
+public class PaymentEventHandler {
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @KafkaListener(topics = "order-created", groupId = "payment")
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        try {
+            System.out.println("Processing payment for order: " + event.getOrderId());
+
+            // simulate success
+            PaymentCompletedEvent paymentEvent =
+                    new PaymentCompletedEvent(event.getOrderId());
+
+            kafkaTemplate.send("payment-completed", paymentEvent);
+
+        } catch (Exception e) {
+            kafkaTemplate.send("payment-failed",
+                    new PaymentFailedEvent(event.getOrderId()));
+        }
+    }
+}
+
+🔁 PaymentCompletedEvent
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PaymentCompletedEvent {
+    private Long orderId;
+}
+
+🔁 Choreography — Inventory Service
+A. Listener for PaymentCompletedEvent
+@Service
+public class InventoryEventHandler {
+
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @KafkaListener(topics = "payment-completed", groupId = "inventory")
+    public void handlePaymentCompleted(PaymentCompletedEvent event) {
+
+        try {
+            System.out.println("Reserving stock for order: " + event.getOrderId());
+
+            // simulate failure
+            throw new RuntimeException("Stock not available!");
+
+        } catch (Exception e) {
+            kafkaTemplate.send("inventory-failed",
+                    new InventoryFailedEvent(event.getOrderId()));
+        }
+    }
+}
+
+🔁 Choreography — Compensation Example
+Payment Service compensates on inventory failure
+@Service
+public class InventoryFailedListener {
+
+    @KafkaListener(topics = "inventory-failed", groupId = "payment-compensation")
+    public void compensatePayment(InventoryFailedEvent event) {
+        System.out.println("Compensating Payment → Refund for order: " + event.getOrderId());
+        // refund logic here
+    }
+}
+
+
+✅ 2. Orchestration Saga Pattern (Coordinator + Services)
+
+Here we introduce a Saga Orchestrator, which calls microservices and triggers compensations on failure.
+🔄 Services:
+1️⃣ Order Service
+2️⃣ Payment Service
+3️⃣ Inventory Service
+4️⃣ Saga Orchestrator
+
+🔁 Orchestrator Class
+@Service
+public class OrderSagaOrchestrator {
+
+    @Autowired
+    private PaymentClient paymentClient;
+
+    @Autowired
+    private InventoryClient inventoryClient;
+
+    public void startSaga(Long orderId, double amount) {
+
+        try {
+            System.out.println("Saga started for order: " + orderId);
+
+            // Step 1: payment
+            paymentClient.process(orderId, amount);
+
+            // Step 2: inventory
+            inventoryClient.reserve(orderId);
+
+            System.out.println("Saga completed → Order confirmed");
+
+        } catch (Exception e) {
+            System.out.println("Saga failed → Triggering compensations");
+
+            paymentClient.refund(orderId);
+            inventoryClient.release(orderId);
+
+            System.out.println("Compensation completed → Order Cancelled");
+        }
+    }
+}
+
+🔁 Payment Client (REST call)
+@Service
+public class PaymentClient {
+
+    public void process(Long orderId, double amount) {
+        System.out.println("Payment processed for " + orderId);
+    }
+
+    public void refund(Long orderId) {
+        System.out.println("Refund issued for " + orderId);
+    }
+}
+
+🔁 Inventory Client (REST call)
+@Service
+public class InventoryClient {
+
+    public void reserve(Long orderId) {
+        System.out.println("Stock reserved for order: " + orderId);
+
+        // simulate failure
+        throw new RuntimeException("Stock unavailable!");
+    }
+
+    public void release(Long orderId) {
+        System.out.println("Stock released for order: " + orderId);
+    }
+}
+
+🔁 Order Service triggers the orchestrator
+@RestController
+@RequestMapping("/order")
+public class OrderController {
+
+    @Autowired
+    private OrderSagaOrchestrator orchestrator;
+
+    @PostMapping("/create")
+    public String createOrder(@RequestParam Long id,
+                              @RequestParam double amount) {
+        orchestrator.startSaga(id, amount);
+        return "Order processing started";
+    }
+}

@@ -1,0 +1,3226 @@
+🔷 TypeScript
+➤ TypeScript is a superset of JavaScript.
+➤ It is a programming language built on JavaScript.
+➤ TypeScript has all the features of JavaScript plus extra features like:
+1️⃣ interface
+2️⃣ access modifiers
+
+These features are not available in the latest version of JavaScript.
+
+🎯 Why Use TypeScript?
+➤ TypeScript makes writing JavaScript easier, cleaner, less error-prone.
+➤ You can write simple code in TypeScript which compiles to complex JavaScript logic.
+➤ Helps avoid bugs and identity
+
+⚠️ Limitation of TypeScript
+➤ TypeScript code cannot be executed directly by JavaScript runtimes like:
+1️⃣ Browser
+2️⃣ Node.js
+
+⚙️ How TypeScript Works
+➤ TypeScript is also a tool — a powerful compiler.
+➤ It compiles TypeScript code into JavaScript code.
+➤ Then this JavaScript code can be run by:
+1️⃣ Browser
+2️⃣ Node.js
+
+➤ We don’t write JavaScript directly when using TypeScript.
+➤ We write TypeScript, then compile it to JavaScript.
+
+🤔 How can TS use new features if JS doesn’t support them?
+➤ The TypeScript compiler uses workarounds in JavaScript.
+➤ TS features are compiled into equivalent JavaScript using:
+1️⃣ Existing JavaScript features
+2️⃣ More complex JS code
+➤ There's no magic
+➤ You write simple code in TypeScript -> gets converted into complex JS code.
+
+TypeScript is strongly typed, whereas Javascript is dynamically typed.
+
+
+####################################
+📘 TypeScript Installation & Setup
+####################################
+🔷 Compile TypeScript Code
+Open terminal in the project folder.
+
+Run the compiler: 
+🔗 tsc app.ts
+This generates app.js.
+
+🔗 tsc app.ts --watch  #continuously watches the typescript file and changes to Javascript
+
+
+##########################
+📘 TypeScript – Variables
+##########################
+➤ A variable is a named storage where we can store a value.
+
+🔄 Creating Variables in TypeScript
+Variables can be created using let or const keywords.
+
+let num=100;
+const str="hello world";
+
+🔄 let vs const
+| Feature                 | `let`                      | `const`                               |
+| ----------------------- | -------------------------- | ------------------------------------- |
+| Initialization Required | ❌Not required immediately | ✅ Must be initialized immediately   |
+| Can Reassign Value      | ✅ Yes                     | ❌ No, value cannot be changed       |
+| Example (Valid)         | `let x; x = 10;`           | `const y = 5;`                        |
+| Example (Invalid)       | –                          | `const y;`(❌  Error: must initialize)|
+
+
+################################
+🔄 Type Inference in TypeScript
+################################
+TypeScript automatically infers the type at the time of initialization.
+
+Example:
+let num=100; //inferred as number
+
+Once the type is set, it cannot be changed.
+num=true // ❌ Error: boolean not assignable to number
+
+🔄 Rules for Naming Variables
+1. Allowed characters- Letters, digits, _(underscore), {dollar sign}
+2. Cannot start with a digit.
+3. Valid start characters: A letter, _, $
+4. Case Sensitive
+5. Reserved Keywords not Allowed
+
+
+############################
+📘 Datatypes in TypeScript
+############################
+
+⚡ Note: 
+➤ With Backticks we can write multi line string, not possible normally also allows expression interpolation.
+➤ TypeScript numbers are always floating point numbers even if we don't see or write it.
+
+🔄 Common Data Types in  TypeScript
+1️⃣ string: Textual data or a sequence of characters.
+2️⃣ number: All numeric values(both integers and float).
+3️⃣ boolean: true or false
+
+0, null, undefined is a falsy values.
+
+📘 Explicit Typing & Type Inference
+
+🔄 Explicit Typing: You can explicitly specify data types for:
+➤ Function parameters
+➤ Variables
+➤ Function return value
+
+function sum(num1:number,num2:number):number{
+    return num1+num2;
+}
+If non-number values are passed, TypeScript gives a compile-time error.
+
+🔄 Without Explicit Types
+If no type is specified, any type can be passed, which can lead to unexpected results.
+
+function sum(num1,num2){
+    return num1+num2;
+}
+
+sum("12",13); //Output: "1213" (string concatenation!)
+
+🔄 Explicit Types for Variables
+let n1:number=10;
+let msg:string= "Result is"
+
+🔄 Type Inference
+TypeScript automatically infers the type of a variable when you assign a value during declaration.
+
+let n1=10; //inferred as number
+let name= "Ankur" //inferred as string
+
+After inference, the type cannot be changed
+n1= "Hello" //❌ Error: string not assignable to number
+
+🔄 Type Inference in Functions
+If you define parameters without types, any value can be passed (not recommended).
+➤ Always use explicit typing in function parameters for safety.
+
+🔄 Comparison with JavaScript
+| Feature              | JavaScript          | TypeScript               |
+| -------------------- | ------------------- | ------------------------ |
+| Typing               | Dynamic             | Static (strong typing)   |
+| Type Errors          | Detected at runtime | Detected at compile time |
+| Variable Type Change | Allowed             | Not Allowed              |
+
+
+##########################
+📘 Objects in TypeScript
+##########################
+🔄 Creating Objects in TypeScript
+
+let person={
+    name:"John",
+    age:30
+};
+Just like JavaScript- Key value pairs
+
+🔄 Type Inference for Objects
+➤TypeScript infers the structure of the object at initialization.
+➤If you reassign an object with extra or missing properties, it throws an error.
+
+person={
+    name:"Mark",
+    age:32,
+    gender:"male" //❌ Error: gender is not expected
+};
+
+🔄 Explicit Object Typing
+let person: {name:string,age:number}={
+    name:'John",
+    age:30
+}
+Only objects matching this structure can be assigned.
+
+🔄 Assigning object as a Type (Generic)
+let person: object;
+Accepts any object, but accessing specific properties will give error(TypeScript doesn’t know what properties exist).
+
+🔄 Accessing Properties Notations
+console.log(person.name); // if name exist
+console.log(person["age"]); // square bracket notation
+
+🔄 Nested Object Typing
+let person:{
+    name:string;
+    age:number;
+    address:{
+        city: string;
+        country: string;
+    }
+}={
+    name:"John",
+    age:30,
+    address:{
+        city:"London",
+        country:"UK"
+    }
+};
+
+🔄 JavaScript vs TypeScript
+| Feature                | JavaScript       | TypeScript             |
+| ---------------------- | ---------------  | --------------------   |
+| Type Safety            | ❌ No            | ✅ Yes                |
+| Extra Property Check   | ❌ Allowed       | ✅ Error              |
+| Property Inference     | ❌ Not available | ✅ Strong inference   |
+| Accessing Missing Keys | `undefined`      | ❌ Compile-time error  |
+
+
+##########################
+📘 Arrays in TypeScript
+##########################
+➤ Just like JavaScript, an array is a collection of values.
+➤ Syntax to create an array is the same [], but TypeScript adds type safety.
+
+🔄 Type Inference in Arrays
+let person=["John",28,"male",1000];
+
+TypeScript infers: (string | number)[] -> An array of string or number.
+
+🔄 Restriction Based on Inferred Type
+person.push(true);// ❌ Error: boolean not allowed
+person.push(500);// number allowed
+
+🔄 Arrays with Single Type
+let names= ["Alice", "Bob"] // string[]
+Push any value not matching the type -> ❌ Error
+
+🔄 Explicitly Typing Arrays
+let names: string[] = [];           // only strings allowed
+names.push("John");                 // ✅ OK
+names.push(42);                     // ❌ Error
+
+// Use | (pipe) operator for multiple allowed types:
+let person: (string | number)[] = ["John", 28]; // ✅
+person.push(true); // ❌ Error if boolean not included
+
+Accessing of elements we use traditional indexing method
+
+Use for...of loop:
+for(let year of birthYears){
+    console.log(year);
+}
+
+📌 Key Differences from JavaScript
+| Feature                   | JavaScript         | TypeScript            |
+| ------------------------- | ----------------   | --------------------  |
+| Type Safety               | ❌ No             | ✅ Yes                |
+| Invalid Type Insertion    | Allowed            | ❌ Compile-time error|
+| Explicit Type Declaration | ❌ Not applicable | ✅ Supported          |
+| Code Autocompletion       | Limited            | ✅ Strong support    |
+
+
+###################################
+🔷 What is a Tuple in TypeScript?
+###################################
+➤ A Tuple is a fixed length, ordered collection of elements.
+➤ Each position in the tuple has a specific data type.
+➤ Not available in JavaScript, but compiled to an array in JS.
+
+let employee:[number,string,number,boolean];
+employee=[1123,"John", 2000,true];
+➤ We cannot add 5th element but there is an exception
+
+❗ Exception: Push Method
+Even though tuples are fixed-length, you can still push values to them without error:
+
+employee.push(100): //✅No compiler error
+This is a TypeScript limitation, not enforced at runtime or by push.
+
+❌ Common Errors
+➤ Assigning more/fewer values than defined:
+employee = [1, "Mark", 1200];     // ❌ Error: needs 4 elements
+employee = [1, "Mark", 1200, true, 100]; // ❌ Error: too many elements
+
+➤ Assigning wrong types:
+employee = ["one", "John", 2000, true]; // ❌ Error: "one" is not a number
+
+🚫 Why Not Use Tuples for Random, Long, Mixed Data?
+Because:
+➤ Tuples are meant for structure (e.g., [id, name, active])
+➤ Not meant for arbitrary or unpredictable values
+
+Tuples can be reassinged when it have same type of elements in the ordered manner in fixed defined length.
+
+
+######################
+🔶 TypeScript enum
+######################
+➤ A special data type used to define a set of named constants.
+➤ Not available in plain JavaScript, only in TypeScript.
+➤ Used for cleaner, more readable code especially when dealing with fixed categories(e.g. user roles,states);
+
+enum Roles{
+    Admin,
+    ReadOnly,
+    WriteOnly,
+    ReadWrite
+}
+By default 
+➤ Admin=0, ReadOnly=1,WriteOnly=2,ReadWrite=3
+
+🔄 Example
+let user={
+    name:"Ankur",
+    age:30,
+    role:Roles.Admin
+};
+
+if(user.role==Roles.Admin){
+    console.log("This user is Admin");
+}
+
+✍️ Explicit Value Assignment
+Numeric:
+enum Roles {
+  Admin = 100,
+  ReadOnly = 200,
+  WriteOnly = 300,
+  ReadWrite         // → 301 (auto-increment from previous)
+}
+
+String:
+enum Roles {
+  Admin = "ADMIN",
+  ReadOnly = "READ_ONLY"
+}
+
+Mixed (⚠ Not recommended):
+enum Roles {
+  Admin = "ADMIN",
+  ReadOnly = 2
+}
+
+Note:Can be mixed with string and number but initialization should end with number only
+
+🌀 Compilation to JavaScript
+➤ TypeScript compiles enums to IIFE(Immediately Invoked Function Expression) functions to generate bi-directional mappings.
+
+✅ When to Use Enum
+➤ When you need fixed categories (roles, permissions, statuses).
+➤ To avoid hardcoded strings or magic numbers in your logic.
+➤ When you want autocompletion + type safety.
+
+🚫 Caution
+➤ Enums are not available in JS- they're a TypeScript-only feature.
+Use const enum for performance(inlines the values), but it doesn't support reverse mapping.
+
+
+#########################
+🔶 TypeScript any Type
+#########################
+➤ any is the most flexible type in TypeScript.
+➤ A variable declared as any can hold any kind of value:number, string, boolean, array, object ect.
+➤ Disables type checking, like JavaScript.
+
+let data: any;
+
+data = 42;          // ✅ No error
+data = "hello";     // ✅ No error
+data = true;        // ✅ No error
+data = [1, 2, 3];   // ✅ No error
+data = { a: 1 };    // ✅ No error
+
+📚 any[] — Array of Any
+let arr: any[] = [1, "two", true, null, undefined];
+
+⚠️ Why to Avoid any
+➤ Removes all the benifits of TypeScript.
+➤ Turns TypeScript code into JavaScript-like untyped code.
+➤ May lead to runtime bugs since type saftey is lost.
+
+✅ Use Case
+➤ When you don't know the type in advance(e.g. external libraries, user inputs, JSON, parsing).
+➤ Type is dynamic or varies at runtime.
+
+🕵️ Variable with No Type or Value
+let test;  // No value, no type
+console.log(typeof test);  // "undefined"
+console.log(test);         // undefined
+
+➤ TypeScript infers test as any if used without initialization.
+➤ Both type and value will be undefined.
+
+
+############################
+🟣 TypeScript: Union Types
+############################
+➤ A Union Type allows a variable, parameter or return type to hold more than one type.
+
+let data: string|number; ( | ) know as pipe operator
+Here data can hold either a string or a number.
+
+✅ Example 1: Union in Variables
+let user:{name:string,age:number} | null;
+
+✅ Example 2: Union in Function Parameters
+function printStatus(message:string,code:string|number){
+    if(typeof code==="string"){ //here typeof is a type guard
+        code =code.trim(); //✅Safe: Only used if code is string
+    }
+    console.log(`${message}- Status Code: ${code}`);
+}
+➤To access type-specific methods, you need type guards (typeof, instanceof, etc.).
+
+printStatus("Success",200);
+printStatus("Not found","404");
+
+❗Common Pitfall
+➤ Trying to call methods that only exist on one of the types:
+code.trim(); // ❌ Error: 'trim' might not exist on type 'number'
+
+✔️ Fix:
+Use a type check:
+if (typeof code === "string") {
+  code = code.trim();
+}
+
+✅ When to Use Union Types
+➤ When you expect multiple possible input types.
+➤ When a variable can be nullable.
+➤ For flexibility with controlled safety (better than any).
+
+
+##############################
+🟡 TypeScript: Literal Types
+##############################
+A literal type allows you to restrict a variable to a specific value, not just a general type.
+➤ Unlike string,which accepts any string value, a literal type like "admin" only accepts that exact value
+
+✅ Example 1: Literal Type in a Constant
+const status="hello world";
+
+➤ TypeScript infers:
+status:"hello world"(Literal Type)
+➤ Not just string -- it's exactly "hello world".
+
+🆚 Difference Between const and let
+const msg = "hi";       // msg: "hi" (literal)
+let msg2 = "hi";        // msg2: string
+
+✅ Example 2: Literal Types in Function Parameters
+function roleMessage(role:"admin" | "read" | "read-write"){
+    switch(role){
+        case "admin":
+        console.log("You have admin permissions");
+        break;
+        case "read":
+        console.log("You have read permissions");
+        break;
+        case "read-write":
+        console.log("You have read-write permissions");
+        break;
+        default:
+        console.log("Unknown role");
+    }
+}
+
+roleMessage("admin");         // ✅ allowed
+roleMessage("read-write");    // ✅ allowed
+roleMessage("guest");         // ❌ error at compile time
+
+🔁 Literal Types Can Be:
+Strings: "start" | "stop"
+Numbers: 1 | 2 | 3
+Booleans: true | false
+Null / Undefined: null | undefined
+
+⚠️ Why Use Literal Types?
+➤ Adds strict control over allowed values.
+➤ Prevents invalid inputs at compile time.
+➤ Helps in writing safe and predictable code (especially with switch, API requests, enums, etc.).
+
+
+##########################
+🟡 TypeScript: Type Alias
+##########################
+➤ A Type Alias allows you to give a custom name to a type(primitive, union, literal, object etc).
+➤ It helps in writing clean, reusable, and maintainable code by avoiding type repition.
+
+✅ Syntax
+type CustomTypeName = existingType;
+
+✅ Example 1: Alias for a Primitive Type
+type StringType=string;
+let message:StringType="Hello World!";
+StringType is now a custom alias for string.
+
+✅ Example 2: Alias for a Union Type
+type StringOrNumber= string | number;
+
+function printCode(code: StringOrNumber) {
+  console.log(code);
+}
+➤ Instead of repeating string | number, you can use the alias StringOrNumber.
+
+✅ Example 3: Alias for an Object Type
+type User={
+    firstName:string;
+    lastName:string;
+    age:number;
+};
+
+function getFullName(user:User):string{
+    return `${user.firstName} ${user.lastName}`;
+}
+
+🧠 Bonus Tip: You can even alias complex types like:
+
+type UserList = User[];
+type Callback = (value: number) => void;
+
+
+#####################################
+🟡 TypeScript: Function Return Types
+#####################################
+➤ The return type of a function indicates the type of value that function will return.
+➤ You can either:
+Let TypeScript infer the return type automatically.
+Explicitly define the return type using :type Syntax
+
+✅ Syntax
+
+function functionName(params): returnType {
+  // logic
+  return value;
+}
+
+✅ Examples
+1️⃣ Function That Returns a Value
+
+function add(num1:number,num2:number):number{
+    return num1+num2;
+}
+➤ Return type is explicitly declared as numbers
+➤ TypeScript can also infer this if return type is not specified.
+
+2️⃣ Incorrect Return Type
+function add(num1: number, num2: number): string {
+  return num1 + num2; // ❌ Error: number is not assignable to string
+}
+
+3️⃣ Return Type Inferred as string
+function add(num1: number, num2: number) {
+  return (num1 + num2).toString();
+}
+
+4️⃣ Function That Returns Nothing
+function add(num1: number, num2: number): void {
+  console.log(num1 + num2);
+}
+➤ void means that function doesn't return anything.
+➤ Even if you use return; without a value, it is still void.
+
+5️⃣ Return Type as undefined (Not Recommended)
+function add(num1: number, num2: number): undefined {
+  console.log(num1 + num2);
+  return undefined;
+}
+Works, but not recommended.
+✅ Prefer void over undefined for clarity and convention.
+
+➤ If no return statment is used, TypeScript infers return type as void.
+
+
+################################################
+🟣 TypeScript: Function Types as Variable Types
+################################################
+🧠 What You Already Know
+➤ We can add types to function parameters and return types.
+➤ We can assign a function to a variable in Javascript.
+
+🔸 Example: Assigning Function to Variable
+function greeUser(user:{name:string}){
+  console.log(`Hello ${user.name}`)
+}
+
+let greet=greeUser; // ✅ Valid
+✅ We can now call greet({name:"John"}) and it will behave like greeUser. 
+
+❗ Problem with any Type
+If no type is defined for greet, its type is inferred as any:
+
+let greet:any=greeUser;
+greet=100; // ❌ Allowed, but dangerous!
+
+➤Can accidentally assign non-function values (like 100, true, "text") to greet.
+➤This cause runtime errors (e.g. greet is not a function) without compile-time warning.
+
+✅ Solution 1: Use General Function Type
+let greet:Function =greeUser;
+greet=100; // ❌ Error at compile time
+
+➤Function restricts assignment to function values only.
+➤❌ But it doesn’t check the parameter or return types of the function.
+
+✅✅ Solution 2: Use Specific Function Signature
+➤Specify the exact structure (Signature) of the function:
+
+let greet:(user:{name:string})=>void;
+
+Now only function that:
+➤Accepts a single user object with a name Property
+➤Return void
+➤...can be assigned to greet
+
+🔍 Detailed Example
+type User = { name: string; age: number };
+
+function greetUser(user: User): void {
+  console.log(`Hello ${user.name}`);
+}
+
+function isEligible(user: User): void {
+  console.log(user.age >= 18);
+}
+
+function sum(a: number, b: number): number {
+  return a + b;
+}
+
+// Declare variable with specific function signature
+let greet: (user: User) => void;
+
+greet = greetUser;   // ✅
+greet = isEligible;  // ✅
+greet = sum;         // ❌ Error - Signature mismatch
+
+🟦 TypeScript: Function Types for Variables & Callbacks
+###########################################################
+
+We can assign a function to a variable, and define the expected function signature using function types.
+
+let addNumbers:(a:number,b:number) => number;
+
+function sum(x:number,y:number):number{
+  return x+y;
+}
+
+addNumbers=sum; // ✅ Matches signature
+
+🔁 Callback Functions with Function Types
+We can also define function types as parameter types (for callback functions).
+
+✅ Example: Defining a Function with a Callback
+function getResult(num1:number,num2:number,print:(msg:string,result:number) =>void):void {
+  const result=num1+num2;
+  print("Sum =",result);
+} 
+
+📘 Callback Function Example
+function display(message:string,result:number):void{
+  console.log(`${message}${result}`);
+}
+
+🔄 Calling with Callback
+getResult(12,13,display); // Output: Sum = 25
+
+⚠️ What If We Pass Invalid Types?
+If the callback parameter is not a function or does not match the signature, TypeScript shows compile-time errors
+
+📌 Why Use Function Types for Callbacks?
+➤Prevents bugs during runtime.
+➤Ensures correct usage of callbacks.
+➤Helps with IntelliSense and auto-completion.
+➤Makes function contracts clear and safe.
+
+✅ Best Practice
+Always define callback function types explicitly when:
+➤Passing a function as an argument
+➤Returning a function from another function
+➤Storing a function in a variable
+
+🔄 TypeScript unknown Type
+###########################
+
+🧠 What Is unknown?
+➤unknown is a type-safe counterpart of any.
+➤It is used when you don't yet know what type of data a variable can hold.
+➤Unlike any, it forces you to do a type check before using the variable.
+
+✅ unknown vs any
+| Feature                        | `any`          | `unknown`  |
+| ------------------------------ | -------------- | ---------- |
+| Can hold any value             | ✅ Yes          | ✅ Yes      |
+| Type checking before usage     | ❌ Not required | ✅ Required |
+| Type-safe                      | ❌ No           | ✅ Yes      |
+| Suitable when type is unknown? | ⚠️ Not ideal   | ✅ Ideal    |
+
+💡 Use Case
+let inputVal:unknown;
+inputVal = 123;         // valid
+inputVal = "hello";     // valid
+inputVal = [1, 2, 3];   // valid
+✅ All types can be assigned to unknown.
+
+let uname:string;
+uname=inputVal; // ❌ Error: Type 'unknown' is not assignable to type 'string'
+
+We must narrow the type:
+if(typeof inputVal==="string") uname=inputVal;
+
+🚫 Why Not Use any?
+Using any disables all type safety:
+let inputVal:any;
+let uname:string=inputVal; // ✅ No error, but could lead to runtime bugs
+
+Whereas unknown prevents unsafe assignment unless you explicit verify the type.
+
+🧪 Real-Life Scenario
+You get data from an API reponse or user input and aren't sure of its type at first:
+
+function handleInput(data:unknown){
+  if(typeof data==="number"){
+    console.log("Square:",data*data);
+  }
+  else{
+    console.log("Invalid number input); 
+  }
+}
+
+🔥 TypeScript never Type
+#########################
+
+🚫 What Is never?
+➤The never type represents a value that never occurs.
+➤A function with return type (never) never completes normally:
+It either throw an error.
+Or it runs forever (like an infinite loop).
+
+It’s more strict than void — not even undefined is returned.
+
+✅ When to Use never
+You use never when a function
+1. Always thows an error
+2. Never finishes executing (infinite loop)
+
+🔁 never vs void
+| Feature                  | `void`                              | `never`                                              |
+| ------------------------ | ----------------------------------- | ---------------------------------------------------- |
+| Used for functions that: | Finish but return nothing           | Never finish or always throw                         |
+| Returns value?           | ❌ No value, but returns `undefined` | ❌ No return at all — not even `undefined`            |
+| Logged output            | Logs `undefined`                    | Logs nothing (because function crashes or loops) |
+
+🧪 Examples
+✅ 1. Error-Throwing Utility Functions
+Imagine a utility function that always throws an error when something goes wrong — this is a perfect case for never:
+
+function throwError(message: string): never {
+  throw new Error(message);
+}
+✅ Real-Life Scenario:
+In an API or validation library:
+
+function validateUser(data: any) {
+  if (!data.email) {
+    throwError("Email is required"); // return type: never
+  }
+}
+Here, throwError() stops the execution and will never return.
+
+❌ No value is ever returned — just throws.
+
+2. Function with infinite loop → never
+function runForever():never{
+  while(true){
+    console.log("Running...")
+  }
+}
+🚫 Never exits → return type is never.
+console.log(runForever());           // keeps running, no output after
+
+✅ 2. Exhaustive Type Checking (with never)
+When you use discriminated unions, never helps ensure that all cases are handled — very common in Redux, state machines, or switch cases.
+
+🔄 Example: Handling shape types
+
+type Shape = 
+ { type: "circle"; radius: number } | { type: "square"; side: number };
+
+function getArea(shape: Shape): number {
+  switch (shape.type) {
+    case "circle":
+      return Math.PI * shape.radius * shape.radius;
+    case "square":
+      return shape.side * shape.side;
+    default:
+      const _exhaustiveCheck: never = shape; // ❌ Error if new shape type is added but not handled
+      throw new Error("Unhandled shape type");
+  }
+}
+✅ Real-Life Scenario:
+In large applications, this pattern ensures that all variants of a type are covered. If a new shape is added (like "triangle"), TypeScript will force you to handle it.
+
+✅ 3. Unreachable Code Detection
+In deeply nested logic or switch cases, never can help identify unreachable code:
+
+function process(value: string | number) {
+  if (typeof value === "string") {
+    console.log("string value:", value);
+  } else if (typeof value === "number") {
+    console.log("number value:", value);
+  } else {
+    const unreachable: never = value; // Will throw error: Type 'string | number' is not assignable to 'never'
+  }
+}
+
+⚠️ Default Behavior
+If you don’t write the return type:
+➤Functions that throw or loop forever will not be automatically inferred as never.
+➤You'll have to explicitly set it to never.
+
+🔶 What is Array Destructuring?
+#################################
+
+Array Destructuring is an ES6 feature that allows unpacking values from arrays  into individual Variables using a clean, concise syntax.
+
+✅ Traditional Way (Without Destructuring)
+
+const person=["John","Smith",28];
+const fName=person[0];
+const lName=person[1];
+const age=person[2];
+This becomes verbose for larger arrays.
+
+✅ Destructuring Syntax
+
+const [fName,lName,age]=person;
+
+➤Uses square brackets [].
+➤Assign based on position/index.
+
+🔷 Important Points
+1. 🔄 You Can Skip Elements
+const [fName,,age]=person; //skips the second element
+
+2. 🔄 Fewer Variables Than Elements
+const [fName,lName]=person; //only first two elements used
+
+3. 🔄 More Variables Than Elements
+const [fName,lName,age,gender="Male"]=person;
+If gender is missing, it will default to "Male" if not defined the default value then it will assigned with undefined.
+
+5. 🔄 Original Array is Untouched
+Destructuring does not modify the original array.
+
+✅ Use Cases
+➤Returning multiple values from a function.
+➤Extracting parts of an API response.
+➤Clean, readable assignments from arrays.
+
+🔶 What is Object Destructuring?
+##################################
+
+Object destructuring is an ES6 feature that allows ys to extract properties from an object and assign them to variables in a single line using a concise syntax.
+
+✅ Traditional Way (Without Destructuring)
+const user={
+  forname:"John",
+  age:28,
+  gender:"Male"
+};
+
+const forname=user.forname;
+const age=user.age;
+const gender=user.gender;
+
+✅ With Object Destructuring
+
+const {forname,age,gender}=user;
+
+➤Uses curly braces {}.
+➤The variable name must match the property name in the object.
+➤Destructuring is based on property names, not order like arrays.
+
+🔷 Important Points
+
+1. 🔄 Variable Names Must Match Object Keys
+const {forname}=user; //OK
+const {name}=user; // ❌ Error (or `undefined` in JS) – no such property
+
+2. 🔄 Using Aliases for Variables
+If you want the variable name to be different from the property name:
+
+const {forname:fname}=user;
+console.log(fname);   //John
+
+➤forname is a property name and fname is the new variable name.
+
+3. 🔄 Mixing Destructuring with Aliases
+const {forname:fname,age,gender}=user;
+
+4. 🔄 Handling Non-Existent Properties
+const {country}=user; // ❌ Error: Property 'country' does not exist on type
+
+➤Ensure the object type includes country.
+➤Or use optional chaining (for nested objects)/defaults:
+const {country="India"}=user;
+
+✅ What is the Spread Operator?
+##################################
+The spread operator(...) is a feature introduced in ES6 that unpacks elements from array or properties from objects into individual values or properties.
+
+const arr=[1,2,3]
+console.log(...arr); //Output: 1 2 3
+
+🔷 Use Cases of the Spread Operator
+
+1. 🔁 Extract Elements from an Array
+const user=["John","Mark","Mary"]
+console.log(...user)// Output: John Mark Mary
+
+2. 📋 Shallow Copy of an Array
+const user=["John","Mark","Mary"]
+const copyUsers=[...users];
+
+copyUsers.push("Steve");
+console.log(copyUsers); // // ["John", "Mark", "Mary", "Steve"]
+console.log(users); // // ["John", "Mark", "Mary"]
+
+3. ➕ Merging Arrays / Adding Elements
+const users = ["John", "Mark", "Mary"];
+const extendedUsers = ["Ravi", "Steve", ...users];
+console.log(extendedUsers); // ["Ravi", "Steve", "John", "Mark", "Mary"]
+
+✅ Spread brings in elements not as an array, but as individual items.
+
+4. 📦 Using Spread in Objects
+const person={
+  firstName:"John",
+  age:28,
+  gender:"male"
+};
+
+const employee={
+  ..person,
+  salary:1200,
+  company:"Google"
+};
+
+console.log(employee);
+//Output
+{
+  firstName:"John",
+  age:28,
+  gender:"male",
+  salary:1200,
+  company:"Google"
+};
+
+🔄 Copies all key-value pairs from person into employee.
+
+❗ Important Notes
+🔸 Shallow Copy Only
+Spread operator does not deep clone nested structures.and hence the nested object will be copied as reference so when we change in one object it will change the other also.
+
+const nested = [{ name: "John" }];
+const copy = [...nested];
+
+copy[0].name = "Steve";
+console.log(nested[0].name); // "Steve" 😱
+
+✅ Rest Pattern & Rest Parameters (ES6)
+########################################
+
+Both use three dots(...), just like spread operator, but their purpose is opposite.
+
+🔄 1. Rest Pattern (Used in Destructuring)
+➤Collects remaining elements in the array
+➤Used on the left side of assignment(=)
+
+Example (Array Destructuring)
+
+const [a,b,...rest]=[1,2,3,4,5]
+console.log(a); //1
+console.log(b); //2
+console.log(rest); //3,4,5
+➡️ rest gathers the remaining elements into a new array
+
+⚠️ Note:
+➤Only one rest variable allowed
+➤Must be at the end when destructuring
+
+🔄 2. Rest Parameters (Used in Functions)
+Allows passing any number of arguments int a single array parameter.
+Also used on the left side (in the function parameter list);
+
+🧪 Example:
+function addNumbers(...numbers:numbers){
+  let sum=0;
+  for(const num of numbers){
+    sum+=num;
+  }
+  return sum;
+}
+
+console.log(addNumbers(1,2,3,4,5)); //15
+➡️ numbers becomes an array of all passed arguments.
+
+✅ Nullish Coalescing Operator (??) in TypeScript
+###################################################
+To provide a default value only when a variable is null or undefined- not when it's 0,false, or an empty string.
+
+Syntax: let result=value ?? defaultValue;
+
+✅ TypeScript Example
+let username:string | null=null;
+let displayName:string=username ?? "Guest";
+console.log(displayName); // Guest
+
+🔸 Falsy But Valid:
+let age:number | undefined=0;
+let userAge:number=age ?? 18;
+
+console.log(userage); //0
+💡 0 is falsy, but not null or undefined- so it reamins.
+
+ || 🆚 ?? in TypeScript
+
+ let title:string | null ="";
+
+ let result1= title || "untitled"; // untitled
+ let result2= title ?? "untitled"; //""
+
+ Explanation:
+ || considers ""(empty string) as falsy and uses "untitled"
+ ?? keeps the empty string since it's not null or undefined.
+
+ 🔐 Type Safety Benefit
+When you declare a union type:
+
+let message: string | null | undefined;
+
+Using ?? ensures that you handle only the nullish case explicitly
+
+let finalMessage:string=message ?? "No message";
+🔸No need to check "" or false values seperately- TypeScript knows the variable may be nullish, and ?? fixes that safely.
+
+✅ Optional Chaining (?.) in TypeScript
+########################################
+Optional chaining is a safe way to access nested object properties, methods or array elements without having to manually check for null or undefined at each level.
+
+🔸 Why We Use It?
+When working with:
+➤Backend data (e.g. API response)
+➤Deeply nested objects, Or
+➤DOM elements that might not exist,
+
+you risk runtim errors like:
+❌ Cannot read properties of undefined (reading 'something')
+
+Optional chaining prevents these by short-circuiting the expression when something is null or undefined.
+
+🧠 Syntax
+object?.property
+object?.[index]
+object?.method?.()
+
+✅ Example in TypeScript
+
+🔄 Basic Setup:
+const products: Product[] = [
+  { name: "iPhone", price: 99999, details: { color: "black", ram: "8GB" } },
+  { name: "T-shirt", price: 899, details: { color: "blue" } },
+  { name: "Book", price: 499 } // no `details` property
+];
+
+🔸 Without Optional Chaining ❌ (Risky)
+for (const prod of products){
+  console.log(prod.details.color); // 💥 Error for product without `details`
+}
+
+✅ With Optional Chaining
+for (const prod of products){
+  console.log("Color: ",prod.details?.color); // ✅ Safe access
+  console.log("RAM: ",prod.details?.ram); // ✅ Safe access
+}
+
+🧪 Bonus: Optional Chaining with Functions
+const user = {
+  greet: () => "Hello!"
+};
+
+console.log(user.greet?.()); // "Hello!"
+
+const user2 = {};
+console.log(user2.greet?.()); // ✅ undefined, no error
+
+🧭 When to Use Optional Chaining
+
+Use it when:
+➤You're accessing optional or backend-provided nested data.
+
+➤You want to avoid lengthy if checks like:
+if (user && user.details && user.details.name) { ... }
+
+Instead: user?.details?.name
+
+✅ Arrow Functions in TypeScript
+#################################
+Arrow functions are a compact way to write functions,introduced in ES6 and fully Supported in TypeScript with type annotations.
+
+🔄 1. Three Ways to Declare Functions
+
+🔸 a. Function Declaration
+function print(message:string):void{
+  console.log(message);
+}
+
+🔸 b. Function Expression
+const sum=function(num1:number,num2:number):number{
+  return num1+num2;
+}
+
+🔸 c. Arrow Function
+const sum=(num1:number,num2:number):number=>{
+  return num1+num2;
+}
+
+🔄 2. Arrow Function Syntax Simplification
+
+✅ Full Syntax:
+const sum=(a:number,b:number):number=>{
+  return a+b;
+}
+
+✅ Shorter Syntax (for 1-liner body):
+const sum=(a:number,b:number):number=>a+b;
+
+✅ Single Parameter: Parentheses Optional (but only in JS):
+const square=(x:number):number=> x*x; //✅ TypeScript requires parentheses if omitted gives error
+
+🔄 3. Assigning Arrow Function to a Typed 
+
+You can declare the function type separately:
+const sum: (a: number, b: number) => number = (a, b) => a + b;
+
+This allows type inference for parameters.
+
+🔄 4. Arrow Function in Callbacks
+
+Arrow functions are perfect for callbacks like event listeners:
+const button =document.getElementById("btn");
+
+button?.addEventListener("click",()=>{
+  console.log("Button clicked!");
+})
+
+🔄 5. Arrow Functions and this
+
+Arrow function do not bind their own this. They inherit this from the surrounding (lexical scope) which is helpful in object methods and events callbacks.
+
+class Counter{
+  count=0;
+  start(){
+    setInterval(()=>{
+      this.count++;
+      console.log(this.count);
+    },1000)
+  }
+}
+
+Using regular function inside setInterval would require bind(this) or saving context in a self variable. Arrow function solves that.
+
+💡 When to Use Arrow Functions
+✅ Ideal for:
+➤Short, concise functions
+➤Callbacks (e.g. map, filter, eventListener)
+➤When you want to preserve this
+
+❌ Avoid if:
+You need dynamic this (e.g., inside some class methods)
+
+✅ Object-Oriented Programming (OOP) in TypeScript
+#####################################################
+
+OOP is a programming paradigm where real-world entities are modeled as object that have:
+➤Properties (State) – Data/attributes
+➤Methods (Behavior) – Functions/actions
+
+🧱 Why Use Classes?
+❌ Without Classes (Object Literal)
+Imagine we want to create 100 products.
+➤We are duplicating logic in every object.
+➤Easy to miss properties or functions.
+➤Hard to scale.
+
+✅ With Classes: A Blueprint
+
+class Product {
+  //Properties in class
+  name: string;
+  price: number;
+  color: string;
+
+  constructor(name: string, price: number, color: string) {
+    this.name = name;
+    this.price = price;
+    this.color = color;
+  }
+  //Methods in class
+  calcDiscount(): number {
+    return this.price * 0.1;
+  }
+
+  availability(): string {
+    return "In Stock";
+  }
+}
+
+👉 Create Objects (Instances) from the Class:
+
+const p1 = new Product("iPhone 11", 19900, "Black");
+const p2 = new Product("Shoes", 3000, "White");
+
+console.log(p1.calcDiscount()); // 1990
+
+➤Product class is a blueprint.
+➤p1, p2 are instances (actual data).
+➤All instances share same structure but have different values.
+
+🔐 Access Modifiers in TypeScript
+###################################
+Access modifiers control visibility of properties and methods in a class.
+
+✅ Three Types of Access Modifiers
+| Modifier    | Accessible From                                           |
+| ----------- | --------------------------------------------------------- |
+| `public`    | Anywhere (default)                                        |
+| `private`   | Only within the same class                                |
+| `protected` |  within the class & its subclasses |
+
+🧱 Class Example: Employee
+🎯 Goal:
+Restrict direct modification of sensitive properties like salary and hikePercentage.
+
+👨‍💼 Sample Code:
+
+class Employee {
+  name: string;
+  location: string;
+  isEligible: boolean;
+
+  private _salary: number;
+  private _hikePercentage: number;
+
+  constructor(name: string, _salary: number, location: string, isEligible: boolean, _hikePercentage: number) {
+    this.name = name;
+    this._salary = _salary;
+    this.location = location;
+    this.isEligible = isEligible;
+    this._hikePercentage = _hikePercentage;
+  }
+
+  getSalary(): number {
+    if (this.isEligible) {
+      return this._getNewSalary(); // Calls private method
+    }
+    return this.salary;
+  }
+  private _getNewSalary(): number {
+    return this._salary + (this._salary * this._hikePercentage / 100);
+  }
+}
+
+🚫 Problem Without Access Modifiers
+Without private, anyone can do this:
+
+const emp = new Employee("John", 10000, "London", true, 20);
+emp._salary = 20000; // ❌ Not secure
+
+✅ Solution With private
+➤salary and hikePercentage can't be modified directly from outside the class.
+➤Controlled access via methods like getSalary().
+
+🧪 Example in Action
+const emp = new Employee("John", 10000, "London", true, 20);
+console.log(emp.getSalary()); // 12000
+
+Trying this:
+console.log(emp._salary);            // ❌ Error: salary is private
+console.log(emp._getNewSalary());   // ❌ Error: private method
+
+🧠 Shorthand Property Initialization
+#######################################
+
+In TypeScript, when you add an access modifier (public, private,protected) directly to a constructor parameter, it automatically:
+
+➤Creates a class property with the same name.
+➤Initializes that property with the argument passed to the constructor.
+
+✅ Example: Without Shorthand
+
+class Employee {
+  public empName: string;
+  private _salary: number;
+
+  constructor(empName: string, salary: number) {
+    this.empName = empName;
+    this.salary = salary;
+  }
+}
+
+✅ Example: With Shorthand (Cleaner!)
+
+class Employee {
+  constructor(public empName: string, private salary: number) {}
+}
+
+🔄 Behind the scenes:
+➤public empName: string → creates this.empName and assigns the value.
+➤private salary: number → creates this.salary and makes it private.
+
+🛑 Be Careful About:
+Name Conflicts: You can't use the same name for shorthand and then declare that property again explicitly.
+
+✅ Readonly Properties in TypeScript
+#####################################
+
+➤Can be assigned only once, either during declaration or inside the constructor.
+➤Can be accessed(read) from outside the class.
+➤Cannot be modified after initialization.
+
+🔸 Declaration Syntax
+readonly propertyName:type=value; //Initialized during declaration
+readonly propertyName:type; //can be initialized in constructor
+
+or using constructor shorthand:
+
+constructor(public readonly empId:number){}
+
+🔄 Example with Shorthand & Access Modifiers
+
+class Employee {
+  constructor(
+    public readonly empId: number,               // Readonly & public
+    public empName: string,
+    private _salary: number,
+    public baseLocation: string,
+    public isEligible: boolean,
+    private _hikePercent: number
+  ) {}
+
+  public getSalary(): number {
+    return this.isEligible
+      ? this._salary + (this._salary * this._hikePercent) / 100
+      : this._salary;
+  }
+
+  private _getNewSalary(): number {
+    return this.getSalary(); // Example of internal method usage
+  }
+}
+
+const emp = new Employee(101, "John Smith", 10000, "London", true, 20);
+console.log(emp.empId);        // ✅ Allowed (read)
+emp.empId = 201;               // ❌ Error (cannot assign to readonly)
+
+✅ Inheritance in TypeScript
+###########################
+Inheritance is a core concept of OOP that allows a class(child/derived class) to inherit properties and methods from another class (parent/base class).
+
+🔄 Why Use Inheritance?
+➤Avoid code duplication
+➤Code reusability
+➤Improves Maintainability
+➤Helps in keeping the code organized
+
+Base / Parent Class: The class being inherited from (e.g., Person)
+Derived / Child Class: The class that inherits (e.g., Employee, Athlete)
+
+🔄 Inheritance Syntax in TypeScript
+class Child extends Parent {}
+
+🔄 Calling Parent constructor
+Use super(...) inside the child constructor before accessing this.
+
+✅Example:
+class Person{
+  constructor(public name:string,public dob:string,public gender:string){}
+
+  calculateAge():number{
+    const currentYear=new Date().getFullYear();
+    const birthYear=new Date(this.dob).getFullYear();
+
+    return currentYear-birthYear;
+  }
+}
+
+class Employee extends Person{
+  constructor(public name:string,public dob:string,public gender:string,private _salary:number,private _bonus:number){
+    super(name,dob,gender);
+  }
+
+  getSalary():number{
+    return this._salary+this._bonus;
+  }
+}
+
+//Create an instanceof
+const emp=new Employee("Ankur Verma","2003-08-30,"male",100000,2000);
+
+//Output results
+console.log("Name:", emp._name);
+console.log("Age:", emp.calculateAge());
+console.log("Total Salary:", emp.getSalary());
+
+Overriding & Protected Modifier in TypeScript
+################################################
+
+🔄 What is Method Overriding?
+➤A child class redefine a method of the parent class.
+➤The overridden method in the child class will be called instead of the one in the parent.
+
+🔄 Access Modifiers Recap:
+| Modifier    | Accessible In | Accessible In Child Class |
+| ----------- | ------------- | ------------------------- |
+| `public`    | Everywhere    | ✅ Yes                     |
+| `private`   | Inside class  | ❌ No                      |
+| `protected` | Inside class  | ✅ Yes                     |
+
+➤If a property is marked private, even the child class can't access it.
+➤Use protected if the child class should access the property.
+
+✅ TypeScript Code Example
+class Person{
+  constructor(public name:string,protected dob:string,public gender:string){}
+
+  calculateAge():number{
+  console.log("calculateAge of Person called");
+    const currentYear = new Date().getFullYear();
+    const birthYear = new Date(this._dob).getFullYear();
+    return currentYear - birthYear; 
+  }
+}
+
+class Employee extends Person{
+  constructor(public name:string,public dob:string,public gender:string,private _salary:number,private _bonus:number){
+    super(name,dob,gender);
+  }
+  
+  override calculateAge():number{
+    console.log("calculateAge of Employee called");
+    return 2024 - new Date(this._dob).getFullYear();
+  }
+
+  getSalary():number{
+    return this._salary+this._bonus;
+  }
+}
+
+const emp = new Employee("John", "08/30/1991", "male", 10000, 2000);
+console.log("Name:", emp._name);
+console.log("Age:", emp.calculateAge());      // Overridden method
+console.log("Salary:", emp.getSalary());
+
+const person = new Person("Jane", "05/15/1990", "female");
+console.log("Person Age:", person.calculateAge()); // Base class method
+
+🧠 Key Takeaways:
+➤Use protected for properties you want to access in both parent and child classes.
+➤Use override keyword (optional in TypeScript, but good for clarity) when overriding a method.
+
+✅ Overridden methods are called based on the actual object, not the reference type.
+🔧 Simple Analogy (Real-World):
+Imagine you have a reference labeled "Vehicle", but you attach a Car object to it.
+
+Even though the label says "Vehicle", the actual object is a Car.
+So if you press the "start" button (i.e., call the start() method), the Car's version of the method will run — not the generic Vehicle one.
+
+🧪 Code Example in TypeScript
+class Person {
+  constructor(public _name: string) {}
+
+  greet() {
+    console.log("Hello from Person");
+  }
+}
+
+class Employee extends Person {
+  greet() {
+    console.log("Hello from Employee");
+  }
+}
+
+// 👇 Reference is of type Person
+let someone: Person;
+
+// 👇 But actual object is of type Employee
+someone = new Employee("John");
+
+// 🔥 This will call the Employee's greet(), NOT Person's greet()
+someone.greet(); // Output: Hello from Employee.
+
+🔁 Why This Happens:
+This behavior is called dynamic dispatch or runtime polymorphism — the method is selected at runtime based on the actual object type, not the variable’s declared type.
+
+❗If Method Wasn't Overridden:
+class Employee extends Person {
+  // no override
+}
+
+let someone: Person = new Employee("John");
+someone.greet(); // Output: Hello from Person
+Here, since Employee didn’t override greet(), it calls the parent’s version.
+
+✅ Getters and Setters
+########################
+Getters: Used to read private/protected properties safely.
+Setters: Used to write/set values with validation if needed.
+
+Common in OOP to encapsulate and control access of data.
+
+🔧 Basic Example
+class Person{
+  public name:string;
+  private _age:number|null=null;
+
+  constructor(name:string){
+    this.name=name;
+  }
+
+  //Getters
+  get age():number{
+    if(this._age!=null) return this._age.
+    throw new Error(`Age is not defined for ${this.name}`);
+  }
+
+  //Setters
+  set age(value:number){
+    if(value<0) throw new Error(`Age is not defined for person ${this.name}`)
+    this._age=value;
+  }
+}
+
+✅ Usage:
+const p = new Person("John");
+
+p.age = 30;           // setter gets called ✅
+console.log(p.age);   // getter gets called ✅
+
+🧠 Why Use Getters and Setters?
+| Feature         | Benefit                                                                 |
+| --------------- | ----------------------------------------------------------------------- |
+| Access control  | Keep property `private`, but expose safe access                         |
+| Validation      | Can add rules (e.g., age must be positive) before assigning             |
+| Computed values | Can return values derived from private data (like diameter from radius) |
+| Encapsulation   | Internal data structure can change without affecting external code      |
+
+🧮 Computed Property Example (Circle Class)
+
+class Circle {
+  private _radius: number = 0;
+
+  get radius(): number {
+    return this._radius;
+  }
+
+  set radius(value: number) {
+    this._radius = value;
+  }
+
+  // Computed Property
+  get diameter(): number {
+    return this._radius * 2;
+  }
+
+  set diameter(value: number) {
+    this._radius = value / 2;
+  }
+}
+
+✅ Usage
+const c = new Circle();
+c.diameter = 10;
+console.log(c.radius);    // 5
+console.log(c.diameter);  // 10
+
+🧵 Real-Life Analogy
+Think of getters and setters like ATM operations:
+
+Getter → Viewing balance — safe, read-only.
+Setter → Depositing cash — you must follow rules (no fake notes!).
+
+✅ What Are Static Methods and Properties?
+###########################################
+Static members belong to class itself, not to instances of class.
+
+🔁 Instance vs Static Members
+| Category     | Belongs To | Accessed Using        | Copied Per Object? |
+| ------------ | ---------- | --------------------- | ------------------ |
+| **Instance** | Object     | `objectInstance.name` | ✅ Yes              |
+| **Static**   | Class      | `ClassName.name`      | ❌ No (shared)      |
+
+🔧 Basic Syntax
+class Employee {
+  static count = 0; // Static property
+
+  constructor(public firstName: string, public lastName: string) {
+    Employee.count++; // Access using class name
+  }
+
+  static sayHello() {
+    return "Hi there"; // Static method
+  }
+}
+
+const emp1 = new Employee("John", "Doe");
+const emp2 = new Employee("Jane", "Smith");
+
+console.log(Employee.count);        // ✅ 2 (shared count)
+console.log(Employee.sayHello());   // ✅ "Hi there"
+
+❌ You cannot do emp1.count or emp1.sayHello() because count and sayHello are not instance members.
+
+🔥 Key Rules to Remember
+ ➤Use static keyword to declare static members.
+ ➤Static members cannot be accessed using this inside the constructor or static methods.
+ ➤Access static members using ClassName.staticMember.
+ ➤There is only one copy of a static property shared across all instances.
+
+🧠 Real-Life Analogy
+Think of static members like company-wide policies:
+All employees (instances) share the same policy (static property).
+But each employee has their own name, ID (instance properties).
+
+✅ Abstract Class
+###################
+An abstract class in TypeScript provides a base class with common logic and abstract methods that must be implemented by derived classes. It cannot be instantiated directly and is mainly used to enforce a structure among subclasses.
+
+💡 Why Use Abstract Classes?
+To define a blueprint or base structure for subclasses:
+➤You can define common properties/methods.
+➤You can enforce method implementation.
+
+🧱 Structure & Syntax
+abstract class Employee{
+  constructor(public firstName:string,public lastName:string){}
+
+  //Abstract method:no implementation here
+  abstract getSalary():number;
+}
+
+❌ Cannot Instantiate
+const emp=new Employee("Ankur","Verma"); //❌Error:Cannot create an instance of an abstract class
+
+🧬 Inheriting Abstract Class
+class PermanentEmployee extends Employee{
+  constructor(firstName:string,lastName:string,private monthlySalary:number){
+    super(firstName,lastName); //call parent constructor
+  }
+
+  getSalary():number{
+    return this.monthlySalary*12;
+  }
+}
+
+class ContractEmployee extends Employee{
+  constructor(firstName:string,lastName:string,private hourlyRate:number){
+    super(firstName,lastName)
+  }
+
+  getSalary():number{
+    return this.hourlyRate*9*365; //assuming 9hours/day, 365 days/year
+  }
+}
+
+🚀 Usage
+const emp1=new PermanentEmployee("Ankur","Verma",4000);
+console.log(emp1.getSalary());// Output: 48000
+
+const emp2= new ContractEmployee("John", "Doe",10);
+console.log(emp2.getSalary()) // Output: 32850
+
+➤If a method is abstract then the class should also be abstract
+➤Contains both abstract & non-abstract code - We can mix implemented and abstract methods. 
+
+🧠 Real-World Analogy
+Think of Employee as a template:
+You don’t hire an “Employee” directly.
+You hire either a PermanentEmployee or a ContractEmployee, each with their own getSalary() logic.
+
+✅private Constructor in TypeScript
+####################################
+➤A private constructor prevents a class from beging instantiated directly from outside.
+➤It's used to control object creation,which is essential for design pattern like Singleton.
+
+🎯 Singleton Design Pattern
+A Singleton is a design pattern that ensures a class has only one instance and provides a global access point to it.
+In TypeScript, we use a private constructor to restrict instantiation and a static method to return the same instance every time.
+
+🧱 Implementation Steps
+class Person{
+  //Step 1: Static property to hold the instance
+  private static _instance:Person;
+
+  //Step 2: Private constructor to prevent external instantiation
+  private constructor() {}
+
+  //Step 3: Static method to control instance creation
+  static getInstance():Person{
+    if(!Person._instance){
+      Person._instance=new Person();
+    }
+    return Person._instance;
+  }
+}
+cosnt person1=Person.getInstance();
+const person2=Person.getInstance();
+
+console.log(person1==person2); //✅ true-both are same instance
+
+📦 Real-world Use Cases of Singleton
+➤Database connections
+➤Logging services
+➤Configuration managers
+➤Caching
+➤Shared app-wide services(e.g. Usersession, Auth)
+
+✅ Interface in TypeScript
+###########################
+➤An interface in TypeScript is like a contract that forces an object or class to follow a specific structure. It improves code reliability, readability, and allows for polymorphism without inheritance.
+➤It is used for type-checking and enforcing shape without providing any implementation.
+➤Think of it as a blueprint for objects/classes;
+
+🧱 Syntax and Example
+inteface User{
+  firstName:string;
+  lastName:string;
+  greetUser():void;
+  getFullName():string;
+}
+Only declaration are allowed- no initialization or implementation.
+
+🎯 Using Interface as Type
+const user1:User={
+  firstName:'John',
+  lastName:'Smith',
+  greetUser():void{
+    console.log('Hello User');
+  }
+
+  getFullName():string{
+    return this.firstName+" "+this.lastName;
+  }
+};
+The object must match all properties and methods defined in the interface.
+
+👨‍🏫 Implementing Interface in Classes
+class Admin implements User{
+  constructor(public firstName:string,public lastName:string){}
+
+  greetUser(){
+    console.log(`Hello Admin ${this.getFullName()}`);
+  }
+
+  getFullName(){
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+This class must implment all members of the interface.
+
+📌 Real-world Example – Polymorphism with Interfaces
+function displayGreetMessage(user:User){
+  user.greeUser();
+}
+
+const admin=new Admin("John","Smith");
+displayGreetMessage(admin); // Works because admin implements User
+
+➤You can pass any class instance that implements the interface. 
+
+🔁 Interface vs Type Alias
+| Feature             | Interface       | Type Alias                 |
+| ------------------- | --------------- | -------------------------- |
+| Extension           | Can be extended | Can use intersection (`&`) |
+| Declaration merging | ✅ Yes           | ❌ No                       |
+| Use with classes    | ✅ Preferred     | 👎 Not ideal               |
+| Implementation      | No logic        | No logic                    |
+
+
+🔄 Declaration Merging
+interface User{
+  name:string;
+}
+
+interface User{
+  age:number;
+}
+
+const user:User={
+  name:'John',
+  age:30
+}
+➤ Can add more properties and methods in the interface after the first declaration
+console.log(user.name); // Output: John
+console.log(user.age); // Output: 30
+
+
+⚠️ Interface vs Abstract Class
+| Aspect                | Interface              | Abstract Class               |
+| --------------------- | ---------------------- | ---------------------------- |
+| Implements logic?     | ❌ Only declarations    | ✅ Can have logic             |
+| Multiple inheritance? | ✅ Multiple interfaces  | ❌ Only one abstract class    |
+| Object creation?      | ❌ Not allowed          | ❌ Not allowed                |
+| Use case              | Contract for structure | Base class with shared logic |
+
+🔐 Multiple Interface Implementation
+interface Role {
+  roleName: string;
+}
+
+class Manager implements User, Role {
+  constructor(public firstName: string, public lastName: string, public roleName: string) {}
+
+  greetUser() {
+    console.log(`Hello Manager ${this.getFullName()}`);
+  }
+
+  getFullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+
+✅ Benefits of Using Interfaces
+➤Type Safety – Catch errors at compile time.
+➤Code Readability – Acts as clear documentation.
+➤Reusability – Use across classes/functions.
+➤Flexibility – Easily extendable and scalable.
+
+🛡️ readonly Properties in Interfaces
+######################################
+➤ A readonly property can only be set once (at initialization)
+➤ It prevents mutation after object creation, ensuring immutability.
+
+✅ Syntax:
+interface User{
+  readonly company:string;
+}
+
+❌ Wrong: Mutating readonly property
+
+let admin: User = { company: "Google" };
+admin.company = "Microsoft"; // ❌ Error: Cannot assign to 'company' because it is a read-only property.
+
+⚠️ Important:
+The readonly restriction only works if the variable is typed as the interface.
+If it's typed as a class (e.g., Admin), and the class doesn't use readonly, it won't throw an error.
+
+✅ Solution:
+Either use readonly in the class definition:
+class Admin implements User {
+  readonly company = "Google";
+}
+
+Or type the object using the interface:
+const admin: User = new Admin("John", "Smith"); // Enforces readonly
+
+❓ Optional Properties in Interfaces
+######################################
+➤Optional properties may or may not be present in the Implementing class or object.
+
+✅ Syntax:
+interface User{
+  location?:string;
+}
+🔄 Behavior:
+➤ If location is not defined in a class implementing User, no error occurs.
+➤ If defined, it must be of the correct type.
+
+class Member implements User{
+  location?:string; // Optional
+  constructor(public firstName:string,public lastName:string,loc?:string){
+    this.location=loc;
+  }
+}
+
+✅ Optional Constructor Parameters
+Use ? to make constructor parameters optional:
+
+constructor(public firstName: string, public lastName: string, loc?: string) {
+  this.location = loc ?? "London"; // ✅ Set default value if not provided
+}
+❗ Note:
+You cannot use both ? and default value at the same time like loc?: string = "London" — it will throw an error.
+
+Instead, use:
+this.location = loc ?? "London"; // Fallback to "London" if undefined
+
+✅ Implementing Multiple Interfaces in a Class
+##################################################
+
+interface User {
+  name: string;
+  getFullName(): string;
+}
+
+interface Role {
+  getRole(): string;
+}
+
+class Admin implements User, Role {
+  constructor(public name: string) {}
+
+  getFullName(): string {
+    return `Full Name: ${this.name}`;
+  }
+
+  getRole(): string {
+    return "Admin";
+  }
+}
+
+🔸 Key Points:
+➤ Use commas to implement multiple interfaces.
+➤ You must implement all properties and methods from all interfaces.
+➤ A class can implement as many interfaces as needed.
+
+✅ Extending an Interface from Another
+🔄 Syntax
+interface Role {
+  getRole(): string;
+}
+
+interface User extends Role {
+  name: string;
+  getFullName(): string;
+}
+
+Now User contains: name, getFullName(), getRole() (from Role)
+
+🔸 Key Points:
+➤ Use extends keyword when one interface inherits from another.
+➤ You can extend multiple interfaces:
+
+interface User extends Role, Permissions, MetaData { ... }
+
+Any class implementing User must implement everything from User, Role, Permissions, etc.
+
+✅ Interface vs Class Extension Rules
+| Feature                        | Class                | Interface                  |
+| ------------------------------ | -------------------- | -------------------------- |
+| Extend multiple types?         | ❌ Only **one** class | ✅ Can extend **multiple**  |
+| Implement multiple interfaces? | ✅ Yes                | –                          |
+| Syntax                         | `class A extends B`  | `interface A extends B, C` |
+
+✅ Method Access After Extending
+
+If:
+interface User extends Role {
+  name: string;
+}
+
+Then:
+let admin: User = new Admin("John");
+admin.getRole(); // ✅ Works because `User` extends `Role`
+
+✅ Defining Function Types in TypeScript
+############################################
+
+🔸 Using type:
+type SumFn=(num1:number,num2:number)=> number;
+
+const add:SumFn=(n1,n2)=>n1+n2;
+➤ You define a type alias with parameters and return type.
+➤ Then use it to assing a funciton to a variable.
+➤ The function must match the declared signature.
+
+🔸 Using interface:
+interface SumFn{
+  (num1:number,num2:number)=>number;
+}
+
+const add:SumFn=(n1,n2)=>n1+n2;
+➤ The interface represents a function type.
+➤ Used in the same was as type alias.
+➤ If the function signature doesn't match, TypeScript throws an error.
+
+🎯 Why Use Function Interfaces?
+Mostly useful for:
+Complex function structures
+Reusability in large codebases
+
+But in real-world use, the type alias is preferred
+
+ 🔷 Intersection Types
+ #######################
+
+ Union vs. Intersection Types
+
+ 🔄 Union Type (|)
+ type StringOrNumber=string | number;
+
+ let x:StringOrNumber
+ x='hello';
+ x=42;
+ x=true;  //// ❌ Error: boolean not assignable
+You can assign either a string or a number.
+
+🔄 Intersection Type (&)
+type BoolOrNumber=boolean | number;
+type StringOrNumber=string | number;
+
+type MyNumbertype= StringOrNumber & BoolOrNumber;
+let x:MyNumbertype;
+x=42;       //✅ OK
+x='hello';  // ❌ Error
+x=true;     // ❌ Error
+✅ Only the common type between both (i.e., number) is allowed.
+
+🔷 Intersection of Complex Types (Objects)
+type User={
+  name:string;
+  age:number;
+};
+
+type Admin={
+  name:string;
+  role:string;
+}
+
+type AdminUser=User & Admin;
+
+cosnt john:AdminUser={
+  name:'John',
+  age:30,
+  role:'admin'
+};
+✅ The final object must have all properties from both User and Admin.
+
+🔧 Using interface with Intersection
+interface Order{
+  id:number;
+  items:string[];
+}
+
+function processOrder(order:Order &{status :string}){
+  console.log(order.id,order.items,order.status); //combined the property of Order interface and status property
+}
+
+processOrder({id:123,items:['item1','item2'],status:'shipped'});
+✅ The function expects an object with both order structure and a status property.
+
+🧪 Quiz Yourself
+What does type A = string & number evaluate to?
+❌ Error – no overlap, results in never
+
+What will be the type of User & Admin?
+✅ { name: string; age: number; role: string }
+
+✅ Type Guards in TypeScript
+###############################
+Type Guards help you narrow down the type of a variable withing a conditional block, ensuring type-safe operations on union types.
+
+🔄 Why Use Type Guards?
+In Typescript, we often deal with union types like:
+type value=string | number;
+You can't safely call string methods on value unless you narrow it to string. That's where type guard come in.
+
+🔄 Built-in Type Guards
+1. typeof (for primitives)
+function printLength(value:string | number){
+  if(typeof==='string'){
+    console.log(value.length); // ✅ Safe: narrowed to string
+  }
+  else{
+    console.log(value.toFixed(2)); // ✅ Safe: narrowed to string
+  }
+}
+
+2. instanceof (for class instances)
+class Dog{
+  bark(){
+    console.log('Bark');
+  }
+}
+
+class Cat{
+  meow(){
+    console.log('Meow');
+  }
+}
+
+function speak(animal:Dog | Cat){
+  if(animal instanceof Dog){
+    animal.bark(); // ✅ Dog
+  }
+  else {
+    animal.meow(); // ✅ Cat
+  }
+}
+
+3. in Operator (for property existance)
+type Circle={radius:number};
+type Square= { side: number};
+
+function area(shape:Circle | Square){
+  if('radius' in shape){
+    return Math.PI*shape.radius**2;
+  }
+  else{
+    return shape.side**2;
+  }
+}
+
+🔄 Custom Type Guards (User-defined)
+Create your own function to check type and narrow:
+type Admin={
+  role:'admin';
+  privileges:string[]
+  };
+type User={
+  role:'user';
+  email:string
+};
+
+function isAdmin(person: Admin | User): person is Admin{
+  return person.role==='admin';
+}
+
+function handlePerson(p:Admin | User){
+  if(isAdmin(p)){
+    console.log(p.privileges); // ✅ Safe: p is admin
+  }
+  else{
+    console.log(p.email); // ✅ Safe: p is user
+  }
+}
+
+✅ Discriminated Union in TypeScript
+#######################################
+Discriminated Union(also called Tagged Union) is a way to implement type guards using a common property (called as "tag") across multiple interfaces.
+
+🔄 Key Concept:
+Each interface is the union includes a common literal property like kind or type. This tag 'discriminates' which type the object belongs to.
+
+🔸 Example Setup:
+interface Circle{
+  kind:'circle'; //literal type
+  radius:number;
+}
+
+interface Square{
+  kind:'square';  //literal type
+  length:number;
+}
+
+type Shape=Circle | Square;
+
+🔸 Function Using Discriminated Union:
+function calculateArea(shape:Shape): number{
+  switch(shape.kind){
+    case 'circle':
+    return 3.14*shape.radius**2;
+    case 'square':
+    return shape.length**2;
+  }
+}
+
+🧪 Example Calls:
+console.log(calculateArea({kind:'square', length:12}));
+console.log(calculateArea({kind:'circle', radius:7}));
+
+🔍 Why Use This?
+➤ Helps Typescript infer types inside branches.
+➤ Avoids unsafe property access.
+➤ Scales well when adding more shapes like Rectangle, Triangle, etc.
+
+✅ Type Casting in TypeScript
+###############################
+Type castingn is used to explicitly tell the Typescript compiler to treat a variable as a specific type.
+
+🔄 Scenario:
+When accessing an element using document.querySelector, Typescript may infer the type as Element | null, not the exact type like HTMLInputElement.
+
+✅Example:
+const fname=document.querySelector("#fname"); //inferred as Element | null
+Trying to access fname.value will cause an error because Element doestn't guarantee a value property.
+
+🔸 Problem:
+➤ fname might be null
+➤ Element does not always have a value property;
+
+🔸 Solution: Type Cast
+✅ Method 1: Angle Bracket Syntax
+const fname=<HTMLInputElement>document.querySelector("#fname");
+fname.value="John";
+
+✅ Method 2: as Syntax
+const fname =document.querySelector("#fname") as HTMLInputElement;
+fname.value="John";
+Use the as keyword expecially in React/JSX code, as angle brackets can be misinterpreted as JSX.
+
+⚠️ Caution:
+➤ Use !(non-null assertion) only if you're sure the element exists.
+➤ If the element might be null, use a conditional check.
+
+✅Example:
+const fname=document.querySelector("fname");
+if(fname){
+  (fname as HTMLInputElement).value="John";
+}
+
+✅ Index Signatures (Indexed Properties) in TypeScript
+#######################################################
+Index signature allow yo uto define objects with dynamic property names- especially useful when property names are not know ahead of time.
+
+🔸 Syntax:
+interface Example{
+  fixedProeprty:string;
+  [prop:string]:sting | number;
+}
+➤ prop: placeholder for unknown property names( can be named anything)
+➤ string: type of the property name
+➤ string | number : type of the value allowed
+
+🔸 Example 1: Product with Optional/Dynamic Properties
+interface Product{
+  id: number;
+  name:string;
+  [prop:string]: string | number;
+}
+
+const product1={
+  id:1,
+  name:"T-Shirt",
+  color:"Red",
+  price:123,
+}
+
+const product2: Product = {
+  id: 2,
+  name: "Mug",
+  material: "Ceramic",
+  capacity: 300
+}
+
+🔸 Example 2: Settings with Flexible Keys
+
+interface Settings {
+  [props: string]: boolean | string | number;
+}
+
+const mySettings: Settings = {
+  darkMode: true,
+  fontSize: 16,
+  customTheme: "Pink"
+};
+
+🧠 When to Use Index Signatures:
+➤ When objects can have varying properties.
+➤ When working with settings, prefrences, or configuarations.
+➤ When building collections of heterogeneous objects.
+
+✅ Function Overloading in TypeScript
+########################################
+It allows you to define multiple function signature for a single function. Based on the arguments types, Typescript can infer what the return type will be.
+
+🔄 Why Do We Need It?
+When we have a function that:
+➤ Accepts different types of parameters (e.g. number and string).
+➤ Returns different types based on input types
+It allows Typescript to infer the correct return type, enabling IntelliSense and type saftey (e.g. method suggestions like .split() for string only).
+
+🔄 Real-World Example
+Suppose we have an addition function that:
+Concatenates strings when inputs are strings.
+Adds values when inputs are numbers.
+
+Here's the shorthand syntax-based TypeScript implementation:
+
+type StringOrNumber = string | number;
+
+// ✅ Function overloads
+function addition(a: number, b: number): number;
+function addition(a: string, b: string): string;
+function addition(a: number, b: string): string;
+function addition(a: string, b: number): string;
+
+// 🔧 Actual implementation (compatible with all overloads)
+function addition(a: StringOrNumber, b: StringOrNumber): StringOrNumber {
+  return a.toString() + b.toString(); // Concatenate everything
+}
+
+// 🧪 Usage
+
+const result1 = addition(10, 20); // number => 30
+const result2 = addition("Hello", "World"); // string => HelloWorld
+const result3 = addition("Hello", 123); // string => Hello123
+
+// ✅ TypeScript knows result2 is string, so split is allowed
+const words = result2.split(""); // Works!
+
+// ❌ This will show error: Property 'split' does not exist on type 'number'.
+// const broken = result1.split("");
+
+🔄 What Problem Does It Solve?
+If you don’t use function overloading, TypeScript sees this:
+function addition(a: string | number, b: string | number): string | number
+
+Then calling:
+const result = addition("hello", "world");
+result.split(","); // ❌ Error! split not available on type string | number
+
+Because the type is ambiguous: string | number.
+With overloads, TypeScript knows the exact type based on the arguments.
+
+Generics in TypeScript
+#######################
+Generics are placeholders for types- allowing you to create reusable, type-safe functions, classes, and data structures without knowing the exact types up front.
+
+✅Syntax
+function identify<T>(value:T):T{
+  return value;
+}
+➤ Here T is a placeholder type.
+➤ The actual type(e.g. number, string) will be provided when calling the function.
+
+🔄 Why Use Generics?
+Using any breaks type saftey:
+
+✅Example
+function getItem(arr:any[]):any{
+  return arr[0];
+}
+➤ You lose access to type-specific methods (e.g. .split() for strings, .toFixed() for numbers).
+✅Generics preserve type saftey while keeping code flexible.
+
+🔄 Real Example: swap Function
+funciton swap<T>(arr:T[],index1:number,index2:number):T[]{
+  const temp=arr[index1];
+  arr[index1]=arr[index2];
+  arr[index2]=temp;
+
+  return arr;
+}
+➤ T represents any type(string, number, object etc).
+➤ Now swap works with:
+
+swap([1, 2, 3], 0, 2);            // number[]
+swap(["a", "b", "c"], 0, 1);      // string[]
+swap([{ id: 1 }, { id: 2 }], 0, 1); // object[]
+
+🔄 Built-in Generics in TypeScript
+| Type           | Example                     | Explanation                                            |
+| -------------- | --------------------------- | ------------------------------------------------------ |
+| `Array<T>`     | `const nums: Array<number>` | Same as `number[]`, `T` is `number` here               |
+| `Promise<T>`   | `const p: Promise<string>`  | This promise must resolve to a string                  |
+| `Record<K, V>` | `Record<string, number>`    | Object where keys are `string` and values are `number` |
+
+🔄 Arrays Are Generic
+const nums:Array<number>=[1,2,3];
+Equivalent to:
+const nums:number[]=[1,2,3];
+
+➤ Both are Array<T> where T=number.
+
+🔄 Promises Are Generic
+const p: Promise<number>=new Promise((resolve,reject)=>{
+  setTimeout(()=> resolve(100),1000);
+});
+
+➤ You declare the expected return type, so Typescript enforces that only a number can be resolved.
+
+🔄 Generic Objects
+function wrapInObj<T>(value:T):{data:T}{
+  return {data:value};
+}
+
+const wrapped=wrapInObj("hello");
+
+❗Important Notes
+➤ Generics do not exist in the final JavaScript output. They're erased during compilation.
+➤ You can also extend types in generics for more control:
+
+function printLength<T extends {length:number}>(val:T):void{
+  console.log(val.length);
+}
+
+Creating Generic Functions in TypeScript
+#########################################
+
+✅Example 1: swap Function
+You built a function that swaps elements in an array regardless of the element types.
+
+🔸 Syntax:
+function swap<T>(arr:T[],index1:number,index2:number):T[]{
+  if(index1<0 || index1>=arr.length || index2<0 || index2>= arr.length){
+    throw new Error("Invalid index");
+  }
+  [arr[index1],arr[index2]]=[arr[index2],arr[index1]];
+  return arr;
+}
+
+🔸 How It Works:
+➤ T is a generic placeholder.
+➤ If you pass an array of numbers, T=number.
+➤ If you pass an array of strings, T=string
+
+🔸 Examples:
+swap([1, 2, 3], 0, 2);            // returns [3, 2, 1]
+swap(["a", "b", "c"], 1, 2);      // returns ["a", "c", "b"]
+
+✅ Example 2: expand Function
+You created a function to merge two objects using generics.
+
+🔸 Initial Version:
+function expand(obj1: object, obj2: object): object {
+  return Object.assign(obj1, obj2);
+}
+
+❌ Problem:
+➤ The return type is object, so TypeScript doesn’t know the merged object’s shape.
+➤ Accessing combined.name causes a type error: "Property 'name' does not exist".
+
+✅ Using Multiple Generics
+To fix this, introduce generic T and U:
+
+function expand <T,U>(obj1:T, obj2:U){
+  return Object.assign(obj1,obj2);
+}
+Now:
+➤ If obj1 has {name: string, age: number}
+➤ And obj2 has {name:string, gender: string}
+➤ The merged result has type {name:string, age: number, gender: string}
+
+🔸 Usage:
+const combined=expand(
+  {name: 'John', age:28},
+  {name:'John', gender:'male'}
+);
+console.log(combined.name) // ✅ Works!
+
+❗ Note on Type Constraints
+➤ The current expand function may still throw an error if obj1 or obj2 is not an object.
+➤ To fix this, Constraints like <T extends object> will be used.
+
+🧠 What Are Generic Constraints in TypeScript?
+################################################
+➤ Generic constraints limit what types can be passed to a generic.
+➤ You use extends keyword to apply such constraints.
+➤ This is useful to enforce type saftey in generic utility functions.
+
+🔧 Use Case: Merging Two Objects Safely
+You want to merge two objects safely using a function.
+
+function merge<T extends object, U extends object>(obj1:T,obj2:U){
+  return {...obj1,...obj2};
+}
+Here:
+➤ T and U must be objects(✅ not allowed: numbers, strings, arrays).
+➤ The constraints T extends object ensures that T must be an object.
+
+🧪 Code Example with Explanation
+const obj1={name:"John", age:25};
+const obj2={gender:"Male", name:"Steve"};
+
+const combined=merge(obj1,obj2);
+// combined: { name: "Steve", age:25, gender:"Male"};
+
+➤ This function creates a new object using the spread operator.
+➤ Since both are objects and satisfy the constraint, it works fine.
+
+❌ What if You Violate the Constraint?
+merge(100, { name:"John"}); //❌ Error: 100 is not an object
+merge({name:"John"}, "hello"); //❌Error: string is not an object
+
+➤ Without extends object, Typescript would allow this and might cause runtime issues.
+➤ Using constraints prevents passing types like number, string, or null.
+
+
+💡 Why Use Constraints?
+➤ Enforces only valid inputs are passed.
+➤ Improves type inference and developer tooling like IntelliSense.
+➤ Helps you avoid runtime bugs early.
+
+✅ Bonus Tip
+You can also constrain generics to:
+➤ Arrays: T extends any[]
+➤ Specify keys: T extends {id: number}
+➤ Custom interfaces: T extends MyInterface
+
+🔑 keyof Constraint in TypeScript
+#####################################
+To ensure the second parameter passed to a funciton must be a valid key of the object passed as the first parameter.
+
+✅ Problem Without Constraint
+function getPropValue(obj:Object, key: string){
+  return obj[key]; //❌ Typescript will throw error
+}
+Typescript complains because it can't guarantee key exist on obj.
+
+✅ Solution Using keyof Constraint
+function getPropValue<T extends object, K extends keyof T>(obj:T, key:K){
+  return obj[key];
+}
+➤ T -> the object type.
+➤ K extends keyof T -> The key must be one of the property names (keys) of T.
+
+📌 Example Usage
+const user={
+  name:"Alice",
+  age:30,
+};
+
+const name=getPropValue(user,"name"); //✅ Works fine
+const age=getPropValue(user, "age"); //✅ Works fine
+const gender =getPropValue(user,"gender"); //❌ Error: "gender" is not a key of user
+
+📘 What keyof T Does
+➤ Turns the object type into a union of its keys:
+
+type User= {name:string, age:number};
+type Keys= keyof User; // "name" | "age"
+➤ So now, K extends keyof T ensures key must be "name" or "age" in the above case.
+
+🎯 Benefits
+➤ Prevents accessing non-existing properties.
+➤ Gives autocomple suggestions.
+➤ Catches errors at compile tiem.
+➤ Improves code type saftey and developer productivity.
+
+✅ Generic Classes in TypeScript
+##################################
+Generic classes allow you to write reusable class logic that can work with any data type.
+
+💡 Why use generic classes?
+To create flexible classes that work with different data types without duplicating code.
+
+🧱 Syntax Example:
+class ShoppingCaryt<T>{
+  private _items:T[]=[];
+
+  addItem(item:T){
+    this._items.push(item);
+  }
+
+  getItems():T[]{
+    return this._items;
+  }
+}
+➤ T is a type placeholder
+➤ T[] means this class will work with an array of whatever type you specify when creating an instance.
+
+📦 Usage Example with Custom Types:
+type Book={
+  name:string;
+  pages:number;
+  price:number;
+}
+
+type Cloth={
+  name:string;
+  size:string;
+  price:number;
+}
+const bookCart = new ShoppingCart<Book>();
+bookCart.addItem({ name: "Book A", pages: 250, price: 30 });
+bookCart.addItem({ name: "Book B", pages: 300, price: 40 });
+
+console.log(bookCart.getItems()); // Array of Book
+
+const clothCart = new ShoppingCart<Cloth>();
+clothCart.addItem({ name: "T-Shirt", size: "M", price: 25 });
+
+console.log(clothCart.getItems()); // Array of Cloth
+
+🔡 Can Also Be Used with Primitive Types:
+const stringCart = new ShoppingCart<string>();
+stringCart.addItem("hello");
+stringCart.addItem("world");
+
+console.log(stringCart.getItems()); // ["hello", "world"]
+
+🧠 When to Use a Generic Class
+Use generic classes when:
+➤ You want the same class logic to work across multiple types.
+➤ You want to keep the class strongly typed based on the provided type.
+➤ You want to avoid repeating similar class code for each type.
+
+🔁 With Shorthand Constructor Example:
+class Repository<T> {
+  constructor(private _items: T[] = []) {}
+
+  add(item: T) {
+    this._items.push(item);
+  }
+
+  getAll(): T[] {
+    return this._items;
+  }
+}
+
+🔁 Generic Types vs Union Types in TypeScript
+###############################################
+✅ Generic Types
+Generics allow writing reusable code that works with any specific type, provided at the time of usage.
+
+🧠 Concept:
+Define type once, use many times with different types, but with strict consistency per instance.
+
+📦 Example: Generic Class
+class ShoppingCart<T> {
+  private _items: T[] = [];
+
+  addItem(item: T): void {
+    this._items.push(item);
+  }
+
+  getItems(): T[] {
+    return this._items;
+  }
+}
+
+🔸 Usage
+const stringCart = new ShoppingCart<string>();
+stringCart.addItem("Book");
+// stringCart.addItem(100); ❌ Error — number not allowed
+
+const numberCart = new ShoppingCart<number>();
+numberCart.addItem(100);
+// numberCart.addItem("Book"); ❌ Error — string not allowed
+
+✅ Benefits of Generics:
+➤ Type-safe per instance
+➤ Reusable logic without type repetition
+➤ Compile-time error checking
+➤ Better for classes/methods where the type is consistent per use case but can differ across scenarios.
+
+🚫 Union Types
+Union types allow a variable to be one of several types, but they don't enforce consistency between related values.
+
+📦 Example:
+class ShoppingCart {
+  private _items: (string | number)[] = [];
+
+  addItem(item: string | number): void {
+    this._items.push(item);
+  }
+
+  getItems(): (string | number)[] {
+    return this._items;
+  }
+}
+
+const cart = new ShoppingCart();
+cart.addItem("Apple");
+cart.addItem(42); // ✅ Both allowed, but mixed types inside array
+
+❗Problem:
+Union allows both types, so items may become a mix of string and numbers, even if only one was intended.
+
+⚠️ Why Union Types Can Be Risky Here
+
+If your items field is declared like:
+items: string[] | number[]
+
+➤ Then Typescript expects only all strings or all numbers.
+➤ But if your method accepts string | number, htis lets you mix types during .push() operations, breaking the contract.
+
+this._items = []; // Initially empty
+this.addItem("Apple"); // Adds string
+this.addItem(42);       // Now it's mixed: ❌ Not allowed for `string[] | number[]`
+
+✅ When to Use What
+| Use Case                                                                                               | Use Type      |
+| ------------------------------------------------------------------------------------------------------ | ------------- |
+| A class/method that works with **one consistent type**, but needs to be reused for **different types** | ✅ Generics    |
+| A value that can be **one of many types** at the same time (e.g., config input, error types)           | ✅ Union Types |
+
+💡 Interview Insight:
+Generics provide parametric polymorphism — type determined at usage.
+Union types provide ad hoc polymorphism — type can vary at runtime.
+
+🎓 TypeScript Built-in Generics: Partial & Readonly
+#####################################################
+🔄 Partial<T>
+✅ Purpose: Make all properties of a type optional.
+📦 Use Case: When updating or modifying only some fields of an object, not all.
+
+🧱 Example:
+interface UserSettings{
+  username:string;
+  email:string;
+  darkMode:string;
+  language:string;
+}
+
+// Normally, you'd need to pass all fields
+const user: UserSettings = {
+  username: "John Smith",
+  email: "johnsmith@gmail.com",
+  darkMode: false,
+  language: "en"
+};
+
+// Function to update only part of the settings
+function updateUserSettings(settings: Partial<UserSettings>) {
+  console.log("Updating:", settings);
+}
+
+updateUserSettings({
+  darkMode: true,
+  language: "fr"
+});
+
+🧠 Why Useful:
+➤ Accepts parital data like form updates or settings patches.
+➤ Prevents need to provide the full object.
+➤ Does not mutate the original type- just temporarily makes fields optional.
+
+🔄 Readonly<T>
+✅ Purpose: Makes all properties of a type immutable(cannot be changed after assignment).
+
+🧱 Example: With Arrays
+const arr:Readonly<string[]>=["John", "Mark"];
+arr.push("Mary"); //❌ Error: Property 'push' does not exist
+
+🧱 Example: With Objects
+interface UserSettings {
+  username: string;
+  email: string;
+  darkMode: boolean;
+  language: string;
+}
+
+const user: Readonly<UserSettings> = {
+  username: "John",
+  email: "john@gmail.com",
+  darkMode: false,
+  language: "en"
+};
+
+user.username = "Steve"; // ❌ Error: Cannot assign to 'username'
+
+🧠 Why Useful:
+➤ Prevents accidental mutation of data.
+➤ Helps with immutability in functional programming or state management.
+➤ Clear contracts: ensures certain objects are read-only after creation.
+
+✨ TypeScript Decorators (Introduction)
+#########################################
+A decorator in Typescript is a function that modifies or enhances the behavior of:
+1. Classes
+2. Methods
+3. Properties
+4. Parameters
+Decorators are executed at runtime and prefixed with @.
+
+🔧 How to Enable Decorators
+Open tsconfig.json
+
+Enable experimental support: "experimentalDecorators": true
+
+🔸 Class Decorator: Basic Example
+✅ Goal:
+Log a message whenever the class is loaded.
+
+🧱 Code:
+//Decorator function
+function Logger(target:Function){
+  console.log("Logging...");
+  console.log(target); // 👉 Logs the class constructor
+}
+
+//Applying the decorator
+@Logger
+class User{
+  name:string="John";
+  age:number=28;
+
+  constructor(){
+    console.log("User class constructor called");
+  }
+}
+
+//Creating an instance
+const user1=new User();
+
+🧠 Output:
+Logging...
+[class User]
+User class constructor called
+➤ Even if no instance is created, the decorator still runs when the class is parsed!
+
+🔄 How It Works
+➤ @Logger runs before the class is instantiated.
+➤ The decorator receives the constructor function as its argument.
+➤ The decorator does not need to be called like Logger() unless you're passing arguments. 
+
+🧠Decorator Factory
+#####################
+➤ A function that returns a decorator function.
+➤ It allows you to pass parameters or configuarations to decorators.
+➤ It's useful when you want customized behavior per usuage.
+
+🧠 Why Not Just Use a Decorator Function?
+If you write:
+
+@logger
+class User {}
+
+➤ You are not passing any parameters to logger. It's just a plain decorator.
+➤ But when if you want to pass a custom message like:
+
+@loggerDecorator("This is a custom logger")
+clas User{}
+Then you need a decorator factory.
+
+🏗️ Syntax of a Decorator Factory
+function loggerDecorator(message:string){
+  return function(constructor:Function){
+    console.log(message); //custom behavior
+  };
+}
+
+Usage:
+@loggerDecorator("This is custom logger")
+class User {
+  constructor() {
+    console.log("User constructor called");
+  }
+}
+
+🟡 Output:
+This is custom logger
+User constructor called
+
+Key Idea:
+Outer function → Accepts custom data.
+Inner function → Is the actual decorator, called by TypeScript.
+
+✅ Why Use Decorator Factory?
+➤ To pass dynamic values or configuration into the decorator.
+➤ To reuse the decorator logic with different parameters.
+
+✅ Important Notes:
+You must call the outer factory function with () to get the actual decorator.
+
+Example:
+@loggerDecorator("Logging user...")
+class User {}
+
+✅DOM-based decorator factory
+##################################
+1. 📦 HTML Setup
+<!-- index.html -->
+<div id="container"></div>
+
+2. ⚙️ Decorator Factory Definition
+function Template(template:string, elementId:string){
+  return function(target:any){
+    const u=new target(); //Create instance of the class
+
+    const container=document.getElementById(elementId);
+    if(container){
+      container.innerHTML=template;
+
+      const h2=container.querySelector("h2");
+      if(h2){
+        h2.textContent=`Hello Mr ${u.name}`;
+      }
+    }
+  };
+}
+
+This function returnsthe actual decorators.
+It inserts a given HTML template into a DOM element.
+If the template includes an <h2>, it fills it with the user's name from the class instance.
+
+3. 👤 Class with Decorator Applied
+@Template("<h2>Dynamic Header</h2><button>Click</button>", "container")
+class User {
+  name = "John";
+
+  constructor() {
+    console.log("User constructor called");
+  }
+}
+
+➤ When User class is defined, the decorator runs.
+➤ It inserts a dynamic HTML header into the #container div
+➤ Then it updates the H2 text using User's name.
+
+🧠 Key Concepts Highlighted
+| Concept               | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| **Decorator Factory** | Allows passing arguments like template string and element ID                |
+| **Target**            | Refers to the class constructor when decorating a class                     |
+| **DOM Access**        | Uses `getElementById` and `querySelector` to access and manipulate elements |
+| **Dynamic Behavior**  | Injects content and updates it using class instance properties              |
+
+🔁 Angular Analogy
+In Angular:
+
+@Component({
+  selector: 'app-root',
+  template: `<h2>Hello {{name}}</h2>`
+})
+class AppComponent {
+  name = 'John';
+}
+In your example:
+
+@Template("<h2>Dynamic Header</h2>", "container")
+class User {
+  name = "John";
+}
+👉 Decorator + Template + DOM Element — the same fundamental idea, just implemented manually.
+
+🔧 Using Multiple Decorators in TypeScript
+############################################
+✅ Syntax: Multiple Decorators on a Class
+@Logger('Logging...')
+@Template('<h1>User Component</h1>', 'app')
+class User {
+  constructor() {
+    console.log('User class Constructor called');
+  }
+}
+
+📌 Decorator Factory vs Decorator Function
+| Type                   | What it does                     | When it runs           |
+| ---------------------- | -------------------------------- | ---------------------- |
+| Decorator Factory  | Returns the actual decorator     | Runs top to bottom |
+| Decorator Function | Modifies class/function/property | Runs bottom to top |
+
+📋 Execution Order
+Given:
+
+@Logger('Logger Decorator')  // 1st decorator (top)
+@Template('<div>Hello</div>', 'app') // 2nd decorator (bottom)
+class User {}
+
+1️⃣ Decorator Factory Execution (Top to Bottom):
+Logger Decorator Factory runs first
+Template Decorator Factory runs second
+
+2️⃣ Decorator Function Execution (Bottom to Top):
+Template Decorator runs first
+Logger Decorator runs second
+
+🧪 Console Output Example
+When decorators are written like:
+
+@Logger()
+@Template()
+class User {}
+
+The console will show:
+
+Logger decorator factory
+Template decorator factory
+Template decorator called
+Logger decorator called
+
+🧩 Why Is Decorator Execution Bottom to Top?
+Typescript(and Javascript) follows the stack model for decorator evaluation:
+➤ Decorators are applied in the order of evaluation stack, so the last one(at the bottom) is pushed to the top of the call stack and executed first.
+
+🏷️ Property Decorators in TypeScript
+#####################################
+➤ A property decorator is a function applied to a class property to intercept, modify, or enhance its behavior.
+➤ It is invoked when the class is defined, not when instances are created.
+
+🧪 Basic Syntax
+function capitalize(target:any, propertyKey:string){
+  console.log("Capitalize decorator called");
+  console.log("Target: ", target);
+  console.log("Property Key:", propertyKey);
+}
+
+class Product{
+  @capitalize
+  name:string;
+  constructor(name:string){
+    this.name=name;
+  }
+}
+
+⚙️ Parameters of Property Decorator
+| Parameter     | Description                                                            |
+| ------------- | ---------------------------------------------------------------------- |
+| `target`      | Prototype object (for instance properties) or constructor (for static) |
+| `propertyKey` | Name of the property being decorated                                   |
+
+🧠 Static vs Instance Property Target
+| Property Type     | `target` Value               |
+| ----------------- | ---------------------------- |
+| Instance property | `Class.prototype` (object)   |
+| Static property   | Constructor function (class) |
+
+✨ Practical Example: Capitalize a String Property
+function capitalize(target:any, propertyKey:string):any{
+  let value:string;
+
+  const getter = () =>{
+    return value.charAt(0).toUpperCase();
+  };
+
+  const setter=(newVal:string) =>{
+    value=newVal.toLowerCase();
+  }
+
+  Object.defineProperty(target, propertyKey, {
+    get: getter,
+    set: setter,
+    enumerable: true,
+    configurable: true
+  });
+}
+
+✅ Usage
+class Product{
+  @capitalize
+  name:string;
+
+  constructor(name:string){
+    this.name=name;
+  }
+}
+
+const p1=new Product("apple");
+console.log(p.name); // Output Apple
+
+🧪 Behavior Breakdown
+➤ When p.name="apple" is called: Setter saves it as "apple" (all lowercase).
+
+➤When p.name is accessed: Getter capitalize the first letter: "Apple"
+
+🧠 Interview Insight
+Q: What does a property decorator return?
+A: It can optionally return a property descriptor (object with get, set, etc.) — mostly for advanced use like defining accessors.
+
+Q: When is a property decorator executed?
+A: At class definition time, not during instance creation.
+
+📌 Decorator Return Type Rule
+To avoid TS errors:
+
+function myDecorator(...): any {
+  // must return `void` or a descriptor-like object
+}
+
+🏷️ Access Decorators in TypeScript
+####################################
+We created an @accessLogger decorator that:
+Logs a message when a getter or setter is accessed.
+Internally wraps the original get or set method and adds custom logic(console log) before calling the original behaviour.
+
+🧠 Why does it work on both getter and setter?
+Because you used the decorator on one accessor (get price) but getters and setters share the same proeprty name (price). Typescript passes both getter and setter functions in the descriptor,, allowing you to modify both from the same decorator.
+
+🧩 Now, What is target in This Context?
+When using decorator in Typescript:
+function accessLogger(target:any, name:string, descriptor:PropertyDescriptor){
+  console.log(target); 
+  console.log(name);  // property name like price
+  console.log(descriptor); // contains get/set, configurable, enumerable
+}
+
+🔍 target meaning:
+| Scenario                      | `target` refers to...                     |
+| ----------------------------- | ----------------------------------------- |
+| Used on instance property | The class prototype object            |
+| Used on static property   | The class constructor function itself |
+
+So when the accessor is Not static, target is the prototype of the class, meaning
+console.log(target=== Product.prototype); //true
+
+This is important if you ever need to reflect metadata or attach new properties on the class from inside the decorator.
+
+🧪 Practical Use Case
+If we want to track access to certain sensitive fields (like price, password, etc) for logging or auditing purpose in production. Using accessor decorators like this gives you centralized control.
+
+✍ Final Decorator Structure (Simplified):
+function accessLogger(target:any, name:string, descriptor:PropertyDescriptor){
+  const originalGet=descriptor.get;
+  const originalSet=descriptor.set;
+
+  descriptor.get=function(){
+    console.log(`Getting {name}`);
+    return originalGet?.call(this);
+  }
+
+   descriptor.set = function (value: number) {
+    console.log(`Setting ${name} to ${value}`);
+    originalSet?.call(this, value);
+  };
+
+  return descriptor;
+}
+
+🏷️ Using It in a Class
+class Product{
+private _price:number;
+
+constructor (_price:number){
+  this._price=_price;
+}
+
+@accessLogger
+get price(){
+  return this._price;
+}
+
+set price(value:number){
+  if(value<0) throw new Error("Price cannot be negative");
+  this._price=value;
+}
+}
+
+🧪 Usage
+const p = new Product(100);
+
+console.log(p.price); // Triggers decorated getter
+p.price = 150;        // Triggers decorated setter
+
+🧾 Output Will Be:
+Target (prototype): Product {}
+Property Name: price
+Descriptor: { get: ƒ, set: ƒ, enumerable: false, configurable: true }
+
+🔍 Getting value of "price" 100
+📝 Setting value of "price" to 150
+
+✅ Using Decorators on Methods and Method Parameters in TypeScript
+####################################################################
+🔄 Example Class
+class Person{
+  constructor(private _name:string){}
+
+  @Logger
+  calculateAge(@ParamDecorator dob:string){}
+}
+
+🧠 Concept Summary
+
+1. Method Parameter Decorator
+A decorator placed directly before a method parameter.
+
+function ParamDecorator(target:any, methodName:string, parameterIndex:number){
+  console.log("Param Decorator called");
+  console.log("Target: ",target);   // Prototype object
+  console.log("Method name: ", methodName); // "calculateAge"
+  console.log("Parameter Index: ", parameterIndex); // e.g., 0
+}
+
+target: Prototype object (for instance method)
+methodName: Name of the method the parameter belongs to 
+parameterIndex: Position of the parameter in the method signature(0-based);
+
+2. Method Decorator
+A decorator applied on a method itself.
+
+function Logger(target:any, methodName:string, descriptor:PropertyDescriptor){
+  console.log("Logger Decorator called");
+  console.log("Target: ",target);   // Prototype object or class constructor
+  console.log("Method name: ", methodName); // "calculateAge"
+  console.log("Parameter Index: ", parameterIndex); // PropertyDescriptor object
+}
+
+➤ target: Prototype object (for instance methods)
+Constructor function for static methods
+➤ methodName: Name of the decorator method
+➤ descriptor: A PropertyDescriptor that includes:
+1. value: Method definition
+2. writable, enumerable, configurable
+
+🔄 Behavior Based on Method Type
+| Method Type     | `target` Value                  |
+| --------------- | ------------------------------- |
+| Instance method | `Person.prototype`              |
+| Static method   | `Person` (constructor function) |
+
+📦 What Can You Do With This?
+➤ Log method calls
+➤ Validate parameter inputs
+➤ Modify method behavior (by editing descriptor.value)
+➤ Track usage of certain 
+
+💡 Code Example:
+// Parameter Decorator
+function LogParameter(target: any, methodName: string, parameterIndex: number) {
+  console.log(`📌 Parameter decorator called on:`);
+  console.log(`➡ Method: ${methodName}, Parameter Index: ${parameterIndex}`);
+}
+
+// Method Decorator
+function LogMethod(target: any, methodName: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+
+  descriptor.value = function (...args: any[]) {
+    console.log(`🚀 Method "${methodName}" called with arguments:`, args);
+    return originalMethod.apply(this, args);
+  };
+
+  return descriptor;
+}
+
+// Class
+class Calculator {
+  @LogMethod
+  multiply(@LogParameter a: number, @LogParameter b: number): number {
+    return a * b;
+  }
+}
+
+// Instantiate and Call
+const calc = new Calculator();
+const result = calc.multiply(4, 5);
+console.log("✅ Result:", result);
+
+🧠 Output (when run):
+📌 Parameter decorator called on:
+➡ Method: multiply, Parameter Index: 1
+📌 Parameter decorator called on:
+➡ Method: multiply, Parameter Index: 0
+🚀 Method "multiply" called with arguments: [4, 5]
+✅ Result: 20

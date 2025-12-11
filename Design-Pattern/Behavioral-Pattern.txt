@@ -970,6 +970,533 @@ Versioning of entity states or rollback operations can use Memento-like logic.
 ❌ Overhead if object state is large or complex.
 ❌ Complexity increases if deep copying is required for nested objects.
 
+
+#########################
+🔷 State Design Pattern
+#########################
+The State Design Pattern allows an object to change its behavior when its internal state changes.
+It looks like the object changed its class dynamically.
+
+➡ You encapsulate different states into different classes.
+➡ The object delegates behaviors to the current state object.
+
+🔄 What Problem Does It Solve❓
+Problem: Lots of if-else or switch logic
+✅ Example: Order can be in states:
+✔️ NEW
+✔️ PACKED
+✔️ SHIPPED
+✔️ DELIVERED
+✔️ CANCELLED
+
+Typical bad code:
+if (orderStatus.equals("NEW")) { ... }
+else if (orderStatus.equals("PACKED")) { ... }
+else if (orderStatus.equals("SHIPPED")) { ... }
+...
+
+❌ Hard to maintain
+❌ Hard to extend
+❌ Violates Open/Closed Principle
+❌ All logic lives inside one massive class
+
+🔄 State Pattern Does
+It breaks each state into its own class.
+
+Order
+  |
+  ---> NEW State (NewOrderState)
+  ---> PACKED State (PackedState)
+  ---> SHIPPED State (ShippedState)
+  ---> DELIVERED State (DeliveredState)
+
+Each state knows:
+What it should do
+What the next state can be
+
+🔄 When To Use 
+Use State Pattern when:
+✔️ Object needs to behave differently in different phases
+✔️ Object transitions between states
+✔️ You want to avoid if/else chains
+✔️ States have independent, evolving logic
+✔️ Workflow automation
+✔️ Stateful machines
+
+✅ Real world examples:
+✔️ Order workflow (order states)
+✔️ ATM machine (insert card → enter PIN → withdraw)
+✔️ Payment processing
+✔️ Traffic light system
+✔️ Document workflow (Draft → Review → Approved → Published)
+
+
+🔄 5. UML Diagram (Simple)
+          State (interface)
+        /        |        \
+   NewState  PackedState  ShippedState  ...
+           ↑
+         Context (e.g., Order)
+👉 Context delegates behavior to current state.
+
+
+🔄 6. Real-Life Example in Java: Order Processing Workflow
+Let’s create a State Pattern for E-commerce Order.
+
+🟩 Step 1️⃣: State Interface
+public interface OrderState {
+    void next(OrderContext context);
+    void prev(OrderContext context);
+    String getStatus();
+}
+
+🟩 Step 2️⃣: Create Concrete States
+🔁 NEW → PACKED
+public class NewOrderState implements OrderState {
+
+    @Override
+    public void next(OrderContext context) {
+        context.setState(new PackedState());
+    }
+
+    @Override
+    public void prev(OrderContext context) {
+        System.out.println("This is the first state. No previous state.");
+    }
+
+    @Override
+    public String getStatus() {
+        return "Order is in NEW state.";
+    }
+}
+
+🔁 PACKED → SHIPPED
+public class PackedState implements OrderState {
+
+    @Override
+    public void next(OrderContext context) {
+        context.setState(new ShippedState());
+    }
+
+    @Override
+    public void prev(OrderContext context) {
+        context.setState(new NewOrderState());
+    }
+
+    @Override
+    public String getStatus() {
+        return "Order is PACKED.";
+    }
+}
+
+🔁 SHIPPED → DELIVERED
+public class ShippedState implements OrderState {
+
+    @Override
+    public void next(OrderContext context) {
+        context.setState(new DeliveredState());
+    }
+
+    @Override
+    public void prev(OrderContext context) {
+        context.setState(new PackedState());
+    }
+
+    @Override
+    public String getStatus() {
+        return "Order is SHIPPED.";
+    }
+}
+
+🔁 DELIVERED (Final State)
+public class DeliveredState implements OrderState {
+
+    @Override
+    public void next(OrderContext context) {
+        System.out.println("This is the final state. No next state.");
+    }
+
+    @Override
+    public void prev(OrderContext context) {
+        context.setState(new ShippedState());
+    }
+
+    @Override
+    public String getStatus() {
+        return "Order is DELIVERED.";
+    }
+}
+
+🟩 Step 3️⃣: Context Class
+public class OrderContext {
+
+    private OrderState state;
+
+    public OrderContext() {
+        this.state = new NewOrderState();   // default state
+    }
+
+    public void setState(OrderState state) {
+        this.state = state;
+    }
+
+    public void nextState() {
+        state.next(this);
+    }
+
+    public void previousState() {
+        state.prev(this);
+    }
+
+    public String getStatus() {
+        return state.getStatus();
+    }
+}
+
+🟩 Step 4️⃣: Using It
+public class Main {
+    public static void main(String[] args) {
+        
+        OrderContext order = new OrderContext();
+
+        System.out.println(order.getStatus());  
+        order.nextState();
+
+        System.out.println(order.getStatus());  
+        order.nextState();
+
+        System.out.println(order.getStatus());  
+        order.nextState();
+
+        System.out.println(order.getStatus());
+    }
+}
+
+✅ Output:
+Order is in NEW state.
+Order is PACKED.
+Order is SHIPPED.
+Order is DELIVERED.
+
+🔄 7. Real Spring Boot Use Case (Production Grade)
+A very common real-world project using State Pattern:
+✔️ Order State Workflow in Microservices
+✔️ (E-commerce, pharmacy, hospital, ticket booking)
+
+Spring Boot code structure:
+
+/states
+   |- NewState
+   |- PackedState
+   |- ShippedState
+   |- DeliveredState
+/context
+   |- OrderContext
+/controller
+   |- OrderController
+/service
+   |- OrderService
+/entity
+   |- OrderEntity
+
+State transitions can be saved in DB:
+✔️ state = NEW
+✔️ state = PACKED
+✔️ state = SHIPPED
+
+This is extremely useful in:
+✔️ Saga pattern
+✔️ Workflow engines
+✔️ State machines
+✔️ Payment gateways
+✔️ Microservice orchestration
+
+🔄 Advantages of State Pattern
+➤ Removes complex if-else
+➤ Easy to extend new states
+➤ Better separation of concerns
+➤ Follows Open/Closed Principle
+➤ Cleaner workflow management
+
+🔄 Disadvantages
+➤ More classes → more boilerplate
+➤ Overkill for simple state transitions
+➤ Harder debugging if too many states
+
+
+###########################
+🔷 Command Design Pattern
+###########################
+The Command Pattern is a behavioral design pattern that turns a request into a standalone object (Command object).
+This allows you to parameterize methods with commands, queue or log requests, undo operations, and support macro operations.
+
+➡ In simple terms: It encapsulates “what needs to be done” inside an object.
+
+🔄 Why is Command Pattern needed? 
+❌ Problems Without Command Pattern
+➤ Code becomes large if many operations are needed.
+➤ Hard-coded function calls → no flexibility.
+➤ Cannot support undo/redo.
+➤ Cannot queue, delay, or log operations.
+➤ UI handlers tightly coupled with logic.
+
+🔄 Command Pattern Solves This
+➤ Encapsulates each request into a Command object.
+➤ Loose coupling between requester (invoker) and performer (receiver).
+➤ Can queue commands, log commands, and undo/redo commands.
+➤ Supports macro commands (execute many commands in sequence).
+
+🔄 Real-Life Examples
+➤ Remote control system: Buttons → Commands.
+➤ GUI buttons (IDE, Photoshop): Save, Undo, Redo.
+➤ Database transaction queue: Insert, Update, Delete commands.
+➤ Message queues: Commands stored and executed later.
+➤ Microservices command queue: CQRS (Command Query Responsibility Segregation).
+
+🔄 Core Components
+| Component               | Role                                 |
+| ----------------------- | ------------------------------------ |
+| Command (interface)**   | Declares `execute()`                 |
+| ConcreteCommand**       | Implements the action                |
+| Receiver**              | The actual executor (business logic) |
+| Invoker**               | Triggers the command                 |
+| Client**                | Instantiates command & invoker       |
+
+🔄 UML Diagram
+Client ---> ConcreteCommand ---> Receiver
+              ^
+              |
+           Command
+              |
+           Invoker ---> execute()
+
+🔄 Simple Java Example 
+1️⃣: Command Interface
+interface Command {
+    void execute();
+}
+
+2️⃣: Receiver (actual business logic)
+class Light {
+    public void turnOn() {
+        System.out.println("Light is ON");
+    }
+    public void turnOff() {
+        System.out.println("Light is OFF");
+    }
+}
+
+3️⃣: Concrete Commands
+class TurnOnCommand implements Command {
+    private Light light;
+
+    public TurnOnCommand(Light light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        light.turnOn();
+    }
+}
+
+class TurnOffCommand implements Command {
+    private Light light;
+
+    public TurnOffCommand(Light light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        light.turnOff();
+    }
+}
+
+4️⃣: Invoker
+class RemoteControl {
+    private Command command;
+
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+    public void pressButton() {
+        command.execute();
+    }
+}
+
+5️⃣: Client
+public class Main {
+    public static void main(String[] args) {
+        Light light = new Light();
+
+        RemoteControl remote = new RemoteControl();
+
+        remote.setCommand(new TurnOnCommand(light));
+        remote.pressButton();
+
+        remote.setCommand(new TurnOffCommand(light));
+        remote.pressButton();
+    }
+}
+
+🟦 Command Pattern in Order Processing System
+Use Case:
+You have an e-commerce system with commands:
+CreateOrderCommand
+CancelOrderCommand
+ShipOrderCommand
+
+1️⃣: Command Interface
+public interface OrderCommand {
+    void execute();
+}
+
+2️⃣: Receiver (Service Layer)
+@Service
+public class OrderService {
+
+    public void createOrder(Long id) {
+        System.out.println("Order created: " + id);
+    }
+
+    public void cancelOrder(Long id) {
+        System.out.println("Order cancelled: " + id);
+    }
+
+    public void shipOrder(Long id) {
+        System.out.println("Order shipped: " + id);
+    }
+}
+
+3️⃣: Concrete Commands
+public class CreateOrderCommand implements OrderCommand {
+    private final OrderService orderService;
+    private final Long orderId;
+
+    public CreateOrderCommand(OrderService orderService, Long orderId) {
+        this.orderService = orderService;
+        this.orderId = orderId;
+    }
+
+    @Override
+    public void execute() {
+        orderService.createOrder(orderId);
+    }
+}
+
+public class CancelOrderCommand implements OrderCommand {
+    private final OrderService orderService;
+    private final Long orderId;
+
+    public CancelOrderCommand(OrderService orderService, Long orderId) {
+        this.orderService = orderService;
+        this.orderId = orderId;
+    }
+
+    @Override
+    public void execute() {
+        orderService.cancelOrder(orderId);
+    }
+}
+
+public class ShipOrderCommand implements OrderCommand {
+    private final OrderService orderService;
+    private final Long orderId;
+
+    public ShipOrderCommand(OrderService orderService, Long orderId) {
+        this.orderService = orderService;
+        this.orderId = orderId;
+    }
+
+    @Override
+    public void execute() {
+        orderService.shipOrder(orderId);
+    }
+}
+
+4️⃣ Invoker
+@Component
+public class OrderInvoker {
+
+    public void executeCommand(OrderCommand command) {
+        command.execute();
+    }
+}
+
+5️⃣ Controller (Client)
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+    private final OrderInvoker invoker;
+
+    public OrderController(OrderService orderService, OrderInvoker invoker) {
+        this.orderService = orderService;
+        this.invoker = invoker;
+    }
+
+    @PostMapping("/{id}/create")
+    public String createOrder(@PathVariable Long id) {
+        invoker.executeCommand(new CreateOrderCommand(orderService, id));
+        return "Order Created!";
+    }
+
+    @PostMapping("/{id}/cancel")
+    public String cancelOrder(@PathVariable Long id) {
+        invoker.executeCommand(new CancelOrderCommand(orderService, id));
+        return "Order Cancelled!";
+    }
+
+    @PostMapping("/{id}/ship")
+    public String shipOrder(@PathVariable Long id) {
+        invoker.executeCommand(new ShipOrderCommand(orderService, id));
+        return "Order Shipped!";
+    }
+}
+
+
+✔️ Advantages of Command Pattern
+➤ Decouples invoker & receiver.
+➤ Easy to add new commands.
+➤ Supports undo/redo.
+➤ Can queue, log, schedule commands.
+➤ Enables macro commands.
+
+✔️ Disadvantages
+➤ Increase in classes (each command is a new class).
+➤ Overkill if simple function calls suffice.
+
+✔️ When to Use (very important for interviews)
+When you need:
+➤ Operations as objects.
+➤ Undo/redo support.
+➤ Logging or queueing tasks.
+➤ Decoupled UI actions from business logic.
+➤ Macro operations.
+
+
+Command 🆚 Strategy 🆚 State 🆚 Observer
+Command vs Adapter
+| Attribute | Command               | Adapter                          |
+| --------- | --------------------- | -------------------------------- |
+| Purpose   | Encapsulate a request | Convert interface A to B         |
+| Usage     | Undo, Queues, Macros  | When two incompatible interfaces |
+| Focus     | Actions               | Interfaces                       |
+
+Command vs Strategy
+Strategy selects HOW to do something.
+Command represents WHAT action to execute.
+
+Command vs State
+State changes behavior based on internal state.
+Command is a request wrapped as an object.
+
+Command vs Observer
+Observer notifies subscribers.
+Command encapsulates an action.
+✅
 🔄
 🔄
 🔄
