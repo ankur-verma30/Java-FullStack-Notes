@@ -1,0 +1,734 @@
+
+###############################
+🔷 Introduction to Containers
+###############################
+➤ Containers are lightweight, isolated runtime environments that package an application along with its dependencies (libraries, configs, binaries).
+➤ They share the host OS kernel, unlike VMs which need a full guest OS.
+➤ They ensure “Works on my machine” issues disappear by providing a consistent environment across development, testing, and production.
+➤ Popular container runtime: Docker (most common), containerd, CRI-O, runc.
+
+
+🔄 Problems With Virtual Machines
+❌ Problem 1️⃣: Heavy Resource Usage
+➤ VMs include a full guest operating system → large in size (GBs).
+➤ Heavy CPU/RAM consumption.
+
+❌ Problem 2️⃣: Slow Boot Time
+➤ VMs take minutes to start because they boot a complete OS.
+
+❌ Problem 3️⃣: Hard to Scale
+➤ Spinning up multiple VMs is costly and slow → not ideal for microservices.
+
+❌ Problem 4️⃣: Duplication of OS
+➤ Each VM has its own OS → wastes disk space.
+
+❌ Problem 5️⃣: Hard to Port
+➤ VM images are large → difficult to move, copy, push/pull.
+
+❌ Problem 6️⃣: Dev/Prod Inconsistency
+➤ Developers run different OS versions or dependencies → deployment failures.
+
+
+🔄 How Containers Solve Those Problems
+1️⃣ Lightweight (No Guest OS)
+✔️ Containers share the host OS kernel → only app + its libraries are packaged.
+✔️ Much smaller than VMs (MBs instead of GBs).
+
+2️⃣ Fast Startup
+✔️ Containers start in seconds (no OS booting).
+
+3️⃣ Easy Scaling
+✔️ Spin up multiple containers instantly → perfect for microservices + Kubernetes.
+
+4️⃣ Better Resource Utilization
+More containers on same hardware vs VMs → cheaper infrastructure.
+
+5️⃣ Portability
+Same container image runs on:
+  ✔️Dev laptop
+  ✔️Test server
+  ✔️Production
+  ✔️Cloud
+
+6️⃣ Consistent Environments
+✔️ Application + dependencies packaged together → no configuration drift.
+
+ 
+🔄 Containers 🆚 VMs
+| Feature      | Containers           | Virtual Machines              |
+| ------------ | -------------------- | ----------------------------- |
+| OS           | Share host OS kernel | Each has its own guest OS     |
+| Startup time | Seconds              | Minutes                       |
+| Size         | MBs                  | GBs                           |
+| Isolation    | Process-level        | Full OS-level                 |
+| Performance  | Near-native          | Some overhead                 |
+| Scaling      | Very fast            | Slow                          |
+| Use case     | Microservices, CI/CD | Strong isolation, legacy apps |
+
+
+🔄 Drawbacks of Containers & How to Overcome Them
+❌  Weaker Security (Shared Kernel)
+➤ If kernel is compromised → all containers are at risk.
+
+✅ Solution:
+➤ Use VM isolation for untrusted workloads.
+➤ Use Kubernetes Pod Security Policies, AppArmor, SELinux.
+➤ Regular kernel patching.
+
+❌ Limited Isolation Compared to VMs
+➤ Containers share the same OS kernel.
+
+✅ Solution:
+➤ Use sandboxed containers (gVisor, Kata Containers).
+➤ Use hardened distros (Bottlerocket, Flatcar).
+
+❌ Complex Networking
+➤ Container networking (bridge, overlay, CNI plugins) is harder than VM networks.
+
+✅ Solution:
+➤ Use Kubernetes CNI (Calico, Flannel) for easier management.
+
+❌ Persistent Storage Challenges
+➤ Containers are ephemeral; data disappears on deletion.
+
+✅ Solution:
+➤ Use volumes: Docker volumes, Kubernetes PersistentVolumes.
+
+❌ Image Bloat
+➤ Large base images → slow builds and pulls.
+
+✅ Solution:
+➤ Use slim images (alpine, debian-slim).
+➤ Multi-stage Docker builds.
+
+
+🔄 Architecture of Containers
+Container architecture consists of:
+
+1️⃣ User Layer
+✔️ Applications
+✔️ Libraries
+✔️ Dependencies
+✔️ Environment variables
+
+2️⃣ Container Image Layer
+➤ Immutable filesystem created by layering:
+  ✔️ base image → runtime → dependencies → source code
+➤ Stored in a registry (Docker Hub, ECR, GCR)
+
+3️⃣ Runtime Layer
+Two main components:
+1️⃣ High-level runtime (Docker, containerd)
+2️⃣ Low-level runtime (runc) — responsible for creating the container’s namespaces & cgroups
+
+4️⃣ OS Layer
+Kernel features used:
+✔️ Namespaces → isolation
+✔️ cgroups → resource limits
+✔️ UnionFS → layered filesystem
+
+5️⃣ Host Layer
+Host OS + hardware resources
+
+
+🔄 Features of Containers
+1️⃣ Isolation
+Each container runs independently.
+
+2️⃣ Portability
+Runs anywhere (Linux, Windows, Cloud, Kubernetes).
+
+3️⃣ Lightweight
+No OS included → fast and small.
+
+4️⃣ Scalability
+Scale up/down quickly.
+
+5️⃣ Immutability
+Images are read-only; changes create new layers.
+
+6️⃣ Consistency
+Same environment across all stages.
+
+7️⃣ Resource Efficiency
+More apps per host vs VMs.
+
+8️⃣ Fast Deployment
+Containers spin up in seconds.
+
+9️⃣ Loose Coupling
+Perfect for microservices architecture.
+
+
+🔄 Lifecycle of Containers
+1️⃣ Create
+✔️ Container is defined but not running.
+🔗 docker create image-name
+
+2️⃣ Start
+✔️ Container starts execution.
+🔗 docker start container-id
+
+3️⃣ Run
+✔️ Equivalent to create + start.
+🔗 docker run image-name
+
+4️⃣ Pause
+✔️ Temporarily pause execution.
+🔗 docker pause container-id
+
+5️⃣ Resume / Unpause
+🔗 docker unpause container-id
+
+6️⃣ Stop
+✔️ Gracefully stops the container (SIGTERM).
+🔗 docker stop container-id
+
+7️⃣ Kill
+✔️ Force stop (SIGKILL).
+🔗 docker kill container-id
+
+8️⃣ Restart
+✔️ Stop + start.
+🔗 docker restart container-id
+
+9️⃣ Remove
+✔️ Deletes the container.
+🔗 docker rm container-id
+
+
+🔄 Files and Folders in containers base images
+1️⃣  /bin: contains binary executable files, such as the ls, cp, and ps commands.
+2️⃣ /sbin: contains system binary executable files, such as the init and shutdown commands.
+3️⃣ /etc: contains configuration files for various system services.
+4️⃣ /lib: contains library files that are used by the binary executables.
+5️⃣ /usr: contains user-related files and utilities, such as applications, libraries, and documentation.
+6️⃣ /var: contains variable data, such as log files, spool files, and temporary files.
+7️⃣ /root: is the home directory of the root user.
+
+🔄 Files and Folders that containers use from host operating system
+1️⃣ The host's file system: Docker containers can access the host file system using bind mounts, which allow the container to read and write files in the host file system.
+
+2️⃣ The host's Networking stack: The host's networking stack is used to provide network connectivity to the container. Docker containers can be connected to the host's network directly or through a virtual network.
+
+3️⃣ The host's System calls: The host's kernel handles system calls from the container, which is how the container accesses the host's resources, such as CPU, memory, and I/O.
+
+4️⃣ Namespaces: Docker containers use Linux namespaces to create isolated environments for the container's processes. Namespaces provide isolation for resources such as the file system, process ID, and network.
+
+5️⃣ Control groups (cgroups): Docker containers use cgroups to limit and control the amount of resources, such as CPU, memory, and I/O, that a container can access.
+
+
+###########
+🔷 Docker
+###########
+Docker is a containerization platform that provides easy way to containerize your applications, which means, using Docker you can build container images, run the images to create containers and also push these containers to container regestries such as DockerHub, Quay.io and so on.
+
+In simple words, you can understand as containerization is a concept or technology and Docker Implements Containerization.
+
+🔄 Docker LifeCycle
+There are three important things,
+1️⃣ docker build -> builds docker images from Dockerfile
+2️⃣ docker run -> runs container from docker images
+3️⃣ docker push -> push the container image to public/private regestries to share the docker images.
+
+
+🔄 Understanding the terminology
+1️⃣ Docker daemon
+The Docker daemon (dockerd) listens for Docker API requests and manages Docker objects such as images, containers, networks, and volumes. A daemon can also communicate with other daemons to manage Docker services.
+
+2️⃣ Docker client
+The Docker client (docker) is the primary way that many Docker users interact with Docker. When you use commands such as docker run, the client sends these commands to dockerd, which carries them out. The docker command uses the Docker API. The Docker client can communicate with more than one daemon.
+
+3️⃣ Docker Desktop
+Docker Desktop is an easy-to-install application for your Mac, Windows or Linux environment that enables you to build and share containerized applications and microservices. Docker Desktop includes the Docker daemon (dockerd), the Docker client (docker), Docker Compose, Docker Content Trust, Kubernetes, and Credential Helper. For more information, see Docker Desktop.
+
+4️⃣ Docker registries
+✔️ A Docker registry stores Docker images. Docker Hub is a public registry that anyone can use, and Docker is configured to look for images on Docker Hub by default. You can even run your own private registry.
+
+✔️ When you use the docker pull or docker run commands, the required images are pulled from your configured registry. When you use the docker push command, your image is pushed to your configured registry. Docker objects
+
+✔️ When you use Docker, you are creating and using images, containers, networks, volumes, plugins, and other objects. This section is a brief overview of some of those objects.
+
+5️⃣ Dockerfile
+Dockerfile is a file where you provide the steps to build your Docker Image.
+
+6️⃣ Images
+An image is a read-only template with instructions for creating a Docker container. Often, an image is based on another image, with some additional customization. For example, you may build an image which is based on the ubuntu image, but installs the Apache web server and your application, as well as the configuration details needed to make your application run.
+
+You might create your own images or you might only use those created by others and published in a registry. To build your own image, you create a Dockerfile with a simple syntax for defining the steps needed to create the image and run it. Each instruction in a Dockerfile creates a layer in the image. When you change the Dockerfile and rebuild the image, only those layers which have changed are rebuilt. This is part of what makes images so lightweight, small, and fast, when compared to other virtualization technologies.
+
+
+🔄 INSTALL DOCKER
+A very detailed instructions to install Docker are provide in the below link
+
+https://docs.docker.com/get-docker/
+
+For Demo,
+1️⃣ You can create an Ubuntu EC2 Instance on AWS and run the below commands to install docker.
+🔗 sudo apt update
+🔗 sudo apt install docker.io -y
+
+2️⃣ Start Docker and Grant Access
+A very common mistake that many beginners do is, After they install docker using the sudo access, they miss the step to Start the Docker daemon and grant acess to the user they want to use to interact with docker and run docker commands.
+
+3️⃣ Always ensure the docker daemon is up and running.
+A easy way to verify your Docker installation is by running the below command
+🔗 docker run hello-world
+
+👉 If the output says:
+docker: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/create": dial unix /var/run/docker.sock: connect: permission denied.
+See 'docker run --help'.
+
+This can mean two things,
+1️⃣ Docker deamon is not running.
+2️⃣ Your user does not have access to run docker commands.
+
+4️⃣ Start Docker daemon
+You use the below command to verify if the docker daemon is actually started and Active
+🔗 sudo systemctl status docker
+
+5️⃣ If you notice that the docker daemon is not running, you can start the daemon using the below command
+🔗 sudo systemctl start docker
+
+6️⃣ Grant Access to your user to run docker commands
+To grant access to your user to run the docker command, you should add the user to the Docker Linux group. Docker group is create by default when docker is installed.
+🔗 sudo usermod -aG docker ubuntu
+
+👉 In the above command ubuntu is the name of the user, you can change the username appropriately.
+
+⚡ NOTE: : You need to logout and login back for the changes to be reflected.
+
+Docker is Installed, up and running 🥳🥳
+Use the same command again, to verify that docker is up and running.
+
+🔗 docker run hello-world
+✅ Output should look like:
+....
+....
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+...
+...
+
+#############################
+🔷 Multi-Stage Docker Build 
+#############################
+Multi-stage Docker build allows you to use multiple temporary images during the build process and copy only the required final artifacts into a small, clean production image.
+
+📌 In short:
+➤ Build in one image
+➤ Run in another image
+➤ Discard everything else
+
+
+🔄 Why Multi-Stage Build Was Introduced (The Problem)
+❌ Old (Single-Stage Dockerfile) Problem
+
+Earlier, Dockerfiles looked like this:
+FROM node:18
+
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+
+CMD ["npm", "start"]
+
+❗ Issues with this approach:
+➤ Image contains:
+  ✔️ Node.js
+  ✔️ npm
+  ✔️ source code
+  ✔️ build tools
+  ✔️ dev dependencies
+➤ Image size becomes very large (300–800MB)
+➤ Security risk (extra tools inside production container)
+➤ Slow deployment
+
+
+🔄 Core Idea of Multi-Stage Build
+Use different images for different stages of the build.
+
+| Stage         | Purpose                   |
+| ------------- | ------------------------- |
+| Build stage   | Compile / build code      |
+| Runtime stage | Only run the final output |
+👉 Only the final stage image is shipped 🚀
+
+
+🔗  Basic Syntax of Multi-Stage Dockerfile
+FROM image AS stage-name
+👉 You can have multiple FROM statements in one Dockerfile.
+
+
+✅ Example (Node.js App)
+📁 Project Structure
+.
+├── package.json
+├── src/
+└── Dockerfile
+
+🔗 Multi-Stage Dockerfile
+# ---------- Stage 1: Build ----------
+FROM node:18 AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+
+# ---------- Stage 2: Production ----------
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+
+RUN npm install --only=production
+
+CMD ["node", "dist/index.js"]
+
+
+🔄 Internal Working
+1️⃣ Docker starts Stage 1 (builder)
+2️⃣ Installs dependencies
+3️⃣ Builds the project
+4️⃣ Output goes to /app/dist
+5️⃣ Docker starts Stage 2
+6️⃣ Copies only /app/dist from Stage 1
+7️⃣ Stage 1 image is discarded
+8️⃣ Final image contains:
+  ✔️ compiled files
+  ✔️ minimal runtime
+👉 Intermediate images are NOT shipped
+
+🔄 COPY --from 
+COPY --from=builder /app/dist ./dist
+
+👉 Means:
+➤ Copy files from another stage
+➤ Not from local filesystem
+➤ Stage name acts like a virtual image
+
+✅ Real-World Example: React App + Nginx
+🎯 Goal
+➤ Build React app
+➤ Serve via Nginx
+➤ No Node.js in production
+
+🔗 Dockerfile
+# ---------- Stage 1: Build ----------
+FROM node:18 AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+
+# ---------- Stage 2: Nginx ----------
+FROM nginx:alpine
+
+COPY --from=builder /app/build /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+👉 Final image:
+➤ No Node.js
+➤ Only static files + Nginx
+➤ Very small (~25MB)
+
+🔄Multi-Stage 🆚 Single-Stage 
+| Feature            | Single Stage | Multi-Stage |
+| ------------------ | ------------ | ----------- |
+| Image size         | Large        | Very small  |
+| Security           | Poor         | High        |
+| Build tools inside | Yes          | No          |
+| Production ready   | ❌            | ✅           |
+| Best practice      | ❌            | ✅           |
+
+
+🔐 Security Advantages
+➤ No compilers
+➤ No package managers
+➤ No source code
+➤ Reduced attack surface
+➤ Follows principle of least privilege
+
+⚡ “Multi-stage builds significantly reduce the attack surface of production containers.”
+
+
+🔄 Performance Benefits
+➤ Faster pull time
+➤ Faster container startup
+➤ Less disk usage
+➤ Faster CI/CD pipelines
+
+✅ Multi-Stage Build with Java
+Spring Boot Example
+# ---------- Stage 1: Build ----------
+FROM maven:3.9-eclipse-temurin-17 AS builder
+
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+
+# ---------- Stage 2: Runtime ----------
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+COPY --from=builder /app/target/app.jar app.jar
+
+CMD ["java", "-jar", "app.jar"]
+
+👉 Maven is not included in final image.
+
+
+❓ Can multiple stages use different base images?
+✅ Yes (Node, Nginx, JRE, Alpine, etc.)
+
+❓ Are intermediate images stored?
+❌ No (unless you tag them manually)
+
+❓ Does multi-stage increase build time?
+❌ Slightly during build
+✅ But saves time in runtime and deployment
+
+❓ Can we copy between stages?
+✅ Yes using COPY --from=stage
+
+
+🔄 Best Practices 
+✔️ Use small base images (alpine)
+✔️ Separate build and runtime
+✔️ Name stages clearly (builder, runtime)
+✔️ Copy only required artifacts
+✔️ Avoid copying .env or secrets
+
+
+❌ When NOT to Use Multi-Stage?
+➤ Very small scripts
+➤ One-file utilities
+➤ Quick local testing
+
+👉 In production → Always use multi-stage
+
+#################################
+🔷 Distroless Container Images
+#################################
+Distroless container images are Docker/container images that contain only the application and its runtime dependencies, and nothing else.
+➤ No OS package manager
+➤ No shell (bash/sh)
+➤ No utilities like ls, curl, ps
+➤ No unnecessary libraries
+
+➡️ Distroless images remove everything except what is required to run the app.”
+
+
+❓ Why are they called “Distroless”?
+
+🔗 Traditional images:
+Ubuntu / Debian / Alpine
++ Shell
++ Coreutils
++ Package manager
++ Debug tools
++ App
+
+
+🔗 Distroless images:
+Only App + Runtime (JRE / Node / Python / libc)
+➡️ There is no Linux distribution inside, so the image is called “distroless”.
+
+👉 Distroless was Developed by Google
+👉 Used internally at Google Cloud
+👉 Open-sourced for production workloads
+
+
+🔄 Goal of Distroless Images
+🎯 Reduce attack surface + increase security + reduce image size
+
+
+❗Problems with Traditional Container Images
+❌ 1️⃣ Large Image Size
+➤ Ubuntu image ~70MB
+➤ Debian ~120MB
+➤ Includes tools not required in production
+
+❌ 2️⃣ Security Vulnerabilities
+➤ Shells + utilities = more CVEs
+➤ Hackers can exploit bash, curl, apt, etc.
+
+❌ 3️⃣ Containers Used as Mini VMs
+➤ Devs SSH into containers (bad practice)
+➤ Containers should be immutable
+
+🔄 Distroless Solves These Problems
+| Problem        | Distroless Solution             |
+| -------------- | ------------------------------- |
+| Large size     | Only runtime libraries included |
+| Security risk  | No shell, no package manager    |
+| Debug misuse   | Forces proper observability     |
+| Faster startup | Less filesystem to scan         |
+
+
+🔄 Distroless Images Contain
+Depending on runtime:
+1️⃣ Java Distroless
+  ✔️ JVM
+  ✔️ Required libc
+  ✔️ CA certificates
+  ✔️ Your .jar
+
+2️⃣ Node.js Distroless
+  ✔️ Node runtime
+  ✔️ Required shared libraries
+  ✔️ Your JS app
+
+3️⃣ Python Distroless
+  ✔️ Python interpreter
+  ✔️ Required libraries
+  ✔️ Your app
+
+
+🔄 Distroless Images DO NOT Contain
+❌ /bin/bash
+❌ /bin/sh
+❌ apt, apk, yum
+❌ curl, wget
+❌ ps, top, netstat
+👉 This is intentional.
+
+
+🔄 Why No Shell is a BIG DEAL
+1️⃣ Security Impact:
+➤ Attacker cannot run commands inside container
+➤ Even if container is compromised → limited damage
+
+2️⃣ Operational Impact:
+➤ Cannot docker exec -it bash
+➤ Must rely on:
+  ✔️ Logs
+  ✔️ Metrics
+  ✔️ Tracing
+👉 Encourages cloud-native best practices
+
+
+🔄 Distroless 🆚 Alpine 🆚 Ubuntu
+| Feature          | Ubuntu | Alpine | Distroless    |
+| ---------------- | ------ | ------ | ------------  |
+| OS present       | Yes    | Yes    | ❌ No         |
+| Shell            | Yes    | Yes    | ❌ No         |
+| Package manager  | Yes    | Yes    | ❌ No         |
+| Image size       | Large  | Small  | Smallest      |
+| Security         | Medium | Better | Best          |
+| Debugging        | Easy   | Easy   | Hard          |
+| Production ready | ❌     | ⚠️    | ✅            |
+
+
+🔄 Distroless is for Production, not Development
+❌ Bad Use Case
+➤ Local debugging
+➤ Running scripts interactively
+➤ Installing packages dynamically
+
+✅ Good Use Case
+➤ Microservices
+➤ Kubernetes workloads
+➤ Cloud-native apps
+➤ CI/CD final stage images
+
+
+🔄 Multi-Stage Docker Build 
+Distroless is almost always used with multi-stage builds.
+
+✅ Example (Java-Based App) 
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
+# Stage 2: Runtime (Distroless)
+FROM gcr.io/distroless/java17-debian12
+COPY --from=build /app/target/app.jar /app.jar
+CMD ["app.jar"]
+
+
+✔️ Build tools not included
+✔️ Only final artifact copied
+✔️ No shell in runtime image
+
+
+🔄 How Distroless Containers Run Without a Shell
+❌ Instead of:
+🔗 CMD java -jar app.jar
+
+✅ They use exec form:
+🔗 CMD ["java", "-jar", "app.jar"]
+
+👉 Shell form (CMD java -jar) requires /bin/sh → not available
+
+🔄 Logging in Distroless Containers
+➤ Logs go to stdout / stderr
+➤ Docker / Kubernetes captures logs
+➤ Use:
+  ✔️ kubectl logs
+  ✔️ ELK / Loki / Cloud Logging
+
+🔹 Debugging Distroless Containers (Interview Trap)
+❌ You cannot exec into them
+✅ Proper debugging methods:
+✔️ Application logs
+✔️ Metrics (Prometheus)
+✔️ Tracing (Jaeger)
+✔️ Sidecar containers
+✔️ Temporary debug image
+
+
+🔄 Distroless & Kubernetes (Real World)
+➤ Preferred for:
+  ✔️ Backend services
+  ✔️ APIs
+  ✔️ Event consumers
+
+➤ Used by:
+  ✔️ Google
+  ✔️ Large SaaS companies
+
+➤ Works best with:
+  ✔️ Read-only root filesystem
+  ✔️ Non-root users
+
+✅ Distroless Images Examples
+| Runtime | Image                                 |
+| ------- | ------------------------------------- |
+| Java    | `gcr.io/distroless/java17-debian12`   |
+| Node    | `gcr.io/distroless/nodejs20-debian12` |
+| Python  | `gcr.io/distroless/python3-debian12`  |
+| Base    | `gcr.io/distroless/base-debian12`     |
+
+
+🌟 Common Questions
+❓ Why are distroless images more secure?
+✅ Answer: Because they remove shell, package managers, and unnecessary binaries, which significantly reduces the attack surface and vulnerability exposure.
+
+❓ Can you SSH into a distroless container?
+✅ Answer: No. Distroless containers do not contain a shell or SSH server.
+
+❓ How do you debug a distroless container?
+✅ Answer: By using logs, metrics, distributed tracing, or attaching a temporary debug container.
+
+❓ Why not use Alpine instead?
+✅ Answer: Alpine still contains a shell and package manager, whereas distroless removes everything unnecessary, making it more secure for production.
+
+❓ Is distroless suitable for development?
+✅ Answer: No. It is designed for production workloads only.

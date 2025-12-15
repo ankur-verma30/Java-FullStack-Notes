@@ -126,12 +126,18 @@ public class SerializationBreaker {
 }
 
 🛡️ Prevention:
-➤ Implement readResolve() method:
+➤ Implement readResolve() method
+➤ During deserialization, Java creates a new object, which can break the Singleton pattern.
+➤ If a Singleton class defines readResolve(), the JVM replaces the deserialized object with the object returned by this method.
+➤ By returning the existing singleton instance, multiple instances are prevented.
 
 protected Object readResolve() {
     return instance;
 }
-✔️ This ensures deserialization returns the same instance.
+
+➤ JVM discards the newly created deserialized object
+➤ Always returns the same Singleton instance
+➤ Ensures Singleton integrity after serialization
 
 
 3️⃣ Cloning
@@ -242,18 +248,22 @@ public class Singleton {
 🧠 Ultimate Protection Enum Singleton (Best Practice)
 
 ✅ Example:
-public enum EnumSingleton {
+public enum EnumSingletonSafestPractice {
     INSTANCE;
 
-    public void show() {
-        System.out.println("Using Enum Singleton!");
+    public void doSomething(){
+        System.out.println("Singleton instance is doing something");
     }
-}
 
-👉 Usage:
-public class Main {
     public static void main(String[] args) {
-        EnumSingleton.INSTANCE.show();
+        EnumSingletonSafestPractice instance1=EnumSingletonSafestPractice.INSTANCE;
+        EnumSingletonSafestPractice instance2=EnumSingletonSafestPractice.INSTANCE;
+
+        System.out.println(instance1==instance2);
+        instance1.doSomething();
+        instance2.doSomething();
+        System.out.println(System.identityHashCode(instance1));
+        System.out.println(System.identityHashCode(instance2));
     }
 }
 
@@ -282,7 +292,6 @@ public class Runtime {
         return currentRuntime;
     }
 }
-
 
 🔄 Singleton Pattern in Spring Boot
 Spring beans are Singletons by default (scoped as singleton).
@@ -587,7 +596,7 @@ public RestTemplate restTemplate(RestTemplateBuilder builder) {
 👉 Here, RestTemplateBuilder acts as a factory, building pre-configured RestTemplate objects.
 
 
-🔄 Real-+world Use Cases in Projects
+🔄 Real-world Use Cases in Projects
 | Use Case                           | Factory Role                                               |
 | ---------------------------------- | ---------------------------------------------------------- |
 | **Database Connection Factory**    | Create MySQL, PostgreSQL, or Mongo connections dynamically |
@@ -674,6 +683,12 @@ public class BuilderDemo {
         System.out.println(pc);
     }
 }
+
+🔁 Analogy
+Think of it like this:
+    ✔️ BuilderDemo → presses a button
+    ✔️ Computer.Builder → does the construction
+    ✔️ Only the factory (Computer) is allowed to create its own product
 
 🔄 Spring Boot Example
 Builder pattern is commonly used when constructing complex DTOs or entity objects.
@@ -818,16 +833,50 @@ Cloned Employee: Employee [id=1, name=Rahul, department=Development]
 
 🔄 Deep Copy vs Shallow Copy
 ✔️ Shallow Copy:
-Copies only primitive fields and object references (default behavior of Object.clone()).
+➤ Copies primitive fields
+➤ Copies references for object fields
+➤ Both original and clone share the same referenced objects
 
-✔️ Deep Copy:
-Copies the object and all nested objects (requires manual implementation).
-
-✅ Example (Deep Copy using Serialization or Manual Cloning):
-@Override
-public Prototype clone() {
-    return new Employee(this.id, this.name, this.department);
+✅ Example
+class Address {
+    String city;
 }
+
+class Person implements Cloneable {
+    String name;
+    Address address;
+
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone(); // shallow copy
+    }
+}
+
+❗ Problem:
+Person p1 = new Person();
+Person p2 = (Person) p1.clone();
+
+p2.address.city = "Delhi";
+➡️ p1.address.city also becomes "Delhi"
+
+📌 Key Point
+Changes in referenced objects affect both original and clone.
+
+✔️ Deep Copy
+✅ What it does
+Copies primitives
+Creates new objects for referenced fields
+Original and clone are fully independent
+
+✅ Example
+protected Object clone() throws CloneNotSupportedException {
+    Person cloned = (Person) super.clone();
+    cloned.address = new Address();
+    cloned.address.city = this.address.city;
+    return cloned;
+}
+p2.address.city = "Delhi";
+➡️ p1.address.city remains unchanged
+
 
 
 🔄 Real-Life Example in Java

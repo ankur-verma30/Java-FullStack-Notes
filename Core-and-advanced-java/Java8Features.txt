@@ -10,7 +10,7 @@ ClassName::new  (for constructors)
 
 🔄 Types of Method References
 ✅Type 1: Reference to a static method
-list.forEach(System.out::println);  
+list.forEach(System.out::println);
 // equivalent to: list.forEach(x -> System.out.println(x));
 
 ✅Type 2: Reference to an instance method of a particular object

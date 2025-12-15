@@ -1227,10 +1227,9 @@ This is extremely useful in:
 ###########################
 🔷 Command Design Pattern
 ###########################
-The Command Pattern is a behavioral design pattern that turns a request into a standalone object (Command object).
-This allows you to parameterize methods with commands, queue or log requests, undo operations, and support macro operations.
-
-➡ In simple terms: It encapsulates “what needs to be done” inside an object.
+➤ The Command Pattern is a behavioral design pattern that encapsulates a request or command as an object, allowing it to be parameterized, queued, logged, or even undone.
+➤ This pattern allows for the seperation of concern between the client that sends the request and and the reciever that executes it.
+➤ It also support the addition of new commands without changing the client code or the reciever code.
 
 🔄 Why is Command Pattern needed? 
 ❌ Problems Without Command Pattern

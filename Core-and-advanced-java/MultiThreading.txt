@@ -1,25 +1,40 @@
-Program❓
+##############
+🔷 Program❓
+##############
 A Program is a set of instructions written in a programming language that tells the computer how to perform a specific task.
 ✅ For Example: Microsoft Word is a program that allows you to write and edit documents. It is a program that is used to create and edit documents.
 
-Process❓
+
+#############
+🔷 Process❓
+#############
 A process is an instance of a program that is being executed. When a program runs, the operating system creates a process to manage its execution.
 When we open Microsoft Word, it becomes a process in the operating system.
 
-Thread❓
+
+#############
+🔷 Thread❓
+#############
 A thread is the smallesst unit of execution within a process. A process can have multiple threads, which share the same resources but can run independently.
 A thread is a light-weight process that can be created and destroyed at runtime.
 ✅For Example: A we browser like Google Chrome might use multiple threads for different tabs, with each tab running in its own thread.
 
-Multitasking❓
+
+###################
+🔷 Multitasking❓
+###################
 Multitasking is the ability of a computer to run multiple tasks or programs at the same time. On single-core CPUs, this is done through time-sharing, rapdily switching between tasks. On multi-core CPUs, this is done through parallelism, where multiple cores, true paralled execution occurs, with tasks distributed across the cores. The OS scheduler balances the load, ensuring efficient and resposive system performance.
 
 It utilizes the capabilities of a CPU and its cores. When an OS performs multitasking, it can assign different tasks to different cores. This is mroe efficient than assigning all tasks to a single core.
 ✅For Example: We are browsing the internet while listening to music and dowloading files at the same time.
 
-MultiThreading❓
+
+#####################
+🔷 MultiThreading❓
+#####################
 Multithreading is a technique in which multiple threads of execution are created within a single process. Each thread is a separate execution path within the process.
 Multithreading is used to improve the performance of a program by allowing it to execute multiple tasks concurrently.
+
 ✅For Example: A web browser can use mutlithreading by having seperate threads for rendering the page, running JavaScript, and handling user input. This makes the browser more resposive and efficient.
 
 It enhances the efficiency of multitasking by breaking down individual tasks into smaller sub-tasks or threads. These threads can be processed simultaneously, making better use of the CPU's capabilities and resources.
@@ -29,8 +44,129 @@ Both threads and processes are managed by the OS scheduler through time slicing 
 📝In Multi-Core System:
 Both threads and processes can run in true parallelism, with tasks distributed across the cores to optimize performance.
 
-🔷 Thread Creation Techniques
 
+##################################
+🔷 Advantages of Multithreading
+##################################
+1️⃣ Improved Performance / Better CPU Utilization
+➤ Threads run concurrently → utilize multiple cores.
+➤ Reduces CPU idle time.
+➤ Great for computational + IO workloads.
+
+2️⃣ Responsiveness
+➤ One thread can handle heavy tasks while UI/API stays responsive.
+E.g., Web server spins separate threads for each request.
+
+3️⃣ Resource Sharing
+➤ Threads share memory space → low overhead compared to processes.
+➤ Faster context switching.
+
+4️⃣ Scalability in Server Applications
+➤ Widely used in:
+    ✔️Spring Boot APIs (Tomcat/Netty threads)
+    ✔️Kafka consumers
+    ✔️Database connection pools
+
+5️⃣ Simplified Modeling of Real-world Concurrency
+➤ Producer–consumer
+➤ Readers–writers
+➤ Background workers
+
+
+############################################################
+❌ Disadvantages of Multithreading & How to Overcome Them
+############################################################
+
+1️⃣ Race Conditions
+❗ Problem: Two threads access and modify shared data simultaneously → inconsistent data.
+✅ Fix:
+➤ Use synchronization (synchronized, locks)
+➤ Use Atomic classes (AtomicInteger, AtomicReference)
+➤ Use volatile (visibility guarantee)
+➤ Prefer immutable objects
+➤ Use thread-safe data structures (ConcurrentHashMap)
+
+
+2️⃣ Deadlocks
+❗ Problem: Two threads wait forever for each other’s lock → system hangs.
+✅ Fix:
+➤ Acquire locks in consistent global order
+➤ Use tryLock() with timeout (ReentrantLock)
+➤ Reduce lock scope (lock only necessary code)
+➤ Avoid nested locking
+
+✅ Better solution: Use lock-free algorithms if possible.
+
+
+3️⃣ Starvation
+❗ Problem: Lower-priority threads never get CPU time.
+✅ Fix:
+➤ Avoid thread priorities.
+➤ Use fair locks: new ReentrantLock(true)
+➤ Use thread pools instead of manual thread creation.
+
+
+4️⃣ Thread Interference
+❗ Problem: Threads overwrite each other’s computation.
+
+✅ Fix:
+➤ Wrap shared logic with:
+➤ synchronized
+➤ Lock frameworks
+➤ Atomic operations
+
+
+5️⃣ Increased Complexity
+❗ Problem: Writing & debugging concurrent code is harder.
+✅ Fix:
+➤ Prefer ExecutorService instead of creating threads manually.
+➤ Use CompletableFuture, Parallel Streams.
+➤ Use frameworks that manage concurrency (Spring Boot, Reactor, Akka).
+
+
+6️⃣ Context Switching Overhead
+❗ Problem: Too many threads → CPU wastes time switching instead of executing.
+✅ Fix:
+➤ Use thread pools (fixed-size) to limit thread count.
+➤ Use virtual threads (Project Loom) in modern Java.
+➤ Properly tune connection pools / executor pool sizes.
+
+
+7️⃣ Memory Overhead
+❗ Problem: Each thread has its own stack → high memory usage.
+✅ Fix:
+➤ Avoid creating unnecessary threads.
+➤ Use cached or fixed thread pools.
+➤ Use Virtual Threads (Loom) — almost zero-cost threads.
+
+
+8️⃣ Difficulty in Testing & Debugging
+❗ Problem: Concurrency bugs are non-deterministic.
+✅ Fix:
+➤ Use tools:
+    ✔️ IntelliJ concurrency debugger
+    ✔️ JProfiler
+➤ Use logging + Thread dumps
+➤ Design with immutability and clear thread boundaries
+
+
+9️⃣ Lower Performance in Some Cases
+❗ Problem:
+Especially when:
+    ✔️ Workloads are small.
+    ✔️ Over-synchronization.
+    ✔️ Many blocking operations.
+✅ Fix:
+➤ Use non-blocking algorithms (CAS operations).
+➤ Use parallelization only when beneficial.
+➤ Tune thread pool size based on:
+    ✔️ CPU-bound → cores + 1
+    ✔️ IO-bound → (cores * 2) or more
+
+
+###############################
+🔷 Thread Creation Techniques
+###############################
 1️⃣ Using Thread Class
 
 package p1;
@@ -62,8 +198,8 @@ public class intro {
 ➤ The run method is overridden to define the code constitutes the new thread.
 ➤ start method is called to initiate the new thread.
 
-2️⃣ Using Runnable Interface
 
+2️⃣ Using Runnable Interface
 package p1;
 
 public class World implements Runnable {
@@ -88,7 +224,7 @@ public class intro {
     }
 }
 
-🔗 Steps:
+🔄 Steps:
 ➤ A new class World is created that implements Runnable.
 ➤ The run method is overridden to define the code constitutes the new thread.
 ➤ A Thread object is created by passing an instance of the World class to the Thread constructor.
@@ -133,19 +269,22 @@ public class CallableThreadExample {
 }
 
 
-
+#####################
 🔷 Thread Lifecycle
+#####################
 The lifecycle of a thread is Java consist of several states, which a thread can move through during its execution.
 The lifecycle of a thread is as follows:
 
-1. New: A new thread is created but not yet started.
-2. Runnable: After the start method is called, the thread becomes runnable. It's ready to ru and is waiting for CPU time.
-3. Running: The thread is in this state when it is executing.
-4. Blocked/Waiting: A thread is in this state when it is  waiting for a resource or for another thread to perform an action.
-5. Terminated: The thread has completed its execution.
+1️⃣ New: A new thread is created but not yet started.
+2️⃣ Runnable: After the start method is called, the thread becomes runnable. It's ready to run and is waiting for CPU time.
+3️⃣ Running: The thread is in this state when it is executing.
+4️⃣ Blocked/Waiting: A thread is in this state when it is  waiting for a resource or for another thread to perform an action.
+5️⃣ Terminated: The thread has completed its execution.
 
 
-🔷 Thread Methods in Java
+###################
+🔷 Thread Methods
+###################
 🔄 start()
 ➤ Used to start a new thread of execution.
 ➤ Internally calls the run() method in a new call stack.
@@ -316,12 +455,14 @@ public class MyThread extends Thread {
 ✅ Output:
 Main method execution completed
 Hello World
-Hello World 
+Hello World
 Hello World
 ...print Hello World few time and then stops as daemon thread is set to true
 
 
+#####################
 🔷 Synchronization
+#####################
 ➤ Synchronization is a mechanism that ensures that only one thread can access a shared resource at a time.
 ➤ It is used to prevent concurrent access to a shared resource, such as a variable or object.
 ➤ It is implemented using the synchronized keyword.
@@ -329,6 +470,7 @@ Hello World
 ➤ Only one thread can access the synchronized block at a time.
 ➤ If multiple threads try to access the synchronized block at the same time, they will block until the first thread releases the lock.
 ➤ This prevents concurrent access to the shared resource and prevent race conditions and ensures that only one thread can access it at a time and attain mutual exclusion.
+➤ synchronized method accquire the lock on the object for instance methods and on the class for static methods.
 
 ✅Example:
 Counter.java
@@ -395,6 +537,38 @@ public class Test {
        }
        // Other code logic is written
     }
+
+🔁 What synchronized does NOT do
+❌ No fairness guarantee
+❌ No deadlock prevention
+❌ No interruption support
+❌ No timeout mechanism
+
+🔁 Common Problems
+🔄 Deadlock
+Thread 1 → Lock A → Lock B
+Thread 2 → Lock B → Lock A
+
+🔄 Performance Overhead
+➤ Thread blocking
+➤ Context switching
+➤ Monitor contention
+
+🔁 Best Practices
+➤ Synchronize only critical sections
+➤ Avoid synchronizing large methods
+➤ Prefer private lock objects
+
+private final Object lock = new Object();
+
+➤ Avoid locking on:
+    ✔️ this
+    ✔️ String literals
+
+🔁 When to use synchronized
+➤ Simple thread safety
+➤ Low contention
+➤ Legacy code
 
 
 🔷 Locks    
@@ -1163,7 +1337,9 @@ final class Student {
 private volatile boolean flag = true;
 
 
+#################
 🔷 Thread Pool
+#################
 ➤ A Thread Pool is a pool (collection) of pre-created worker threads that can execute tasks concurrently.
 ➤ Instead of creating a new thread for every task (which is expensive), tasks are queued and executed by available threads in the pool.
 ➤ Once a thread completes a task, it is reused for another one — improving performance and resource utilization.
