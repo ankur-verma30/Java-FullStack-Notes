@@ -1,4 +1,3 @@
-
 ###############################
 🔷 Introduction to Containers
 ###############################
@@ -732,3 +731,353 @@ CMD ["app.jar"]
 
 ❓ Is distroless suitable for development?
 ✅ Answer: No. It is designed for production workloads only.
+
+
+#################################
+🔷 Persistent Storage in Docker
+#################################
+🔄 Why Do We Need Persistent Storage in Docker?
+❗ Problem:
+➤ Containers are ephemeral
+➤ When a container stops or is deleted:
+    ✔️ All data inside it is lost
+
+✅ Example:
+Container → writes data → container deleted → data gone ❌
+
+👉 But real applications need:
+➤ Database data
+➤ Logs
+➤ Uploaded files
+➤ Cache
+👉 This is where persistent storage comes in.
+
+🔄 Persistent Storage in Docker
+➤ Data lives outside the container lifecycle
+
+➤ Docker provides two main mechanisms:
+1️⃣ Bind Mounts
+2️⃣ Volumes
+
+
+#################
+🔷 Bind Mounts
+#################
+A bind mount maps a specific directory/file on the host machine directly into a container.
+Host Path  ─────────▶  Container Path
+
+✅ Example (Bind Mount)
+🔗 docker run -v /home/user/data:/app/data nginx
+➤ /home/user/data → host directory
+➤ /app/data → container directory
+
+Any change in:
+➤ Host → visible in container
+➤ Container → visible on host
+
+🔄 Characteristics of Bind Mounts
+| Property          | Bind Mount  |
+| ----------------- | ----------- |
+| Host-dependent    | ✅ Yes      |
+| Managed by Docker | ❌ No       |
+| Performance       | High        |
+| Portability       | ❌ Low      |
+| Security          | Risky       |
+| Use case          | Development |
+
+🔄 When to Use Bind Mounts❓ 
+✅ Local development
+✅ Live code reload
+✅ Debugging
+✅ Editing files from IDE
+
+🔄 Bind Mount Internals
+➤ Docker does not manage the data
+➤ Docker just creates a filesystem link
+➤ If the host path is deleted → data lost
+
+🔄 Problems with Bind Mounts
+❌ Not portable (path differs per machine)
+❌ Host filesystem exposure
+❌ Permission issues
+❌ Harder to secure
+
+
+####################
+🔷 Docker Volumes
+####################
+A Docker volume is a directory managed by Docker, stored in Docker’s own storage area.
+
+📁 Location (Linux):
+🔗 /var/lib/docker/volumes/
+
+✅ Example (Volume)
+🔗 docker volume create myvolume
+🔗 docker run -v myvolume:/app/data nginx
+
+🔗 docker volume inspect myvolume ─────────▶ gives the detail about a particular volume
+🔗 docker volume ls ─────────▶ lists all the volumes created in docker
+🔗 docker volume rm myvolume1 myvolume2 ─────────▶ removes a particular/group of volumes
+🔗 docker run -d --mount source=myvolume, target = /app docker-volume
+🔗 docker ps ─────────▶ to check the running containers
+🔗  docker inspect <container_id> ─────────▶ to check the volume attached to the particular container
+
+
+Docker decides:
+➤ Where data is stored
+➤ How it’s managed
+
+🔄 Characteristics of Docker Volumes
+| Property         | Volume     |
+| ---------------- | ---------- |
+| Docker-managed   | ✅ Yes     |
+| Host-independent | ✅ Yes     |
+| Portable         | ✅ Yes     |
+| Secure           | ✅ Safer   |
+| Backup           | Easy       |
+| Use case         | Production |
+
+
+🔄 Volume Internals
+➤ Stored outside container filesystem
+➤ Survive:
+  ✔️ Container stop
+  ✔️ Container delete
+➤ Can be shared across containers
+
+🔄 Volume Lifecycle
+Create → Attach → Use → Detach → Still Exists
+👉 Volume exists until explicitly deleted.
+
+🔄 Volumes vs Bind Mounts 
+| Feature           | Volumes    | Bind Mounts |
+| ----------------- | ---------- | ----------- |
+| Managed by Docker | ✅ Yes     | ❌ No      |
+| Host path needed  | ❌ No      | ✅ Yes     |
+| Portable          | ✅ Yes     | ❌ No      |
+| Security          | High       | Medium      |
+| Backup & restore  | Easy       | Manual      |
+| Cross-platform    | ✅         | ❌         |
+| Best for          | Production | Development |
+
+🔄 Anonymous Volumes
+🔗 docker run -v /app/data nginx
+
+➤ Docker creates a volume automatically
+➤ No name
+➤ Hard to manage
+➤ Often causes disk leaks
+👉 Avoid in production
+
+🔄 Real-World Examples
+✅ Database (MySQL)
+🔗 docker volume create mysql_data
+
+🔗 docker run -d \
+  -v mysql_data:/var/lib/mysql \
+  mysql
+
+✔️ Data survives container restart
+✔️ Easy backup
+
+🔄 Development (Bind Mount)
+🔗 docker run -v $(pwd):/app node
+
+✔️ Code changes reflect instantly
+✔️ IDE friendly
+
+
+⚡ Best Practices
+✅ Use volumes for databases
+✅ Use bind mounts for dev code
+❌ Don’t store state inside container
+❌ Avoid anonymous volumes
+✅ Backup volumes regularly
+
+🔄 Common Traps
+❌ Saying bind mounts are better than volumes
+❌ Using volumes for live code editing
+❌ Forgetting volume cleanup
+❌ Mixing production & dev storage strategy
+
+
+######################
+🔷 Docker Networking
+######################
+🔄 Why Networking Is Needed in Containers
+➤ Containers run in isolated environments
+
+➤ Each container has:
+  ✔️ Its own network namespace
+  ✔️ Its own IP address
+
+➤ Without Docker networking:
+  ✔️ Containers cannot talk to host
+  ✔️ Containers cannot talk to each other
+👉 Docker networking connects these isolated namespaces in a controlled way.
+
+
+🔄 Containers Communicate with the Host
+Case 1️⃣: Using Port Mapping
+✅ Example:
+🔗 docker run -p 8080:80 nginx
+
+👉 What happens internally:
+Browser → Host:8080 → Docker NAT → Container:80
+⚡ 8080 → Host port
+⚡ 80 → Container port
+⚡ Docker uses iptables + NAT
+
+➤ Container cannot directly access host services
+➤ Host exposes services via ports
+
+
+Case 2️⃣: Using Host IP (172.x.x.x)
+Docker bridge network creates a virtual gateway:
+
+🔗 docker0 → 172.17.0.1 (host)
+🔗 Container → Host via: 172.17.0.1
+
+
+Case 3️⃣: Host Network Mode
+🔗 docker run --network host nginx
+
+➤ Container uses host’s network stack
+➤ No isolation
+➤ Same IP as host
+❌ Not recommended for security
+
+
+🔄 Containers Communicate With Each Other
+🌟 Default: Bridge Network
+✅ Example:
+🔗 docker network create mybridge
+
+🔗 docker run -d --name app1 --network mybridge nginx
+🔗 docker run -d --name app2 --network mybridge nginx
+
+👉 Communication: app1 → app2 (via container name)
+
+Docker provides:
+✔️ Internal DNS
+✔️ Automatic IP resolution
+
+
+🔄 Why NOT Use IPs?
+❌ IP changes on restart
+❌ Breaks communication
+✅ Always use container name
+
+
+🔄 Docker Networking Internals
+Docker creates:
+➤ Network Namespace: Isolated network stack per container
+➤ Virtual Ethernet (veth pair): Container ↔ veth ↔ docker0 bridge ↔ host
+➤ Docker Bridge (docker0): Acts like a virtual switch
+➤ iptables Rules Handle:
+  ✔️ NAT
+  ✔️ Port forwarding
+  ✔️ Isolation
+
+🔄 Types of Docker Networks
+| Network Type | Purpose                      | Isolation |
+| ------------ | ---------------------------- | --------- |
+| bridge       | Default container networking | Medium    |
+| host         | No isolation                 | None      |
+| none         | No networking                | Full      |
+| overlay      | Multi-host (Swarm/K8s)       | High      |
+| macvlan      | Container gets real IP       | Medium    |
+
+
+🔄 How Docker Networking Enables Communication
+| Scenario              | Network Used    |
+| --------------------- | --------------- |
+| Container ↔ Container | Bridge          |
+| Container ↔ Host      | NAT / Host mode |
+| Multi-host containers | Overlay         |
+| No communication      | None            |
+ 
+
+🔄 How to PREVENT Containers from Communicating (Complete Isolation)
+Method 1️⃣: none Network (BEST)
+🔗 docker run --network none nginx
+
+Result:
+  ✔️ No IP
+  ✔️ No internet
+  ✔️ No container communication
+✔ FULL ISOLATION
+
+ 
+Method 2️⃣: Separate Bridge Networks
+🔗 docker network create net1
+🔗 docker network create net2
+
+🔗 docker run --network net1 app1
+🔗 docker run --network net2 app2
+👉 Result: app1 ❌ app2
+✔ Logical isolation
+
+
+Method 3️⃣: Disable Inter-Container Communication (ICC)
+🔗 dockerd --icc=false
+
+➤ Containers cannot talk by default
+➤ Legacy but interview-relevant
+
+
+Method 4️⃣: Firewall / iptables Rules
+  ✔️ Block traffic between containers
+  ✔️ Advanced security
+
+➤ Used in:
+  ✔️ Production
+  ✔️ Zero-trust architecture
+
+
+Method 5️⃣: Kubernetes Network Policies (Advanced)
+➤ Define: Who can talk to whom
+➤ Fine-grained isolation
+
+
+✅ Real-World Isolation Example
+Scenario:
+➤ Frontend should talk to backend
+➤ Backend should talk to DB
+➤ Frontend ❌ DB
+
+✅ Solution:
+frontend-net → frontend + backend
+backend-net → backend + db
+⚡ Controlled communication
+
+9️⃣ Common Traps
+❌ Saying containers share host IP
+❌ Using IP instead of container name
+❌ Using host network in production
+❌ Assuming Docker networks are optional
+
+
+#####################################
+🔷 Real Time Challenges with Docker
+#####################################
+1️⃣ Docker is a single daemon process. Which can cause a single point of failure. If the docker daemon goes down for some reason all the applications running inside the docker containers will also go down. Tools like podman, Buildah can be used to overcome this issue.
+
+2️⃣ Docker Daemon runs as a root user. which is a security threat. Any process running as a root can have adverse effects. when it is compromised for security reasons, it can impact other applications or containers on the host.
+
+3️⃣ Rescource Contraints: If you are running too many containers on a single host, you may experience issues with resource constraints. This can result in slow performance crashes.
+
+
+################################
+🔷 Steps to secure Containers
+################################
+1️⃣ Use Distroless or images with not too many packages as your final image in multi-stage docker builds, so that there is less chance of CVE or security vulnerabilities.
+
+2️⃣ Ensure that the networking is configured properly. This is one of the most common reasons for security breaches in containers. If required configure custom bridge networks to isolate the containers.
+
+3️⃣ Use utilities like Sync to scan your container images for vulnerabilities before deploying them to production.
+
+
+####################
+🔷 Docker Compose
+####################
