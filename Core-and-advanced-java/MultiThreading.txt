@@ -306,6 +306,26 @@ public void run() {
 ➤ ➤ Throws InterruptedException if another thread interrupts the sleeping one.
 ➤ ➤ Static method → belongs to the class, not an object.
 
+#############################################
+🔷 Difference between sleep and wait method
+#############################################
+| Feature                     | `sleep()`                        | `wait()`                               |
+| --------------------------- | -------------------------------- | -------------------------------------- |
+| Method belongs to           | `Thread` class                   | `Object` class                         |
+| Purpose                     | Pause execution for a fixed time | Release lock and wait for notification |
+| Lock release                | ❌ Does **not** release lock     | ✅ **Releases** lock                  |
+| Requires synchronized block | ❌ No                            | ✅ Yes                                |
+| How it resumes              | Automatically after time expires | Via `notify()` / `notifyAll()`         |
+| Time-bound                  | Yes (mandatory or optional)      | Optional (`wait()` or `wait(time)`)    |
+| Thread state                | TIMED_WAITING                    | WAITING / TIMED_WAITING                |
+| Can be interrupted          | Yes                              | Yes                                    |
+| Throws exception            | `InterruptedException`           | `InterruptedException`                 |
+| Used for                    | Delays, polling, retry logic     | Inter-thread communication             |
+| Who controls wake-up        | JVM (timer-based)                | Another thread                         |
+| Common misuse               | Used instead of wait/notify      | Used without synchronization           |
+| Typical use case            | Pause execution                  | Producer–Consumer                      |
+
+
 Thread.sleep(1000);  // pauses current thread for 1 second
 
 🔄 join()
@@ -571,7 +591,93 @@ private final Object lock = new Object();
 ➤ Legacy code
 
 
-🔷 Locks    
+################
+🔷 Class Lock
+################
+A class lock is a lock associated with the Class object of a class, not with any individual object.
+
+➤ Every Java class has exactly one Class object
+➤ That Class object has one monitor lock
+➤ This lock is called class lock
+
+🔁 How Class Lock is Acquired
+A class lock is acquired in two ways:
+
+1️⃣ static synchronized method
+public static synchronized void method() {
+    // class lock acquired
+}
+
+2️⃣ synchronized(ClassName.class)
+synchronized (MyClass.class) {
+    // class lock acquired
+}
+👉 Both use the same class-level monitor.
+
+
+🔁 Internal Working of Class lock
+➤ JVM creates one Class object per loaded class
+➤ That Class object has a monitor
+➤ When a thread enters:
+    ✔️ static synchronized method
+    ✔️ synchronized(ClassName.class)
+➤ It locks the Class object
+➤ No other thread can enter any class-locked code of that class
+
+
+🔁 Class Lock 🆚  Object Lock
+| Feature            | Object Lock                            | Class Lock            |
+| ------------------ | -------------------------------------- | --------------------- |
+| Lock applies to    | Single object                          | Entire class          |
+| Created by         | `synchronized` instance method / block | `static synchronized` |
+| Lock owner         | Object instance                        | `Class` object        |
+| Threads blocked    | Only for same object                   | Across all objects    |
+| Parallel execution | Allowed on different objects           | ❌ Not allowed         |
+
+
+✅ Class Lock Example
+class Counter {
+    public static synchronized void increment() {
+        // class lock
+    }
+}
+👉 Only one thread in entire JVM can execute this at a time
+
+✅ Code Example Showing Class Lock Behavior
+class Printer {
+    public static synchronized void print() {
+        System.out.println(Thread.currentThread().getName() + " printing...");
+        try { Thread.sleep(1000); } catch (Exception e) {}
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        new Thread(Printer::print).start();
+        new Thread(Printer::print).start();
+    }
+}
+Output (Serialized):
+Thread-0 printing...
+Thread-1 printing...
+👉 Second thread waits for the class lock.
+
+🔄 When Should You Use Class Lock?
+➤ Protecting static variables
+➤ Synchronizing access to shared global resources
+➤ Enforcing one-thread-at-a-time across all instances
+
+❌ Avoid Class Lock When
+➤ High concurrency is required
+➤ Lock scope is unnecessarily large
+➤ Only instance data is being modified
+
+✔️ object lock and class lock coexist independently.
+
+
+##########
+🔷 Locks
+##########
 Thread-safe mechanism that allows multiple threads to access a shared resource concurrently.
 
 ❓ Why Use Locks Instead of synchronized?
