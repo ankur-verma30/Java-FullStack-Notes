@@ -1,0 +1,657 @@
+#########################
+🔷 Introduction to AWS
+#########################
+Cloud computing is the on-demand delivery of compute, storage, networking, databases, and services over the internet with pay-as-you-go pricing.
+
+🔄 Key characteristics
+➤ On-demand self-service → no manual provisioning
+➤ Broad network access → accessible over internet
+➤ Resource pooling → shared infrastructure (multi-tenant)
+➤ Rapid elasticity → scale up/down instantly
+➤ Measured service → pay only for what you use
+
+👉 Cloud is a model that allows us to rent IT resources instead of owning physical infrastructure, improving scalability, cost efficiency, and speed.
+
+
+🔄 Public Cloud vs Private Cloud vs Hybrid Cloud
+🔄 Public Cloud
+Infrastructure owned and managed by third-party providers like AWS, Azure, GCP.
+
+✅ Examples
+    ✔️ AWS EC2, S3
+    ✔️ Azure VM
+    ✔️ Google Compute Engine
+
+🔁 Key points
+    ✔️ Resources shared among multiple customers
+    ✔️ Accessible over the internet
+    ✔️ Highly scalable
+    ✔️ Pay-as-you-go
+
+🔁 Use cases
+    ✔️ Startups
+    ✔️ Web & mobile applications
+    ✔️ Dev/Test environments
+
+
+🔄 Private Cloud
+Infrastructure dedicated to a single organization.
+
+✅ Examples
+    ✔️ On-premise data centers
+    ✔️ VMware-based private cloud
+    ✔️ OpenStack
+
+🔁 Key points
+    ✔️ Full control over data and security
+    ✔️ Higher cost
+    ✔️ Limited scalability compared to public cloud
+
+🔁 Use cases
+    ✔️ Banks
+    ✔️ Government organizations
+    ✔️ Compliance-heavy systems
+
+
+🔄 Hybrid Cloud
+Combination of public + private cloud working together.
+
+🔁 Key points
+✔️ Sensitive data stays in private cloud
+✔️ Compute-intensive workloads run in public cloud
+✔️ Best of both worlds
+
+🔁 Use cases
+✔️ Enterprises with legacy systems
+✔️ Gradual cloud migration
+✔️ Disaster recovery
+
+
+🔄 Comparison Summary
+➤ Public → Cost-effective, scalable
+➤ Private → Secure, controlled
+➤ Hybrid → Flexible, enterprise-friendly
+
+
+❓ Why is Public Cloud So Popular?
+🔁 Core reasons
+    ✔️ No upfront cost
+    ✔️ Instant scalability
+    ✔️ Global availability
+    ✔️ High availability & fault tolerance
+    ✔️ Managed services reduce operational overhead
+
+🔁 Technical advantages
+    ✔️ Auto Scaling
+    ✔️ Load Balancers
+    ✔️ Managed Databases (RDS, DynamoDB)
+    ✔️ Built-in monitoring & security
+
+🔁 Business advantages
+    ✔️ Faster time-to-market
+    ✔️ Focus on core product instead of infra
+    ✔️ Suitable for unpredictable workloads
+👉 Public cloud became popular because it removes infrastructure ownership, allows rapid scaling, and significantly reduces operational cost.
+
+
+❓ Why AWS?
+1️⃣ Market & Ecosystem
+    ✔️ First mover in cloud (launched in 2006)
+    ✔️ Largest market share
+    ✔️ Most mature cloud ecosystem
+
+2️⃣ Global Infrastructure
+    ✔️ Regions, Availability Zones, Edge Locations
+    ✔️ Low latency, high availability
+
+3️⃣ Service Variety
+    ✔️ Compute → EC2, Lambda
+    ✔️ Storage → S3, EBS
+    ✔️ Databases → RDS, DynamoDB
+    ✔️ Networking → VPC, ELB
+    ✔️ DevOps → CodePipeline, CodeBuild
+    ✔️ Security → IAM, KMS
+
+4️⃣ Reliability & Security
+    ✔️ IAM for fine-grained access control
+    ✔️ Compliance with global standards (ISO, SOC, GDPR)
+    ✔️ Highly fault-tolerant architecture
+
+
+
+🔄 Trends: People Moving Back to Private Cloud
+❓Why is this happening?
+Despite public cloud popularity, some companies are repatriating workloads.
+👉 Key reasons
+1️⃣ High long-term cost
+    ✔️ Continuous usage → expensive at scale
+
+2️⃣ Data sovereignty & compliance
+    ✔️ Strict regulations (banking, healthcare)
+
+3️⃣ Predictable workloads
+    ✔️ No benefit of elastic scaling
+
+4️⃣ Vendor lock-in
+    ✔️ Heavy dependency on cloud-native services
+
+5️⃣ Performance-sensitive systems
+    ✔️ Low-latency workloads prefer on-prem
+
+
+❓ Does this mean public cloud is failing in the market? ❌ No
+➤ Cloud is still dominant
+➤ Trend mainly applies to:
+    ✔️ Large enterprises
+    ✔️ Stable, predictable workloads
+
+➤ Current industry direction
+    ✔️ Hybrid cloud is growing the fastest
+    ✔️ Companies choose workload-based deployment
+👉 Instead of abandoning public cloud, companies are becoming more strategic by choosing hybrid models based on workload requirements.
+
+🔄 Takeaways
+➤ Cloud = Renting IT infrastructure
+➤ Public cloud dominates due to scalability & cost
+➤ AWS leads due to maturity & global reach
+➤ Private cloud still relevant for compliance-heavy workloads
+➤ Hybrid cloud is the future for enterprises
+
+
+#############
+🔷 AWS IAM
+#############
+➤ AWS IAM is a global AWS service used to manage users, permissions, and access to AWS resources securely.
+➤ IAM allows us to control who can access AWS, what actions they can perform, and on which resources.
+
+🔄 Why IAM is Needed?
+🌟 Without IAM:
+    ✔️ Everyone uses root account ❌
+    ✔️ No permission boundaries ❌
+    ✔️ High risk of data breach ❌
+
+🌟 With IAM:
+    ✔️ Fine-grained access control
+    ✔️ Least privilege principle
+    ✔️ Secure multi-user AWS environment
+
+🔄 IAM Core Components (MOST IMPORTANT)
+1️⃣ IAM Users
+Represents a human or application that needs AWS access.
+
+🌟 Characteristics
+➤ Has unique credentials
+➤ Can log in via:
+    ✔️ AWS Console
+    ✔️ AWS CLI
+    ✔️ SDK / API
+➤ Credentials
+    ✔️ Password (Console access)
+    ✔️ Access Key + Secret Key (Programmatic access)
+➤ Best Practices
+    ❌ Never use root user
+    ❌ Never hardcode access keys
+    ✅ Enable MFA
+
+
+2️⃣ IAM Groups
+Collection of users with similar permissions.
+
+❓ Why groups?
+➤ Easier permission management
+➤ Avoid assigning policies individually
+
+✅ Example
+➤ Developers group → EC2, S3 access
+➤ Admins group → Full access
+📌 Groups cannot contain groups
+
+
+3️⃣ IAM Roles
+Used to grant temporary permissions.
+
+⚡ Key idea: Roles are assumed, not logged in.
+
+➤ Used by
+    ✔️ EC2
+    ✔️ Lambda
+    ✔️ ECS
+    ✔️ Cross-account access
+
+❓ Why roles instead of access keys?
+    ✔️ Temporary credentials
+    ✔️ Auto-rotation
+    ✔️ More secure
+
+
+✅ Common Scenario
+➤ EC2 needs to access S3
+➤ ✔ Attach IAM Role to EC2
+➤ ❌ Don’t store access keys inside EC2
+
+
+4️⃣ IAM Policies
+Defines permissions in JSON format.
+
+🔗 Types of Policies
+    ✔️ AWS Managed Policies
+    ✔️ Customer Managed Policies
+    ✔️ Inline Policies
+
+🔄 IAM Policy Structure (JSON)
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-bucket/*"
+    }
+  ]
+}
+🌟 Key Elements
+➤ Effect → Allow / Deny
+➤ Action → What can be done
+➤ Resource → On which resource
+➤ Condition → Optional constraints
+📌 Explicit Deny always wins
+
+
+🔄 Types of Access Control
+1️⃣ Identity-Based Policies
+➤ Attached to users, groups, roles
+➤ Most common
+
+2️⃣ Resource-Based Policies
+Attached to resource itself
+✅ Example:
+    ✔️ S3 bucket policy
+    ✔️ Lambda permission policy
+📌 Resource-based policies allow cross-account access
+
+
+🔄 IAM Authentication vs Authorization
+| Concept        | Meaning         |
+| -------------- | --------------- |
+| Authentication | Who you are     |
+| Authorization  | What you can do |
+➤ IAM handles both
+
+
+🔄 Root User (High Risk Topic)
+➤ Created when AWS account is created
+➤ Has full unrestricted access
+
+⚡ Root User Best Practices
+➤ Enable MFA
+➤ Never use for daily work
+➤ Store credentials securely
+
+
+🔄 IAM Security Best Practices 
+➤ Principle of Least Privilege
+➤ Use roles instead of access keys
+➤ Enable MFA
+➤ Rotate credentials
+➤ Use IAM Access Analyzer
+➤ Use AWS CloudTrail for auditing
+
+
+🔄 IAM Global vs Regional
+➤ IAM is GLOBAL
+➤ Policies apply across all regions
+
+
+🔄 Common Scenarios
+Scenario 1️⃣
+Lambda needs DynamoDB access
+✔️ Assign IAM Role to Lambda
+
+Scenario 2️⃣
+One AWS account wants to access another account’s S3
+✔️ Use IAM Role + Bucket Policy
+
+Scenario 3️⃣
+Give developer read-only EC2 access
+✔️ Attach AWS managed policy: AmazonEC2ReadOnlyAccess
+
+
+🔄 IAM vs Other Security Services
+| Service         | Purpose                   |
+| --------------- | ------------------------- |
+| IAM             | Identity & access control |
+| KMS             | Encryption                |
+| Cognito         | App user authentication   |
+| Secrets Manager | Secrets storage           |
+
+
+
+#####################################
+🔷 AWS EC2(Elastic Compute Cloud)
+#####################################
+➤ EC2 (Elastic Compute Cloud) is an AWS service that provides scalable virtual servers (instances) in the cloud.
+
+➤ EC2 allows us to launch and manage virtual machines with full control over OS, compute, storage, and networking.
+
+
+🔄 Why Use an EC2 Instance?
+❌ Problems with traditional servers
+➤ High upfront hardware cost
+➤ Fixed capacity
+➤ Manual scaling
+➤ Long setup time
+
+✅ EC2 Advantages
+➤ On-demand servers in minutes
+➤ Pay only for usage
+➤ Easy scaling
+➤ Global infrastructure
+➤ High availability
+
+🌊 We use EC2 when we need full control over the server, long-running applications, or custom runtime environments.
+
+🔄 Different Types of EC2 Instances
+1️⃣ General Purpose: Balanced CPU, memory, networking
+
+✅ Examples: t3, t4g, m5
+🌟 Use cases
+    ✔️ Web applications
+    ✔️ Backend APIs
+    ✔️ Dev/test
+
+2️⃣ Compute Optimized: High CPU performance
+
+✅ Examples: c5, c6g
+🌟 Use cases
+    ✔️ CPU-intensive apps
+    ✔️ Game servers
+    ✔️ Data processing
+
+3️⃣ Memory Optimized: Large RAM
+
+✅ Examples: r5, x1
+🌟 Use cases
+    ✔️ In-memory databases
+    ✔️ Caching
+    ✔️ Big data analytics
+
+4️⃣ Storage Optimized: High disk I/O
+
+✅ Examples: i3, d2
+🌟 Use cases
+    ✔️ Data warehousing
+    ✔️ Large datasets
+
+5️⃣ Accelerated Computing: GPU / ML workloads
+
+✅ Examples: p, g
+🌟 Use cases
+    ✔️ Machine learning
+    ✔️ Video processing
+─────────▶ Instance type defines hardware capacity, not software.
+
+
+🔄 How to Connect to an EC2 Instance?
+🌟 For Linux EC2 (SSH)
+⚡ Steps:
+1️⃣ Download .pem key file
+2️⃣ Set permission
+🔗 chmod 400 key.pem
+
+3️⃣ Connect
+🔗 ssh -i key.pem ec2-user@<public-ip>
+
+
+❓ Why key pair is needed?
+✅ Secure authentication instead of passwords
+
+
+🔄 How to Deploy an Application on EC2?
+✅ Example: Node.js / Java / React / Backend App
+🌟 Steps:
+1️⃣ Launch EC2
+2️⃣ Connect via SSH
+3️⃣ Install runtime
+🔗 sudo yum install nodejs -y
+
+4️⃣ Upload code (Git / SCP)
+🔗 git clone <repo-url>
+
+5️⃣ Install dependencies
+🔗 npm install
+
+6️⃣ Start application
+🔗 npm start
+
+
+🔄 How to Access the Application from Outside World?
+1️⃣ Public IP / Elastic IP
+➤ Assign public IP to EC2
+➤ Or use Elastic IP (static)
+
+2️⃣ Security Group Configuration
+Allow inbound traffic:
+    ✔️ HTTP → Port 80
+    ✔️ HTTPS → Port 443
+    ✔️ App port → 3000 / 8080
+📌 Security Group acts as a firewall
+
+3️⃣ URL Access
+🔗 http://<public-ip>:<port>
+
+
+🔄 Common Issues
+⚡ App running but not accessible: Check Security Group inbound rules
+
+
+🔄 How EC2 Is Exposed Publicly (Production Setup)
+➤ Application Load Balancer
+➤ Auto Scaling Group
+➤ Multiple AZs
+
+
+🔄 What Are AWS Regions?
+A Region is a geographical area where AWS has data centers.
+✅ Examples
+    ✔️ us-east-1
+    ✔️ ap-south-1 (Mumbai)
+
+
+❓ Why regions exist
+➤ Low latency
+➤ Compliance
+➤ Fault isolation
+
+
+🔄 What Are Availability Zones (AZs)?
+An Availability Zone is an isolated data center inside a region.
+
+✅ Example
+    ✔️ ap-south-1a
+    ✔️ ap-south-1b
+➤ Each region has multiple AZs
+➤ AZs are physically separate
+➤ Connected via high-speed network
+
+
+🔄 Region vs Availability Zone
+| Region           | Availability Zone        |
+| ---------------- | ------------------------ |
+| Geographic area  | Data center              |
+| Multiple AZs     | Inside one region        |
+| Used for latency | Used for fault tolerance |
+
+
+🔄 Why Multi-AZ is Important?
+➤ High availability
+➤ Fault tolerance
+➤ Disaster recovery
+
+
+##############################
+🔷 Virtual Private Cloud(VPC)
+##############################
+➤ VPC (Virtual Private Cloud) is a logically isolated virtual network in AWS where you launch and manage AWS resources.
+
+➤ VPC is a private network in AWS that gives us full control over IP addressing, subnets, routing, and network security.
+
+
+🔄 Why Do We Need VPC?
+❗ Without VPC:
+    ✔️ No network isolation
+    ✔️ No control over IP ranges
+    ✔️ No security boundaries
+
+✅ With VPC:
+    ✔️ Network isolation
+    ✔️ Custom IP addressing
+    ✔️ Controlled inbound/outbound traffic
+    ✔️ Secure architecture
+👉 We need VPC to design secure, isolated, and scalable cloud networks similar to on-premise data centers.
+
+
+🔄 Core Components of VPC
+1️⃣ CIDR Block
+2️⃣ Subnets
+3️⃣ Route Tables
+4️⃣ Internet Gateway
+5️⃣ NAT Gateway
+6️⃣ Security Groups
+7️⃣ Network ACLs
+
+
+🔄 Concept of CIDR Block & Subnetting
+CIDR (Classless Inter-Domain Routing) defines the IP address range for the VPC.
+
+✅ Example: 10.0.0.0/16
+✔️ /16 → network bits
+✔️ Total IPs = 65,536
+
+
+🔄 Why CIDR is Important?
+➤ Defines how many IPs are available
+➤ Helps divide network into subnets
+➤ Avoids IP conflicts
+
+
+🔄 Subnetting Concept
+Dividing a VPC CIDR into smaller IP ranges.
+
+✅ Example:
+✔️ VPC: 10.0.0.0/16
+✔️ Subnet 1: 10.0.1.0/24
+✔️ Subnet 2: 10.0.2.0/24
+📌 Each subnet belongs to one AZ only
+
+
+🔄 How VPC Components Interact
+User → Internet → Internet Gateway → Route Table →
+Public Subnet → EC2 Instance
+
+🔗 For private access:
+Private Subnet → NAT Gateway → Internet Gateway
+
+
+🔄 How to Create a VPC
+Step-1️⃣: Create VPC
+Step-2️⃣: Choose CIDR block
+✅ Example: 10.0.0.0/16
+📌 VPC is regional
+
+
+🔄 How to Create Subnet (After VPC)
+Steps:
+1️⃣ Select VPC
+2️⃣ Choose Availability Zone
+3️⃣ Assign subnet CIDR
+✅ Example:
+Public Subnet: 10.0.1.0/24
+Private Subnet: 10.0.2.0/24
+
+📌 Subnet is AZ-specific
+
+
+🔄 Public Subnet vs Private Subnet
+🔁 Public Subnet
+➤ Has route to Internet Gateway
+➤ Used for:
+    ✔️ EC2 (Web servers)
+    ✔️ Load Balancer
+
+🔁 Private Subnet
+➤ No direct internet access
+➤ Used for:
+    ✔️ Databases
+    ✔️ Backend services
+⚡ A subnet becomes public or private based on route table configuration, not by name.
+
+
+🔄 How to Create Internet Gateway (IGW)
+(Used for internet access)
+Steps:
+1️⃣ Create Internet Gateway
+2️⃣ Attach it to VPC
+📌 One IGW per VPC
+
+
+🔄 Route Table
+➤ Controls where network traffic goes.
+➤ Default Route Table
+    ✔️ Allows internal VPC traffic
+
+
+🔄 Public Route Table
+➤ Add route: 0.0.0.0/0 → Internet Gateway
+➤ Associate with: Public Subnet
+
+🔄 Private Route Table
+➤ Add route: 0.0.0.0/0 → NAT Gateway
+➤ Associate with: Private Subnet
+
+
+🔄 NAT Gateway (Private Subnet Internet Access)
+➤ Allows outbound internet
+➤ Blocks inbound internet
+📌 Placed in public subnet
+
+
+🔄 Security Components Interaction
+1️⃣ Security Group
+➤ Instance-level firewall
+➤ Stateful
+➤ Allow rules only
+
+2️⃣ NACL
+➤ Subnet-level firewall
+➤ Stateless
+➤ Allow & deny rules
+
+
+🔄 VPC Setup Flow
+➤ Create VPC (CIDR)
+➤ Create Subnets (Public & Private)
+➤ Create Internet Gateway
+➤ Attach IGW to VPC
+➤ Create Route Tables
+➤ Add routes
+➤ Associate route tables with subnets
+➤ Launch EC2 in correct subnet
+➤ Configure Security Groups
+
+✅ Real-World Example:: Web Application Architecture
+➤ Public Subnet → ALB, EC2
+➤ Private Subnet → RDS
+➤ NAT Gateway → Updates from private subnet
+
+
+🔄 Common Traps
+➤ Subnet ≠ AZ (Subnet belongs to AZ)
+➤ Public subnet ≠ public IP
+➤ IGW alone ≠ internet access
+➤ Route table defines public/private
+➤ NAT Gateway must be in public subnet
+
+
+############################
+🔷 Security Group and NACL
+############################

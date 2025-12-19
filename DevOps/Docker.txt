@@ -1081,3 +1081,260 @@ backend-net → backend + db
 ####################
 🔷 Docker Compose
 ####################
+Docker Compose is a tool used to define, configure, and run multi-container Docker applications using a single YAML file (docker-compose.yml).
+
+❌Instead of running:
+docker run ...
+docker run ...
+docker run ...
+
+✅ You run:
+docker compose up
+
+➤ Docker → runs one container
+➤ Docker Compose → runs multiple containers together
+➤ Configuration is written once in YAML
+➤ Ideal for microservices & local development
+
+
+🔄 Why Docker Compose Exists (Problem It Solves)
+❌ Without Docker Compose:
+➤ Multiple docker run commands
+➤ Manual port linking
+➤ Manual network creation
+➤ Manual startup order
+➤ Error-prone and hard to maintain
+
+✅ With Docker Compose:
+➤ One file
+➤ One command
+➤ Automatic networking
+➤ Service discovery by name
+
+
+🔄 Working of Docker Compose
+When you run:
+🔗 docker compose up
+
+⚡ Internally Docker Compose does:
+1️⃣ Reads docker-compose.yml
+2️⃣ Creates a default network
+3️⃣ Creates containers for each service
+4️⃣ Assigns DNS names = service names
+5️⃣ Sets environment variables
+6️⃣ Starts containers in dependency order
+7️⃣ Streams logs to terminal
+
+📌 Each service = one container
+
+🔄 Docker Compose Architecture
+⚡ High-Level Architecture
+docker-compose.yml
+        |
+        v
+ Docker Compose CLI
+        |
+        v
+   Docker Engine
+        |
+        v
+ Containers + Network + Volumes
+
+
+🔄 Key Components
+| Component            | Purpose                 |
+| -------------------- | ----------------------- |
+| `docker-compose.yml` | Application definition  |
+| Docker Compose CLI   | Orchestrates containers |
+| Docker Engine        | Runs containers         |
+| Bridge Network       | Container communication |
+| Volumes              | Persistent storage      |
+
+
+🔄 Key Features of Docker Compose
+1️⃣ Multi-Container Orchestration
+➤ Define multiple services in one file
+
+2️⃣ Service Discovery
+➤ Containers communicate via service name
+🔗 jdbc:mysql://mysql-db:3306/app_db
+
+3️⃣ Single Command Control
+🔗 docker compose up
+🔗 docker compose down
+🔗 docker compose restart
+
+4️⃣ Environment Configuration
+➤ Environment variables
+➤ .env file support
+
+5️⃣ Volume Management
+➤ Persistent DB storage
+
+6️⃣ Network Isolation
+➤ Dedicated network per compose project
+
+7️⃣ Dependency Management
+depends_on:
+  - mysql
+
+6️⃣ Docker Compose vs Kubernetes
+| Feature         | Docker Compose       | Kubernetes               |
+| --------------- | -------------------- | ------------------------ |
+| Purpose         | Local / small setups | Production orchestration |
+| Complexity      | Simple               | Very complex             |
+| Scaling         | Manual               | Automatic                |
+| Load Balancing  | Basic                | Advanced                 |
+| Self-Healing    | ❌                    | ✅                        |
+| Rolling Updates | ❌                    | ✅                        |
+| Learning Curve  | Low                  | High                     |
+
+
+🔄 When to Use Docker Compose
+✔️ Local development
+✔️ Microservice testing
+✔️ Small teams
+✔️ CI pipelines
+✔️ Proof of concepts
+
+🔄 Use Kubernetes when:
+✔️ Large scale systems
+✔️ Auto-scaling required
+✔️ High availability
+✔️ Production workloads
+
+
+❗Important Interview Point
+“Docker Compose is NOT a replacement for Docker”
+➤ Docker → container runtime
+➤ Docker Compose → container orchestration tool
+
+📌 Docker Compose depends on Docker
+📌 Docker works without Compose, but Compose cannot work without Docker
+
+📌 Real-World Architecture
+Requirements:
+➤ 2 Spring Boot services
+➤ Redis cache
+➤ MySQL database
+➤ Eureka Server (Service Discovery)
+➤ Load balancing via Eureka + Spring Cloud
+
+🔷 Microservices Architecture
+             Client
+               |
+        ----------------
+        |              |
+  Service-1        Service-2
+        |              |
+        ------ Eureka ------
+               |
+        ------------------
+        |                |
+      MySQL             Redis
+
+🔄 Docker Compose File
+🔗 docker-compose.yml
+version: "3.9"
+
+services:
+
+  eureka-server:
+    image: netflixoss/eureka:latest
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: job_portal
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - microservices-net
+
+  redis-cache:
+    image: redis:7
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - microservices-net
+
+  service-1:
+    build: ./service-1
+    container_name: service-1
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/job_portal
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_pass
+      SPRING_REDIS_HOST: redis-cache
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      - mysql-db
+      - redis-cache
+      - eureka-server
+    networks:
+      - microservices-net
+
+  service-2:
+    build: ./service-2
+    container_name: service-2
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/job_portal
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_pass
+      SPRING_REDIS_HOST: redis-cache
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      - mysql-db
+      - redis-cache
+      - eureka-server
+    networks:
+      - microservices-net
+
+volumes:
+  mysql_data:
+
+networks:
+  microservices-net:
+    driver: bridge
+
+
+🔗 Spring Boot Application Properties (Inside Container)
+spring.datasource.url=jdbc:mysql://mysql-db:3306/job_portal
+spring.datasource.username=app_user
+spring.datasource.password=app_pass
+
+spring.redis.host=redis-cache
+spring.redis.port=6379
+
+eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+
+
+❓ How Load Balancing Works Here
+➤ Eureka registers both services
+➤ Client uses Spring Cloud LoadBalancer
+➤ Requests distributed automatically
+➤ Docker Compose only provides networking, not LB logic
+
+
+🌟 Commands to manage Docker Compose
+docker compose up -d
+docker compose ps
+docker compose logs
+docker compose down
+

@@ -302,9 +302,9 @@ public void run() {
 }
 
 🔄 sleep(milliseconds)
-➤ ➤ Causes the currently executing thread to pause temporarily for a given time.
-➤ ➤ Throws InterruptedException if another thread interrupts the sleeping one.
-➤ ➤ Static method → belongs to the class, not an object.
+➤ Causes the currently executing thread to pause temporarily for a given time.
+➤ Throws InterruptedException if another thread interrupts the sleeping one.
+➤ Static method → belongs to the class, not an object.
 
 #############################################
 🔷 Difference between sleep and wait method

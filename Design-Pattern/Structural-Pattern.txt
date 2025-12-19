@@ -916,7 +916,7 @@ public class PushNotificationSender implements NotificationSender {
     }
 }
 
-🟩 STEP 3️⃣: Abstraction Layer
+STEP 3️⃣: Abstraction Layer
 public abstract class Notification {
 
     protected NotificationSender sender;  // BRIDGE
@@ -928,7 +928,7 @@ public abstract class Notification {
     public abstract void send(String message);
 }
 
-🟩 STEP 4️⃣: Refined Abstractions (Different Notification Types)
+STEP 4️⃣: Refined Abstractions (Different Notification Types)
 🔗 Order Notification
 public class OrderNotification extends Notification {
 
@@ -955,7 +955,7 @@ public class PaymentNotification extends Notification {
     }
 }
 
-🟩 STEP 5️⃣: Using Bridge Pattern in Spring Boot
+STEP 5️⃣: Using Bridge Pattern in Spring Boot
 Example Controller
 @RestController
 @RequestMapping("/notify")
@@ -1026,7 +1026,7 @@ More layers → more architectural overhead.
 
 
 #######################################################
-Bridge Pattern vs Adapter Pattern (Interview Version)
+Bridge Pattern vs Adapter Pattern
 #######################################################
 1️⃣ Bridge Pattern
 ➤ Used to separate Abstraction from Implementation so both can evolve independently.
@@ -1111,10 +1111,418 @@ public class TextLocalAdapter implements SmsService {
 | **Pattern Type**     | Structural                            | Structural                                  |
 | **Focus**            | Decoupling                            | Conversion                                  |
 
-
-🔄  8. Trick to Remember
 🔁 Bridge = Designing forward
 (For future flexibility)
 
 🔁 Adapter = Fixing backward
 (For legacy compatibility)
+
+
+######################
+🔷 Composite Pattern
+######################
+It allows you to treat individual objects (leaf) and groups of objects (composites) uniformly by organizing them in a tree structure.
+
+
+🌟 Problem It Solves (Why We Need It)
+Without Composite pattern:
+    ➤ You write separate logic for:
+        ✔️ Single objects
+        ✔️ Group of objects
+    ➤ Code becomes:
+        ✔️ Complex
+        ✔️ Full of if-else
+        ✔️ Hard to extend
+
+❗ Real Issue
+❌ Client code must know:
+➤ Is this a file or a folder?
+➤ Is this a product or a box?
+
+✅ Composite pattern hides this complexity
+
+🌳 Core Idea (Intuition)
+Think in terms of tree structure:
+
+        Folder
+       /      \
+   File1     Folder
+              |
+            File2
+👉 Folder → composite (contains children)
+👉 File → leaf (no children)
+👉 Both are treated the same way
+
+
+🔄 Structure of Composite Pattern
+1️⃣ Component (Common Interface)
+Declares common operations for:
+    ✔️ Leaf
+    ✔️ Composite
+
+2️⃣ Leaf
+➤ Represents individual objects
+➤ No children
+
+3️⃣ Composite
+➤ Represents group of objects
+➤ Stores children
+➤ Delegates work to children
+
+4️⃣ Client
+➤ Uses Component interface
+➤ Doesn’t care if object is Leaf or Composite
+
+📐 UML-like Structure
+           Component
+               |
+      -------------------
+      |                 |
+    Leaf            Composite
+                       |
+                   children[]
+
+✅ Real-World Examples
+| Example           | Leaf     | Composite |
+| ----------------- | -------- | --------- |
+| File System       | File     | Folder    |
+| UI Components     | Button   | Panel     |
+| Company Structure | Employee | Manager   |
+| Shopping Cart     | Product  | Box       |
+| Menu System       | MenuItem | Menu      |
+
+
+🧪 Java Code Example 
+Step 1️⃣: Component Interface
+interface FileSystemComponent {
+    void showDetails();
+}
+
+Step 2️⃣: Leaf Class
+class File implements FileSystemComponent {
+    private String name;
+
+    public File(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void showDetails() {
+        System.out.println("File: " + name);
+    }
+}
+
+Step 3️⃣: Composite Class
+import java.util.*;
+
+class Folder implements FileSystemComponent {
+    private String name;
+    private List<FileSystemComponent> children = new ArrayList<>();
+
+    public Folder(String name) {
+        this.name = name;
+    }
+
+    public void add(FileSystemComponent component) {
+        children.add(component);
+    }
+
+    public void remove(FileSystemComponent component) {
+        children.remove(component);
+    }
+
+    @Override
+    public void showDetails() {
+        System.out.println("Folder: " + name);
+        for (FileSystemComponent component : children) {
+            component.showDetails();
+        }
+    }
+}
+
+Step 4️⃣: Client Code
+public class Main {
+    public static void main(String[] args) {
+        File file1 = new File("resume.pdf");
+        File file2 = new File("photo.jpg");
+
+        Folder folder = new Folder("Documents");
+        folder.add(file1);
+        folder.add(file2);
+
+        folder.showDetails();
+    }
+}
+
+🧠 Key Insights
+1️⃣ Uniformity
+➤ Client treats:
+    ✔️ Single object
+    ✔️ Group of objects
+➤ Exactly the same
+
+2️⃣ Open-Closed Principle
+➤ New components can be added
+➤ No modification of existing code
+
+3️⃣ Recursive Behavior
+➤ Composite delegates work to children
+➤ Tree traversal happens naturally
+
+
+⚠️ Drawbacks 
+❌ Hard to restrict:
+➤ Leaf should not have children
+➤ Composite should have children
+
+❌ Interface may become:
+➤ Too generic
+➤ Some methods meaningless for Leaf
+
+
+🔄 Composite vs Decorator 
+| Composite                       | Decorator             |
+| ------------------------------- | --------------------- |
+| Tree structure                  | Wrapper structure     |
+| Represents part-whole hierarchy | Adds responsibilities |
+| Focus on structure              | Focus on behavior     |
+| Example: Folder                 | Example: Logging      |
+
+
+🔄 Composite vs Adapter
+| Composite         | Adapter                 |
+| ----------------- | ----------------------- |
+| Hierarchy         | Conversion              |
+| Uniform treatment | Interface compatibility |
+
+
+🔄 When to Use Composite Pattern
+✅ When objects form a tree structure
+✅ When clients should treat individual and group uniformly
+✅ When recursion naturally fits the problem
+
+
+🔄 Spring / Real Project Usage
+➤ UI component trees
+➤ Organization hierarchy
+➤ Permission systems
+➤ Expression trees
+➤ JSON/XML parsers
+
+❓ Why not use if-else?
+“Composite removes conditional complexity and follows OCP by pushing behavior into object hierarchy.”
+
+
+#######################
+🔷 Fly weight Pattern
+#######################
+Flyweight Pattern is a structural design pattern used to reduce memory usage by sharing common (intrinsic) state among multiple objects instead of creating duplicate objects.
+
+👉 It is mainly used when:
+➤ You have a large number of similar objects
+➤ Object creation is memory-expensive
+➤ Many object fields are repeating
+
+🔁 Core Idea
+🌟 Separate what changes from what doesn’t.
+➤ Intrinsic state → shared (stored in flyweight)
+➤ Extrinsic state → passed from outside
+
+🔁 Key Terms
+| Term                  | Meaning                        |
+| --------------------- | ------------------------------ |
+| Intrinsic State       | Common, immutable, shared data |
+| Extrinsic State       | Context-specific, not shared   |
+| Flyweight             | Shared object                  |
+| Flyweight Factory     | Manages object reuse           |
+
+
+🔁 Structure
+Client
+   |
+FlyweightFactory
+   |
+Flyweight (shared object)
+
+
+✅ Classic Example – Game (Trees in a Forest)
+👉 Imagine:
+➤ Forest with 1,000,000 trees
+➤ Each tree has:
+    ✔️ type, color, texture → same for many trees
+    ✔️ x, y → different for every tree
+➤ Without Flyweight → huge memory waste
+
+
+❌ Without Flyweight (Bad Design)
+class Tree {
+    private String type;
+    private String color;
+    private String texture;
+    private int x;
+    private int y;
+}
+👉 Every tree stores duplicate data.
+
+
+✅ With Flyweight Pattern
+1️⃣ Flyweight Interface
+public interface Tree {
+    void draw(int x, int y);
+}
+
+2️⃣ Concrete Flyweight (Intrinsic State)
+public class TreeType implements Tree {
+
+    private String type;
+    private String color;
+    private String texture;
+
+    public TreeType(String type, String color, String texture) {
+        this.type = type;
+        this.color = color;
+        this.texture = texture;
+    }
+
+    @Override
+    public void draw(int x, int y) {
+        System.out.println(
+            "Drawing " + type + " tree at (" + x + ", " + y + 
+            ") with color " + color + " and texture " + texture
+        );
+    }
+}
+👉 type, color, texture → intrinsic (shared)
+👉 x, y → extrinsic (passed at runtime)
+
+
+3️⃣ Flyweight Factory
+import java.util.HashMap;
+import java.util.Map;
+
+public class TreeFactory {
+
+    private static final Map<String, Tree> treeCache = new HashMap<>();
+
+    public static Tree getTree(String type, String color, String texture) {
+        String key = type + "-" + color + "-" + texture;
+
+        if (!treeCache.containsKey(key)) {
+            treeCache.put(key, new TreeType(type, color, texture));
+            System.out.println("Creating new TreeType: " + key);
+        }
+
+        return treeCache.get(key);
+    }
+}
+👉 Flyweight Factory ensures:
+    ✔️ Reuse
+    ✔️ No duplicate objects
+
+4️⃣ Client Code
+public class FlyweightDemo {
+
+    public static void main(String[] args) {
+
+        Tree oak1 = TreeFactory.getTree("Oak", "Green", "Rough");
+        oak1.draw(10, 20);
+
+        Tree oak2 = TreeFactory.getTree("Oak", "Green", "Rough");
+        oak2.draw(30, 40);
+
+        Tree pine = TreeFactory.getTree("Pine", "Dark Green", "Smooth");
+        pine.draw(50, 60);
+    }
+}
+
+✅ Output
+Creating new TreeType: Oak-Green-Rough
+Drawing Oak tree at (10, 20) with color Green and texture Rough
+Drawing Oak tree at (30, 40) with color Green and texture Rough
+Creating new TreeType: Pine-Dark Green-Smooth
+Drawing Pine tree at (50, 60) with color Dark Green and texture Smooth
+
+✔️ Same Oak object reused
+✔️ Huge memory saving
+
+
+☕ Java Internal Examples
+1️⃣ String Constant Pool
+String s1 = "hello";
+String s2 = "hello";
+
+System.out.println(s1 == s2); // true
+
+✔️ JVM stores only one "hello" object
+✔️ Classic Flyweight Pattern
+
+
+2️⃣ Integer Cache
+Integer a = 100;
+Integer b = 100;
+Integer c = 200;
+Integer d = 200;
+
+System.out.println(a == b); // true
+System.out.println(c == d); // false
+
+✔️ Integers from -128 to 127 are cached
+✔️ Flyweight pattern used internally
+
+
+3️⃣ Boolean, Character, Enum
+All use Flyweight internally.
+
+
+🔁 Flyweight in Spring & Real Projects
+👉 Where Used
+➤ Hibernate
+    ✔️ First-level cache
+    ✔️ Entity metadata
+➤ Connection Pools
+    ✔️ Shared DB connections
+➤ Logging Frameworks
+    ✔️ Shared logger instances
+➤ Caching Systems
+    ✔️ Redis, Caffeine, Ehcache
+
+
+✅ Spring Boot Example – Product Type Cache
+@Service
+public class ProductTypeFactory {
+
+    private final Map<String, ProductType> cache = new ConcurrentHashMap<>();
+
+    public ProductType getProductType(String category) {
+        return cache.computeIfAbsent(category, 
+            key -> new ProductType(key));
+    }
+}
+👉 Prevents creating duplicate product metadata.
+
+
+⚖️ Advantages
+✅ Huge memory optimization
+✅ Improves performance
+✅ Reduces object creation cost
+
+
+🚫 Disadvantages
+❌ Code becomes more complex
+❌ Debugging is harder
+❌ Must carefully manage extrinsic state
+
+
+🆚 Flyweight vs Singleton
+| Aspect  | Flyweight             | Singleton            |
+| ------- | --------------------- | -------------------- |
+| Objects | Many shared objects   | Only one instance    |
+| Goal    | Memory optimization   | Single global access |
+| Scope   | Per state combination | Entire application   |
+
+
+🔁 When to Use Flyweight?
+✔️ Large number of similar objects
+✔️ Repeated immutable data
+✔️ Memory-critical systems
+✔️ Games, compilers, caching, JVM internals

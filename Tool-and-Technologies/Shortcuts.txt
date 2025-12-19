@@ -5,12 +5,14 @@
 4. F3: 🔄 Go to the declaration of a variable, method, or class.
 5. Ctrl + . : ➡️ Jump to the next error or warning in the file.
 
+
 🔷 Important Shortcuts in IntelliJ IDEA
 🚀 Editing & Navigation
 Ctrl + Space → Code completion (basic).
 Alt + Enter → Quick fix / intention actions (e.g., import, generate).
 Ctrl + Q → Quick documentation for class/method.
 Ctrl + B (or Ctrl + Click) → Go to declaration.
+Alt + Insert → Create files  classes/packages/interface etc.
 
 ✨ Code Generation
 Ctrl + O → Override methods.

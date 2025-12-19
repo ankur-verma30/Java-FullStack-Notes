@@ -1476,7 +1476,7 @@ When you need:
 ➤ Macro operations.
 
 
-Command 🆚 Strategy 🆚 State 🆚 Observer
+🔄 Command 🆚 Strategy 🆚 State 🆚 Observer
 Command vs Adapter
 | Attribute | Command               | Adapter                          |
 | --------- | --------------------- | -------------------------------- |
@@ -1484,22 +1484,404 @@ Command vs Adapter
 | Usage     | Undo, Queues, Macros  | When two incompatible interfaces |
 | Focus     | Actions               | Interfaces                       |
 
-Command vs Strategy
+🔄 Command vs Strategy
 Strategy selects HOW to do something.
 Command represents WHAT action to execute.
 
-Command vs State
+🔄 Command vs State
 State changes behavior based on internal state.
 Command is a request wrapped as an object.
 
-Command vs Observer
+🔄 Command vs Observer
 Observer notifies subscribers.
 Command encapsulates an action.
-✅
-🔄
-🔄
-🔄
-🔄
-🔄
-🔄
-🔄
+
+
+#####################  
+🔷 Mediator Pattern
+#####################
+➤ Mediator Pattern defines an object that encapsulates how a set of objects interact with each other.
+➤ Instead of objects communicating directly, they communicate via a mediator.
+
+👉 This reduces tight coupling between interacting objects.
+
+➤ Mediator promotes loose coupling by preventing objects from referring to each other explicitly and lets you vary their interaction independently.
+
+
+🔁 Problem Without Mediator
+❌ Objects directly communicate with each other
+❌ Too many dependencies
+❌ Changes in one class affect others
+❌ Hard to maintain and test
+
+
+✅ Solution With Mediator
+✔ Central mediator handles communication
+✔ Objects only know mediator, not each other
+✔ Easy to modify behavior
+✔ Cleaner architecture
+
+
+🔁 Structure
+Colleague  ----\
+Colleague  ----- >  Mediator  ----> Colleague
+Colleague  ----/
+
+
+🧪 Example – Chat Room
+Users don’t talk directly to each other — they talk via a ChatRoom (Mediator).
+
+1️⃣ Mediator Interface
+public interface ChatMediator {
+    void sendMessage(String message, User user);
+}
+
+2️⃣ Concrete Mediator
+import java.util.ArrayList;
+import java.util.List;
+
+public class ChatRoom implements ChatMediator {
+
+    private List<User> users = new ArrayList<>();
+
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    @Override
+    public void sendMessage(String message, User sender) {
+        for (User user : users) {
+            if (user != sender) {
+                user.receive(message);
+            }
+        }
+    }
+}
+
+3️⃣ Colleague (Abstract User)
+public abstract class User {
+
+    protected ChatMediator mediator;
+    protected String name;
+
+    public User(ChatMediator mediator, String name) {
+        this.mediator = mediator;
+        this.name = name;
+    }
+
+    public abstract void send(String message);
+    public abstract void receive(String message);
+}
+
+4️⃣ Concrete Colleague
+public class ChatUser extends User {
+
+    public ChatUser(ChatMediator mediator, String name) {
+        super(mediator, name);
+    }
+
+    @Override
+    public void send(String message) {
+        System.out.println(this.name + " sends: " + message);
+        mediator.sendMessage(message, this);
+    }
+
+    @Override
+    public void receive(String message) {
+        System.out.println(this.name + " receives: " + message);
+    }
+}
+
+5️⃣ Client Code
+public class MediatorDemo {
+
+    public static void main(String[] args) {
+
+        ChatRoom chatRoom = new ChatRoom();
+
+        User ankur = new ChatUser(chatRoom, "Ankur");
+        User rahul = new ChatUser(chatRoom, "Rahul");
+        User neha = new ChatUser(chatRoom, "Neha");
+
+        chatRoom.addUser(ankur);
+        chatRoom.addUser(rahul);
+        chatRoom.addUser(neha);
+
+        ankur.send("Hello everyone!");
+        rahul.send("Hi Ankur!");
+    }
+}
+✅ Output
+Ankur sends: Hello everyone!
+Rahul receives: Hello everyone!
+Neha receives: Hello everyone!
+Rahul sends: Hi Ankur!
+Ankur receives: Hi Ankur!
+Neha receives: Hi Ankur!
+
+
+✅ Example — Air Traffic Control (ATC) System
+✈️ Planes never talk to each other directly
+🧠 All communication goes via Air Traffic Controller (Mediator)
+
+✈️ Air Traffic Control System
+🔄 Design Mapping
+| Mediator Pattern Role  | ATC System                 |
+| ---------------------- | -------------------------- |
+| Mediator               | AirTrafficController       |
+| Concrete Mediator      | AirportATC                 |
+| Colleague              | Aircraft                   |
+| Concrete Colleague     | PassengerPlane, CargoPlane |
+
+
+1️⃣ Mediator Interface
+public interface AirTrafficController {
+    void registerAircraft(Aircraft aircraft);
+    void requestLanding(Aircraft aircraft);
+    void notifyAircraft(Aircraft sender, String message);
+}
+
+2️⃣ Concrete Mediator (ATC Tower)
+import java.util.ArrayList;
+import java.util.List;
+
+public class AirportATC implements AirTrafficController {
+
+    private final List<Aircraft> aircrafts = new ArrayList<>();
+    private boolean runwayFree = true;
+
+    @Override
+    public void registerAircraft(Aircraft aircraft) {
+        aircrafts.add(aircraft);
+    }
+
+    @Override
+    public synchronized void requestLanding(Aircraft aircraft) {
+
+        if (runwayFree) {
+            runwayFree = false;
+            System.out.println("ATC: Runway cleared for landing -> " + aircraft.getName());
+            aircraft.receive("You are cleared to land.");
+        } else {
+            System.out.println("ATC: Runway busy. " + aircraft.getName() + " please wait.");
+            aircraft.receive("Runway busy. Hold position.");
+        }
+    }
+
+    @Override
+    public void notifyAircraft(Aircraft sender, String message) {
+        for (Aircraft aircraft : aircrafts) {
+            if (aircraft != sender) {
+                aircraft.receive(
+                    "Message from " + sender.getName() + ": " + message
+                );
+            }
+        }
+    }
+
+    // Called when aircraft vacates runway
+    public synchronized void runwayFreed(Aircraft aircraft) {
+        runwayFree = true;
+        System.out.println("ATC: Runway is now free (vacated by " + aircraft.getName() + ")");
+    }
+}
+👉 ATC controls runway access
+👉 ATC notifies other aircraft
+👉 Aircrafts never communicate directly
+
+3️⃣ Colleague (Abstract Aircraft)
+public abstract class Aircraft {
+
+    protected AirTrafficController atc;
+    protected String name;
+
+    public Aircraft(AirTrafficController atc, String name) {
+        this.atc = atc;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public abstract void requestLanding();
+    public abstract void receive(String message);
+}
+
+4️⃣ Concrete Colleague – Passenger Plane
+public class PassengerPlane extends Aircraft {
+
+    public PassengerPlane(AirTrafficController atc, String name) {
+        super(atc, name);
+    }
+
+    @Override
+    public void requestLanding() {
+        System.out.println(name + " requesting permission to land.");
+        atc.requestLanding(this);
+    }
+
+    @Override
+    public void receive(String message) {
+        System.out.println(name + " received ATC message: " + message);
+    }
+
+    public void landAndClearRunway() {
+        System.out.println(name + " has landed and cleared the runway.");
+        ((AirportATC) atc).runwayFreed(this);
+    }
+}
+
+5️⃣ Concrete Colleague – Cargo Plane
+public class CargoPlane extends Aircraft {
+
+    public CargoPlane(AirTrafficController atc, String name) {
+        super(atc, name);
+    }
+
+    @Override
+    public void requestLanding() {
+        System.out.println(name + " requesting permission to land.");
+        atc.requestLanding(this);
+    }
+
+    @Override
+    public void receive(String message) {
+        System.out.println(name + " received ATC message: " + message);
+    }
+
+    public void landAndClearRunway() {
+        System.out.println(name + " has landed and cleared the runway.");
+        ((AirportATC) atc).runwayFreed(this);
+    }
+}
+
+6️⃣ Client Code (Main Program)
+public class AirTrafficMediatorDemo {
+
+    public static void main(String[] args) {
+
+        AirportATC atc = new AirportATC();
+
+        Aircraft flight1 = new PassengerPlane(atc, "Indigo-101");
+        Aircraft flight2 = new PassengerPlane(atc, "AirIndia-202");
+        Aircraft cargo1  = new CargoPlane(atc, "Cargo-777");
+
+        atc.registerAircraft(flight1);
+        atc.registerAircraft(flight2);
+        atc.registerAircraft(cargo1);
+
+        flight1.requestLanding();
+        flight2.requestLanding();
+
+        // flight1 lands and frees runway
+        ((PassengerPlane) flight1).landAndClearRunway();
+
+        cargo1.requestLanding();
+    }
+}
+
+✅ Sample Output
+Indigo-101 requesting permission to land.
+ATC: Runway cleared for landing -> Indigo-101
+Indigo-101 received ATC message: You are cleared to land.
+
+AirIndia-202 requesting permission to land.
+ATC: Runway busy. AirIndia-202 please wait.
+AirIndia-202 received ATC message: Runway busy. Hold position.
+
+Indigo-101 has landed and cleared the runway.
+ATC: Runway is now free (vacated by Indigo-101)
+
+Cargo-777 requesting permission to land.
+ATC: Runway cleared for landing -> Cargo-777
+Cargo-777 received ATC message: You are cleared to land.
+
+ 
+🔁 Real-Life Java & Framework Examples
+1️⃣ Java Swing
+Dialog, Button, TextField communicate via event dispatcher
+The event manager acts as Mediator
+
+2️⃣ Spring heavily uses Mediator-like patterns:
+| Feature                                     | Mediator Role                      |
+| ------------------------------------------- | ---------------------------------- |
+| Spring Events (`ApplicationEventPublisher`) | Event mediator                     |
+| Controller → Service → Repository           | Controller acts as mediator        |
+| API Gateway                                 | Mediates requests between services |
+| Message Brokers (Kafka, RabbitMQ)           | Central mediator                   |
+
+
+🔄 Spring Boot Example – Order Processing Mediator
+1️⃣ Mediator Interface
+public interface OrderMediator {
+    void processOrder(String orderId);
+}
+
+2️⃣ Concrete Mediator
+@Service
+public class OrderProcessingMediator implements OrderMediator {
+
+    @Autowired private PaymentService paymentService;
+    @Autowired private InventoryService inventoryService;
+    @Autowired private NotificationService notificationService;
+
+    @Override
+    public void processOrder(String orderId) {
+        paymentService.makePayment(orderId);
+        inventoryService.updateStock(orderId);
+        notificationService.sendConfirmation(orderId);
+    }
+}
+
+3️⃣ Colleague Services
+@Service
+class PaymentService {
+    void makePayment(String orderId) {
+        System.out.println("Payment done for " + orderId);
+    }
+}
+
+@Service
+class InventoryService {
+    void updateStock(String orderId) {
+        System.out.println("Stock updated for " + orderId);
+    }
+}
+
+@Service
+class NotificationService {
+    void sendConfirmation(String orderId) {
+        System.out.println("Notification sent for " + orderId);
+    }
+}
+👉 Services do not talk to each other directly
+👉 Mediator orchestrates interaction
+
+
+⚖️ Advantages
+✅ Loose coupling
+✅ Centralized control
+✅ Easier maintenance
+✅ Simplifies object interaction
+
+
+❌ Disadvantages
+❌ Mediator can become God Object
+❌ Complexity shifts to mediator
+❌ Harder to scale if mediator grows too large
+
+🆚 Mediator vs Observer
+| Mediator                      | Observer                 |
+| ----------------------------- | ------------------------ |
+| Central control               | One-to-many notification |
+| Objects don’t know each other | Observers know subject   |
+| Two-way communication         | One-way                  |
+| Used for coordination         | Used for event updates   |
+
+
+🎯 When to Use Mediator?
+✔ Many objects interact in complex ways
+✔ Want to reduce dependencies
+✔ Event-driven systems
+✔ Workflow orchestration
