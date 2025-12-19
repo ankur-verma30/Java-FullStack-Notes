@@ -1,0 +1,255 @@
+🔴 S – Single Responsibility Principle (SRP)
+A class should have only ONE reason to change.
+
+👉 This does NOT mean “only one method”.
+👉 It means one responsibility / one axis of change.
+
+❌ SRP Violation (Bad Design)
+class UserService {
+
+    public void registerUser(String name) {
+        System.out.println("User registered: " + name);
+    }
+
+    public void sendEmail(String email) {
+        System.out.println("Email sent to " + email);
+    }
+
+    public void saveToDatabase(String name) {
+        System.out.println("User saved in DB: " + name);
+    }
+}
+
+❌ Why this violates SRP?
+➤ Registration logic changes → class changes
+➤ Email logic changes → class changes
+➤ DB logic changes → class changes
+👉 Multiple reasons to change
+
+
+✅ SRP Compliant Design
+class UserService {
+    public void registerUser(String name) {
+        System.out.println("User registered: " + name);
+    }
+}
+
+class EmailService {
+    public void sendEmail(String email) {
+        System.out.println("Email sent to " + email);
+    }
+}
+
+class UserRepository {
+    public void save(String name) {
+        System.out.println("User saved in DB: " + name);
+    }
+}
+👉 Each class has one responsibility
+
+
+🌱 Spring Boot Mapping
+🔗 @Controller → HTTP handling
+🔗 @Service → Business logic
+🔗 @Repository → DB logic
+
+
+🔵 O – Open/Closed Principle (OCP)
+Software entities should be open for extension but closed for modification.
+👉 You should add new behavior without changing existing code.
+
+❌ OCP Violation
+class DiscountService {
+
+    public double calculateDiscount(String type, double amount) {
+        if (type.equals("STUDENT")) {
+            return amount * 0.1;
+        } else if (type.equals("SENIOR")) {
+            return amount * 0.2;
+        }
+        return 0;
+    }
+}
+❌ Every new discount → modify this class
+❌ Breaks OCP
+
+✅ OCP Compliant Design (Using Polymorphism)
+Strategy Interface
+interface Discount {
+    double apply(double amount);
+}
+
+Implementations
+class StudentDiscount implements Discount {
+    public double apply(double amount) {
+        return amount * 0.1;
+    }
+}
+
+class SeniorDiscount implements Discount {
+    public double apply(double amount) {
+        return amount * 0.2;
+    }
+}
+
+Service
+class DiscountService {
+    public double calculateDiscount(Discount discount, double amount) {
+        return discount.apply(amount);
+    }
+}
+👉 Add new discount → no modification
+
+
+🌱 Spring Boot Mapping
+➤ Use @Component
+➤ Inject via @Qualifier
+➤ Strategy pattern + OCP
+
+
+🟢 L – Liskov Substitution Principle (LSP)
+Subclasses should be replaceable for their base class without breaking behavior.
+
+❌ LSP Violation
+class Bird {
+    public void fly() {
+        System.out.println("Flying");
+    }
+}
+
+class Ostrich extends Bird {
+    public void fly() {
+        throw new UnsupportedOperationException();
+    }
+}
+❌ Ostrich cannot fly
+❌ Breaks LSP
+
+✅ LSP Compliant Design
+interface Bird {}
+
+interface FlyingBird extends Bird {
+    void fly();
+}
+
+class Sparrow implements FlyingBird {
+    public void fly() {
+        System.out.println("Sparrow flying");
+    }
+}
+
+class Ostrich implements Bird {
+    public void walk() {
+        System.out.println("Ostrich walking");
+    }
+}
+👉 No behavioral contract violation
+
+
+🌱 Spring Boot Mapping
+➤ Avoid forcing subclasses to implement unused methods
+➤ Use interfaces wisely
+
+
+🟡 I – Interface Segregation Principle (ISP)
+Clients should not be forced to depend on interfaces they do not use.
+
+❌ ISP Violation
+interface Worker {
+    void work();
+    void eat();
+}
+
+class Robot implements Worker {
+    public void work() {}
+    public void eat() {} // ❌ meaningless
+}
+
+✅ ISP Compliant Design
+interface Workable {
+    void work();
+}
+
+interface Eatable {
+    void eat();
+}
+
+class HumanWorker implements Workable, Eatable {
+    public void work() {}
+    public void eat() {}
+}
+
+class RobotWorker implements Workable {
+    public void work() {}
+}
+👉 Interfaces are small & specific
+
+
+🌱 Spring Boot Mapping
+➤ Smaller interfaces = cleaner dependency injection
+➤ Avoid “fat” service interfaces
+
+
+🔵 D – Dependency Inversion Principle (DIP)
+High-level modules should not depend on low-level modules.
+Both should depend on abstractions.
+
+❌ DIP Violation
+class MySQLDatabase {
+    void connect() {}
+}
+
+class UserService {
+    private MySQLDatabase db = new MySQLDatabase();
+}
+❌ Tight coupling
+❌ Hard to change DB
+
+✅ DIP Compliant Design
+🔄 Abstraction
+interface Database {
+    void connect();
+}
+
+🔄 Implementations
+class MySQLDatabase implements Database {
+    public void connect() {
+        System.out.println("MySQL connected");
+    }
+}
+
+class MongoDatabase implements Database {
+    public void connect() {
+        System.out.println("MongoDB connected");
+    }
+}
+
+🔄 High-Level Module
+class UserService {
+    private Database database;
+
+    public UserService(Database database) {
+        this.database = database;
+    }
+
+    public void connect() {
+        database.connect();
+    }
+}
+✔️ Loosely coupled
+✔️ Easy to swap implementation
+
+🌱 Spring Boot Mapping
+➤ @Autowired
+➤ Constructor injection
+➤ Interfaces everywhere
+
+
+🔄 Summary of SOLID Principles
+| Principle | Key Idea                 |
+| --------- | ------------------------ |
+| SRP       | One responsibility       |
+| OCP       | Extend without modify    |
+| LSP       | Substitutable subclasses |
+| ISP       | Small interfaces         |
+| DIP       | Depend on abstractions   |

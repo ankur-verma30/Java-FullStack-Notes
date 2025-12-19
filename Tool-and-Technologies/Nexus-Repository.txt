@@ -1,0 +1,391 @@
+➤ Nexus Repository is a repository manager
+➤ It acts as a central storage + proxy + distribution hub for:
+    ✔️ Build artifacts
+    ✔️ Dependencies
+    ✔️ Packages
+➤ Developed by Sonatype
+➤ Used heavily in:
+    ✔️ Enterprise DevOps
+    ✔️ CI/CD pipelines
+    ✔️ Microservices architectures
+👉 Nexus is like a private “Google Drive + Cache + Firewall” for your build dependencies and artifacts
+
+
+🔁 Why Nexus Exists (Core Problem It Solves)
+❌ Problems Without Nexus
+➤ Every developer downloads dependencies separately from the internet
+➤ Builds break if:
+    ✔️ Internet is slow
+    ✔️ Public repo is down
+    ✔️ Dependency version disappears
+➤ No control over:
+    ✔️ What dependencies are used
+    ✔️ Vulnerable or malicious libraries
+➤ No centralized artifact storage
+
+
+✅ What Nexus Solves
+➤ Central dependency caching
+➤ Faster & repeatable builds
+➤ Controlled artifact versions
+➤ Security & governance
+➤ One source of truth for binaries
+
+
+🔁 Where Nexus Fits in the Software Lifecycle
+Developer → Git → CI (Jenkins/GitHub Actions)
+                      ↓
+               Build Tool (Maven/Gradle/npm)
+                      ↓
+                 Nexus Repository
+                      ↓
+            Production / Docker / K8s
+
+➤ Consumes dependencies during build
+➤ Publishes artifacts after build
+➤ Stores everything centrally
+
+
+🔁 Types of Repositories in Nexus (VERY IMPORTANT)
+1️⃣ Hosted Repository
+Used to store your own artifacts
+✅ Examples:
+➤ Your company’s JARs
+➤ Internal npm packages
+➤ Docker images
+✅ Example: my-service-1.0.0.jar
+
+2️⃣ Proxy Repository
+➤ Acts as a cache for remote public repositories
+➤ Downloads once → serves many times
+✅ Example:
+    ✔️ Maven Central
+    ✔️ npmjs.org
+    ✔️ Docker Hub
+Build → Nexus → (If not present) → Internet
+
+
+3️⃣ Group Repository
+➤ Logical combination of hosted + proxy
+➤ Developers use only ONE URL
+✅ Example:
+maven-public = hosted + maven-central + snapshots
+
+✔️ Simplifies configuration
+✔️ Hides internal structure
+
+5️⃣ Supported Package Formats
+Nexus supports multiple ecosystems
+🌟 Common Ones
+🔗 Java → Maven, Gradle
+🔗 JavaScript → npm, Yarn
+🔗 Docker → Docker images
+🔗 Python → PyPI
+🔗 C/C++ → NuGet
+🔗 Go → Go modules
+🔗 Helm → Helm charts
+🔗 Raw → Generic files (ZIP, TAR, binaries)
+👉 One Nexus → many languages
+
+
+🔄 How Dependency Resolution Works
+✅ Example: Maven build
+
+1️⃣ Developer runs: mvn clean install
+2️⃣ Maven requests dependency: spring-core:5.3.10
+3️⃣ Maven contacts Nexus Group Repository
+4️⃣ Nexus checks:
+    ✔️ Hosted → ❌
+    ✔️ Proxy cache → ❌
+5️⃣ Nexus downloads from Maven Central
+6️⃣ Stores it locally
+7️⃣ Sends it to Maven
+8️⃣ Next time → served from Nexus cache
+
+✔️ Faster
+✔️ Offline-safe
+✔️ Stable builds
+
+
+🔁 Artifact Publishing Flow
+After build success:
+1️⃣ CI pipeline generates artifact:my-app-1.0.0.jar
+2️⃣ Artifact is uploaded to: Hosted repository
+3️⃣ Nexus stores:
+    ✔️ Binary
+    ✔️ Metadata
+    ✔️ Version info
+
+✅ Now artifact becomes:
+    ✔️ Immutable
+    ✔️ Versioned
+    ✔️ Shareable
+
+
+🔁 Nexus 🆚 Maven Central 
+➤ Nexus is NOT a build tool
+➤ Nexus is NOT a version control system
+| Aspect             | Nexus        | Maven Central |
+| ------------------ | ------------ | ------------- |
+| Ownership          | Your company | Public        |
+| Upload control     | Full         | Restricted    |
+| Internal artifacts | Yes          | No            |
+| Security policies  | Yes          | No            |
+👉 Nexus wraps & controls public repos
+
+
+🔁 Snapshot 🆚 Release Artifacts
+1️⃣ SNAPSHOT
+    ✔️ Mutable
+    ✔️ Used during development
+    ✔️ Can change without version bump
+🔗 my-app-1.0-SNAPSHOT
+
+2️⃣ RELEASE
+    ✔️ Immutable
+    ✔️ Production-ready
+    ✔️ Cannot be overwritten
+🔗 my-app-1.0.0
+👉 Nexus enforces this separation strictly
+
+
+🔟 Security & Governance in Nexus
+➤ Authentication
+    ✔️ Users
+    ✔️ Roles
+    ✔️ Permissions
+➤ Authorization
+    ✔️ Read / Write / Delete per repo
+➤ Common Role Setup
+    ✔️ Developer → Read + Publish
+    ✔️ CI → Publish
+    ✔️ Admin → Full access
+
+
+🔁 Nexus with CI/CD (Real DevOps Usage)
+✅ Jenkins Example
+Build → Test → Publish → Nexus → Deploy
+
+➤ Jenkins pushes artifact to Nexus
+➤ Deployment tools pull from Nexus
+✔️ Decouples build & deploy
+✔️ Rollbacks become easy
+
+
+🔁 Nexus with Docker
+➤ Nexus can act as:
+    ✔️ Docker Registry
+    ✔️ Docker Proxy
+➤ Caches Docker Hub images
+➤ Stores private images
+
+📌 Huge benefit:
+    ✔️ Faster image pulls
+    ✔️ No Docker Hub rate limits
+
+
+🔁 Nexus Architecture (High Level)
+Internally Nexus Uses:
+    ✔️ Blob store (file system / S3)
+    ✔️ Metadata database
+    ✔️ REST APIs
+    ✔️ UI dashboard
+
+Artifacts are:
+    ✔️ Stored as binary blobs
+    ✔️ Indexed with metadata
+    ✔️ Served via HTTP
+
+
+🔁 Why Enterprises Prefer Nexus
+➤ Centralized control
+➤ Dependency stability
+➤ Security enforcement
+➤ Multi-language support
+➤ Scales well with microservices
+➤ Strong DevOps integration
+
+
+🔁 Nexus vs Artifactory (High Level)
+Both are repository managers
+
+Nexus:
+    ✔️ Simpler
+    ✔️ Strong Java ecosystem
+
+Artifactory:
+    ✔️ More enterprise integrations
+    ✔️ Slightly heavier
+
+
+🔁 Nexus Respository 🆚 Github
+Nexus Repository vs GitHub
+| Aspect                    | **Nexus Repository**                                                     | **GitHub**                                          |
+| ------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------- |
+| **Primary Purpose**       | Artifact & dependency management                                         | Source code version control & collaboration         |
+| **What it stores**        | Compiled binaries (JARs, WARs, Docker images, npm packages, Helm charts) | Source code (Java, JS, Python, etc.), configs, docs |
+| **Data Type**             | Binary artifacts                                                         | Human-readable source files                         |
+| **Versioning**            | Artifact versioning (semantic, snapshots, releases)                      | Git commits, branches, tags                         |
+| **Used in SDLC stage**    | Post-build & pre-deployment                                              | Development & collaboration                         |
+| **Dependency management** | Core functionality (proxy, cache, group repos)                           | Not designed for dependency cachi                   |
+
+
+🔁 How to setup Nexus Repository
+🔄 Prerequisites 
+➤ Minimum System Requirements
+➤ RAM: 4 GB (8 GB recommended)
+➤ CPU: 2 cores
+➤ Disk: 20–40 GB (depends on artifacts)
+➤ OS: Linux / Windows / macOS
+👉 Nexus is memory-heavy, don’t run it on low-RAM systems.
+
+
+🔄 Setup Nexus Using Docker
+❓ Why Docker?
+➤ Fast
+➤ No Java setup needed
+➤ Easy upgrades
+➤ Production-safe
+
+
+Step-1️⃣: Pull Nexus Image
+🔗 docker pull sonatype/nexus3
+
+Step-2️⃣: Run Nexus Container
+🔗 docker run -d \
+  --name nexus \
+  -p 8081:8081 \
+  -v nexus-data:/nexus-data \
+  sonatype/nexus3
+
+➤ 8081 → Nexus UI
+➤ nexus-data → Persistent storage
+➤ Data survives container restarts
+
+Step-3️⃣: Access Nexus UI
+🔗 http://<server-ip>:8081
+Default username: admin
+
+Step-4️⃣: Get Admin Password
+🔗 docker exec -it nexus cat /nexus-data/admin.password
+📌 Copy this password → login → change password immediately.
+
+Step-5️⃣: Initial Setup Wizard
+➤ Change admin password
+➤ Choose Disable anonymous access (recommended)
+👉 Nexus is now running 🎉
+
+
+🔄 Post-Setup Configuration 
+Step-1️⃣: Create Blob Store
+📍 UI → Settings → Blob Stores → Create Blob Store
+✔️ Name: default-blob-store
+✔️ Type: File
+✔️ Path: /nexus-data/blobs
+👉 Blob store = physical storage for artifacts
+
+Step-2️⃣: Create Repositories
+1️⃣ Hosted Maven Repository
+📍 Repositories → Create → Maven (hosted)
+✔️ Name: maven-releases
+✔️ Version policy: Release
+✔️ Deployment policy: Disable redeploy
+✔️ Blob store: default-blob-store
+
+
+2️⃣ Maven Snapshot Repository
+✔️ Name: maven-snapshots
+✔️ Version policy: Snapshot
+✔️ Deployment policy: Allow redeploy
+
+
+3️⃣ Maven Proxy Repository
+📍 Create → Maven (proxy)
+✔️ Name: maven-central
+🔗 Remote URL: https://repo1.maven.org/maven2/
+
+
+4️⃣ Maven Group Repository
+📍 Create → Maven (group)
+➤ Name: maven-public
+➤ Members:
+    ✔️ maven-releases
+    ✔️ maven-snapshots
+    ✔️ maven-central
+👉 Developers use ONLY this repo
+
+
+🔄 Configure Maven to Use Nexus
+🔗 settings.xml
+<mirrors>
+  <mirror>
+    <id>nexus</id>
+    <mirrorOf>*</mirrorOf>
+    <url>http://<nexus-ip>:8081/repository/maven-public/</url>
+  </mirror>
+</mirrors>
+
+
+🔗 Authentication
+<servers>
+  <server>
+    <id>nexus</id>
+    <username>admin</username>
+    <password>password</password>
+  </server>
+</servers>
+
+
+🔄 Publish Artifact to Nexus (Real Flow)
+🔗 pom.xml
+<distributionManagement>
+  <repository>
+    <id>nexus</id>
+    <url>http://<nexus-ip>:8081/repository/maven-releases/</url>
+  </repository>
+  <snapshotRepository>
+    <id>nexus</id>
+    <url>http://<nexus-ip>:8081/repository/maven-snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
+
+🔗 Deploy: mvn deploy
+👉 Artifact uploaded to Nexus
+
+
+🔄 Setup Nexus with Jenkins (CI/CD)
+🔗 Jenkins Pipeline Snippet
+stage('Build & Publish') {
+  steps {
+    sh 'mvn clean deploy'
+  }
+}
+➤ Jenkins user must have deploy permissions
+➤ Credentials stored securely in Jenkins
+
+
+🔄 Setup Docker Registry in Nexus (Optional)
+📍 Create Repository → Docker (hosted)
+➤ Name: docker-hosted
+➤ HTTP port: 5000
+🔗 Run Docker with insecure registry (if HTTP):
+{
+  "insecure-registries": ["<nexus-ip>:5000"]
+}
+
+
+🔄 Security Best Practices
+✔️ Disable anonymous access
+✔️ Use roles & least privilege
+✔️ Separate snapshot & release
+✔️ Backup /nexus-data
+✔️ Put Nexus behind Nginx / ALB
+✔️ Enable HTTPS
+
+
+🔄 Production Deployment Tips
+➤ Use external volume / S3 blob store
+➤ Minimum 8 GB RAM
+➤ Daily backups
+➤ Monitor disk usage
+➤ Rotate old snapshots

@@ -35,4 +35,4 @@
 5️⃣ Service Discovery Pattern
 6️⃣ Circuit Breaker
 
-🔄 SOLID Principles 
+🔄 SOLID Principles
