@@ -2080,3 +2080,224 @@ Used in:
 ❌ Large, complex grammar
 ❌ High-performance critical systems
 ❌ Prefer parser generators (ANTLR) instead
+
+  
+####################
+🔷 Visitor Design 
+####################
+Visitor Pattern allows you to add new operations to a set of objects without modifying their classes by moving the operation logic into a separate visitor class.
+
+✔️ Object structure stays stable
+✔️ Operations change frequently
+✔️ Add new behavior without touching existing classes
+
+
+❌ Problem It Solves
+Imagine:
+    ✔️ Many object types
+    ✔️ Many operations to perform on them
+    ✔️ Adding a new operation forces modifying every class
+❌ Violates Open-Closed Principle
+
+
+🔁 Visitor Solution
+✔️ Move operations into a Visitor
+✔️ Objects accept visitors
+✔️ Visitor decides what to do based on object type
+👉 This is called Double Dispatch.
+
+
+🔁 Core Idea (Mental Model)
+Object.accept(visitor)
+        ↓
+visitor.visitConcreteObject(object)
+✔️ Object type
+✔️ Visitor type
+👉 Both decide the behavior
+
+
+🔁 Structure
+Participants
+1️⃣ Visitor – interface with visit methods
+2️⃣ ConcreteVisitor – implements operations
+3️⃣ Element – interface with accept()
+4️⃣ ConcreteElement – calls visitor.visit(this)
+5️⃣ Object Structure – collection of elements
+
+
+✅ Java Code Example 
+🔁 Scenario
+We have different file types and want to:
+    ✔️ Calculate size
+    ✔️ Scan for virus
+    ✔️ Compress
+Instead of modifying each file class → use Visitor.
+
+
+1️⃣ Element Interface
+public interface FileElement {
+    void accept(FileVisitor visitor);
+}
+
+
+2️⃣ Concrete Elements
+👉 Text File
+public class TextFile implements FileElement {
+    private final String name;
+
+    public TextFile(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void accept(FileVisitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+
+👉 PDF File
+public class PdfFile implements FileElement {
+    private final String name;
+
+    public PdfFile(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void accept(FileVisitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+
+3️⃣ Visitor Interface
+public interface FileVisitor {
+    void visit(TextFile textFile);
+    void visit(PdfFile pdfFile);
+}
+
+
+4️⃣ Concrete Visitor (Operation)
+Virus Scanner Visitor
+public class VirusScannerVisitor implements FileVisitor {
+
+    @Override
+    public void visit(TextFile textFile) {
+        System.out.println("Scanning text file: " + textFile.getName());
+    }
+
+    @Override
+    public void visit(PdfFile pdfFile) {
+        System.out.println("Scanning PDF file: " + pdfFile.getName());
+    }
+}
+
+
+5️⃣ Client Code
+public class VisitorDemo {
+    public static void main(String[] args) {
+
+        List<FileElement> files = List.of(
+                new TextFile("notes.txt"),
+                new PdfFile("resume.pdf")
+        );
+
+        FileVisitor virusScanner = new VirusScannerVisitor();
+
+        for (FileElement file : files) {
+            file.accept(virusScanner);
+        }
+    }
+}
+✅ Output
+Scanning text file: notes.txt
+Scanning PDF file: resume.pdf
+
+
+🔁 Adding New Operation (Power of Visitor)
+Add CompressionVisitor
+👉 NO change in file classes
+
+public class CompressionVisitor implements FileVisitor {
+
+    @Override
+    public void visit(TextFile textFile) {
+        System.out.println("Compressing text file: " + textFile.getName());
+    }
+
+    @Override
+    public void visit(PdfFile pdfFile) {
+        System.out.println("Compressing PDF file: " + pdfFile.getName());
+    }
+}
+
+
+🔁 Important Trade-Off
+| Scenario                | Visitor is Good? |
+| ----------------------- | ---------------- |
+| Adding new operations   | ✅ YES            |
+| Adding new object types | ❌ NO             |
+👉 Adding a new element → must update all visitors
+
+
+🔁 Visitor & SOLID Principles
+✔️ Open-Closed Principle
+Open for new behavior
+Closed for modification
+
+❌ Interface Segregation (sometimes)
+Visitor interface grows as elements grow
+
+
+🔁 Visitor in Real Java / Frameworks
+✅ Java
+    ✔️ FileVisitor in java.nio.file
+    ✔️ AST parsing tools
+    ✔️ Compiler design
+
+✅ Spring / Enterprise
+    ✔️ Validation frameworks
+    ✔️ Rule engines
+    ✔️ Report generation
+    ✔️ Tax / Pricing calculation systems
+
+
+🧠 Real-World Use Case (Enterprise)
+✅ Example:
+E-commerce product types:
+    ✔️ Electronics
+    ✔️ Clothing
+    ✔️ Grocery
+Operations:
+    ✔️ Discount calculation
+    ✔️ Tax calculation
+    ✔️ Shipping cost
+👉 Use Visitor to add new pricing rules without touching product classes.
+
+
+🆚 Visitor vs Strategy
+| Visitor                 | Strategy          |
+| ----------------------- | ----------------- |
+| Object structure stable | Behavior stable   |
+| Operations change       | Algorithms change |
+| Double dispatch         | Single dispatch   |
+
+
+🔁 Traps & Answers
+❓ Why is accept() required?
+👉 Enables double dispatch
+
+❓ Is Visitor violating encapsulation?
+👉 Slightly, but acceptable for extensibility
+
+❓ When NOT to use Visitor?
+👉 When object types change frequently

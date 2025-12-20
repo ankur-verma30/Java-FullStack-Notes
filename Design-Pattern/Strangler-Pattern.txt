@@ -1,0 +1,185 @@
+Strangler Pattern is an incremental migration pattern where a legacy system is gradually replaced by a new system by routing specific functionality to the new system while the old system continues to run.
+
+🌟 Name comes from Strangler Fig Tree:
+➤ It grows around the old tree
+➤ Slowly replaces it
+➤ Eventually the old tree dies
+
+
+❌ Problem It Solves
+Legacy systems often:
+    ✔️ Are monolithic
+    ✔️ Hard to change
+    ✔️ Risky to rewrite fully
+    ✔️ Business-critical (can’t stop)
+❌ Big-bang rewrite = high risk + long downtime
+
+
+✅ Strangler Solution
+✔️ Keep legacy system running
+✔️ Introduce new system piece by piece
+✔️ Route traffic gradually
+✔️ Kill legacy parts only when safe
+
+
+🔁 High-Level Architecture
+Client
+   |
+   v
+API Gateway / Router
+   |
+   |----> Legacy System
+   |
+   |----> New Microservice
+
+
+🔄 How Strangler Works (Step-by-Step)
+1️⃣ Identify a feature boundary
+2️⃣ Build that feature in a new system
+3️⃣ Route requests to the new system
+4️⃣ Monitor & stabilize
+5️⃣ Remove legacy feature
+6️⃣ Repeat until legacy system disappears
+
+
+✅ Java + Spring Boot Example
+Legacy monolith handles:
+    ✔️ User Management
+    ✔️ Order Management
+We want to migrate Order Management to a new microservice.
+
+1️⃣ Legacy Monolith (Old System)
+@RestController
+@RequestMapping("/api")
+public class LegacyController {
+
+    @GetMapping("/orders/{id}")
+    public String getOrder(@PathVariable String id) {
+        return "Order " + id + " from LEGACY system";
+    }
+}
+
+2️⃣ New Microservice (Modern System)
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @GetMapping("/{id}")
+    public String getOrder(@PathVariable String id) {
+        return "Order " + id + " from NEW microservice";
+    }
+}
+
+3️⃣ Strangler Router (Gateway Layer)
+@RestController
+@RequestMapping("/api")
+public class StranglerRouter {
+
+    private final OrderServiceClient orderServiceClient;
+    private final LegacyOrderService legacyOrderService;
+
+    public StranglerRouter(
+            OrderServiceClient orderServiceClient,
+            LegacyOrderService legacyOrderService
+    ) {
+        this.orderServiceClient = orderServiceClient;
+        this.legacyOrderService = legacyOrderService;
+    }
+
+    @GetMapping("/orders/{id}")
+    public String routeOrder(@PathVariable String id) {
+
+        if (isMigrated(id)) {
+            return orderServiceClient.getOrder(id);
+        }
+        return legacyOrderService.getOrder(id);
+    }
+
+    private boolean isMigrated(String id) {
+        // feature toggle / DB flag / percentage rollout
+        return id.startsWith("N");
+    }
+}
+
+4️⃣ Service Clients
+Legacy Service
+@Service
+public class LegacyOrderService {
+    public String getOrder(String id) {
+        return "Order " + id + " from LEGACY system";
+    }
+}
+
+New Service Client
+@Service
+public class OrderServiceClient {
+    public String getOrder(String id) {
+        return "Order " + id + " from NEW microservice";
+    }
+}
+
+✅ Output Behavior
+| Order ID | Routed To        |
+| -------- | ---------------- |
+| `L123`   | Legacy System    |
+| `N456`   | New Microservice |
+✔️ Zero downtime
+✔️ Safe migration
+✔️ Gradual rollout
+
+
+🧠 Real-World Industry Examples
+✅ Amazon: Migrated monolith to microservices incrementally
+✅ Netflix: Strangled data centers with cloud services
+✅ Uber: Migrated core systems feature-by-feature
+
+
+🔁 Key Techniques Used with Strangler
+| Technique              | Purpose                |
+| ---------------------- | ---------------------- |
+| API Gateway            | Traffic routing        |
+| Feature Flags          | Gradual rollout        |
+| Canary Releases        | Risk reduction         |
+| Blue-Green Deployments | Safe switching         |
+| Database Strangling    | Gradual data migration |
+
+
+🔁 Advantages
+✅ Zero downtime
+✅ Lower risk
+✅ Business continuity
+✅ Incremental delivery
+✅ Easier rollback
+
+
+🔁 Disadvantages
+❌ Temporary complexity
+❌ Dual systems maintenance
+❌ Requires strong routing strategy
+
+
+🆚 Strangler vs Big-Bang Rewrite
+| Strangler     | Big-Bang            |
+| ------------- | ------------------- |
+| Incremental   | All at once         |
+| Low risk      | High risk           |
+| Business safe | Business disruptive |
+| Preferred     | Avoided             |
+
+
+🔁 Traps &  Answers
+❓ Is Strangler a design pattern or architecture pattern?
+👉 It’s an architectural migration pattern.
+
+❓ Does it require microservices?
+👉 ❌ No — but it fits perfectly with microservices.
+
+❓ Where does routing logic live?
+👉 API Gateway / Reverse Proxy / Load Balancer.
+
+
+🔁 When to Use Strangler Pattern?
+✔️ Legacy modernization
+✔️ Monolith → Microservices
+✔️ High-risk systems
+✔️ Continuous delivery environments
