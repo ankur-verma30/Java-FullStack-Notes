@@ -63,7 +63,7 @@ E.g., Web server spins separate threads for each request.
 
 4️⃣ Scalability in Server Applications
 ➤ Widely used in:
-    ✔️Spring Boot APIs (Tomcat/Netty threads)
+    ✔️️️Spring Boot APIs (Tomcat/Netty threads)
     ✔️Kafka consumers
     ✔️Database connection pools
 
@@ -939,7 +939,9 @@ if (lock.tryLock()) {
 ➤ Deadlocks or long wait times are tough to identify without specialized tools.
 
 
-🔷 ReadWriteLock
+############################
+🔷 ReadWriteLock Interface
+############################
 A ReadWriteLock is a special kind of lock that maintains two separate locks:
 👉 Read Lock – for read-only operations
 👉 Write Lock – for write/update operations
@@ -1101,8 +1103,9 @@ System.out.println("Final count:" + counter.getCount());
 ✔️ Prefer ReentrantReadWriteLock for reentrancy (same thread can re-acquire lock safely).
 ✔️ Readers block writers, and writers block readers — but readers can share the lock.
 
-
+#############
 🔷 Deadlock
+#############
 ➤ Deadlock is a situation when two or more threads are waiting for each other to release a lock.
 ➤ This can happen when two threads hold locks in opposite order, or when a thread acquires a lock and then waits for another thread to release it.
 ➤ In a deadlock, neither thread can proceed, and the program will be stuck in an infinite loop.
@@ -1205,8 +1208,174 @@ class Task2 implements Runnable{
     }
 }
 
+####################
+🔷tryLock() method
+####################
+➤ tryLock() is a non-blocking lock acquisition method
+➤ Part of java.util.concurrent.locks.Lock (e.g., ReentrantLock)
+➤ Returns true if lock is acquired, false otherwise
+➤ Thread does not wait if the lock is unavailable
 
+🔄 How tryLock() Prevents Deadlock
+✅ tryLock() Solution
+➤ Thread attempts to acquire lock
+➤ If lock not available → backs off instead of waiting
+➤ Breaks circular wait, hence prevents deadlock
+
+
+🔄 Deadlock vs tryLock()
+Without tryLock()
+➤ Thread A holds Lock1 → waits for Lock2
+➤ Thread B holds Lock2 → waits for Lock1
+
+❌ Deadlock
+➤ With tryLock()
+➤ Thread A tries Lock2 → fails → releases Lock1
+➤ Thread B proceeds
+✅ No deadlock
+
+
+#####################################
+🔷 Semaphore (Concurrency Control)
+#####################################
+➤ A Semaphore is a synchronization primitive
+➤ Used to control access to a limited number of resources
+➤ Maintains a counter (permits)
+➤ Threads must acquire a permit before accessing the resource
+➤ Permit is released after use
+
+📦 Package (Java): java.util.concurrent.Semaphore
+
+🔄 Why Semaphore is Needed?
+When multiple threads want to access a finite resource
+
+✅ Examples:
+    ✔️ Database connection pool
+    ✔️ Thread pool size control
+    ✔️ Printer pool
+    ✔️ API rate limiting
+
+
+🔄 Types of Semaphore
+1️⃣ Binary Semaphore
+➤ Permits = 1
+➤ Works like a mutex
+➤ Only one thread allowed at a time
+
+2️⃣ Counting Semaphore
+➤ Permits > 1
+➤ Allows limited parallel access
+
+
+🔄 Working of Semaphores
+Semaphore has an internal counter
+1️⃣ acquire():
+    ✔️ If counter > 0 → decrement and proceed
+    ✔️ If counter = 0 → thread blocks
+2️⃣ release():
+    ✔️ Increment counter
+    ✔️ Wake up one waiting thread
+
+
+🔄 Important Methods
+1️⃣ acquire() → blocks until permit available
+2️⃣ tryAcquire() → non-blocking
+3️⃣ release() → returns permit
+4️⃣ availablePermits() → remaining permits
+
+
+🔄 Real-World Use Case: Database Connection Pool
+👉 Problem:
+    ✔️ Only 3 DB connections available
+    ✔️ 10 threads want DB access
+    ✔️ More than 3 connections → DB crash
+✅ Solution: Use Semaphore(3)
+
+
+✅ Java Code Example (Counting Semaphore)
+import java.util.concurrent.Semaphore;
+
+class Database {
+
+    private static final Semaphore semaphore = new Semaphore(3);
+
+    public static void accessDatabase(int userId) {
+        try {
+            semaphore.acquire(); // request permit
+            System.out.println("User " + userId + " acquired DB connection");
+
+            Thread.sleep(2000); // simulate DB work
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            semaphore.release(); // return permit
+            System.out.println("User " + userId + " released DB connection");
+        }
+    }
+}
+
+public class SemaphoreDemo {
+    public static void main(String[] args) {
+
+        for (int i = 1; i <= 10; i++) {
+            int userId = i;
+            new Thread(() -> Database.accessDatabase(userId)).start();
+        }
+    }
+}
+
+✅ Output Behavior
+➤ At most 3 users access DB at the same time
+➤ Others wait until a permit is released
+➤ Prevents resource exhaustion
+
+
+🔄 Semaphore with tryAcquire() (Deadlock-Safe)
+if (semaphore.tryAcquire()) {
+    try {
+        // access resource
+    } finally {
+        semaphore.release();
+    }
+} else {
+    System.out.println("Resource busy, try later");
+}
+✔️ Avoids blocking
+✔️ Useful in high-availability systems
+
+🔄 Fair vs Unfair Semaphore
+Semaphore semaphore = new Semaphore(3, true); // fair
+➤ Fair = true
+    ✔️ FIFO order
+    ✔️ Slower
+
+➤ Fair = false (default)
+    ✔️ Higher throughput
+    ✔️ Possible starvation
+
+
+✅ Advantages of Semaphore
+➤ Controls access to limited resources: Ideal for DB connections, thread pools, printers
+➤ Supports multiple permits: Allows controlled parallelism (unlike mutex)
+➤ Prevents resource exhaustion: Limits number of concurrent threads
+➤ Flexible usage: Can be binary or counting semaphore
+➤ Non-blocking options: tryAcquire() helps avoid deadlocks
+➤ Language & OS level concept: Widely supported across systems
+
+
+❌ Disadvantages of Semaphore
+➤ No ownership concept: Any thread can release → error-prone
+➤ Hard to debug: Permit leaks cause hidden deadlocks
+➤ Risk of forgetting release(): Leads to thread starvation
+➤ Not reentrant: Same thread cannot re-acquire safely
+➤ No atomicity guarantee: Not suitable for compound operations
+➤ Overuse reduces readability: Complex logic compared to locks
+
+
+#########################
 🔷 Thread Communication
+#########################
 ➤ In a multithreaded environment, threads can communicate with each other to accomplish a task.
 ➤ Without proper communication mechanisms, threads might end up in efficient busy-waiting states, leading to wastage of CPU resources and potential deadlocks.
 
@@ -1232,8 +1401,8 @@ class Task2 implements Runnable{
 ➤ Producer thread produces data (adds items to buffer).
 ➤ Consumer thread consumes data (removes items from buffer).
 ➤ Both need to coordinate:
-    ✔️ Producer must wait if buffer is full.
-    ✔️ Consumer must wait if buffer is empty.
+    ✔️️ Producer must wait if buffer is full.
+    ✔️️ Consumer must wait if buffer is empty.
 
 🔗 Code implementation:
 class SharedResource {
@@ -1436,11 +1605,113 @@ final class Student {
 }
 👉 Immutable objects are naturally thread-safe because no thread can modify their state.
 
-6️⃣ Use Volatile for Visibility
-➤ The volatile keyword ensures changes made by one thread are immediately visible to others.
-➤ But it does not make operations atomic.
+#####################
+6️⃣ Volatile Keyword
+#####################
+➤ volatile ensures visibility of a variable across threads
+➤ Any write to a volatile variable is immediately written to main memory
+➤ Any read of a volatile variable is always read from main memory
+➤ Prevents instruction reordering for that variable
+➤ Does NOT provide atomicity or full thread safety
 
-private volatile boolean flag = true;
+
+🔄 Problem Without volatile (Visibility Issue)
+❌ What can go wrong?
+➤ One thread updates a variable
+➤ Another thread never sees the updated value
+➤ Happens due to CPU cache + instruction reordering
+
+❌ Code WITHOUT volatile (May run forever)
+class VolatileDemoWithout {
+
+    private static boolean stop = false; // NOT volatile
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Thread worker = new Thread(() -> {
+            System.out.println("Worker thread started...");
+            while (!stop) {
+                // busy wait
+            }
+            System.out.println("Worker thread stopped!");
+        });
+
+        worker.start();
+
+        Thread.sleep(1000); // main thread waits
+        stop = true;        // update flag
+        System.out.println("Main thread updated stop = true");
+    }
+}
+⚠️ What may happen?
+➤ Program never terminates
+➤ Worker thread keeps reading cached stop = false
+➤ Update from main thread not visible
+
+
+✅ Correct Code WITH volatile
+class VolatileDemoWith {
+
+    private static volatile boolean stop = false; // VOLATILE
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Thread worker = new Thread(() -> {
+            System.out.println("Worker thread started...");
+            while (!stop) {
+                // busy wait
+            }
+            System.out.println("Worker thread stopped!");
+        });
+
+        worker.start();
+
+        Thread.sleep(1000); // main thread waits
+        stop = true;        // update flag
+        System.out.println("Main thread updated stop = true");
+    }
+}
+🔍 What volatile FIXES
+✔️ Guarantees
+    ➤ Visibility: changes made by one thread are immediately visible to others
+    ➤ Prevents instruction reordering (for that variable)
+
+❌ What volatile DOES NOT guarantee
+❌ Atomicity
+❌ Thread safety for compound operations
+
+
+🔄 Memory-Level Explanation
+👉 Without volatile
+Main Thread      CPU Cache       Worker Thread
+stop = true  ->  NOT flushed  ->  still sees stop = false
+
+👉 With volatile
+Main Thread      Main Memory     Worker Thread
+stop = true  ->  written       ->  reads updated value
+👉 volatile forces read/write directly from main memory, not CPU cache.
+
+
+❓ Is volatile thread-safe?
+👉 NO
+Example ❌:
+volatile int count = 0;
+count++; // NOT atomic
+
+✔️ Correct alternative:
+1️⃣ AtomicInteger
+2️⃣ synchronized
+
+
+✅ When to Use volatile
+✔️ Use when:
+    ➤ One thread writes, others only read
+    ➤ Flag variables (stop, status, shutdown)
+    ➤ No compound operations
+
+❌ Avoid when:
+    ➤ Multiple threads modify value
+    ➤ Increment/decrement logic needed
 
 
 #################
@@ -1491,26 +1762,10 @@ Before the Executor Framework, developers had to manually handle:
 🔄 Common Thread Pool Types (via Executors)
 1️⃣ newFixedThreadPool(n)
 ➤ Creates a pool of fixed number of threads.
-➤ If all threads are busy, extra tasks wait in the queue.
+➤ If all threads are busy, extra tasks wait in the queue(LinkedBlockingQueue).
 
 ✅ Best for: constant load, predictable number of threads.
 ExecutorService pool = Executors.newFixedThreadPool(3);
-
-2️⃣ newCachedThreadPool()
-➤ Creates new threads as needed and reuses existing ones.
-➤ Threads idle for 60s are terminated after inactivity.
-✅ Best for: many short-lived asynchronous tasks.
-ExecutorService pool = Executors.newCachedThreadPool();
-
-3️⃣ newSingleThreadExecutor()
-Only one thread executes tasks sequentially.
-✅ Best for: ensuring ordered execution.
-ExecutorService pool = Executors.newSingleThreadExecutor();
-
-4️⃣ newScheduledThreadPool(n)
-Supports scheduling tasks after delay or periodically.
-✅ Best for: background maintenance tasks.
-ScheduledExecutorService pool = Executors.newScheduledThreadPool(2);
 
 ✅Example 1: Fixed Thread Pool
 package com.executorframework;
@@ -1662,8 +1917,176 @@ public class Main {
 | `Future.get(timeout, unit)` | Waits for a limited time, else throws TimeoutException.                 |
 
 
-🔄 ScheduledExecutorService
-Used for delayed or periodic task execution.
+2️⃣ newCachedThreadPool()
+➤ It creates a thread pool that grows and shrinks dynamically
+➤ Threads are created when needed
+➤ Idle threads are reused
+➤ If a thread stays idle for 60 seconds, it is destroyed
+
+👉 Best for:
+    ✔️️ Short-lived
+    ✔️ Asynchronous
+    ✔️ Bursty tasks (many tasks for a short time)
+
+✅Example:
+You have multiple independent tasks coming at unpredictable times
+(e.g., API calls, background jobs, async processing)
+
+✅ Code Example
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class CachedThreadPoolExample {
+
+    public static void main(String[] args) {
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+        for (int i = 1; i <= 10; i++) {
+            int taskId = i;
+
+            executor.submit(() -> {
+                System.out.println(
+                    "Task " + taskId + 
+                    " executed by " + Thread.currentThread().getName()
+                );
+
+                try {
+                    Thread.sleep(1000); // simulate short task
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+
+        executor.shutdown();
+    }
+}
+
+🔄 Internal Working
+1️⃣ First task arrives → new thread created
+2️⃣ Next tasks arrive quickly → more threads created
+3️⃣ Tasks finish
+4️⃣ Threads become idle
+5️⃣ Idle threads:
+    ✔️ Reused if new tasks come within 60 seconds
+    ✔️ Destroyed if idle for 60 seconds
+
+✅ Output:
+Task 1 executed by pool-1-thread-1
+Task 2 executed by pool-1-thread-2
+Task 3 executed by pool-1-thread-3
+...
+✔️ You’ll see different thread names, because the pool grows as needed.
+
+🔄 Real-Life Use Case
+✅ Example: Hospital System
+ExecutorService executor = Executors.newCachedThreadPool();
+
+executor.execute(() -> processPatientReport());
+executor.execute(() -> sendBillingNotification());
+executor.execute(() -> generateAuditLogs());
+
+✔️ Tasks are short
+✔️ Arrive unpredictably
+✔️ No fixed thread limit needed
+
+
+⚠️ Warning 
+newCachedThreadPool() has NO upper limit on threads
+
+❌ If tasks are:
+    ✔️ Long-running
+    ✔️ Blocking (DB, API calls)
+    ✔️ Heavy load
+➡️ It can create too many threads → OutOfMemoryError
+
+
+🔄 When to Use vs Avoid
+✅ Use When
+    ✔️ Tasks are short-lived
+    ✔️ Load is bursty
+    ✔️ Async background jobs
+
+❌ Avoid When
+    ✔️ Heavy DB calls
+    ✔️ Long-running CPU tasks
+    ✔️ You need strict thread control
+
+
+3️⃣ newSingleThreadExecutor()
+➤ Creates exactly ONE worker thread
+➤ Tasks are executed one by one
+➤ Order is guaranteed
+➤ If the thread crashes, Executor creates a new one
+ 
+
+🔄 When to Use
+➤ Logging
+➤ File writing
+➤ Audit trails
+➤ Sequential business rules
+➤ Any task where order matters
+
+✅ Example 1: Basic Usage
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class SingleThreadExecutorExample {
+
+    public static void main(String[] args) {
+
+        ExecutorService executor =
+                Executors.newSingleThreadExecutor();
+
+        executor.submit(() -> System.out.println("Task 1"));
+        executor.submit(() -> System.out.println("Task 2"));
+        executor.submit(() -> System.out.println("Task 3"));
+
+        executor.shutdown();
+    }
+}
+✅ Output (Always Same Order)
+Task 1
+Task 2
+Task 3
+➤ Even on a multi-core system.
+
+
+✅ Example 2: Real-World Logging Scenario
+ExecutorService loggerExecutor =
+        Executors.newSingleThreadExecutor();
+
+public void logEvent(String message) {
+    loggerExecutor.submit(() -> {
+        System.out.println("LOG: " + message +
+                " | Thread: " + Thread.currentThread().getName());
+    });
+}
+
+❓ Why Single Thread?
+➤ Prevents log corruption
+➤ Maintains exact order
+➤ Avoids synchronization complexity
+
+
+🔄 Internal Working
+➤ Uses:
+✔️ 1 core thread
+✔️ Unbounded LinkedBlockingQueue
+➤ Tasks wait in queue if thread is busy
+➤ No parallel execution — ever
+
+⚠️ Important Caveat
+❌ If one task blocks or hangs
+➡️ All following tasks are blocked
+✔️ Best for short, non-blocking tasks
+
+
+4️⃣ newScheduledThreadPool(n)
+Supports scheduling tasks after delay or periodically.
+✅ Best for: background maintenance tasks.
+ScheduledExecutorService pool = Executors.newScheduledThreadPool(2);
 
 ✅ Example 1 — One-shot Task After Delay
 ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -1720,3 +2143,1016 @@ scheduler.shutdown();
 ⚡ For large-scale systems, prefer ThreadPoolExecutor for advanced configurations.
 ⚡ Use submit() for tasks needing results.
 ⚡ Handle InterruptedException properly inside tasks.
+
+
+
+######################
+🔷 Future Interface
+######################
+➤ Future is part of java.util.concurrent and represents the result of an asynchronous computation.
+➤ Future = a placeholder for a result that will be available in the future
+
+When you submit a task to an executor:
+➤ The task runs in the background
+➤ You immediately get a Future object
+➤ You can later:
+    ✔️ Check if the task is done
+    ✔️ Get the result
+    ✔️ Cancel the task
+
+
+🔄 Why Do We Need Future?
+Without Future:
+    ✔️ You either block the main thread
+    ✔️ Or you have no way to know when a background task finishes
+
+With Future:
+    ✔️ You continue doing other work
+    ✔️ Retrieve the result only when needed
+
+
+🔄 Real-World Analogy: Hospital Example
+✔️ You give a blood sample to the lab.
+✔️ Lab gives you a receipt
+✔️ You continue with other activities
+✔️ Later, you use the receipt to collect the report
+
+📌 That receipt = Future
+📌 Report = Result
+📌 Lab test = Async task
+
+
+🔄 Basic Flow of Future
+1️⃣ Submit task to Executor
+2️⃣ Task runs asynchronously
+3️⃣ Future object is returned immediately
+4️⃣ Use future.get() to fetch result (blocks if not ready)
+
+
+🔄 Simple Example
+ExecutorService executor = Executors.newSingleThreadExecutor();
+
+Future<Integer> future = executor.submit(() -> {
+    Thread.sleep(2000);  // Simulate heavy task
+    return 42;
+});
+
+System.out.println("Doing other work...");
+
+Integer result = future.get();  // blocks until ready
+System.out.println("Result: " + result);
+
+executor.shutdown();
+
+✅ Output Flow:
+Doing other work...
+(wait 2 seconds)
+Result: 42
+
+
+🔄 Key Methods of Future Interface
+| Method               | Purpose                  |
+| -------------------- | ------------------------ |
+| `get()`              | Waits and returns result |
+| `get(timeout, unit)` | Waits up to timeout      |
+| `isDone()`           | Checks if task finished  |
+| `cancel(true/false)` | Cancels execution        |
+| `isCancelled()`      | Checks cancellation      |
+
+
+🔄 Real-World Problem Example (Backend System)
+In a Hospital Management System, when a patient books an appointment:
+    ✔️ Fetch doctor availability (DB)
+    ✔️ Calculate billing
+    ✔️ Send notification
+These are independent tasks.
+
+❌ Without Future
+    ✔️ Tasks run sequentially
+    ✔️ High latency
+
+
+✅ With Future
+ExecutorService executor = Executors.newFixedThreadPool(3);
+
+Future<Boolean> availability =
+        executor.submit(() -> checkDoctorAvailability());
+
+Future<Double> bill =
+        executor.submit(() -> calculateBilling());
+
+Future<Void> notification =
+        executor.submit(() -> sendNotification());
+
+if (availability.get()) {
+    System.out.println("Appointment confirmed");
+}
+
+System.out.println("Bill Amount: " + bill.get());
+
+executor.shutdown();
+
+👉 Benefits
+    ✔️ Faster response
+    ✔️ Better resource utilization
+    ✔️ Clean async control
+
+
+🔄 Limitations
+❌ Future.get() is blocking
+❌ No chaining of tasks
+❌ No callback support
+❌ Hard to combine multiple Futures
+
+📌 Because of these, Java introduced:
+➡️ CompletableFuture
+
+🔄 Future vs CompletableFuture
+Future allows asynchronous execution, but CompletableFuture enables non-blocking, reactive, and composable async programming.
+
+🔄 When to Use Future
+✅ Simple async task
+✅ Need result later
+✅ Basic background processing
+❌ Complex async flows
+❌ Multiple dependent tasks
+
+
+
+#####################################
+🔷CountDownLatch (Java Concurrency)
+##################################### 
+➤ CountDownLatch is a synchronization aid
+➤ Allows one or more threads to wait until a set of operations complete
+➤ Works using a counter
+➤ Threads wait until the counter reaches zero
+
+📦 Package: java.util.concurrent.CountDownLatch
+
+
+🔁 Why Do We Need CountDownLatch?
+➤ To coordinate threads
+➤ To ensure:
+    ✔️ Main thread waits for worker threads
+    ✔️ A task starts only after prerequisites finish
+➤ Avoids manual wait() / notify() complexity
+
+🔁 How CountDownLatch Works
+➤ Latch initialized with a count
+➤ Each completed task calls countDown()
+➤ Waiting threads call await()
+➤ When count becomes 0:
+    ✔️ All waiting threads are released
+    ✔️ Latch becomes inactive (cannot be reused)
+
+🔁 Important Methods
+➤ await() → blocks until count reaches zero
+➤ await(timeout, unit) → waits with timeout
+➤ countDown() → decreases count by 1
+➤ getCount() → current count
+
+
+🔁 Internal Working
+➤ Internally uses AQS (AbstractQueuedSynchronizer)
+➤ await() → thread goes into wait queue
+➤ countDown() → releases threads when count == 0
+➤ One-time use only
+
+
+🔁 Simple Real-World Analogy
+A race where the referee waits for all runners to reach the start line before blowing the whistle.
+
+
+🔁 Use Cases of CountDownLatch
+➤ Wait for multiple services to start
+➤ Main thread waits for worker threads
+➤ Parallel computation result aggregation
+➤ Testing & benchmarking (wait for async tasks)
+
+
+🔁 Code Example 1️⃣: Main Thread Waiting for Workers
+❗ Problem
+➤ 3 worker threads doing independent tasks
+➤ Main thread must wait until all finish
+
+
+✅ Java Code
+import java.util.concurrent.CountDownLatch;
+
+class Worker implements Runnable {
+
+    private CountDownLatch latch;
+    private int workerId;
+
+    Worker(CountDownLatch latch, int workerId) {
+        this.latch = latch;
+        this.workerId = workerId;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Worker " + workerId + " started work");
+            Thread.sleep(2000); // simulate task
+            System.out.println("Worker " + workerId + " finished work");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            latch.countDown(); // signal completion
+        }
+    }
+}
+
+public class CountDownLatchDemo {
+    public static void main(String[] args) throws InterruptedException {
+
+        int workers = 3;
+        CountDownLatch latch = new CountDownLatch(workers);
+
+        for (int i = 1; i <= workers; i++) {
+            new Thread(new Worker(latch, i)).start();
+        }
+
+        latch.await(); // wait for all workers
+        System.out.println("All workers completed. Main thread proceeding...");
+    }
+}
+✅ Output Behavior
+➤ Main thread blocks
+➤ Workers run in parallel
+➤ When last worker calls countDown()
+➤ Main thread resumes execution
+
+
+🔁 Code Example 2️⃣: Service Startup Dependency
+❗ Problem: App should start only after DB, Cache, MQ are ready
+
+✅ Java Code
+import java.util.concurrent.CountDownLatch;
+
+class Service implements Runnable {
+
+    private String serviceName;
+    private CountDownLatch latch;
+
+    Service(String serviceName, CountDownLatch latch) {
+        this.serviceName = serviceName;
+        this.latch = latch;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println(serviceName + " starting...");
+            Thread.sleep(1500);
+            System.out.println(serviceName + " started");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            latch.countDown();
+        }
+    }
+}
+
+public class ApplicationStartup {
+    public static void main(String[] args) throws InterruptedException {
+
+        CountDownLatch latch = new CountDownLatch(3);
+
+        new Thread(new Service("Database Service", latch)).start();
+        new Thread(new Service("Cache Service", latch)).start();
+        new Thread(new Service("Message Queue", latch)).start();
+
+        latch.await();
+        System.out.println("All services are up. Application started!");
+    }
+}
+
+🔁 Key Characteristics 
+✔️ One-time use
+✔️ Multiple threads can wait
+✔️ Thread-safe
+❌ Cannot reset
+❌ Not reusable
+
+🔁 CountDownLatch vs join()
+| Aspect           | CountDownLatch | Thread.join() |
+| ---------------- | -------------- | ------------- |
+| Multiple threads | ✅ Yes         | ❌ No        |
+| Timeout support  | ✅ Yes         | ✅ Yes       |
+| Flexibility      | High           | Low           |
+| Reusability      | ❌ No         | N/A            |
+
+
+🔁 CountDownLatch vs CyclicBarrier
+| Feature   | CountDownLatch  | CyclicBarrier             |
+| --------- | --------------- | ------------------------- |
+| Reusable  | ❌ No            | ✅ Yes                     |
+| Trigger   | Count reaches 0 | All threads reach barrier |
+| Direction | Workers → main  | Peer threads              |
+| Use case  | Waiting         | Synchronization           |
+
+
+🔁 Common Mistakes
+❌ Forgetting countDown()
+❌ Expecting reuse
+❌ Confusing with CyclicBarrier
+❌ Using for mutual exclusion
+
+
+🔄 When to Use / Avoid
+✔ Use When
+➤ One-time synchronization
+➤ Startup dependency
+➤ Main waits for workers
+
+❌ Avoid When
+➤ Reusable synchronization needed
+➤ Bidirectional thread coordination
+
+
+
+##########################
+🔷 Atomicity vs Volatile
+########################## 
+➤ volatile ensures visibility,
+➤ AtomicInteger ensures atomicity + visibility.
+
+❌ volatile Does NOT Ensure Atomicity
+❌ Code Using volatile
+class VolatileCounter {
+
+    private static volatile int count = 0;
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                count++; // NOT atomic
+            }
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                count++; // NOT atomic
+            }
+        });
+
+        t1.start();
+        t2.start();
+
+        t1.join();
+        t2.join();
+
+        System.out.println("Final count: " + count);
+    }
+}
+✅ Expected Output
+2000
+
+❌ Actual Output
+< 2000
+
+❗ Why?
+    ✔️ count++ = 3 steps
+    ✔️ Read value
+    ✔️ Increment
+    ✔️ Write back
+➤ volatile only makes step 1 & 3 visible —
+➤ steps are NOT atomic
+
+
+🔄 AtomicInteger
+➤ AtomicInteger is a thread-safe integer wrapper
+➤ Part of java.util.concurrent.atomic
+➤ Supports lock-free, atomic operations
+➤ Used when multiple threads update a shared integer
+
+
+🔄 Why Do We Need AtomicInteger?
+➤ Normal int operations like count++ are NOT atomic
+➤ synchronized → blocking + context switching
+➤ AtomicInteger → high performance, non-blocking
+
+
+🔄 Core Concept 
+➤ Uses CAS (Compare-And-Swap) at hardware level
+➤ Operation succeeds only if expected value matches
+➤ If CAS fails → operation retries automatically
+➤ No locks, no blocking
+
+🔄 Example Problem Without AtomicInteger
+int count = 0;
+count++; // NOT thread-safe
+
+➤ Multiple threads → race condition
+➤ Lost updates
+
+
+✅ Correct Solution Using AtomicInteger
+AtomicInteger count = new AtomicInteger(0);
+count.incrementAndGet(); // atomic
+
+🔄 Important Methods
+➤ incrementAndGet()
+➤ getAndIncrement()
+➤ decrementAndGet()
+➤ compareAndSet(expected, update)
+➤ get(), set()
+
+🔄 AtomicInteger vs volatile
+➤ volatile → visibility only
+➤ AtomicInteger → visibility + atomicity
+
+
+🔄 Real-World Use Cases
+➤ Request counters
+➤ Hit counters
+➤ Thread-safe metrics
+➤ Rate limiting
+➤ Sequence generators
+
+🔄 Advantages
+✔️ Lock-free
+✔️ High performance
+✔️ No deadlock
+✔️ Scales well under contention
+
+🔄 Limitations
+❌ Only single-variable atomicity
+❌ Complex logic still needs locks
+❌ CAS spinning under heavy contention
+
+
+⚠️  Trap
+❌ Using AtomicInteger for compound multi-variable operations
+✔️ Use locks for consistency across multiple fields
+
+
+
+##################
+🔷 CyclicBarrier
+##################
+➤ CyclicBarrier is a synchronization aid
+➤ Allows a fixed number of threads to wait for each other
+➤ All threads must reach a common barrier point
+➤ Once reached → all threads are released together
+➤ Barrier is reusable (cyclic)
+📦 Package: java.util.concurrent.CyclicBarrier
+
+
+🔄 Why Do We Need CyclicBarrier?
+➤ To synchronize peer threads
+➤ To ensure all threads complete a phase before moving to the next
+➤ Ideal for multi-phase parallel algorithms
+
+
+🔄 Core Concept
+➤ Barrier initialized with number of parties
+➤ Each thread calls await()
+➤ When last thread arrives:
+    ✔️ Barrier opens
+    ✔️ Optional barrier action executes
+    ✔️ Barrier resets automatically
+
+
+🔄 Important Methods
+➤ await() → wait until all parties arrive
+➤ await(timeout, unit) → timed wait
+➤ getNumberWaiting() → waiting threads
+➤ getParties() → total parties
+➤ isBroken() → barrier status
+➤ reset() → manual reset
+
+
+🔄 Barrier Action 
+➤ Runnable executed once
+➤ Runs by last arriving thread
+➤ Used for:
+    ✔️ Aggregation
+    ✔️ Logging
+    ✔️ State updates
+
+🔄 Code Example 1: Simple CyclicBarrier
+🎯 Problem: 3 threads must start work together
+
+✅ Java Code
+import java.util.concurrent.CyclicBarrier;
+
+class Task implements Runnable {
+
+    private CyclicBarrier barrier;
+    private int taskId;
+
+    Task(CyclicBarrier barrier, int taskId) {
+        this.barrier = barrier;
+        this.taskId = taskId;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Task " + taskId + " is ready");
+            barrier.await(); // wait for others
+
+            System.out.println("Task " + taskId + " started execution");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class CyclicBarrierDemo {
+    public static void main(String[] args) {
+
+        CyclicBarrier barrier = new CyclicBarrier(3);
+
+        for (int i = 1; i <= 3; i++) {
+            new Thread(new Task(barrier, i)).start();
+        }
+    }
+}
+Output Behavior
+➤ All threads print "ready"
+➤ Execution starts only after all reach barrier
+➤ Threads proceed simultaneously
+
+
+🔄 Code Example 2: Multi-Phase Execution (Cyclic Nature)
+🎯 Problem
+➤ 3 threads execute 2 phases
+➤ Phase 2 starts only after Phase 1 finishes
+
+
+✅ Java Code
+import java.util.concurrent.CyclicBarrier;
+
+class Worker implements Runnable {
+
+    private CyclicBarrier barrier;
+    private int id;
+
+    Worker(CyclicBarrier barrier, int id) {
+        this.barrier = barrier;
+        this.id = id;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Worker " + id + " - Phase 1");
+            Thread.sleep(1000);
+            barrier.await(); // end of phase 1
+
+            System.out.println("Worker " + id + " - Phase 2");
+            Thread.sleep(1000);
+            barrier.await(); // end of phase 2
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class MultiPhaseDemo {
+    public static void main(String[] args) {
+
+        CyclicBarrier barrier = new CyclicBarrier(3,
+                () -> System.out.println("---- All threads reached barrier ----"));
+
+        for (int i = 1; i <= 3; i++) {
+            new Thread(new Worker(barrier, i)).start();
+        }
+    }
+}
+
+🔄 Barrier Action Output
+---- All threads reached barrier ----
+Printed twice (after each phase)
+
+
+🔄 Broken Barrier Concept
+➤ If a thread:
+    ✔️ Is interrupted
+    ✔️ Times out
+➤ Barrier enters broken state
+➤ All waiting threads get BrokenBarrierException
+
+if (barrier.isBroken()) {
+    System.out.println("Barrier is broken");
+}
+
+🔄 CyclicBarrier vs CountDownLatch
+| Feature        | CyclicBarrier     | CountDownLatch  |
+| -------------- | ----------------- | --------------- |
+| Reusable       | ✅ Yes            | ❌ No          |
+| Direction      | Peer-to-peer      | Worker → main   |
+| Trigger        | All threads reach | Count reaches 0 |
+| Barrier action | ✅ Yes           | ❌ No           |
+
+
+🔄 Common Mistakes
+❌ Expecting reuse from CountDownLatch
+❌ Forgetting same number of threads as parties
+❌ Ignoring broken barrier handling
+❌ Using CyclicBarrier for mutual exclusion
+
+
+🔥 When to Use / Avoid
+✔️ Use When
+➤ Multi-phase computation
+➤ Parallel algorithms
+➤ Simulation steps
+
+❌ Avoid When
+➤ One-time waiting
+➤ Main thread coordination
+➤ Resource locking
+
+
+################################
+🔷 Fork/Join Framework in Java
+################################
+➤ A parallel execution framework introduced in Java 7
+➤ Designed for divide-and-conquer problems
+➤ Breaks a large task into smaller subtasks (fork)
+➤ Combines results of subtasks (join)
+➤ Optimized for CPU-bound, recursive tasks
+
+📦 Package: java.util.concurrent.forkjoin
+
+🔄 Why Fork/Join is Needed?
+➤ Traditional thread pools:
+    ✔️ Poor for recursive parallelism
+➤ Fork/Join:
+    ✔️ Efficient task splitting
+    ✔️ Automatic load balancing
+    ✔️ Minimal thread creation overhead
+
+
+🔄 Core Components
+1️⃣ ForkJoinPool
+➤ Specialized thread pool
+➤ Uses worker threads
+➤ Default size = number of CPU cores
+
+ForkJoinPool pool = new ForkJoinPool();
+
+
+2️⃣ ForkJoinTask
+➤ Base abstract class
+➤ Represents a parallel task
+
+Subclasses:
+➤ RecursiveTask<V> → returns result
+➤ RecursiveAction → no result
+
+
+🔄 How Fork/Join Works
+🔄 Work-Stealing Algorithm
+➤ Each worker thread has its own deque
+➤ Threads push tasks to their own queue
+➤ Idle threads steal tasks from others
+➤ Ensures maximum CPU utilization
+
+🔄 Fork/Join Execution Flow
+➤ Task checks if problem is small enough
+➤ If yes → solve directly
+➤ If no:
+    ✔️ Split task into subtasks
+    ✔️ fork() subtasks
+    ✔️ join() results
+
+
+🔄 Code Example 1: RecursiveTask (Sum of Array)
+🎯 Problem: Compute sum of array elements in parallel
+
+✅ Java Code
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.ForkJoinPool;
+
+class ArraySumTask extends RecursiveTask<Long> {
+
+    private static final int THRESHOLD = 5;
+    private int[] arr;
+    private int start, end;
+
+    ArraySumTask(int[] arr, int start, int end) {
+        this.arr = arr;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Long compute() {
+        if (end - start <= THRESHOLD) {
+            long sum = 0;
+            for (int i = start; i < end; i++) {
+                sum += arr[i];
+            }
+            return sum;
+        }
+
+        int mid = (start + end) / 2;
+
+        ArraySumTask left = new ArraySumTask(arr, start, mid);
+        ArraySumTask right = new ArraySumTask(arr, mid, end);
+
+        left.fork();                  // fork left task
+        long rightResult = right.compute(); // compute right
+        long leftResult = left.join();       // join left
+
+        return leftResult + rightResult;
+    }
+}
+
+public class ForkJoinDemo {
+    public static void main(String[] args) {
+
+        int[] arr = {1,2,3,4,5,6,7,8,9,10};
+
+        ForkJoinPool pool = new ForkJoinPool();
+        long result = pool.invoke(new ArraySumTask(arr, 0, arr.length));
+
+        System.out.println("Sum = " + result);
+    }
+}
+
+
+🔄 Code Example 2: RecursiveAction (No Return)
+import java.util.concurrent.RecursiveAction;
+
+class PrintTask extends RecursiveAction {
+
+    private int start, end;
+
+    PrintTask(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected void compute() {
+        if (end - start <= 3) {
+            System.out.println(Thread.currentThread().getName()
+                    + " printing " + start + " to " + end);
+            return;
+        }
+
+        int mid = (start + end) / 2;
+        invokeAll(
+            new PrintTask(start, mid),
+            new PrintTask(mid, end)
+        );
+    }
+}
+
+🔄 Fork/Join Best Practices (Interview Gold)
+✔️ Use for CPU-bound tasks
+✔️ Choose correct threshold
+✔️ Prefer invokeAll() for simplicity
+❌ Avoid blocking I/O inside tasks
+❌ Avoid synchronized blocks
+
+
+🔄 Fork/Join vs ExecutorService
+| Aspect         | Fork/Join          | ExecutorService   |
+| -------------- | ------------------ | ----------------- |
+| Best for       | Recursive tasks    | Independent tasks |
+| Load balancing | Work stealing      | Limited           |
+| Task type      | Divide-and-conquer | Flat tasks        |
+| Blocking I/O   | ❌ Bad              | ✅ OK              |
+
+
+🔄 Common Interview Traps
+❌ Using Fork/Join for I/O tasks
+❌ Very small thresholds (overhead)
+❌ Forgetting join()
+❌ Creating too many subtasks
+
+
+🔄 Where Fork/Join is Used Internally
+➤ Java Streams (parallelStream())
+➤ Arrays.parallelSort()
+➤ CompletableFuture (internals)
+
+
+#########################
+🔷 ThreadLocal Variable
+#########################
+➤ ThreadLocal provides thread-confined variables
+➤ Each thread gets its own independent copy of a variable
+➤ Changes made by one thread are not visible to others
+➤ Used to avoid synchronization for per-thread state
+
+📦 Package: java.lang.ThreadLocal
+
+
+🔄 Why Do We Need ThreadLocal?
+➤ To store thread-specific data safely
+➤ Avoids using synchronized
+➤ Common in:
+    ✔️ User session data
+    ✔️ Transaction context
+    ✔️ Request IDs
+    ✔️ DateFormat / SimpleDateFormat
+
+
+🔄 Core Concept
+➤ Internally, each Thread has a ThreadLocalMap
+➤ Map stores:
+    ✔️ Key → ThreadLocal object
+    ✔️ Value → thread-specific value
+➤ Same ThreadLocal → different value per thread
+
+
+✅ Example
+class ThreadLocalDemo {
+
+    private static ThreadLocal<Integer> threadLocal =
+            ThreadLocal.withInitial(() -> 0);
+
+    public static void main(String[] args) {
+
+        Runnable task = () -> {
+            int value = threadLocal.get();
+            value += 1;
+            threadLocal.set(value);
+
+            System.out.println(Thread.currentThread().getName()
+                    + " value = " + threadLocal.get());
+        };
+
+        new Thread(task, "Thread-A").start();
+        new Thread(task, "Thread-B").start();
+    }
+}
+✅ Output
+Thread-A value = 1
+Thread-B value = 1
+
+✔️ No shared state
+✔️ No synchronization
+
+
+🔄 Real-World Use Case: User Request Context
+class UserContext {
+    static ThreadLocal<String> userId = new ThreadLocal<>();
+}
+
+class Service {
+    static void process(String uid) {
+        UserContext.userId.set(uid);
+        System.out.println("User = " + UserContext.userId.get());
+        UserContext.userId.remove(); // IMPORTANT
+    }
+}
+
+🔄 Important Methods
+➤ get() → returns thread’s value
+➤ set(value) → sets thread’s value
+➤ remove() → clears value (critical!)
+➤ withInitial() → default value
+
+
+🔄 ThreadLocal vs Shared Variable
+| Feature         | ThreadLocal    | Normal Variable |
+| --------------- | ------------   | --------------- |
+| Shared          | ❌ No         | ✅ Yes          |
+| Synchronization | ❌ Not needed | ✅ Required     |
+| Visibility      | Thread-only    | Cross-thread    |
+
+
+🔄 Memory Leak Risk
+❌ Problem
+➤ In thread pools, threads are reused
+➤ ThreadLocal values stay attached to thread
+➤ Causes memory leaks
+
+✅ Solution
+threadLocal.remove();
+✔️ Always call remove() in finally
+
+
+🔄 ThreadLocal vs volatile
+➤ volatile → shared variable, visibility
+➤ ThreadLocal → no sharing at all
+
+
+🔄 Common Traps
+❌ Assuming ThreadLocal is thread-safe sharing
+❌ Forgetting remove() in thread pools
+❌ Using ThreadLocal as cache
+
+
+🔄 When to Use / Avoid
+✔️ Use When
+➤ Per-thread state
+➤ Request/session context
+➤ Non-thread-safe utilities
+
+❌ Avoid When
+➤ Data must be shared
+➤ Long-lived thread pools without cleanup
+
+
+
+#####################################
+🔷 Pessimistic vs Optimistic locking
+#####################################
+1️⃣ Pessimistic Locking
+➤ Assumes conflicts are likely
+➤ Locks data before access
+➤ Other threads/transactions must wait
+➤ Common in high-contention systems
+
+🔄 How It Works
+➤ Thread acquires lock
+➤ Performs operation
+➤ Releases lock
+➤ Others proceed
+
+✅ Java Example (Pessimistic)
+class PessimisticCounter {
+
+    private int count = 0;
+
+    public synchronized void increment() {
+        count++; // exclusive access
+    }
+
+    public int getCount() {
+        return count;
+    }
+}
+✔️ Safe
+❌ Blocking
+❌ Risk of deadlock
+
+
+2️⃣ Optimistic Locking
+➤ Assumes conflicts are rare
+➤ No lock while reading
+➤ Checks for conflicts before updating
+➤ If conflict → retry
+
+
+🔄 How It Works
+➤ Read value + version
+➤ Modify locally
+➤ Update only if version unchanged
+➤ Else retry
+
+
+✅ Java Example (Optimistic)
+import java.util.concurrent.atomic.AtomicInteger;
+
+class OptimisticCounter {
+
+    private AtomicInteger count = new AtomicInteger(0);
+
+    public void increment() {
+        count.incrementAndGet(); // CAS-based
+    }
+
+    public int getCount() {
+        return count.get();
+    }
+}
+✔️ Non-blocking
+✔️ High throughput
+❌ Possible retries
+
+
+🔄 Core Differences
+| Aspect      | Pessimistic Lock                | Optimistic Lock |
+| ----------- | ------------------------------- | --------------- |
+| Assumption  | Conflicts likely                | Conflicts rare  |
+| Locking     | Before access                   | At update time  |
+| Blocking    | Yes                             | No              |
+| Deadlock    | Possible                        | Not possible    |
+| Performance | Lower under contention          | Higher          |
+| Examples    | `synchronized`, `ReentrantLock` | CAS, versioning |
+
+
+🔄 Database Perspective
+➤ Pessimistic: SELECT ... FOR UPDATE
+➤ Optimistic: Version column (@Version in JPA)
+
+ 
+🔄 When to Use What
+✔️ Use Pessimistic When
+➤ High contention
+➤ Critical consistency
+➤ Short transactions
+
+✔️ Use Optimistic When
+➤ Low contention
+➤ Read-heavy systems
+➤ High scalability needed
+
+
+⚠️ Common Traps
+❌ Thinking optimistic lock always faster
+❌ Using pessimistic locks in read-heavy systems
+❌ Ignoring retry cost in optimistic locking
