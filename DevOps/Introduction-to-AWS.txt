@@ -18,18 +18,18 @@ Cloud computing is the on-demand delivery of compute, storage, networking, datab
 Infrastructure owned and managed by third-party providers like AWS, Azure, GCP.
 
 ✅ Examples
-    ✔️ AWS EC2, S3
-    ✔️ Azure VM
-    ✔️ Google Compute Engine
+    ✔️️ AWS EC2, S3
+    ✔️️ Azure VM
+    ✔️️ Google Compute Engine
 
 🔁 Key points
-    ✔️ Resources shared among multiple customers
-    ✔️ Accessible over the internet
-    ✔️ Highly scalable
-    ✔️ Pay-as-you-go
+    ✔️️ Resources shared among multiple customers
+    ✔️️ Accessible over the internet
+    ✔️️ Highly scalable
+    ✔️️ Pay-as-you-go
 
 🔁 Use cases
-    ✔️ Startups
+    ✔️️ Startups
     ✔️ Web & mobile applications
     ✔️ Dev/Test environments
 
@@ -655,3 +655,546 @@ Steps:
 ############################
 🔷 Security Group and NACL
 ############################
+Security Group = Virtual Firewall for Instances
+➤ Applied at EC2 instance level
+➤ Controls traffic inbound and outbound
+➤ Stateful → If inbound traffic is allowed, the response automatically allowed outbound
+
+🔁 Key Characteristics
+| Feature          | Security Group                                        |
+| ---------------- | ----------------------------------------------------- |
+| Scope            | **Instance-level**                                    |
+| Traffic control  | Inbound + Outbound                                    |
+| Stateful         | ✔ Yes                                                 |
+| Allow/Deny       | **Only Allow** rules                                  |
+| Default Behavior | All inbound traffic **blocked**, outbound **allowed** |
+| Evaluation       | All rules checked, if one matches → allowed           |
+| Logging          | Supported via VPC Flow Logs                           |
+
+
+🔷 Network Access Control List(NACL)
+NACL = Firewall for Subnets
+➤ Applied at Subnet level
+➤ Controls inbound & outbound traffic for all resources inside the subnet
+➤ Stateless → Return traffic must be explicitly allowed
+
+
+🔁 Key Characteristics
+| Feature      | NACL                                      |
+| ------------ | ----------------------------------------- |
+| Scope        | **Subnet-level**                          |
+| Stateful     | ❌ No                                     |
+| Allow/Deny   | Supports **Allow + Deny**                 |
+| Rule Order   | **Evaluated in order** (Lowest → Highest) |
+| Default Rule | Allow everything (modifiable)             |
+| Logging      | Supported via VPC Flow Logs               |
+
+
+🔁 STATEFUL vs STATELESS
+| Feature                               | Security Group | NACL    |
+| ------------------------------------- | -------------- | -----   |
+| Return traffic allowed automatically? | ✔ Yes         | ❌ No   |
+| Need separate rule for response?      | ❌ No         | ✔ Yes   |
+| Need separate rule for logging?       | ✔ Yes         | ❌ No   |
+
+
+🔁 Default Rules
+| Component      | Default Behavior                         |
+| -------------- | ---------------------------------------- |
+| Security Group | **Deny all inbound**, allow all outbound |
+| NACL (default) | Allow all inbound and outbound           |
+❗Trap → Many mistakenly say NACL blocks everything by default
+
+
+🔁 Order of Operation
+Traffic Flow Check:
+
+                     Internet
+                        |
+                  Internet Gateway
+                        |
+                   VPC Router
+                        |
+               ┌──────────────────┐
+               |      NACL        |  ← Stateless, subnet-level
+               └──────────────────┘
+                        |
+               ┌──────────────────┐
+               | Security Group   |  ← Stateful, instance-level
+               └──────────────────┘
+                        |
+                     EC2
+
+
+🔁 Use Cases
+| Scenario                    | Use Security Group | Use NACL  |
+| --------------------------- | ------------------ | --------- |
+| Protect individual EC2      | ✔ Yes              | ❌ No    |
+| Control subnet-wide traffic | ❌ No              | ✔ Yes    |
+| Block specific IPs          | ❌ No              | ✔ Yes    |
+| Fine-grained rules          | ✔ Yes              | ❌ Limited|
+| Allow both HTTP & SSH       | ✔ Yes              | ✔ Yes     |
+
+
+🔁 Common Traps & Answers
+| Question                                  | Correct Answer                                |
+| ----------------------------------------- | --------------------------------------------- |
+| Can SG deny rules?                        | ❌ Only allow rules                            |
+| Can SG be attached to multiple instances? | ✔ Yes                                         |
+| Can a subnet have multiple NACLs?         | ❌ Only one at a time                          |
+| Why NACL is stateless?                    | Must define rules for both request & response |
+
+
+✅ Example Scenario
+You are hosting a web application on an EC2 instance.
+
+Requirement:
+➤ Public users should access the app using HTTP (80) or HTTPS (443)
+➤ Only DevOps team should access server via SSH (22)
+➤ Database is in private subnet, accessible only by the web server
+
+We will configure:
+1️⃣ Security Group for Web Server (EC2)
+| Rule Type       | Direction | Port         | Source                         | Reason                    |
+| --------------- | --------- | ------------ | ------------------------------ | ------------------------- |
+| HTTP            | Inbound   | 80           | 0.0.0.0/0                      | Public can access website |
+| HTTPS           | Inbound   | 443          | 0.0.0.0/0                      | Secure public access      |
+| SSH             | Inbound   | 22           | Your IP (e.g., 183.89.***.***) | Admin access only         |
+| Database Access | Outbound  | 3306 (MySQL) | DB SG                          | App to DB communication   |
+⚡ Note: Outbound default is ALLOW ALL, often kept unchanged.
+
+
+2️⃣ Security Group for Database (RDS / Private EC2 DB)
+| Direction | Port         | Source          | Purpose                             |
+| --------- | ------------ | --------------- | ----------------------------------- |
+| Inbound   | 3306 (MySQL) | WebServer-SG-ID | Only web server can access database |
+| Outbound  | All          | Default         | For response traffic                |
+⚡ Note: Using Security Group ID instead of IP increases security.
+
+
+3️⃣ NACL Rules Example — Public Subnet
+NACL is statelessm so you must add inbound and outbound both.
+| Rule# | Direction | Protocol | Port | Source/Destination | Allow/Deny | Purpose              |
+| ----- | --------- | -------- | ---- | ------------------ | ---------- | -------------------- |
+| 100   | Inbound   | TCP      | 80   | 0.0.0.0/0          | ALLOW      | Public HTTP traffic  |
+| 110   | Inbound   | TCP      | 443  | 0.0.0.0/0          | ALLOW      | HTTPS                |
+| 120   | Inbound   | TCP      | 22   | Your IP            | ALLOW      | Admin SSH            |
+| ★     | Inbound   | All      | All  | 0.0.0.0/0          | DENY       | Deny everything else |
+
+Outbound:
+| Rule# | Protocol | Port       | Destination | Allow/Deny | Purpose        |
+| ----- | -------- | ---------- | ----------- | ---------- | -------------- |
+| 100   | TCP      | 1024-65535 | 0.0.0.0/0   | ALLOW      | Return traffic |
+| ★     | All      | All        | 0.0.0.0/0   | DENY       | Default deny   |
+
+
+4️⃣ NACL Rules Example — Private Subnet
+Only allow database communication from the web server subnet
+
+| Direction | Protocol | Port | Source             | Allow/Deny |
+| --------- | -------- | ---- | ------------------ | ---------- |
+| Inbound   | TCP      | 3306 | Public-subnet-CIDR | ALLOW      |
+| Inbound   | All      | All  | 0.0.0.0/0          | DENY       |
+| Outbound  | All      | All  | 0.0.0.0/0          | DENY       |
+
+
+
+#############
+🔷 Route53
+#############
+Route 53 is AWS’s global DNS & traffic management service designed for:
+➤ Domain registration
+➤ DNS resolution
+➤ Traffic routing + Load steering
+➤ Health-based failover
+➤ Global performance optimization
+
+It runs across AWS’s globally distributed edge locations — the same network as CloudFront — to provide ultra-low-latency DNS responses anywhere in the world.
+
+
+❓ WHY the name Route “53”?
+➤ 53 is the port number of DNS protocol (UDP/TCP port 53)
+➤ “Route” → network routing + traffic steering
+    ✔️ Clever naming rooted in fundamentals
+
+
+🔄 Core Components & Concepts
+| Component             | Role                                        |
+| --------------------- | ------------------------------------------- |
+| **Hosted Zone**       | Container for all DNS records of a domain   |
+| **DNS Records**       | Mapping of names → IPs / resources          |
+| **Authoritative DNS** | Route 53 answers officially for your domain |
+| **Health Checks**     | Remove unhealthy endpoints automatically    |
+| **Routing Policies**  | Intelligent traffic distribution logic      |
+
+
+🔑 Types of Hosted Zones
+| Type                    | Use                          |
+| ----------------------- | ---------------------------- |
+| **Public Hosted Zone**  | Domain available on Internet |
+| **Private Hosted Zone** | DNS restricted inside VPC    |
+👉 Private DNS avoids exposing internal service IPs publicly.
+
+
+🔁 DNS Record Types Supported
+| Record                        | Purpose                                             |
+| ----------------------------- | --------------------------------------------------- |
+| **A**                         | Name → IPv4                                         |
+| **AAAA**                      | Name → IPv6                                         |
+| **CNAME**                     | Name → Another name                                 |
+| **MX**                        | Email routing                                       |
+| **TXT**                       | Verification, SPF, DKIM                             |
+| **NS**                        | Delegation to name servers                          |
+| **Alias** (Route 53-specific) | Map AWS services with automatic health + dynamic IP |
+
+👉 Alias records automatically track changing cloud targets
+✅ Example: ALB DNS → never changes, but IPs change every minute
+
+
+🔁 Route 53 as a Global Load Routing Engine
+Route 53 is not a load balancer, but decides where users go globally:
+
+Supported Routing Policies
+| Routing Type           | What it does               | Use Case                   |
+| ---------------------- | -------------------------- | -------------------------- |
+| **Simple**             | One record → One IP        | Basic websites             |
+| **Weighted**           | Split traffic %            | Blue/Green deploy          |
+| **Latency-based**      | Closest AWS region         | Global apps                |
+| **Geolocation**        | Based on user location     | Legal, GDPR                |
+| **Geo-proximity**      | Regional preference shift  | Regional migrations        |
+| **Failover**           | Primary + Secondary        | DR setups                  |
+| **Multi-value Answer** | Multiple healthy endpoints | Client-side load selection |
+✔️ Route 53 + Health Checks => Self-repairing DNS
+
+
+🔁 Health Checks
+Monitors:
+➤ HTTP/HTTPS/TCP
+➤ Latency, status codes
+➤ String match inside HTTP body
+➤ Can trigger CloudWatch alarms
+
+If endpoint fails:
+➤ Automatically removed from DNS responses
+→ User gets only healthy locations
+
+Failure Detection Time:
+➤ ~15–45 seconds depending on probing interval
+
+
+🔁 DNS resolution works inside Route 53
+User Browser
+     │
+     ▼
+Local DNS Resolver (ISP, OS cache)
+     │ (no cached answer)
+     ▼
+Root DNS Servers (.)
+     │
+     ▼
+TLD DNS (.com, .in, etc.)
+     │
+     ▼
+Route 53 Authoritative Name Servers
+     │
+     ▼
+Return IP → Browser connects to target
+✔️ Route 53 sits at the authoritative layer
+
+
+🔁 Global Anycast DNS Architecture
+➤ Every Route 53 name server:
+    ✔️ Is deployed in multiple physical locations
+    ✔️ Uses Anycast IP addressing
+➤ Result:
+    ✔️ DNS request resolves at the closest edge location
+    ✔️ Fast lookup + high resiliency
+👉 Even if entire region fails → DNS still responds from other edges
+
+
+⚡Alias vs CNAME
+| Feature                  | Alias   | CNAME    |
+| ------------------------ | -----   | ------   |
+| For root domain?         | ✔️ Yes | ❌ No    |
+| Health check integration | ✔️ Yes | ❌ No    |
+| DNS Query cost           | Free    | Billed   |
+| Tracks AWS resource IPs  | ✔️ Yes | ❌ No    |
+✅ Example:
+example.com → ALIAS to ALB
+www.example.com → CNAME to example.com
+
+Alias supports AWS resources:
+➤ CloudFront
+➤ ALB / NLB
+➤ API Gateway
+➤ S3 Static Websites
+➤ Global Accelerator
+
+
+✅ DNS + Load Balancer + VPC + Routing Example
+User → DNS Query → Route 53 (Latency Rule)
+         │
+         ▼
+Closest Region ALB (Health OK?)
+         │
+         ▼
+Target EC2 or ECS Service → App
+
+
+If Region A goes down:
+Traffic shifts → Region B (Failover Rule)
+
+✔️ No downtime
+✔️ No manual changes
+✔️ Global resiliency
+
+
+🔁 Common Architectures Using Route 53
+| Architecture Goal             | Best Route Policy       |
+| ----------------------------- | ----------------------- |
+| Disaster recovery             | Failover                |
+| Global low latency            | Latency-based           |
+| Feature rollout 5% of traffic | Weighted                |
+| Legal restrictions            | Geolocation             |
+| Multi-region active-active    | Latency / Geo-proximity |
+
+
+🔁 Security Perspective
+➤ Route 53 DNS can work with:
+    ✔️ DNSSEC
+    ✔️ Shield Advanced (DDoS protection)
+    ✔️ Firewall Manager
+
+➤ Protects from:
+    ✔️ DNS spoofing
+    ✔️ DNS reflection attacks
+
+
+✔️ Mental Model
+     ┌────────────────────────────┐
+     │ Global Anycast DNS Network │
+     └────────────────────────────┘
+                    │
+                    ▼
+             Route 53 Authority
+   (Records + Policies + Health Checks)
+                    │
+   Intelligent Traffic Distribution
+                    │
+   AWS & On-Prem Endpoints Anywhere
+
+➤ Route 53 = DNS + Traffic Engineering + Health Aware Routing
+➤ It makes the right user reach the right endpoint globally.
+
+
+####################################
+🔷 AWS S3( Simple Storage Service)
+####################################
+S3 is an object storage system used to store unlimited data with extreme durability and global scalability. It is one of the core building blocks of AWS, used across almost every service.
+
+
+🔁 S3’s Core Design Philosophy
+| Feature                    | What it means                             |
+| -------------------------- | ----------------------------------------- |
+| **Object Storage**         | Data stored as objects (not files/blocks) |
+| **Unlimited Scale**        | Infrastructure expands automatically      |
+| **11 9s Durability**       | 99.999999999% object survival             |
+| **Global Namespace**       | Bucket name must be unique per region     |
+| **High Availability**      | Data stored across ≥ 3 Availability Zones |
+| **Designed for 1000s TPS** | Parallelism built in                      |
+👉 S3 is a distributed system, not a file system.
+
+
+🧱 Internal Data Structure of S3
+Every object =
+Key (name/path)
+Value (actual data)
+Version ID (optional)
+Metadata
+ACL/Permissions
+
+✅ Example “path”:mybucket/images/profile.png
+👉 This is not a folder — “folder” behavior is virtual, simulated by key prefixes.
+
+
+🔁 How S3 Achieves 11 9s Durability
+Durability achieved by:
+✔️ Automatic replication across 3+ AZs
+✔️ Checksums on write
+✔️ Self-healing storage
+✔️ Background scans/repair
+
+Even if:
+➤ 1 complete AZ destroyed → data safe
+➤ Hardware failures → auto-replicated
+
+
+🔁 Consistency Model
+| Operation              | Consistency           |
+| ---------------------- | --------------------- |
+| New Object PUT         | **Strong consistent** |
+| UPDATE existing object | **Strong**            |
+| DELETE                 | **Strong**            |
+👉 Older S3 was eventually consistent — now strong consistency for all operations.
+
+
+🔁 Buckets & Regions
+Buckets are regional resources:
+
+✅ Example:
+ap-south-1 (Mumbai)
+us-east-1 (N. Virginia)
+👉 Data physically remains within chosen region (unless replicated).
+
+
+🔁 Storage Classes (Cost vs Performance)
+| Class                    | Usage                                  | Cost    | AZ Redundancy |
+| ------------------------ | -------------------------------------- | ------- | ------------- |
+| **Standard**             | Frequent access                        | 💰💰    | Multi-AZ      |
+| **Standard-IA**          | Infrequent access                      | 💰      | Multi-AZ      |
+| **One-Zone-IA**          | Low-cost archive                       | 💵      | Single-AZ ❌   |
+| **Glacier Instant**      | Archive, Quick read                    | 💵      | Multi-AZ      |
+| **Glacier Flexible**     | Long archive                           | 💵↓     | Hours         |
+| **Glacier Deep Archive** | Lowest cost                            | 💵↓↓    | 12–48h        |
+| **Intelligent Tiering**  | Automatically moves data between tiers | Dynamic | Multi-AZ      |
+
+
+🔄 Lifecycle Policies
+Automate object transitions:
+    ✔️ From Standard → IA → Glacier → Delete
+    ✔️ Based on age/time rules
+Useful for reducing cost automatically.
+
+
+🔁 Access Control Deep Understanding
+S3 security = Layered
+| Layer                   | Controls                             |
+| ----------------------- | ------------------------------------ |
+| **Bucket Policy**       | Public/private rules at bucket level |
+| **IAM Policies**        | User/role permissions                |
+| **ACLs**                | Object-level legacy access control   |
+| **Block Public Access** | Prevent accidental exposure          |
+👉 Security architecture rule: DO NOT make buckets public. Use signed URLs instead.
+
+🔐 Encryption (2 layers)
+| Type    | Where encrypted               | Example              |
+| ------- | ----------------------------- | -------------------- |
+| **SSE** | Server-side                   | SSE-S3 / SSE-KMS     |
+| **CSE** | Client encrypts before upload | Fully app-controlled |
+
+➤ SSE-KMS is most secure:
+    ✔️ Keys managed by AWS KMS
+    ✔️ Audit in CloudTrail
+
+
+🔁 Performance Architecture
+S3 uses:
+✔️ Massive horizontal partitioning
+✔️ Prefix-based scaling
+✔️ Request parallelism
+✔️ Multi-part uploads for large files (≥ 100MB recommended)
+👉 Keys with random prefixes avoid bottleneck (like UUIDs).
+
+S3 supports:
+✔️ 100–350 MB/s per prefix
+✔️ Unlimited prefixes → near unlimited throughput
+
+
+🔁 Accessing S3
+Methods:
+    ✔️ REST API
+    ✔️ HTTPS endpoints
+    ✔️ AWS SDKs/CLI
+    ✔️ S3 Website Access
+    ✔️ VPC Interface Endpoints (private access)
+
+No NFS/SMB mounts directly (use:
+    ✔️ S3 + FSx File Systems
+    ✔️ S3 + EFS
+    ✔️ S3 + S3 File Gateway
+
+
+🔄 Cross-Region Replication (CRR)
+Purpose:
+    ✔️ Disaster recovery
+    ✔️ Reduce latency for remote users
+    ✔️ Data sovereignty compliance
+Supports:
+✔️ New object replication
+✔️ Versioning sync
+❌ Old objects before enabling not auto-replicated
+
+
+🌐 Static Web Hosting on S3
+➤ Serve HTML/JS/CSS directly
+➤ No backend processing
+➤ Index + error page support
+
+CloudFront recommended for:
+    ✔️ HTTPS
+    ✔️ Caching
+    ✔️ Global distribution
+
+
+🔁 Data Protection & Eventing
+| Feature             | Purpose                             |
+| ------------------- | ----------------------------------- |
+| Versioning          | Restore deleted/overwritten objects |
+| MFA Delete          | Prevent accidental/attacker deletes |
+| Object Lock         | WORM compliance (legal records)     |
+| Event Notifications | Trigger Lambda, SQS, SNS            |
+| Access Logs         | Track who accessed data             |
+
+
+
+🔁 Example Use Cases & How S3 Supports Them
+| System                  | Feature used                        |
+| ----------------------- | ----------------------------------- |
+| Data Lake Architecture  | S3 + Glue + Athena + Lake Formation |
+| Serverless Apps         | S3 → Lambda → DynamoDB              |
+| CDN Content             | S3 + CloudFront                     |
+| Backups & Archives      | Lifecycle + Glacier                 |
+| Logging                 | S3 central storage                  |
+| Mobile app file uploads | Presigned URLs                      |
+
+
+🧬 Internal Architecture (Simplified Flow)
+Client
+  │  PUT/GET request
+  ▼
+S3 API Front-End (Global Fleet)
+  │
+  ▼
+Distributed Metadata System
+  │   (Object indexing + consistency)
+  ▼
+Storage Nodes across 3+ AZs
+  (Chunked, replicated, self-healed)
+✔️ Storage hardware constantly rotated
+✔️ System independently verifies integrity
+
+
+🔁 Common Misconceptions
+| Myth                        | Reality                                              |
+| --------------------------- | ---------------------------------------------------- |
+| S3 is a filesystem          | ❌ It's object storage with simulated folders         |
+| Buckets scale automatically | ✔️ But poorly designed key prefixes will bottleneck   |
+| Data is always encrypted    | ❌ Only if enabled explicitly (or enforced by policy) |
+| S3 is slow                  | ❌ It scales, but use multi-prefix + multipart        |
+
+
+🎯 Final Deep Mental Model
+S3 =
+Object Store +
+Distributed Metadata +
+Strong Consistency +
+Extreme Durability (11 9s) +
+Global Parallel Architecture +
+Security + Compliance +
+Event-Driven Platform
+👉 S3 is not just storage — it’s a data foundation layer for modern cloud systems.
+
+
+############
+🔷 AWS CLI
+############

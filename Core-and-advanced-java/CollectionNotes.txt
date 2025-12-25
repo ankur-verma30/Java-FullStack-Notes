@@ -158,13 +158,6 @@ Let’s break this down step by step:
 ➤ Key Method:
 Iterator<T> iterator();
 
-➤ Enables use of the for loop:
-Iterator<T> iterator = someCollection.iterator();
-✔️ for ( iterator.hasNext()) {
-    T element = iterator.next();
-    // ...
-}
-
 ➤ Removal of elements is allowed while iterating.
 Iterator<Integer> itr=numbers.iterator();
 while(itr.hasNext()){
@@ -173,8 +166,8 @@ while(itr.hasNext()){
         itr.remove();
     }
 }
-
 ➤ Use of ListIterator: ListIterator<E> listIterator();
+//When to use ListIterator
 
 🔄 Core Methods:
 🔗 boolean hasNext();
@@ -254,7 +247,7 @@ List<Integer> numbers = new ArrayList<>(List.of(1, 2, 3, 4));
 🔄 Using Arrays.asList (Fixed-size list backed by array)
 List<String> names = new ArrayList<>(Arrays.asList("A", "B", "C"));
 System.out.println(names.getClass().getName());
-✅Output: java.util.Arrays$ArrayList
+✅Output: java.util.ArrayList
 
 ➤ This is NOT java.util.ArrayList
 ➤ It is an inner static class of java.util.Arrays called Arrays$ArrayList.
@@ -301,7 +294,7 @@ list.set(1, 50);       // update index 1 to value 50
 
 4️⃣ Remove Elements
 list.remove(2);        // remove by index
-list.remove(Integer.valueOf(10)); // remove by value
+list.remove(Integer.valueOf(10)); // remove by value if element is not present it will do nothing or else remove the element from the list
 list.clear();          // remove all elements
 
 5️⃣ Search Operations
@@ -430,7 +423,9 @@ class CustomComparator implements Comparator<Integer>{
 		System.out.println(str2);// Output: [Plum, Apple, Banana]
 
 
+###############
 🌟 LinkedList
+###############
 A LinkedList is a doubly-linked list implementation of the List and Deque interfaces.
 It allows for efficient insertion and removal of elements at both ends of the list.
 
@@ -519,7 +514,7 @@ public class LinkedListIntro {
 		System.out.println(linkedlist);
 		
 		//removing the first element
-		int removed=linkedlist.remove();
+		int removed=linkedlist.removeFirst();
 		System.out.println(removed);
 		
 		System.out.println(linkedlist);
@@ -538,7 +533,7 @@ public class LinkedListIntro {
 		System.out.println(linkedlist);
 		
 		LinkedList<String> animals=new LinkedList<>(Arrays.asList("Cat","Dog","Elephant"));
-		LinkedList<String> animalsToRemove=new LinkedList<>(Arrays.asList("Dog"));
+		LinkedList<String> animalsToRemove=new LinkedList<>(Arrays.asList("Dog")); //works if there is ArrayList also
 		
 		boolean removedAnimals=animals.removeAll(animalsToRemove);
 		System.out.println(removedAnimals);
@@ -546,7 +541,9 @@ public class LinkedListIntro {
 	}
 }
 
+#############
 🌟 Vectors
+#############
 ➤ A Vector in Java is a part of the java.util package and is one of the legacy classes in Java that implements the List interface.
 ➤ It was introduced in JDK 1.0 before collection framework and is synchronized, making it thread-safe.
 ➤ Now it is a part of the collection framework.
