@@ -226,7 +226,7 @@ Used to grant temporary permissions.
 
 ✅ Common Scenario
 ➤ EC2 needs to access S3
-➤ ✔ Attach IAM Role to EC2
+➤ ✔️ Attach IAM Role to EC2
 ➤ ❌ Don’t store access keys inside EC2
 
 
@@ -665,7 +665,7 @@ Security Group = Virtual Firewall for Instances
 | ---------------- | ----------------------------------------------------- |
 | Scope            | **Instance-level**                                    |
 | Traffic control  | Inbound + Outbound                                    |
-| Stateful         | ✔ Yes                                                 |
+| Stateful         | ✔️ Yes                                                 |
 | Allow/Deny       | **Only Allow** rules                                  |
 | Default Behavior | All inbound traffic **blocked**, outbound **allowed** |
 | Evaluation       | All rules checked, if one matches → allowed           |
@@ -693,9 +693,9 @@ NACL = Firewall for Subnets
 🔁 STATEFUL vs STATELESS
 | Feature                               | Security Group | NACL    |
 | ------------------------------------- | -------------- | -----   |
-| Return traffic allowed automatically? | ✔ Yes         | ❌ No   |
-| Need separate rule for response?      | ❌ No         | ✔ Yes   |
-| Need separate rule for logging?       | ✔ Yes         | ❌ No   |
+| Return traffic allowed automatically? | ✔️ Yes         | ❌ No   |
+| Need separate rule for response?      | ❌ No         | ✔️ Yes   |
+| Need separate rule for logging?       | ✔️ Yes         | ❌ No   |
 
 
 🔁 Default Rules
@@ -729,18 +729,18 @@ Traffic Flow Check:
 🔁 Use Cases
 | Scenario                    | Use Security Group | Use NACL  |
 | --------------------------- | ------------------ | --------- |
-| Protect individual EC2      | ✔ Yes              | ❌ No    |
-| Control subnet-wide traffic | ❌ No              | ✔ Yes    |
-| Block specific IPs          | ❌ No              | ✔ Yes    |
-| Fine-grained rules          | ✔ Yes              | ❌ Limited|
-| Allow both HTTP & SSH       | ✔ Yes              | ✔ Yes     |
+| Protect individual EC2      | ✔️ Yes              | ❌ No    |
+| Control subnet-wide traffic | ❌ No              | ✔️ Yes    |
+| Block specific IPs          | ❌ No              | ✔️ Yes    |
+| Fine-grained rules          | ✔️ Yes              | ❌ Limited|
+| Allow both HTTP & SSH       | ✔️ Yes              | ✔️ Yes     |
 
 
 🔁 Common Traps & Answers
 | Question                                  | Correct Answer                                |
 | ----------------------------------------- | --------------------------------------------- |
 | Can SG deny rules?                        | ❌ Only allow rules                            |
-| Can SG be attached to multiple instances? | ✔ Yes                                         |
+| Can SG be attached to multiple instances? | ✔️ Yes                                         |
 | Can a subnet have multiple NACLs?         | ❌ Only one at a time                          |
 | Why NACL is stateless?                    | Must define rules for both request & response |
 
@@ -1198,3 +1198,1068 @@ Event-Driven Platform
 ############
 🔷 AWS CLI
 ############
+AWS CLI (Command Line Interface) is a unified tool to interact with all AWS services using commands instead of the browser console.
+
+It’s built on top of:
+➤ AWS SDK for Python (boto3)
+➤ AWS API endpoints using HTTPS
+➤ SigV4 Signing System (cryptographic request signing)
+
+
+❓ Why AWS CLI Exists?
+| Feature                   | Advantage                            |
+| ------------------------- | ------------------------------------ |
+| Automation                | Scripting deployments, CI/CD         |
+| Consistency               | Same commands across OS              |
+| Fast control              | Bulk operations                      |
+| Infrastructure management | Create/modify AWS resources via code |
+| Server environments       | Access AWS without browser GUI       |
+👉 CLI= the backbone of DevOps, IaC and automation workflows.
+
+
+AWS CLI Installation (Latest: v2) for Ubuntu 24.04
+🔗 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+🔗 unzip awscliv2.zip
+🔗 sudo ./aws/install
+🔗 aws --version
+
+
+🔁 AWS CLI Authentication
+AWS CLI signs every request with SigV4 cryptographic signatures using credentials:
+| Type                  | Where used                      |
+| --------------------- | ------------------------------- |
+| **Access Key ID**     | Public identifier               |
+| **Secret Access Key** | Private cryptographic signing   |
+| **Session Token**     | Temporary access (STS/IAM Role) |
+Credentials NEVER appear in request body- only in signature headers.
+
+
+🔁CLI Configuration — aws configure
+1️⃣ Stores credentials in:~/.aws/credentials
+2️⃣ Sets default region in: ~/.aws/config
+3️⃣ Sets default output format in: ~/.aws/config
+4️⃣ Run: aws configure
+
+Input required:
+    ✔️ AWS Access Key ID
+    ✔️ AWS Secret Access Key
+    ✔️ Region (ap-south-1, us-east-1, etc.)
+    ✔️ Output format (json, yaml, text, table)
+
+
+🔁 Use Roles NOT Access Keys
+➡️ On EC2/ECS/Lambda, automatically use Instance Profiles / IAM Roles
+➡️ STS Temporary Credentials auto-rotate
+➡️ No secrets stored on disk
+
+Fallback order (Credential Provider Chain):
+1️⃣ Env variables (AWS_ACCESS_KEY_ID)
+2️⃣ Credentials file
+3️⃣ IAM role attached to instance
+4️⃣ Container credentials
+5️⃣ Custom providers
+👉 That’s how CLI magically works inside EC2/ECS without configuration.
+
+
+🔁 Profiles — Multiple Credentials Support
+1️⃣ Add a new profile: aws configure --profile dev
+2️⃣ Use it: aws s3 ls --profile dev
+
+You can maintain:
+    ✔️ dev
+    ✔️ staging
+    ✔️ production
+    ✔️ audit role
+etc., isolated from each other.
+
+
+🔁 How CLI Executes Commands Internally
+✅ Example: aws s3 ls
+
+🌟 Internal Flow:
+CLI → Credential Selection → API Endpoint → SigV4 → HTTPS → AWS Service API
+│
+└─ Receives JSON → Formats output
+
+🔁 Important Global CLI Parameters
+| Option              | Purpose                      |
+| ------------------- | ---------------------------- |
+| `--region`          | Override configured region   |
+| `--query`           | Filter output using JMESPath |
+| `--output`          | json, yaml, text, table      |
+| `--profile`         | Use specific profile         |
+| `--cli-auto-prompt` | Guided interactive mode      |
+
+
+🔁Output Filtering — JMESPath (Very powerful!)
+✅ Example 1: list only instance IDs
+🔗 aws ec2 describe-instances --query "Reservations[*].Instances[*].InstanceId"
+
+✅ Example 2:Get S3 bucket names only:
+🔗 aws s3api list-buckets --query "Buckets[].Name"
+
+
+🔁 Pagination Issues
+1️⃣ Many APIs paginate results. CLI handles with:
+--starting-token
+--page-size
+--max-items
+
+2️⃣ or stream automatically using: --no-paginate
+
+
+🔁 CLI Command Framework
+🔄 S3 Standard Commands
+🔗 aws s3 ls                         # List buckets
+🔗 aws s3 cp file.txt s3://my-bucket
+🔗 aws s3 sync ./site s3://my-bucket
+🔗 aws s3 rm s3://bucket/file.txt
+
+🔄 Low-level S3API
+🔗 aws s3api list-buckets
+🔗 aws s3api put-object ...
+👉 s3api gives deeper low-level control (encryption, ACLs)
+
+🔄 EC2
+🔗 aws ec2 run-instances ...
+🔗 aws ec2 describe-instances
+🔗 aws ec2 stop-instances --instance-ids i-1234
+🔗 aws ec2 terminate-instances --instance-ids i-1234
+
+
+🔁 Scripting with AWS CLI
+✅ Example: stop all running instances:
+🔗 aws ec2 describe-instances \
+--filters "Name=instance-state-name,Values=running" \
+--query "Reservations[*].Instances[*].InstanceId" --output text \
+| xargs -n 1 aws ec2 stop-instances --instance-ids
+
+Automating:
+    ✔️ Patch updates
+    ✔️ Backups to S3
+    ✔️ Triggering Lambda or Step Functions
+
+
+🔁 Advanced Authentication Strategies
+| Type                      | Where Used        | Rotation        |
+| ------------------------- | ----------------- | --------------- |
+| Static Keys               | Local machines    | Manual (bad)    |
+| SSO (AWS Identity Center) | Enterprise        | Auto tokens     |
+| STS Role Assumption       | Secure automation | Expiring tokens |
+| Instance/Task Role        | Workloads         | Auto refreshed  |
+
+✅ Example: Assume role:
+🔗 aws sts assume-role \
+--role-arn arn:aws:iam::123456789012:role/admin \
+--role-session-name mysess
+
+
+🔁 Security Best Practices
+✔️ Never store keys in code / repo
+✔️ Use IAM least privilege
+✔️ Always enable MFA
+✔️ Use IAM roles for EC2/ECS/Lambda
+✔️ Use AWS SSO for human access
+✔️ Rotate credentials regularly
+
+
+🔁 Networking Behavior
+➤ AWS CLI reaches APIs through:
+    ✔️ Public AWS endpoints
+    ✔️ VPC Interface Endpoints (PrivateLink) for private access
+
+🔗 aws ec2 describe-instances --endpoint-url https://vpce-xyz.ec2.ap-south-1.vpce.amazonaws.com
+
+➤ Useful for:
+    ✔️ Highly regulated environments
+    ✔️ Air-gapped VPCs
+
+
+🔁 Mental Model
+🔗 AWS CLI =
+Unified API client
++ SigV4 cryptographic signing
++ Automation engine
++ JMESPath querying
++ High-scale management tool
+👉 CLI is the command-line gateway into the entire AWS cloud control plane.
+
+
+#############################################
+🔷 IaC(Infrastructure as Code) with AWS CFT
+#############################################
+➤ Infrastructure as Code is the practice of defining and managing IT infrastructure using code, rather than manual configuration.
+
+➤ Infrastructure provisioning becomes repeatable, automated, version-controlled like software development.
+
+
+🔁 Key Principles of IaC
+| Principle                    | Meaning                                                        |
+| ---------------------------- | -------------------------------------------------------------- |
+| **Declarative Definition**   | Define *what* resources are needed, not *how* to create them   |
+| **Idempotency**              | Running the same code again results in the same infrastructure |
+| **Version Control Friendly** | Git can track infrastructure changes                           |
+| **Automation**               | No manual creation of resources in AWS console                 |
+| **Consistency**              | Eliminates misconfiguration and human errors                   |
+
+
+❓ Why we need IaC?
+| Manual Setup Issues                        | IaC Solution                              |
+| ------------------------------------------ | ----------------------------------------- |
+| Human errors                               | Automated provisioning                    |
+| No proper versioning                       | Git version control                       |
+| Hard to replicate environments             | Repeatable environment creation           |
+| Hard to track infrastructure configuration | Everything is documented in code          |
+| Difficult rollback                         | Rollback by redeploying an older template |
+
+
+🔁 AWS CloudFormation
+AWS CFT is a native IaC tool that allows us to define and provision AWS resources using templates (YAML/JSON).
+
+It creates, updates, and deletes infrastructure in a controlled and predictable way.
+
+
+❓ How CloudFormation Works
+Template (YAML/JSON)
+       │
+       ▼
+ CloudFormation Engine
+       │
+       ▼
+Creates Stack (Infrastructure deployment)
+👉 A Stack = A group of AWS resources created from a template
+
+
+🔁 Template Structure
+A CloudFormation template mainly consists of:
+| Section                      | Purpose                                   |
+| ---------------------------- | ----------------------------------------- |
+| **AWSTemplateFormatVersion** | Template version info (optional)          |
+| **Description**              | About the template                        |
+| **Metadata**                 | Additional info for internal logic        |
+| **Parameters**               | Inputs provided during deployment         |
+| **Mappings**                 | Region-based configurations               |
+| **Conditions**               | Create resources based on conditions      |
+| **Resources**                | 🔥 Actual AWS resources (Must have)       |
+| **Outputs**                  | Export important values (e.g., Public IP) |
+
+
+✅Example — EC2 Deployment Template (YAML)
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy a simple EC2 instance
+
+Parameters:
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Existing Key Pair to SSH
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c02fb55956c7d316 # Amazon Linux 2 (Region-specific)
+      KeyName: !Ref KeyPair
+
+
+✅ Outputs:
+  InstancePublicIP:
+    Description: Public IP of EC2
+    Value: !GetAtt MyEC2Instance.PublicIp
+
+
+🔁 Deployment Steps
+Method 1️⃣ — AWS Management Console
+1️⃣ Go to CloudFormation
+2️⃣ Create Stack → Upload Template File
+3️⃣ Enter parameters (like KeyPair)
+4️⃣ Deploy
+
+Method 2️⃣ — AWS CLI
+🔗 aws cloudformation create-stack \
+  --stack-name my-ec2-stack \
+  --template-body file://ec2-template.yaml \
+  --parameters ParameterKey=KeyPair,ParameterValue=mykeypair
+
+
+🔁 Stack Lifecycle
+| Stage                    | Meaning                       |
+| ------------------------ | ----------------------------- |
+| **CREATE_IN_PROGRESS**   | Deploying resources           |
+| **CREATE_COMPLETE**      | Deployed successfully         |
+| **UPDATE_IN_PROGRESS**   | Updating changes              |
+| **ROLLBACK_IN_PROGRESS** | Errors → revert to last state |
+| **DELETE_COMPLETE**      | All resources removed         |
+
+
+🔁 Drift Detection 
+CloudFormation detects if someone manually modified infrastructure outside CFT.
+    ✔️ Drift Detected (console shows differences)
+    ✔️ Helps maintain compliance and consistency
+
+
+🔄 Change Sets
+➤ Like a preview plan
+➤ Shows what changes will happen before updating stack
+➤ Used to avoid accidental destructive changes
+
+
+🔁 StackSets (Multi-Region or Multi-Account)
+➤ If a company runs multi-cloud architecture:
+    ✔️ Create once → deploy across multiple AWS accounts & regions
+
+✅ Examples:
+    ✔️ Deploy same VPC architecture to 10 regions
+    ✔️ Create IAM Roles across multiple business units
+
+
+🔁 CloudFormation vs Terraform
+| Feature             | CloudFormation        | Terraform                   |
+| ------------------- | --------------------- | --------------------------- |
+| Execution Engine    | AWS native            | Cloud-agnostic              |
+| Language            | YAML/JSON             | HCL                         |
+| Multi-Cloud Support | ❌                     | ✔️                           |
+| State Management    | Managed automatically | State file managed manually |
+| Resource Coverage   | Best for AWS          | Best for Hybrid/Multi-Cloud |
+
+
+🔁 Best Practices for CloudFormation
+✔️ Use Parameters for flexibility
+✔️ Use Mappings for region-specific AMIs
+✔️ Use Outputs to export data to other stacks
+✔️ Use Change Sets before updates
+✔️ Use CloudFormation Linter (cfn-lint) for validation
+✔️ Strictly maintain Git versioning
+✔️ Avoid manual AWS resource changes
+
+
+🔁 Why CloudFormation is important for AWS engineers?
+➤ Standardizes environment deployment
+➤ Automates infrastructure provisioning
+➤ Supports CI/CD pipelines
+➤ Helps in DevOps and GitOps workflows
+➤ Ensures production-grade infrastructure consistency
+
+
+###############################
+🔷  AWS CICD | AWS CodeCommit
+###############################
+➤ A fully managed, scalable, private Git repository hosted by AWS.
+➤ Similar to:
+    ✔️ GitHub
+    ✔️ GitLab
+    ✔️ Bitbucket
+➤ But integrated with AWS IAM and security services.
+
+
+🔁 Why CodeCommit?
+| Feature                          | Benefit                     |
+| -------------------------------- | --------------------------- |
+| Fully private                    | Secure enterprise projects  |
+| IAM-based access                 | No external user management |
+| High scalability                 | Amazon-managed backend      |
+| No size limit per repo           | Store large binaries        |
+| Encrypted by default             | At rest & in transit        |
+| Integrated with AWS DevOps tools | CodeBuild, CodePipeline     |
+
+
+🔁 Authentication Options
+| Method                             | Best For                            |
+| ---------------------------------- | ----------------------------------- |
+| **IAM User HTTPS Git credentials** | Developers using HTTPS              |
+| **SSH Keys**                       | Secure local access                 |
+| **AWS CLI with IAM Role**          | CI/CD systems & automated workflows |
+
+
+🔁 Repository Internal Structure
+Standard Git —
+    ✔️ Branches (main, develop, feature branches)
+    ✔️ Merge Requests / Pull Requests
+    ✔️ Commit history & versioning
+
+You can enforce:
+    ✔️ Branch protection
+    ✔️ Approval rules
+    ✔️ Code reviews
+
+
+🔁 CI/CD Example Using AWS DevOps Stack
+Pipeline Structure
+Developer Pushes Code to CodeCommit
+        │
+        ▼
+📌 CodePipeline Triggered
+        │
+        ▼
+🔨 CodeBuild → Build & Test → Create Artifact (.zip/.jar)
+        │
+        ▼
+📦 Store Artifact in S3/ ECR (for containers)
+        │
+        ▼
+🚀 CodeDeploy deploys to EC2 / ECS / Lambda
+        │
+        ▼
+📈 CloudWatch monitors health
+
+
+🔁 Testing in CI/CD
+Types of automated tests executed in CodeBuild:
+
+| Test Type           | Purpose                             |
+| ------------------- | ----------------------------------- |
+| Unit Tests          | Validate code logic                 |
+| Integration Tests   | Verify interactions between modules |
+| Performance Testing | Load testing before production      |
+| Security Scans      | Find vulnerabilities                |
+👉 CodeBuild outputs a status → success/failure → pipeline continues or stops.
+
+
+🔁 Deployment Strategies Supported by AWS
+| Strategy            | Best For                     | Tools                      |
+| ------------------- | ---------------------------- | -------------------------- |
+| **Blue/Green**      | Zero downtime, critical apps | CodeDeploy + Load Balancer |
+| **Canary**          | Gradual rollout of risk      | Lambda deployments         |
+| **Rolling Updates** | Scale-out services           | ECS/Fargate/K8s            |
+
+
+Rollback strategies are automated if:
+    ✔️ Deployment health checks fail
+    ✔️ Errors spike after release
+
+
+🔁 Why Companies Prefer CI/CD with AWS?
+| Advantage                         | Impact                         |
+| --------------------------------- | ------------------------------ |
+| Fully Managed                     | No Jenkins servers to maintain |
+| Deep AWS integration              | IAM security, VPC networking   |
+| Auto-scaling Build Infrastructure | Faster builds                  |
+| Enterprise Security               | KMS, IAM, VPC endpoints        |
+| Global deployment                 | Multi-region pipelines         |
+
+
+🔁 Real-World Use Case Example (Web App Deployment)
+Node.js App → CodeCommit
+Pipeline:
+  Stage 1: Source → CodeCommit
+  Stage 2: Build → CodeBuild (run tests)
+  Stage 3: Deploy → CodeDeploy to EC2 Fleet
+Monitoring → CloudWatch + Alarms
+
+🌟 Automatic:
+    ✔️ Builds on code push
+    ✔️ Deployment to servers
+    ✔️ Failover rollback
+
+
+🚫 Disadvantages of CI/CD on AWS
+➤ Vendor lock-in — tightly integrated with AWS environment
+➤ Cost may increase with frequent builds & deployments
+➤ Complex initial setup for large enterprise pipelines
+➤ Debugging failures in automated pipelines can be difficult
+➤ Learning curve for DevOps & AWS services
+
+
+🚫 Disadvantages of AWS CodeCommit
+➤ Less popular than GitHub/GitLab (community support is smaller)
+➤ UI is not as user-friendly as competitors
+➤ No public repositories → limits open-source collaboration
+➤ Region-specific repos → must handle region constraints
+➤ Third-party tool integration weaker than GitHub/Lab
+
+
+
+#######################
+🔷  AWS Code Pipeline
+#######################
+➤ AWS CodePipeline is a fully managed CI/CD orchestration service that automates:
+    ✔️ Source retrieval (CodeCommit, GitHub, S3)
+    ✔️ Build (via CodeBuild)
+    ✔️ Testing (via integrations)
+    ✔️ Deployment (via CodeDeploy / ECS / Lambda)
+➤ It manages the entire pipeline as connected stages, triggered automatically on code changes.
+
+
+🔁 Pipeline Structure
+Pipeline Structure
+Developer Pushes Code to CodeCommit
+        │
+        ▼
+📌 CodePipeline Triggered
+        │
+        ▼
+🔨 CodeBuild → Build & Test → Create Artifact (.zip/.jar)
+        │
+        ▼
+📦 Store Artifact in S3/ ECR (for containers)
+        │
+        ▼
+🚀 CodeDeploy deploys to EC2 / ECS / Lambda
+        │
+        ▼
+📈 CloudWatch monitors health
+
+
+🔁 Why CodePipeline?
+| Benefit                    | Impact                                               |
+| -------------------------- | ---------------------------------------------------- |
+| Fully managed service      | No servers or software maintenance                   |
+| Native AWS integrations    | Secured with IAM, integrated with other DevOps tools |
+| Event-driven automation    | Auto-trigger pipeline from code commits              |
+| Visual pipeline UI         | Real-time workflow monitoring                        |
+| High availability built-in | No downtime for pipeline workloads                   |
+| Fast setup                 | Pipelines created in minutes                         |
+
+
+🔁 When CodePipeline is Best
+✔️ Teams already inside AWS
+✔️ Microservices architecture using ECS/Fargate/Lambda
+✔️ Auto-scaling, auto-secured DevOps pipelines
+✔️ Enterprises requiring strict IAM governance
+
+
+🔁 When CodePipeline is Not Best
+❌ Teams not inside AWS
+❌ Large-scale, complex DevOps pipelines
+❌ Teams using multiple cloud providers
+❌ Teams using other DevOps tools
+
+
+🔁 Strengths of Jenkins
+| Feature                   | Benefit                                     |
+| ------------------------- | ------------------------------------------- |
+| Plugin ecosystem (~1800+) | Unlimited custom workflows                  |
+| Cloud-agnostic            | Multi-cloud / On-prem flexibility           |
+| Mature community          | Tons of tutorials & integration support     |
+| Self-hosted               | Full control over infrastructure & security |
+
+
+🔁 Weaknesses of Jenkins
+| Issue                               | Impact                        |
+| ----------------------------------- | ----------------------------- |
+| Requires server setup & maintenance | Operations overhead           |
+| Plugin failures & dependency issues | Pipeline instability          |
+| Scaling is manual                   | More infra cost & management  |
+| Security maintenance needed         | Vulnerabilities if mismanaged |
+
+
+🔁 Comparison - CodePipeline vs Jenkins
+| Feature          | AWS CodePipeline           | Jenkins                    |
+| ---------------- | -------------------------- | -------------------------- |
+| Type             | Managed CI/CD              | Open-source CI/CD          |
+| Setup effort     | Very low                   | High                       |
+| Scaling          | Automatic                  | Manual (HA setup required) |
+| Cost             | Pay for usage              | Server cost + Maintenance  |
+| Security         | IAM/KMS/VPC Managed by AWS | User responsibility        |
+| Customization    | Moderate                   | Very high                  |
+| Multi-cloud      | Limited (AWS-centric)      | Excellent                  |
+| Plugin ecosystem | Limited                    | Massive                    |
+| Pipeline as Code | Supported                  | Supported (Jenkinsfile)    |
+
+
+🔁 Open Source vs AWS Managed Services
+| Category       | Jenkins (Open Source)     | CodePipeline (AWS Managed) |
+| -------------- | ------------------------- | -------------------------- |
+| Infrastructure | You manage                | AWS manages                |
+| Flexibility    | Very high                 | Limited to AWS ecosystem   |
+| Reliability    | Depends on setup          | Highly reliable by default |
+| Security       | You maintain patches      | AWS maintains              |
+| Cost Model     | Your compute bill         | Service usage pricing      |
+| Governance     | Custom                    | IAM governance             |
+| Learning Curve | High for DevOps beginners | Easy for AWS users         |
+
+
+🔁 Real-World Recommendation
+| Scenario                                            | Suggested Tool                     |
+| --------------------------------------------------- | ---------------------------------- |
+| Small–medium teams fully on AWS                     | CodePipeline                       |
+| Hybrid infrastructure or enterprise legacy systems  | Jenkins + CodePipeline integration |
+| Highly regulated industries needing on-prem control | Jenkins                            |
+
+
+##################
+🔷 AWS CodeBuild
+##################
+AWS CodeBuild is a fully managed Continuous Integration (CI) service that:
+✔️ Compiles source code
+✔️ Runs tests
+✔️ Produces deployable artifacts
+✔️ Scales automatically
+✔️ Integrates deeply with AWS DevOps tools
+👉 A cloud-native replacement for Jenkins build agents / runners.
+
+
+🔁 Why do we need CodeBuild?
+| Without CodeBuild                                     | With CodeBuild                                  |
+| ----------------------------------------------------- | ----------------------------------------------- |
+| Developer machines handle builds → slows productivity | CI server handles builds automatically          |
+| Hard to scale large builds                            | Auto-scale, build several versions in parallel  |
+| Manual testing leads to delays                        | Automated testing ensures early issue detection |
+| On-prem build servers require maintenance             | Zero infrastructure to manage                   |
+| Slow release cycles                                   | Faster & frequent releases                      |
+
+
+🔁 Where does CodeBuild fit in CI/CD pipeline?
+Developer Pushes Code →
+  CodePipeline triggers →
+    CodeBuild builds & tests →
+      Output artifacts →
+        CodeDeploy/AWS service deploys
+
+
+🔁 Key Concepts in CodeBuild
+1️⃣ Build Project
+Contains configuration:
+    ✔️ Source repo (CodeCommit, GitHub, S3, Bitbucket)
+    ✔️ Build environment
+    ✔️ IAM execution role
+    ✔️ Artifacts output settings
+
+2️⃣ BuildSpec File (buildspec.yml)
+➤ Defines build & test steps + commands to execute
+➤ Located in source repo root.
+
+✅ Example:
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo Installing dependencies
+      - npm install
+  build:
+    commands:
+      - echo Build started
+      - npm run build
+artifacts:
+  files:
+    - '**/*'
+
+
+3️⃣ Build Environment
+Configured using:
+    ✔️ OS → Amazon Linux, Ubuntu, Windows, Custom Docker image
+    ✔️ Runtime → Java, Python, Node.js, DotNet, Go, Docker-in-Docker
+    ✔️ Custom Docker environment is major strength.
+
+
+🔁 Execution Flow
+Start Build →
+Load BuildSpec →
+Install Phase →
+Pre-Build Phase →
+Build Phase →
+Post-Build Phase →
+Upload Artifacts →
+Result sent to CodePipeline (or S3)
+
+
+🔁 Source Providers Supported
+| Provider          | Native support |
+| ----------------- | -------------- |
+| CodeCommit        | ✔️             |
+| GitHub            | ✔️             |
+| GitHub Enterprise | ✔️             |
+| Bitbucket         | ✔️             |
+| S3                | ✔️             |
+
+
+🔁 Security — IAM roles & encryption
+➤ CodeBuild runs inside isolated containers
+➤ Uses IAM Service Role for permissions
+➤ Encrypts artifacts using KMS
+➤ VPC support:
+    ✔️ Build container can run inside private subnet
+
+
+🔁 Scalability
+| Traditional CI Servers        | CodeBuild                             |
+| ----------------------------- | ------------------------------------- |
+| Queue builds during peak load | Creates unlimited concurrent builders |
+| Manual scale-up required      | Auto-scale & pay-per-second           |
+
+
+🔁 Artifacts
+➤ Output options:
+    ✔️ S3
+    ✔️ CodePipeline
+    ✔️ ECR (container images)
+    ✔️ Lambda deployment package
+
+➤ Supports caching for faster builds:
+    ✔️ Local cache (on build host)
+    ✔️ S3 bucket cache
+
+
+🔁 Logging & Monitoring
+| Feature       | Service            |
+| ------------- | ------------------ |
+| Build logs    | CloudWatch Logs    |
+| Metrics       | CloudWatch Metrics |
+| Notifications | EventBridge / SNS  |
+
+
+🔁 Testing Capabilities
+➤ Runs automated:
+    ✔️ Unit tests
+    ✔️ Integration tests
+    ✔️ Security scan
+    ✔️ Code coverage reports
+
+➤ You can use:
+    ✔️ JUnit, Mocha, PyTest, Jest, SonarQube etc.
+
+
+🔄 Integrations
+| Service         | Role                   |
+| --------------- | ---------------------- |
+| CodePipeline    | Pipeline Orchestration |
+| CodeDeploy      | Deployment Automation  |
+| ECR             | Container builds       |
+| CloudWatch      | Logs + Alarms          |
+| Secrets Manager | Secure credentials     |
+| VPC             | Private builds         |
+
+
+🔁 Real-World Use Cases
+| Use Case            | How CodeBuild helps                   |
+| ------------------- | ------------------------------------- |
+| Microservices       | Parallel builds for multiple repos    |
+| Containers          | Docker-in-Docker builds → push to ECR |
+| Serverless          | Build Lambda ZIP artifact             |
+| Test automation     | Run tests after every merge           |
+| Security compliance | Automated vulnerability scanning      |
+
+
+🔁 CodeBuild vs Jenkins Build Agents
+| Feature     | CodeBuild               | Jenkins                      |
+| ----------- | ----------------------- | ---------------------------- |
+| Scaling     | Auto-managed by AWS     | Manual                       |
+| Security    | IAM + network isolation | You secure everything        |
+| Maintenance | None                    | High                         |
+| Cost        | Pay per second          | Must pay infra & maintenance |
+| Flexibility | Strong on AWS workloads | Strong for any workload      |
+
+
+###################
+🔷 AWS CodeDeploy
+###################
+AWS CodeDeploy is a fully managed deployment automation service designed to:
+    ✔️ Automate application deployments
+    ✔️ Across EC2, On-Prem servers, Lambda, ECS
+    ✔️ With Zero Downtime strategies
+
+It ensures that:
+    ✔️ Deployments are reliable
+    ✔️ Rollbacks are quick
+    ✔️ Releases are repeatable & traceable
+
+
+🔁 Why Do We Need CodeDeploy?
+| Problem Without CodeDeploy     | CodeDeploy Solution                    |
+| ------------------------------ | -------------------------------------- |
+| Manual deployments → risky     | Automated & consistent                 |
+| Service downtime               | Blue/Green & Canary                    |
+| Hard rollback                  | Automatic rollback on failure          |
+| Multi-server update complexity | Coordinated deployment + health checks |
+| Complex deployment scripting   | Single deployment config + app spec    |
+
+
+🔁 CodeDeploy Deployment Types
+| Deployment Type | Target Platform    | Use Case                                 |
+| --------------- | ------------------ | ---------------------------------------- |
+| **EC2/On-Prem** | Virtual machines   | Traditional apps, monolith, hybrid infra |
+| **AWS Lambda**  | Serverless         | Version + traffic shifting               |
+| **ECS/Fargate** | Containerized apps | Microservices & orchestrated workloads   |
+
+
+🔁 Deployment strategies
+| Strategy                      | Behavior                                            | Best For                                |
+| ----------------------------- | --------------------------------------------------- | --------------------------------------- |
+| **In-Place (Rolling update)** | Update servers 1-by-1 without replacement           | Stateful apps                           |
+| **Blue/Green Deployment**     | New environment created → switch traffic when ready | Zero downtime, safe rollout, reversible |
+| **Canary** *(Lambda/ECS)*     | Send small traffic % first → increase gradually     | Reducing release risk                   |
+
+
+🔁 Blue/Green Deployment Flow (Example: EC2 + Load Balancer)
+   OLD PROD (Blue) --- Traffic
+          |
+CodeDeploy Starts
+          ↓
+Deploy to NEW (Green)
+          | 
+Health Checks OK?
+          |
+Switch Traffic to Green ➜ Blue kept for rollback
+If failure → revert to old version automatically.
+
+
+🔁 CodeDeploy Architecture Components
+| Component               | Purpose                                          |
+| ----------------------- | ------------------------------------------------ |
+| **Application**         | Logical unit for deployment                      |
+| **Deployment Group**    | Group of EC2/On-Prem instances                   |
+| **Agent**               | CodeDeploy daemon installed on instances         |
+| **AppSpec File**        | Deployment instructions (hooks + file locations) |
+| **Revision / Artifact** | Application package stored in S3 or GitHub       |
+| **Load Balancer**       | Traffic control for Blue/Green                   |
+
+
+🔁 AppSpec File — The Core of CodeDeploy
+Defines what to deploy + how deployment runs.
+
+✅ Example 
+🔗 (EC2 / Linux: appspec.yml)
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /var/www/html/
+
+hooks:
+  BeforeInstall:
+    - location: scripts/stop_server.sh
+  AfterInstall:
+    - location: scripts/install_dependencies.sh
+  ApplicationStart:
+    - location: scripts/start_server.sh
+  ValidateService:
+    - location: scripts/health_check.sh
+
+👉 Each hook runs in order → helps ensure safe deployment.
+
+
+🔁 For Lambda AppSpec
+Uses traffic shifting config instead of file copy.
+
+✅ Example:
+version: 0.0
+Resources:
+  - MyLambda:
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: myFunction
+        Alias: live
+        CurrentVersion: 1
+        TargetVersion: 2
+      Hooks:
+        - BeforeAllowTraffic: testHook.sh
+
+
+🔁 Security and Permissions
+| Security Layer          | Description                           |
+| ----------------------- | ------------------------------------- |
+| IAM Role for CodeDeploy | Permissions to update resources       |
+| IAM Role for EC2 Agents | EC2 instances allow CodeDeploy access |
+| KMS                     | Encrypt artifacts in S3               |
+| ALB/NLB/Target Groups   | Used for Blue/Green routing           |
+👉 Traffic control + health monitoring through Elastic Cloud Balancing
+
+
+🔁 Supported Artifact Sources
+| Storage         | Support         |
+| --------------- | ----------------|
+| **Amazon S3**   | ✔️ Recommended |
+| **GitHub Repo** | ✔️             |
+| **Bitbucket**   | ✔️ Via webhook |
+
+Artifacts typically include:
+    ✔️ application code
+    ✔️ scripts
+    ✔️ config files
+    ✔️ Docker images (for ECS)
+
+
+🔁 Monitoring & Visibility
+| Tool               | Purpose                          |
+| ------------------ | -------------------------------- |
+| CloudWatch Logs    | Execution logs                   |
+| CloudWatch Events  | Deployment event triggers        |
+| SNS Notifications  | Alerts on fail/success           |
+| CodeDeploy Console | Health, status, rollback actions |
+
+
+🔁 Auto-Rollback Scenarios
+➤ Rollback triggers when:
+    ✔️ Health check fails
+    ✔️ Deployment lifecycle hook fails
+    ✔️ Alarm triggered on CloudWatch metric
+➤ Rollback = instant switch to previous stable version
+
+
+🔁 CodeDeploy Best Practices
+✔️ Always test scripts locally before pipeline use
+✔️ Enable Blue/Green with health checks for production
+✔️ Store secrets in AWS Secrets Manager
+✔️ Use AMI bake strategy for zero configuration drift
+✔️ Maintain proper tagging for instance selection
+✔️ Version everything (scripts + app + infra)
+
+
+🔁 CodeBuild vs CodeDeploy 
+| Feature        | CodeBuild      | CodeDeploy          |
+| -------------- | -------------- | ------------------- |
+| Purpose        | Build & Test   | Release & Deploy    |
+| Output         | Artifacts      | Running application |
+| Execution      | In a container | On actual workloads |
+| Pipeline Stage | CI             | CD                  |
+👉 They work together in CI/CD via CodePipeline.
+
+
+####################
+🔷 AWS CloudWatch
+####################
+AWS CloudWatch is a fully managed monitoring and observability service for AWS resources, applications, and infrastructure.
+
+It helps you:
+    ✔️ Collect & track metrics
+    ✔️ Collect & monitor logs
+    ✔️ Set alarms and trigger automated actions
+    ✔️ Visualize data using dashboards
+    ✔️ Monitor application performance & health
+
+
+🔁 Major Components
+| Component                           | Purpose                                                                                 |
+| ----------------------------------- | --------------------------------------------------------------------------------------- |
+| **CloudWatch Metrics**              | Numeric data points for system performance (CPU, memory, requests count, latency, etc.) |
+| **CloudWatch Logs**                 | Collect logs from applications, Lambda, ECS, EC2, RDS, etc.                             |
+| **CloudWatch Alarms**               | Trigger notifications/actions when thresholds are breached (e.g., auto-scale EC2)       |
+| **CloudWatch Events / EventBridge** | Respond to state changes & scheduled tasks (e.g., start/stop EC2 every night)           |
+| **CloudWatch Dashboards**           | Custom visual monitoring panels                                                         |
+| **CloudWatch Synthetics**           | Monitor APIs and endpoints using canaries                                               |
+| **CloudWatch Contributor Insights** | Analyzes high-traffic logs (e.g. top users, IPs causing spikes)                         |
+
+
+🔁 How it works
+AWS Resources → CloudWatch Metrics/Logs → Store & Analyze → Alarms → Trigger SNS/Auto Scaling/Lambda
+
+
+🔁 Common Use Cases
+➤ System Monitoring (CPU, RAM, I/O, Network)
+➤ Application Log Analysis
+➤ Auto-scaling based on performance
+➤ Trigger alerts via SNS → Email / Slack
+➤ Cost monitoring through AWS Billing Alarms
+➤ Detect errors in Lambda, ECS, or API Gateway
+➤ Scheduling tasks using EventBridge rules
+
+
+✅ CloudWatch Integration Example
+➤ EC2 Monitoring → CPU Utilization alarms
+➤ Auto Scaling → scale up/down based on traffic
+➤ Lambda → function failure alarms
+➤ RDS → DB connections & storage monitoring
+➤ API Gateway → latency & error rate alerts
+
+
+🔁 Benefits
+➤ Fully managed (no servers needed)
+➤ Near real-time monitoring
+➤ Unified place for logs, metrics, alarms
+➤ Tight integration with AWS ecosystem
+➤ Supports automated operational responses
+
+
+⚠️ Limitations
+➤ Extra pricing for detailed monitoring & custom metrics
+➤ Log search and analysis can be slow
+➤ Console UI can become complex for large applications
+
+
+###############
+🔷 AWS Lambda
+###############
+Lambda is an event-driven, serverless compute service that automatically:
+➤ Runs code without provisioning servers
+➤ Scales automatically based on demand
+➤ Charges only for compute time used (ms basis)
+
+🔁 Key Features
+➤ No server management → AWS manages everything
+➤ Automatic scaling → runs from 0 to millions of requests
+➤ Pay-as-you-use pricing model
+➤ Supports multiple runtimes: Node.js, Python, Java, Go, .NET, Ruby
+➤ Triggers on events
+➤ Built-in fault tolerance
+➤ Can integrate with 200+ AWS services
+
+
+🔁 Lambda Execution Model
+Event Source (S3, API Gateway, CloudWatch, DynamoDB, SNS etc.)
+          ↓
+   Trigger Lambda Code
+          ↓
+ Return Response / Perform Action
+
+
+🔁 Common Event Sources
+| Service           | Example Trigger                 |
+| ----------------- | ------------------------------- |
+| S3                | New file uploaded in bucket     |
+| API Gateway       | API call invokes Lambda         |
+| DynamoDB Streams  | Database change triggers Lambda |
+| SNS / SQS         | Messaging based invocation      |
+| CloudWatch Events | Scheduled jobs (Cron)           |
+
+
+🔁 Deployment Package
+➤ Lambda requires:
+    ✔️ Code (.zip or container image)
+    ✔️ Optional dependencies
+    ✔️ IAM execution role
+➤ Memory range: 128 MB to 10 GB
+➤ Timeout: max 15 minutes
+➤ Ephemeral storage (/tmp): up to 10 GB
+
+
+🔁 Lambda Invocation Types
+| Type                     | Behavior                              |
+| ------------------------ | ------------------------------------- |
+| **Synchronous**          | Immediate response (e.g. API Gateway) |
+| **Asynchronous**         | Retries if fails (e.g. S3 events)     |
+| **Event Source Mapping** | Streams polling (DynamoDB, Kinesis)   |
+
+
+🔁 Use Cases
+➤ REST APIs (via API Gateway)
+➤ Real-time file processing (S3)
+➤ Event-driven Microservices
+➤ Serverless CRON jobs
+➤ IoT event processing
+➤ Chatbots, notifications
+➤ ETL & Data transformations
+
+
+🔁 Lambda Execution Role
+Lambda uses IAM Role to access AWS resources:
+✅ e.g. read S3 bucket, write DynamoDB table
+
+
+🔁 Scaling Model
+➤ Each event = new Lambda instance
+➤ Horizontal auto-scaling
+➤ Concurrency limit protects from overload (default: 1000 per region)
+➤ Provisioned Concurrency for low-latency predictable execution
+
+
+🔁 Performance Optimization Tips
+➤ Use provisioned concurrency to avoid cold starts
+➤ Keep deployment package lightweight
+➤ Use VPC only if necessary (otherwise causes slow cold starts)
+➤ Utilize cloud-native services (S3, DynamoDB) to reduce external call latency
+
+
+🔁 Lambda vs EC2?
+| Lambda                   | EC2                    |
+| ------------------------ | ---------------------- |
+| Serverless, auto-scaling | Manual provisioning    |
+| Pay only per execution   | Pay for uptime         |
+| Short-running tasks      | Long-running workloads |
+
+
+⚠️ Limitations (Short)
+➤ Max 15 min execution time
+➤ Limited ephemeral storage (/tmp)
+➤ Vendor lock-in
+➤ Not ideal for CPU-intensive/long-running workloads
