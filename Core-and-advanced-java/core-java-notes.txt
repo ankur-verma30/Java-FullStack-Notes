@@ -1,11 +1,15 @@
-🔷 What is OOP in Java?
+################
+🔷 OOP in Java
+################
 Object-Oriented Programming (OOP) is a programming paradigm that organizes code using objects, which are instances of classes.
 Java is a pure object-oriented language (except for primitive types). To overcome the lack of object orientation in primitives, Java provides Wrapper Classes.
 Properties (State) – Data/attributes
 Methods (Behavior) – Functions/actions
 
 
+######################
 🔷 Features of Java
+######################
 1️⃣ Object-Oriented
 ➤ Everything is modeled as objects with clear abstraction.
 ➤ Key OOP principles supported: Abstraction, Encapsulation, Inheritance, Polymorphism.
@@ -18,6 +22,36 @@ Methods (Behavior) – Functions/actions
 ➤ No explicit pointers → prevents memory corruption.
 ➤ Bytecode verification, sandboxing, and Security Manager protect against malicious code.
 ➤ Strong support for cryptography, secure classloading, JVM-level security.
+
+
+#######################
+🔷 Sandboxing in Java
+#######################
+Sandboxing is a Java security mechanism that restricts the actions of untrusted code by running it in a controlled environment called a sandbox.
+This ensures that code downloaded from the internet (like applets in earlier Java days) cannot harm the host system.
+
+❓ How Sandboxing Works
+When Java loads untrusted code:
+1️⃣ Bytecode Verifier
+➤ Checks code for illegal operations (buffer overflow, stack corruption etc.)
+
+2️⃣ Class Loader
+➤ Separates system classes from untrusted classes
+➤ Prevents unauthorized access to internal APIs
+
+3️⃣ Security Manager
+➤ Controls what the code is allowed to do
+✅ Example: block file access, network access, system commands
+
+🚫 Restrictions in Sandbox
+Untrusted Java code cannot:
+	✔️ Read/Write local files
+	✔️ Access sensitive OS resources
+	✔️ Open socket connections to unauthorized locations
+	✔️ Execute system commands (Runtime.exec)
+	✔️ Modify environment variables
+Basically, it locks the code inside a safe virtual room 🧱.
+
 
 4️⃣ Multithreaded
 ➤ Built-in support for creating and managing threads.
@@ -46,8 +80,83 @@ Methods (Behavior) – Functions/actions
 ➤ Data hiding and security
 ➤ Scalability and maintainability
 
-❓ Define JDK, JRE, and JVM
-🔹 1. JVM (Java Virtual Machine)
+
+########################################
+🔷 Medical Shop Example to Explain OOP
+########################################
+🧱 Class: A class is like a blueprint or design.
+
+✅ Example:
+➤ Think of a medicine form in a medical shop that says:
+	✔️ Medicine Name
+	✔️ Company Name
+	✔️ Price
+	✔️ Expiry Date
+➤ This form isn’t a real medicine – it's just a template/design.
+➡ In OOP, a class defines what details an object will have.
+
+
+💊 Object: An object is a real-world thing created from the class blueprint.
+
+✅ Example:
+➤ Actual medicines in the shop:
+	✔️ Paracetamol – ₹25, Expiry: Dec 2025
+	✔️ Crocin – ₹30, Expiry: Jan 2026
+	✔️ These are real medicines, so they are objects of the medicine class.
+➡ Many objects can be made from one class.
+
+🌟 4 Pillars of OOP
+Let’s understand them using the same medical shop example:
+
+1️⃣ Encapsulation — Medicine bottle with a sealed cover
+➤ All ingredients of a medicine are sealed inside the bottle.
+✔️ You can use the tablet…
+✔️ …but cannot change its chemical formula.
+
+➡ Keeping internal details safe and allowing access only in the right way.
+➤ Real-world: Medicine bottle protects what's inside.
+➤ In code: Data is kept safe inside the class.
+
+
+2️⃣ Abstraction — What you need to know only
+When you buy medicine:
+	✔️ You don’t need to know how it's made in the factory
+	✔️ You only need to see name, dose, expiry, etc.
+
+➡ Showing only the important things, hiding the complex stuff
+➤ Real-world: We see the label, not the manufacturing chemistry.
+➤ In code: Only useful functions/data are shown to the user.
+
+
+3️⃣ Inheritance — Generic → Specific Medicines
+Suppose there is a general class Medicine
+	✔️ Name
+	✔️ Price
+	✔️ Expiry
+
+Now, special medicines can inherit from it:
+	✔️ Tablet (extra: number of tablets)
+	✔️ Syrup (extra: volume)
+	✔️ Injection (extra: needle size)
+
+➡ Child items inherit features from parent.
+➤ Real-world: All are medicines but types differ.
+➤ In code: One class shares its properties with other classes.
+
+4️⃣ Polymorphism — Same name, different behavior
+At different times and for different people:
+	✔️ Paracetamol treats fever
+	✔️ Same paracetamol can reduce pain
+	✔️ Same paracetamol can help cold symptoms
+➡ One thing behaving differently based on the situation.
+➤ Real-world: Same medicine — different uses.
+➤ In code: Same function—different implementations.
+
+
+######################
+🔷 JDK, JRE, and JVM
+######################
+1️⃣ JVM (Java Virtual Machine)
 ➤ JVM is an abstract machine that provides a runtime environment to execute Java bytecode.
 
 ⚡Responsibilities:
@@ -57,12 +166,13 @@ Methods (Behavior) – Functions/actions
 ✔️ Ensures security via bytecode verification.
 🔧 Key Point: JVM is platform-dependent (different implementations for Windows/Linux/Mac), but bytecode is platform-independent.
 
-➡️ Interview Insight:
+➡️ Insight:
 Many confuse JVM = Java compiler → Wrong! Compiler (javac) converts Java code → bytecode; JVM executes that bytecode.
 
- The purpose of the JIT (Just-In-Time) compiler in the JVM is to improve the performance of Java programs by compiling bytecode into native machine code at runtime. While the Java compiler (javac) converts Java source code into platform-independent bytecode, it is the JVM that executes this bytecode. 
+The purpose of the JIT (Just-In-Time) compiler in the JVM is to improve the performance of Java programs by compiling bytecode into native machine code at runtime. While the Java compiler (javac) converts Java source code into platform-independent bytecode, it is the JVM that executes this bytecode. 
 
-🔹 2. JRE (Java Runtime Environment)
+
+2️⃣ JRE (Java Runtime Environment)
 ➤ JRE provides libraries, JVM, and other components to run Java applications.
 
 Includes:
@@ -71,10 +181,11 @@ Includes:
 ✔️ Supporting files
 🔧 Key Point: JRE does not include development tools (compiler, debugger). It’s only for running Java programs.
 
-➡️ Interview Trap:
+➡️ Trap:
 If asked, “Can you run Java code with just JRE?” → Yes, if you already have compiled bytecode. But you cannot compile .java files with JRE.
 
-🔹 3. JDK (Java Development Kit)
+
+3️⃣ JDK (Java Development Kit)
 ➤ JDK is the full package required for Java development.
 
 Includes:
@@ -82,21 +193,25 @@ Includes:
 ✔️ Development tools → javac (compiler), jdb (debugger), javadoc, jar, etc.
 🔧 Key Point: JDK is for developers; JRE is for users.
 
-➡️ Interview Trap:
+➡️ Trap:
 Some interviewers ask: “If JDK contains JRE, and JRE contains JVM, can we say JDK = JVM?”
 Answer: No. JDK = JRE + Development Tools. JVM is just part of JRE.
 
-🔹 Hierarchy Diagram
+
+🔄 Hierarchy Diagram
 JDK 
  └── JRE 
       └── JVM
 
-🔹 One-Liner for Revision
+🔄 One-Liner for Revision
 ➤ JVM → Runs bytecode.
 ➤ JRE → JVM + Libraries (to run Java apps).
 ➤ JDK → JRE + Tools (to develop Java apps).
 
-What is a class?
+
+###########
+🔷 Class
+###########
 ➤ A class in Java is a blueprint or template for creating objects.
 ➤ It defines the data (fields/attributes) and the behavior (methods/functions) that the objects created from the class will have.
 ➤ Class helps us to create objects in Java.
@@ -107,11 +222,11 @@ What is a class?
 
 Note: Class names cannot start with a number, but they can begin with a dollar sign ($) or an underscore (_), although this is not recommended.
 
-Example :
+✅ Example :
 class A {}
 ➤ We define the boundary of a class using curly brackets.
   
-Example :
+✅ Example :
 ➤ Will execute without any error
 public class Bank_Account_Number {}// Snake Casing-->Should not use for Java
 
@@ -119,7 +234,10 @@ Note:
 1. Do not use specials characters like #,@ % & etc while creating class.
 2. $Class name will execute. However, never create a class with a special character.
 
+
+######################
 🔷 Breakdown of PSVM
+######################
 public static void main(String[] args)
 It’s the starting point of any Java program, and each keyword has a specific purpose.
 1️⃣ public
@@ -147,14 +265,13 @@ It’s the starting point of any Java program, and each keyword has a specific p
 java MyProgram Hello World
 Then args[0] = "Hello", args[1] = "World"  
 
-🔷 Why Use Command-Line Arguments? (Use Cases)
+
+❓ Why Use Command-Line Arguments? (Use Cases)
 ➤ Dynamic input without Scanner or BufferedReader
 ➤ Script automation (e.g., batch processing, config values)
 ➤ File input/output paths
 ➤ Running test cases with different inputs
 ➤ Avoid hardcoding data into programs
-
-🔷 Real-Time Use Case: Calculator Program
 
 ✅ Example: Add two numbers using command-line arguments
 public class CommandLineCalculator {
@@ -174,25 +291,27 @@ public class CommandLineCalculator {
 }
 
 🔷 How to Run This Program?
-Step 1: Compile
+Step 1️⃣: Compile
 javac CommandLineCalculator.java
 
-Step 2: Run with arguments
+Step 2️⃣: Run with arguments
 java CommandLineCalculator 10 20
 
 Output:
 Sum = 30
 
-🔷 Interview Trap ❗
-Q: Can we pass primitive values as command-line arguments?
-A: No, command-line arguments are always String types. You need to manually parse them using Integer.parseInt(), Double.parseDouble(), etc.
+🚫 Trap 
+Can we pass primitive values as command-line arguments?
+No, command-line arguments are always String types. You need to manually parse them using Integer.parseInt(), Double.parseDouble(), etc.
 
 🔁 JVM Looks for This Exact Signature:
 public static void main(String[] args)
 ⚠️ If the signature is different (e.g., not public, not static, or missing parameters), the program will compile but not run, and you’ll get a "Main method not found" error.
 
 
-🔷 new keyword:
+################
+🔷 new keyword
+################
 ➤ The new keyword in Java is used to create objects (instances) of a class. 
 ➤ Using the new keyword, we send a request to the class to create an object
 ➤ Once the object is created, the new keyword will retrieve the object's address and store it in a reference variable.
@@ -205,14 +324,16 @@ ClassName variableName = new ClassName();
 ➤ lowerCase Camel Casing: Used for creating methods, variables, etc
 
 
+#############################################################
 🔷 Non-static Variable/ Instance Variable /Object Variables
+#############################################################
 It is a variable declared inside a class, but outside any method, and without the static keyword.
 📌 It belongs to:
 ➤ An instance of the class (not the class itself)
 ➤ Every object has its copy
 ➤ Without creating an object, we cannot access non-static variables.
 
-Example :
+✅ Example :
 public class A {
 	int x = 10;
 	int y = 20;
@@ -232,15 +353,18 @@ public class A {
 ➤ It is not mandatory to initialize a non-static variable. Depending on the data type, the default value will be automatically stored in it.
 
 
-🔷 Static variables:
+#####################
+🔷 Static variables
+#####################
 A static variable is a class-level variable, meaning:
 ➤ It belongs to the class, not the object.
 ➤ It is shared among all instances of the class.
 ➤ Only one copy exists in memory, regardless of how many objects are created.
+➤ If you don’t initialize a static variable, Java automatically assigns a default value based on its data type.
+➤ We should create static variables inside a class but outside a method with the static keyword
 
-1. We should create static variables inside a class but outside a method with the static keyword
-2. To access a static variable, we will use the following options:
-✔️ 🔧ClassName.variableName
+🔄 To access a static variable, we will use the following options:
+1️⃣ ClassName.variableName
 public class Main {
     static int x = 10;
     public static void main(String[] args) {
@@ -248,7 +372,7 @@ public class Main {
     }
 }
 
-✔️ Accessing via variableName directly (With Constraints)
+2️⃣ Accessing via variableName directly (With Constraints)
 class A {
     static int x = 10;
     void show() {
@@ -256,16 +380,16 @@ class A {
     }
 }
 You can directly use x without the class name only when:
-➤You're inside the same class where the static variable is declared.
-➤Or the static variable is imported statically (in some special cases).
+➤ You're inside the same class where the static variable is declared.
+➤ Or the static variable is imported statically (in some special cases).
 
 This is allowed because the compiler understands the scope.
 
 ❗ Constraints:
-➤This only works within the same class unless,
-➤You use import static (less common).
+➤ This only works within the same class unless,
+➤ You use import static (less common).
 
-📌 Example Without import static:
+✅ Example Without import static:
 public class MyClass {
     public static int count = 42;
 }
@@ -276,7 +400,7 @@ public class Test {
     }
 }
 
-📌 Example with import static:
+✅ Example with import static:
 import static java.lang.Math.*;
 
 public class Demo {
@@ -287,10 +411,10 @@ public class Demo {
 }
 
 Outside the class, you need to use either:
-➤ClassName.x (best), or
-➤object.x (works but discouraged).
+➤ ClassName.x (best), or
+➤ object.x (works but discouraged).
 
-✔️ objectAddress.variableName (Wrong Approach, but will work)
+3️⃣ objectAddress.variableName (Wrong Approach, but will work)
 ➤This works because the object refers to the class, and the static variable belongs to the class.
 ➤When you do a1.x, Java still resolves it as A.x internally.
 ➤But it's misleading because it looks like x is instance-specific when it's shared across all instances.
@@ -567,7 +691,7 @@ public class C {
 🔷 Java Data Types 
 Java data types are divided into 2 main categories:
 
-🔹 1. Primitive Data Types (8 types)
+🔄 1. Primitive Data Types (8 types)
 Built-in, fixed-size types that store actual values directly.
 
 🔸 Integer Types (for whole numbers)
@@ -596,7 +720,7 @@ Type	    Size	            Default Value	          Description
 boolean	    (JVM dependent)	    false                   Only true or false
 char	    2 bytes	            ' ' (blank)	            0 to 65,535 (Unicode characters)
 
-🔹 2. Non-Primitive / Reference Data Types
+🔄 2. Non-Primitive / Reference Data Types
 Type	               Description	                        Default Value
 String	        A class (sequence of characters)	          null
 Array	        Object that holds multiple values	          null
@@ -639,7 +763,7 @@ public class C {
 ➤ To treat them as objects, Java provides Wrapper Classes in the java.lang package.
 ➤ A wrapper class wraps (encloses) a primitive type inside an object.
 
-🔹 List of Primitive Types and Their Wrapper Classes:
+🔄 List of Primitive Types and Their Wrapper Classes:
 | Primitive Type | Wrapper Class |
 | -------------- | ------------- |
 | byte           | Byte          |
@@ -651,7 +775,7 @@ public class C {
 | char           | Character     |
 | boolean        | Boolean       |
 
-🔹 Why Do We Need Wrapper Classes?
+🔄 Why Do We Need Wrapper Classes?
 ➤ To store primitives in collections like ArrayList, which accept only objects.
 ➤ For object manipulation (e.g., in multithreading, generics, reflection).
 ➤ Useful in parsing strings into numeric values.
@@ -660,7 +784,7 @@ public class C {
 ❓ Are wrapper classes immutable?
 ✅ Yes, all wrapper classes are immutable.
 
-🔹 Key Concepts
+🔄 Key Concepts
 1. Boxing (Manual Conversion) Depreciated
 Converting primitive → object
 int a = 10;
@@ -681,7 +805,7 @@ The compiler automatically converts wrapper → primitive
 Integer y = 100;
 int value = y;  //Auto-unboxing
 
-🔹 Commonly Used Wrapper Class Methods
+🔄 Commonly Used Wrapper Class Methods
 Integer.parseInt(String) → Converts string to int
 Double.parseDouble(String) → Converts string to double
 Character.isDigit(char) → Checks if the char is a digit
@@ -742,7 +866,7 @@ b → new Integer(128)
 🔷 Constructors in Java
 Constructors are special methods used to initialize objects when they are created.
 
-🔹 Basic Rules:
+🔄 Basic Rules:
 ➤ The constructor name must match the class name
 ➤ Constructors do not have a return type, not even void
 ➤ If you write void before a constructor, it becomes a method, not a constructor
@@ -1737,7 +1861,7 @@ The same logic applies to the static variable x:
 PlatinumAccount.x; // resolves to GoldAccount.x (100)
 
 ✅ Overloading in Java (Compile-Time Polymorphism)
-🔹 What is Method Overloading?
+🔄 What is Method Overloading?
 ➤ Method Overloading means defining multiple methods with the same name in a class but with different parameter lists (type, number, or order of parameters).
 ➤ It allows compile-time polymorphism, where the method to be called is determined at compile time based on the method signature.
 
@@ -2130,7 +2254,7 @@ public class Demo {
 🔷 Interfaces in Java - Abstraction
 Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
 
-🔹 Key Points:
+🔄 Key Points:
 Complete Abstraction (Java 7)
 ➤ In Java 7 and earlier, interfaces could only have abstract methods (no method bodies).
 ➤ They define what should be done, not how.
@@ -2628,7 +2752,7 @@ public interface B extends A{
 }
 Output:❌ Error because we are inheriting 1 method from a functional interface, and a functional interface has 1 method, which totals to 2 methods in an interface
 
-🔹Lambda Expression:
+🔄Lambda Expression:
 A Lambda Expression is a short block of code that:
 ➤ Takes in parameters
 ➤ Executes a body
@@ -2641,7 +2765,7 @@ A Lambda Expression is a short block of code that:
 ➤ Works With Functional Interfaces → Lambda expressions can only be used where a functional interface (i.e., one abstract method) is expected.
 ➤ Commonly Used in Stream API → Lambdas  are widely used in filtering, mapping, sorting, and reducing data in the Java Stream API.
 
-🔹 Syntax of Lambda Expression:
+🔄 Syntax of Lambda Expression:
 (parameters) -> { body }
 
 Examples:
@@ -2780,7 +2904,7 @@ Example:
 ✅ Abstract Class in Java
 An abstract class in Java is a class that is declared with the abstract keyword. It cannot be instantiated directly and is typically used to provide a partial implementation that its subclasses must complete.
 
-🔹 Key Features of Abstract Class
+🔄 Key Features of Abstract Class
 1️⃣ Can Have Both Complete and Incomplete Methods
 An abstract class can contain:
 ➤ Complete methods (methods with body)
@@ -4495,7 +4619,7 @@ Same as above — explicitly overwrites content.
 Appends to the existing file content if present.
 Creates a new file if it doesn’t exist.
 
-🔹 Common Methods
+🔄 Common Methods
 1. write(int ch): Writes a single character (based on ASCII value).
 2. write(String str): Writes an entire string.
 3. write(char[] ch): Write a character array.
@@ -4740,7 +4864,7 @@ If you serialize an object and later modify the class (add/remove fields), deser
 ❓ Can serialVersionUID be anything?
 ✅ Yes, you can assign any long value as serialVersionUID.
 
-🔹 Example
+🔄 Example
 private static final long serialVersionUID = 42L;     // Valid
 private static final long serialVersionUID = 1234567890123456789L;  // Also valid
 
@@ -4888,7 +5012,7 @@ public class D {
 🔷  Custom Exception in Java
 Custom exceptions are user-defined exceptions that extend either the Exception class (for checked exceptions) or the RuntimeException class (for unchecked exceptions).
 
-🔹 Syntax for Custom Exception
+🔄 Syntax for Custom Exception
 1️⃣ Checked Exception (extends Exception)
 public class MyCheckedException extends Exception {
     public MyCheckedException(String message) {
@@ -4954,7 +5078,7 @@ public class CustomExceptionDemo {
 | Syntax                   | `throw new ExceptionType("msg");`             | `public void method() throws IOException`               |
 
 ✅ Syntax and Example
-🔹 throw keyword example (used inside method)
+🔄 throw keyword example (used inside method)
 public class ThrowExample {
     public static void main(String[] args) {
         int age = 16;
@@ -4965,7 +5089,7 @@ public class ThrowExample {
     }
 }
 
-🔹 throws keyword example (used in method declaration)
+🔄 throws keyword example (used in method declaration)
 import java.io.*;
 
 public class ThrowsExample {

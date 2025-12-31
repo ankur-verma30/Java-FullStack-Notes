@@ -18,18 +18,18 @@ Cloud computing is the on-demand delivery of compute, storage, networking, datab
 Infrastructure owned and managed by third-party providers like AWS, Azure, GCP.
 
 ✅ Examples
-    ✔️️ AWS EC2, S3
-    ✔️️ Azure VM
-    ✔️️ Google Compute Engine
+    ✔️️️ AWS EC2, S3
+    ✔️️️ Azure VM
+    ✔️️️ Google Compute Engine
 
 🔁 Key points
-    ✔️️ Resources shared among multiple customers
-    ✔️️ Accessible over the internet
-    ✔️️ Highly scalable
-    ✔️️ Pay-as-you-go
+    ✔️️️ Resources shared among multiple customers
+    ✔️️️ Accessible over the internet
+    ✔️️️ Highly scalable
+    ✔️️️ Pay-as-you-go
 
 🔁 Use cases
-    ✔️️ Startups
+    ✔️️️ Startups
     ✔️ Web & mobile applications
     ✔️ Dev/Test environments
 
@@ -204,7 +204,7 @@ Collection of users with similar permissions.
 ✅ Example
 ➤ Developers group → EC2, S3 access
 ➤ Admins group → Full access
-📌 Groups cannot contain groups
+👉 Groups cannot contain groups
 
 
 3️⃣ IAM Roles
@@ -254,7 +254,7 @@ Defines permissions in JSON format.
 ➤ Action → What can be done
 ➤ Resource → On which resource
 ➤ Condition → Optional constraints
-📌 Explicit Deny always wins
+👉 Explicit Deny always wins
 
 
 🔄 Types of Access Control
@@ -267,7 +267,7 @@ Attached to resource itself
 ✅ Example:
     ✔️ S3 bucket policy
     ✔️ Lambda permission policy
-📌 Resource-based policies allow cross-account access
+👉 Resource-based policies allow cross-account access
 
 
 🔄 IAM Authentication vs Authorization
@@ -434,7 +434,7 @@ Allow inbound traffic:
     ✔️ HTTP → Port 80
     ✔️ HTTPS → Port 443
     ✔️ App port → 3000 / 8080
-📌 Security Group acts as a firewall
+👉 Security Group acts as a firewall
 
 3️⃣ URL Access
 🔗 http://<public-ip>:<port>
@@ -541,7 +541,7 @@ Dividing a VPC CIDR into smaller IP ranges.
 ✔️ VPC: 10.0.0.0/16
 ✔️ Subnet 1: 10.0.1.0/24
 ✔️ Subnet 2: 10.0.2.0/24
-📌 Each subnet belongs to one AZ only
+👉 Each subnet belongs to one AZ only
 
 
 🔄 How VPC Components Interact
@@ -556,7 +556,7 @@ Private Subnet → NAT Gateway → Internet Gateway
 Step-1️⃣: Create VPC
 Step-2️⃣: Choose CIDR block
 ✅ Example: 10.0.0.0/16
-📌 VPC is regional
+👉 VPC is regional
 
 
 🔄 How to Create Subnet (After VPC)
@@ -568,7 +568,7 @@ Steps:
 Public Subnet: 10.0.1.0/24
 Private Subnet: 10.0.2.0/24
 
-📌 Subnet is AZ-specific
+👉 Subnet is AZ-specific
 
 
 🔄 Public Subnet vs Private Subnet
@@ -591,7 +591,7 @@ Private Subnet: 10.0.2.0/24
 Steps:
 1️⃣ Create Internet Gateway
 2️⃣ Attach it to VPC
-📌 One IGW per VPC
+🔄 One IGW per VPC
 
 
 🔄 Route Table
@@ -612,7 +612,7 @@ Steps:
 🔄 NAT Gateway (Private Subnet Internet Access)
 ➤ Allows outbound internet
 ➤ Blocks inbound internet
-📌 Placed in public subnet
+🔄 Placed in public subnet
 
 
 🔄 Security Components Interaction
@@ -1588,7 +1588,7 @@ Pipeline Structure
 Developer Pushes Code to CodeCommit
         │
         ▼
-📌 CodePipeline Triggered
+🔄 CodePipeline Triggered
         │
         ▼
 🔨 CodeBuild → Build & Test → Create Artifact (.zip/.jar)
@@ -1685,7 +1685,7 @@ Pipeline Structure
 Developer Pushes Code to CodeCommit
         │
         ▼
-📌 CodePipeline Triggered
+🔄 CodePipeline Triggered
         │
         ▼
 🔨 CodeBuild → Build & Test → Create Artifact (.zip/.jar)
@@ -2263,3 +2263,1201 @@ Lambda uses IAM Role to access AWS resources:
 ➤ Limited ephemeral storage (/tmp)
 ➤ Vendor lock-in
 ➤ Not ideal for CPU-intensive/long-running workloads
+
+
+##################
+🔷 AWS CloudFront
+##################
+CloudFront is a global, highly distributed Content Delivery Network (CDN) that delivers content to users with low latency, high speed, and high availability by caching it at Edge Locations around the world.
+
+
+🔁 Why CloudFront Exists
+Without a CDN:
+    ✔️ Every user request travels all the way to the origin (e.g., S3, EC2, ALB)
+    ✔️ High latency for global users
+    ✔️ Bandwidth + server load increases
+    ✔️ Risk of downtime during high traffic
+
+
+With CloudFront:
+    ✔️ Frequently accessed content stored closer to users
+    ✔️ Reduces load on origin
+    ✔️ Faster response → improved UX + SEO
+    ✔️ Cheaper distribution with caching and compression
+
+
+🔁 Core Concepts
+| Concept                  | Meaning                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| **Edge Locations**       | Small data centers near users where content is cached                         |
+| **Regional Edge Caches** | Larger caches that sit between Edge and Origin                                |
+| **Origin**               | Where authoritative content resides (S3, EC2, ALB, API Gateway, even on-prem) |
+| **Distribution**         | The CloudFront configuration for delivering content                           |
+| **Cache Behavior**       | URL path rules for caching, TTL, security, headers, compression               |
+| **TTL (Time To Live)**   | How long content stays cached at edge nodes                                   |
+| **Invalidation**         | Forcefully removing outdated cached objects                                   |
+
+
+🔁 Supported Origins
+➤ Amazon S3 (static websites, images, media)
+➤ EC2 / ALB / On-Prem Servers (dynamic websites)
+➤ API Gateway + Lambda (serverless APIs)
+➤ Media Streaming (Live/VOD with HLS/DASH)
+
+
+🔁 Security Powerhouse (Why enterprises rely on CloudFront)
+| Feature                          | Purpose                                    |
+| -------------------------------- | ------------------------------------------ |
+| SSL/TLS + HTTPS                  | Secure data delivery                       |
+| **AWS WAF** Integration          | Protect from DDoS, SQLi, XSS               |
+| **Shield (DDoS Protection)**     | Network-level attack protection            |
+| **Signed URLs & Signed Cookies** | Restrict access to paid or private content |
+| **Origin Access Control (OAC)**  | Secure private S3 content (replaces OAI)   |
+
+
+🔁 Performance Features
+| Optimizations                           | Benefits                              |
+| --------------------------------------- | ------------------------------------- |
+| **Caching + Compression (GZIP/Brotli)** | Faster delivery, lower cost           |
+| **HTTP/2 & HTTP/3 support**             | Modern protocol speed-ups             |
+| **Field-Level Encryption**              | Extra encryption for sensitive data   |
+| **Lambda@Edge / CloudFront Functions**  | Logic at the edge → ultra-low latency |
+Example: rewrite URLs, A/B testing, authentication, geolocation routing
+
+
+🔁 Architecture Example
+Static website hosted on S3 → Cached via CloudFront → Global Users
+
+Client (Browser)
+     ↓
+CloudFront Edge Location (Cache)
+     ↓ (Cache Miss)
+Regional Edge Cache
+     ↓ (Cache Miss)
+Origin Server (S3/EC2)
+
+
+🔁 Cache Invalidation Example
+Used when content is updated:
+/*  → invalidate entire site (costly)
+"/images/logo.png" → single file
+
+
+🔁 How CloudFront Works
+1️⃣ User requests https://cdn.example.com/image.png
+2️⃣ CloudFront checks nearest Edge cache
+3️⃣ If cache hit → serve instantly
+4️⃣ If cache miss → request from origin
+5️⃣ Cache stored at Edge for next requests (based on TTL)
+👉 Total latency dramatically reduced especially for global traffic
+
+
+🔁 Cost Optimization Benefits
+✔️ Lower origin data transfer cost
+✔️ Large savings for S3 origins (cheaper than direct S3 Public access)
+✔️ Caching reduces compute usage on EC2/Lambda
+👉 But invalidations and data transfer out from CloudFront still cost money.
+
+
+🎯 Popular Use Cases
+➤ Global Static/Dynamic Website Delivery
+➤ OTT & Video Streaming Platforms
+➤ Software Downloads / Game Assets
+➤ API Acceleration
+➤ Security + Bot Mitigation at Edge
+
+
+⚠️ Limitations
+➤ Invalidations cost money when frequent & large
+➤ Complex caching rules require expertise
+➤ Debugging cache issues can be tricky
+➤ Dynamic content still depends on origin latency (if not cached)
+
+
+########################################
+🔷 AWS Elastic Container Registry (ECR)
+########################################
+ECR (Elastic Container Registry) is a fully managed, secure Docker container registry used to store, manage, version, and deploy container images on AWS.
+
+It works seamlessly with:
+    ✔️ ECS (Fargate/EC2)
+    ✔️ EKS (Kubernetes)
+    ✔️ Lambda (Container Images)
+    ✔️ CodeBuild / CodePipeline
+    ✔️ Local Docker + CI/CD pipelines
+
+
+🔁 Why ECR?
+| Feature                     | Benefit                                   |
+| --------------------------- | ----------------------------------------- |
+| Fully Managed Registry      | No need to host your own Docker registry  |
+| IAM Authentication          | Secure access control                     |
+| Highly Available & Scalable | Built on AWS regional infrastructure      |
+| Lifecycle Policies          | Auto-remove old images → save cost        |
+| Image Scanning              | Finds vulnerabilities (Security scanning) |
+| Encryption                  | Images encrypted at rest (KMS)            |
+Unlike Docker Hub → NO rate limits, no reliance on public internet.
+
+
+🔁 ECR Key Components
+| Component            | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| Repository           | Storage for Docker images                           |
+| Image Tags           | Versioned references (e.g., `v1`, `prod`, `latest`) |
+| Lifecycle Policies   | Auto-delete unused images                           |
+| Scan                 | CVE security checks on push                         |
+| Cross-Account Access | Share images with another AWS Account               |
+
+
+🔁 Security Model
+ECR uses IAM policies for:
+    ✔️ Pushing images
+    ✔️ Pulling (deploying) images
+    ✔️ Cross-account sharing
+    ✔️ Private/Public access (public repos also available)
+
+Example permissions:
+    ✔️ ecr:BatchGetImage
+    ✔️ ecr:PutImage
+    ✔️ ecr:GetDownloadUrlForLayer
+
+Images stored in ECR are:
+    ✔️ Encrypted with KMS
+    ✔️ Private by default 
+
+
+🔁 Workflow: How ECR Works End-to-End
+1️⃣ Build Docker Image Locally or in CI/CD
+2️⃣ Authenticate to ECR (AWS CLI / IAM role)
+3️⃣ Tag the image with ECR repository URI
+4️⃣ Push image to ECR
+5️⃣ Deploy image from ECR using ECS/EKS/Lambda
+
+
+✅ Example Commands:
+# Login using AWS CLI
+aws ecr get-login-password --region ap-south-1 \
+| docker login --username AWS --password-stdin <AWS_Account_ID>.dkr.ecr.ap-south-1.amazonaws.com
+
+# Tag the image
+docker tag myapp:latest <AWS_Account_ID>.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest
+
+# Push to ECR
+docker push <AWS_Account_ID>.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest
+
+
+🔁 ECR + ECS/EKS Integration
+| Service              | Deployment Benefit               |
+| -------------------- | -------------------------------- |
+| **ECS (Fargate)**    | Pull and run images serverlessly |
+| **EKS (Kubernetes)** | Fully private, high security     |
+| **Lambda**           | Deploy containerized functions   |
+Example ECS task definition:
+"image": "<AWS_Account_ID>.dkr.ecr.region.amazonaws.com/myapp:latest"
+
+
+🔁 Security & IAM Best Practices
+➤ Use IAM roles for ECS tasks instead of handing credentials
+➤ Enable Image Scanning on Push
+➤ Use Lifecycle Policies to auto-clean:
+    ✔️ Keep last 10 images
+    ✔️ Delete tags older than 30 days
+➤ Restrict pull access to specific roles / accounts
+
+
+🔁 Real-World DevOps Use Case
+1️⃣ CI/CD Pipeline:
+CodeCommit/GitHub → CodeBuild builds Docker → Push to ECR → CodeDeploy → ECS/EKS deployment
+
+
+2️⃣ Hybrid Cloud:
+On-premise Kubernetes cluster pulls images securely using IAM roles anywhere with AWS PrivateLink
+
+
+🔁 Monitoring & Logging
+➤ CloudWatch logs provide registry performance metrics
+➤ CloudTrail records image push/pull activity → auditing & governance
+
+
+🔁 Public ECR vs Private ECR
+| Feature | Public ECR                    | Private ECR                        |
+| ------- | ----------------------------- | ---------------------------------- |
+| Access  | Public internet               | Private IAM-controlled             |
+| Use     | Open-source sharing           | Internal enterprise images         |
+| Cost    | Free for storage up to limits | Pay per GB storage + data transfer |
+
+
+🔁 Limitations
+➤ Cannot host non-container artifacts (not like Nexus/S3)
+➤ Public containers still incur data transfer charges
+➤ Regional service → cross-region replication must be configured manually
+
+
+
+########################################
+🔷 AWS Elastic Container Service(ECS)
+########################################
+ECS is a fully managed container orchestration service by AWS that helps you run, scale, and manage Docker containers without managing Kubernetes or your own container scheduler.
+
+
+🔁 Why ECS Exists?
+Before ECS:
+    ✔️ Developers manually managed containers on EC2
+    ✔️ Scaling, networking, container health — all manual
+    ✔️ Hard to orchestrate microservices
+
+ECS solved:
+    ✔️ Automated scheduling of containers
+    ✔️ Service discovery
+    ✔️ Auto-scaling
+    ✔️ Rolling deployments
+    ✔️ Secure IAM-based access
+
+
+🔁 ECS Core Components
+| Component           | Purpose                                                             |
+| ------------------- | ------------------------------------------------------------------- |
+| **Task Definition** | Blueprint of the application (image, CPU/RAM, ports, env variables) |
+| **Task**            | Running instance of Task Definition (like a Pod in K8s)             |
+| **Service**         | Ensures tasks stay running (auto-restart, scaling)                  |
+| **Cluster**         | Collection of compute resources (EC2 or Fargate)                    |
+| **Container Agent** | Manages containers on EC2 nodes                                     |
+| **Launch Types**    | EC2 Launch / Fargate Launch                                         |
+
+
+🔁 ECS Launch Types
+| Launch Type | Description              | When to Use                          |
+| ----------- | ------------------------ | ------------------------------------ |
+| **EC2**     | You manage instances     | Cost optimization + customization    |
+| **Fargate** | Fully serverless compute | Zero Ops, auto-scaling microservices |
+👉 Fargate = AWS manages everything
+👉 EC2 = You choose instance types, scaling, patching
+
+
+🔁 Security – IAM Integrated
+➤ Task-level IAM roles (least privilege access)
+➤ Private networking with VPC, SG, NACL
+➤ ECR for secure container image distribution
+
+
+🔁 ECS Architecture Example
+➤ ECR → ECS Fargate → ALB → Internet
+➤ Clients → ALB → ECS Service → Tasks (Containers) → ECR images → Data Stores
+
+
+🔁 ECS Deployment Types (Important)
+| Deployment Type             | Benefit                  |
+| --------------------------- | ------------------------ |
+| Rolling update              | Zero-downtime upgrades   |
+| Blue/Green (via CodeDeploy) | Safe releases + rollback |
+
+
+🔁 Monitoring & Logging
+➤ CloudWatch Logs for container logs
+➤ CloudWatch Metrics for scaling
+➤ X-Ray for distributed tracing
+
+
+🔁 ECS vs EKS vs Kubernetes (Clear Comparison)
+| Feature        | **ECS**                   | **EKS**                       | **Kubernetes (Self-Hosted)** |
+| -------------- | ------------------------- | ----------------------------- | ---------------------------- |
+| Type           | AWS Proprietary           | Managed Kubernetes            | Open-source Kubernetes       |
+| Complexity     | Simple                    | High                          | Very High                    |
+| Control        | Medium                    | Very High                     | Full Control                 |
+| Control Plane  | Managed by AWS            | Managed by AWS                | Self-managed                 |
+| Compute        | EC2 / Fargate             | EC2 / Fargate                 | Own servers/cloud            |
+| Ecosystem      | AWS Only                  | Multi-cloud capable           | Multi-cloud / on-prem        |
+| Learning Curve | Easy                      | Steep                         | Very Steep                   |
+| Cost           | Lower                     | Higher                        | Depends (infra + ops cost)   |
+| Use Case       | AWS-centric microservices | Enterprise-scale, portability | Full control, custom infra   |
+
+
+🔁 Quick Professional Insight
+| When to choose?     | Choose If…                                                         |
+| ------------------- | ------------------------------------------------------------------ |
+| **ECS**             | You are fully on AWS & want fast operational simplicity            |
+| **EKS**             | You need Kubernetes compatibility & want multi-cloud portability   |
+| **Self-Hosted K8s** | You have advanced DevOps team & custom infrastructure requirements |
+
+
+🔁 Real-World Examples
+| Company Goal                         | Recommended                  |
+| ------------------------------------ | ---------------------------- |
+| SaaS startup deploying microservices | ECS Fargate                  |
+| Large enterprise already using K8s   | EKS                          |
+| On-Prem + Multi-cloud workload       | EKS or Managed K8s (GKE/AKS) |
+| Strict compliance / own data center  | Self-hosted Kubernetes       |
+
+
+🔁 Key Limitations of ECS
+➤ Not portable outside AWS ecosystem
+➤ Very AWS-opinionated (vendor lock-in)
+➤ Fewer advanced scheduling & networking plugins than Kubernetes
+
+
+######################
+🔷 Structure of ECS
+######################
+It is like a tree architecture:
+ECS Cluster
+ ├── Services
+ │    ├── Tasks (Desired Count: e.g., 3)
+ │    │     ├── Containers
+ │    │     │     └── Docker Images (from ECR)
+ │    └── Load Balancer (Optional: ALB, NLB)
+ └── Compute Layer
+       ├── Fargate  (Serverless)
+       └── EC2 Auto Scaling Group (Managed Instances)
+
+
+🔁 Layer-by-Layer Breakdown
+1️⃣ ECS Cluster (The Top-Level Container Orchestrator)
+➤ Logical grouping of resources where container workloads run
+➤ Can contain hundreds of services & tasks
+➤ Can run on:
+    ✔️ Fargate (Serverless)
+    ✔️ EC2 Instances
+    ✔️ External instances using ECS Anywhere
+👉 ECS Cluster = Kubernetes Cluster equivalent.
+
+
+2️⃣ ECS Services (Long-running Workload Manager)
+Purpose:
+    ✔️ Ensure desired number of tasks are running
+    ✔️ Auto restart failed tasks
+    ✔️ Support auto-scaling + blue/green deployments
+
+✅ Example:
+Service = "Backend-API"
+Desired Count = 5 running tasks always
+👉 Service = Kubernetes Deployment equivalent.
+
+
+3️⃣ ECS Tasks (Execution Unit)
+➤ Actual running instance of application
+➤ Created from a Task Definition
+
+✅ Example:
+5 replica tasks running in a service → 5 containers of same workload
+👉 Task = Kubernetes Pod equivalent.
+
+
+4️⃣ Task Definition (Blueprint / Manifest)
+Defines everything required to run a container:
+    ✔️ Docker image (from ECR)
+    ✔️ CPU + Memory
+    ✔️ Ports (e.g., 80:3000)
+    ✔️ Environment variables
+    ✔️ Logging (CloudWatch)
+    ✔️ Networking mode (bridge, host, awsvpc)
+    ✔️ IAM Role for Task
+    ✔️ Volumes
+👉 Task Definition = Kubernetes PodSpec equivalent.
+
+
+5️⃣ Containers (Application Units)
+Runs from Docker Image stored in:
+    ✔️ ECR
+    ❌ Docker Hub (not recommended for production)
+👉 Each task may have one or multiple containers.
+
+✅ Example Microservice:
+Task with 2 containers:
+ - app container
+ - log processor/sidecar
+
+
+🔁 Supporting Components
+🔐 IAM Roles & Policies
+➤ Task Role → permissions for the app inside container
+(e.g., access DynamoDB)
+➤ Execution Role → allow ECS to pull images & push logs
+
+
+🔁 Networking Models
+| Mode       | Used in     | Notes                           |
+| ---------- | ----------- | ------------------------------- |
+| **awsvpc** | Fargate/EC2 | Each task gets its own ENI + IP |
+| bridge     | EC2 only    | NAT mapping                     |
+| host       | EC2 only    | Host networking                 |
+👉 awsvpc = highest network isolation, microservice-friendly.
+
+
+🔁 Load Balancing
+➤ Application Load Balancer (ALB) → HTTP/HTTPS routing
+➤ Network Load Balancer (NLB) → TCP/UDP traffic
+
+Used with:
+✔️ Service discovery
+✔️ Health checks
+✔️ Blue/Green deployments
+
+
+🔁 Auto Scaling
+➤ Scale service tasks using CPU/Memory or custom metrics
+➤ EC2 clusters scale via Auto Scaling Group (if EC2 launch type)
+
+
+🔁 ECS Structure Stack
+Client Traffic
+     ↓
+Load Balancer (ALB/NLB)
+     ↓
+ECS Service
+     ↓
+Multiple ECS Tasks
+     ↓
+Containers (Docker Images from ECR)
+     ↓
+Compute (Fargate / EC2) inside VPC
+     ↓
+CloudWatch (Monitoring) + IAM (Security)
+
+
+##############################
+🔷 Secret Management on AWS
+##############################
+Application secrets include:
+    ✔️ Database passwords
+    ✔️ API keys & OAuth tokens
+    ✔️ Encryption keys
+    ✔️ SSH credentials
+    ✔️ Third-party integration secrets
+
+
+Storing secrets in:
+    ❌ Code
+    ❌ Docker images
+    ❌ Environment variables
+…can lead to security breaches & credential leaks.
+👉 AWS provides managed and secure secret management services:
+
+
+🔄 Core AWS Secret Management Services
+| Service                                 | Purpose                                  | Best For                                  |
+| --------------------------------------- | ---------------------------------------- | ----------------------------------------- |
+| **AWS Secrets Manager**                 | Securely store, rotate, retrieve secrets | Databases, API keys, Production workloads |
+| **AWS Systems Manager Parameter Store** | Store config + some secrets              | App configuration, non-critical secrets   |
+| **AWS KMS (Key Management Service)**    | Manage encryption keys                   | Data encryption, secure signing           |
+
+
+1️⃣ AWS Secrets Manager (Best for Production)
+✔️ Automatically rotates secrets (DB credentials)
+✔️ Native integration with:
+    ⚡RDS, Aurora
+    ⚡Lambda, ECS, EKS
+✔️ Audit and access control with IAM & CloudTrail
+✔️ Encryption at rest (KMS) + TLS in transit
+
+
+🔄 How it works:
+App → AWS SDK → Secrets Manager → Secret (Encrypted w/ KMS)
+
+✅ Example JSON Secret:
+{
+  "username": "admin",
+  "password": "Afe9*jdL!",
+  "host": "db.example.us-east-1.rds.amazonaws.com"
+}
+
+
+🔄 Rotation Example
+➤ Lambda function updates DB password
+➤ Secret version updates automatically
+➤ No downtime
+👉 Ideal for: Banking, Fintech, secure microservices, multi-env secrets
+
+
+2️⃣ AWS SSM Parameter Store
+Two tier options:
+| Tier         | Purpose                                   | Cost |
+| ------------ | ----------------------------------------- | ---- |
+| **Standard** | Small configs, simple secrets             | Free |
+| **Advanced** | Bigger payloads, rotation, change history | Paid |
+
+
+Supports:
+    ✔️ EC2 User Data
+    ✔️ CloudFormation
+    ✔️ ECS Task Definitions
+    ✔️ Lambda Environment Variables (reference only)
+✅ Example: /prod/api/payment/secret
+👉 Best For: Feature flags, config params, non-critical secrets
+
+
+3️⃣ AWS KMS (Under the Hood Encryption Engine)
+Creates, stores, and rotates Customer Managed Keys
+Used by:
+    ✔️ S3
+    ✔️ Secrets Manager
+    ✔️ EBS
+    ✔️ RDS
+    ✔️ CloudWatch Logs
+    ✔️ DynamoDB
+👉 Encrypts data keys → Envelope encryption mechanism
+
+
+🔀 Choosing the Right Service
+| Requirement                          | Recommendation             |
+| ------------------------------------ | -------------------------- |
+| Auto-rotate DB credentials           | Secrets Manager            |
+| Store flags/configs & simple secrets | Parameter Store            |
+| Manage encryption for secrets        | KMS                        |
+| Large payloads or JSON configs       | Parameter Store (Advanced) |
+
+
+🔄 Security Architecture for Secrets in ECS/EKS
+ECS Task / EKS Pod
+      ↓ (IAM Role grants access)
+Secrets Manager
+      ↓ (KMS Encryption)
+Secure DB Authentication
+No secrets injected into container images → Zero leakage risk
+
+
+🔄 IAM Access Control
+IAM principles enforce:
+    ✔️ Least privilege
+    ✔️ Separation of duties
+    ✔️ Fine-grained policies
+
+✅ Example IAM policy:
+{
+  "Effect": "Allow",
+  "Action": [
+    "secretsmanager:GetSecretValue"
+  ],
+  "Resource": "arn:aws:secretsmanager:us-east-1:1234567890:secret:ProdDBSecret-*"
+}
+
+
+🔄 Secret Rotation
+Without rotation:
+    ✔️ Leaked credentials remain valid indefinitely
+    ✔️ Compliance failures (PCI-DSS, HIPAA, SOC2)
+
+With AWS:
+    ✔️ Automatic rotation
+    ✔️ Versioning
+    ✔️ Fail-safe rollback
+
+
+🔄 Monitoring & Auditing
+| Log Source     | What is Tracked              |
+| -------------- | ---------------------------- |
+| **CloudTrail** | Who accessed which secret    |
+| **CloudWatch** | Metrics on rotation failures |
+| **Config**     | Compliance & drift tracking  |
+
+
+🔄 Common Pitfalls & Anti-Patterns
+| Anti-Pattern                               | Why Wrong                       |
+| ------------------------------------------ | ------------------------------- |
+| Storing secrets in Lambda env vars         | Visible in console & logs       |
+| Embedding secrets inside code              | Git repo leaks / insider threat |
+| Passing secrets inside ECS task definition | Exposed in JSON and UI          |
+| Hardcoding credentials in CI/CD pipelines  | Credentials in plain text       |
+
+
+🔄 Best Practices 
+➤ Use Secrets Manager for all sensitive credentials
+➤ Combine IAM Roles + KMS for secure access flow
+➤ Never expose secrets to logs or container images
+➤ Enforce automatic rotation wherever possible
+➤ Use resource-based access policies for cross-account access
+➤ Use Private VPC Endpoints → No public internet dependency
+➤ For multi-env: prefix secrets like
+    /dev/app/db/pass
+    /prod/app/db/pass
+
+
+################
+🔷 AWS Config
+################
+AWS Config is a continuous monitoring and compliance evaluation service that tracks configuration changes in AWS resources over time.
+
+🔄 What It does
+➤ Records resource configuration history
+➤ Tracks configuration changes (who changed what, when, and how)
+➤ Evaluates compliance with predefined or custom rules
+➤ Helps audit, security checks, and governance
+
+
+🔄 Key Concepts
+| Component                  | Meaning                                                    |
+| -------------------------- | ---------------------------------------------------------- |
+| **Configuration Recorder** | Collects configuration data for selected resource types    |
+| **Delivery Channel**       | Sends configuration snapshots to S3 + notifications to SNS |
+| **Config Rules**           | Policies to check compliance — AWS Managed or Custom       |
+| **Resource Timeline**      | Shows full history of configuration states & changes       |
+| **Remediation**            | Auto-fix non-compliance using SSM automation               |
+
+
+🔄 How Compliance Evaluation Works
+1️⃣ Configure AWS Config with selected resources
+2️⃣ Apply compliance rules (e.g., S3 Bucket must be encrypted)
+3️⃣ AWS Config evaluates each resource
+4️⃣ Marks them as:
+        🟢 Compliant
+        🔴 Non-Compliant
+5️⃣ Optionally trigger remediation automation
+
+
+🔄 Identifying Compliant / Non-Compliant Resources
+Using AWS Console
+1️⃣ Go to AWS Config > Rules
+2️⃣ View rule status dashboard:
+    ✔️ Shows number of compliant & non-compliant resources
+    ✔️ Drill down into failed resources for reasons
+
+Using AWS CLI
+🔗 aws configservice describe-compliance-by-resource
+
+🔗 aws configservice get-compliance-details-by-config-rule \
+  --config-rule-name s3-bucket-server-side-encryption-enabled
+
+🔄 Auto-Remediation Example Use-Cases
+| Problem                 | Rule                             | Auto Remediation  |
+| ----------------------- | -------------------------------- | ----------------- |
+| Public S3 bucket        | s3-bucket-public-read-prohibited | Remove public ACL |
+| Open security group     | restricted-ssh                   | Remove 0.0.0.0/0  |
+| Unencrypted EBS volumes | encrypted-volumes                | Encrypt volume    |
+| Missing tags            | required-tags                    | Auto-add tags     |
+👉 Done through SSM Automation Docs + Config Rule
+
+
+🔄 Why AWS Config is Useful for Enterprises
+➤ Ensures compliance frameworks (PCI-DSS, HIPAA, ISO27001, SOC2)
+➤ Detects drift from desired configuration
+➤ Prevents security misconfigurations
+➤ Helps in incident investigation and security forensics
+
+
+🔄 Pointers
+✔️ AWS Config checks the state of configurations, not security threats
+✔️ It is NOT a monitoring service (CloudWatch is for metrics & logs)
+✔️ It focuses on audit + governance + compliance
+
+
+#######################
+🔷 AWS Load Balancers
+#######################
+Load Balancer = Distributes incoming traffic across multiple targets to improve:
+    ✔️ Availability
+    ✔️ Fault tolerance
+    ✔️ Performance
+    ✔️ Scalability
+    ✔️ Security
+
+
+🔄 AWS provides 3 major types
+| Load Balancer                       | Layer   | Best for                            | Protocols             | Main Features                                          |
+| ----------------------------------- | ------- | ----------------------------------- | --------------------- | ------------------------------------------------------ |
+| **ALB** (Application Load Balancer) | Layer 7 | HTTP/HTTPS traffic, microservices   | HTTP/HTTPS/WebSockets | URL-based routing, host-based routing, serverless apps |
+| **NLB** (Network Load Balancer)     | Layer 4 | High-performance, ultra-low latency | TCP/UDP/TLS           | Handles millions of requests/sec, static IP            |
+| **GWLB** (Gateway Load Balancer)    | Layer 3 | Security appliances deployment      | GENEVE                | IPS/IDS, Firewalls, Traffic inspection                 |
+
+
+1️⃣ Application Load Balancer (ALB)
+(OSI Layer 7 — Application Layer)
+
+🔁 When to use ALB
+➤ Microservices + multiple target groups
+➤ Routing based on:
+    ✔️ URL path
+        ➝ /login, /checkout
+    ✔️ Hostname
+        ➝ api.example.com, admin.example.com
+    ✔️ Query Strings, Headers, HTTP methods
+➤ WebSockets support (real-time apps)
+➤ Integration with ECS, Lambda
+
+
+🔁 Request Routing Capabilities
+| Routing Type  | Example                           |
+| ------------- | --------------------------------- |
+| Host-based    | `auth.example.com` ➜ Auth service |
+| Path-based    | `/images/*` ➜ S3 / image service  |
+| Query/Headers | `/products?category=mobiles`      |
+
+
+🔁 Security
+➤ AWS WAF support
+➤ HTTPS termination (SSL offloading)
+➤ Authentication (OIDC, Cognito)
+
+🔁 Target Types
+➤ EC2
+➤ ECS tasks
+➤ Lambda functions
+➤ IP addresses
+➤ Private Link
+
+⚠️ Drawbacks
+➤ Not suitable for non-HTTP traffic
+➤ Slightly higher latency than NLB
+
+
+2️⃣ Network Load Balancer (NLB)
+(OSI Layer 4 — Transport Layer)
+
+🔁 When to use NLB
+➤ Extreme performance requirements
+➤ Millions of concurrent requests
+➤ TCP/UDP/TLS traffic
+➤ Static IPs required (or EIPs)
+➤ Preserve client source IP for backend logic
+
+🔁 Features
+➤ Ultra-low latency ~ microseconds
+➤ No content-based routing
+➤ TLS termination (optional)
+➤ Cross-zone load balancing (optional)
+➤ Health checks on TCP/HTTP/HTTPS
+
+🔁 Drawbacks
+➤ No advanced L7 routing
+➤ Monitoring visibility lower than ALB
+
+
+3️⃣ Gateway Load Balancer (GWLB)
+(OSI Layer 3 — Network Layer)
+
+🔁 Primary Purpose
+➤ Deploy, scale & manage security appliances like:
+    ✔️ Firewalls
+    ✔️ Deep packet inspection
+    ✔️ IDS/IPS
+    ✔️ Intrusion prevention gateways
+
+🔁 Traffic forwarding mechanism
+➤ Uses GENEVE encapsulation
+    → Packets are tunneled without modifying their content
+
+➤ Meaning:
+    ✔️ You can inspect traffic without breaking it
+    ✔️ Enables transparent inline security filtering
+
+
+🔁 Integrates with:
+➤ Virtual appliances from Marketplace
+➤ Hub-and-spoke network security architecture
+
+🔁 Drawbacks
+➤ Complex deployment & configuration
+➤ Higher network overhead (encapsulation)
+
+
+🔁 Choosing the Right Load Balancer
+| Requirement                                     | Best Option |
+| ----------------------------------------------- | ----------- |
+| HTTP routing based on path or domain names      | **ALB**     |
+| WebSockets, gRPC, authentication                | **ALB**     |
+| Very high throughput + low latency              | **NLB**     |
+| TCP/UDP traffic like databases, gaming servers  | **NLB**     |
+| Static IP requirement                           | **NLB**     |
+| Inline traffic inspection + security appliances | **GWLB**    |
+| Serverless (Lambda) backend                     | **ALB**     |
+
+
+🔁 Real-World Use Cases
+| Scenario                             | Recommended LB | Reason                   |
+| ------------------------------------ | -------------- | ------------------------ |
+| Microservices architecture (ECS/EKS) | ALB            | Smart routing by service |
+| Payment gateways                     | NLB            | Low latency + TLS        |
+| WAF + Advanced L7 security           | ALB            | Supports WAF             |
+| Centralized firewall/security        | GWLB           | Transparent inline       |
+| Gaming applications or chat servers  | NLB            | High throughput, UDP     |
+| Hybrid on-prem network inspection    | GWLB           | Partner appliances       |
+
+
+🔄 Internal Architecture (High Level)
+Client Request
+      ↓
+DNS Lookup via Route53
+      ↓
+Load Balancer
+  ├── Listener (Port rules)
+  │      ↓
+  ├─ Target Group (Health checks, routing rules)
+      ↓
+Targets (EC2, ECS, Lambda, IPs)
+
+Each LB type differs in:
+    ✔️ Listener protocol
+    ✔️ Target recognition
+    ✔️ Routing logic
+
+
+🔁 Cost Differences
+| Cost Component                     | ALB                                   | NLB                                  | GWLB              |
+| ---------------------------------- | ------------------------------------- | ------------------------------------ | ----------------- |
+| LB-hours                           | Medium                                | High                                 | Highest           |
+| LCU (Load balancer capacity units) | Based on connections, rule eval, data | Based on new connections + bandwidth | Processed traffic |
+| Additional Security Appliances     | —                                     | —                                    | Yes               |
+| Level of Security                  | High                                  | Medium                               | High Security     | 
+
+
+#########################################
+🔷 AWS Cloud Migration Strategies(7R's)
+#########################################
+These represent different approaches organizations use to move workloads from on-prem or other clouds to AWS — based on complexity, cost, and modernization goals.
+
+🔁 7 Migration Strategies 
+| Strategy                         | Complexity | Cost           | Time     | When to Choose               |
+| -------------------------------- | ---------- | -------------- | -------- | ---------------------------- |
+| **Rehost (Lift & Shift)**        | Low        | Medium         | Fast     | Quick cloud adoption         |
+| **Replatform (Lift & Optimize)** | Medium     | Medium         | Moderate | Minor cloud upgrades         |
+| **Repurchase (Drop & Shop)**     | Medium     | Subscription   | Fast     | Switch to SaaS               |
+| **Refactor / Re-architect**      | High       | High           | Slow     | Modernization + cloud native |
+| **Retire**                       | Very Low   | Saves cost     | Fast     | Remove unused apps           |
+| **Retain (Revisit / Hybrid)**    | Very Low   | None initially | N/A      | Some apps remain on-prem     |
+| **Relocate (VM Migration)**      | Low/Medium | Low/Medium     | Fast     | Migrate VMs as-is to AWS     |
+
+
+1️⃣ Rehost — Lift and Shift
+Migrating your servers to AWS with minimal changes.
+Application architecture remains the same.
+
+🔄 Where used?
+➤ Apps nearing end-of-life but still required
+➤ Fast cloud migration deadlines
+➤ Datacenter exit initiatives
+
+✅ Example on AWS
+| On-Prem                | AWS Equivalent |
+| ---------------------- | -------------- |
+| Physical Server/VM     | EC2            |
+| Local Storage          | EBS, S3        |
+| Internal Load Balancer | ALB/NLB        |
+
+⭐ Pros
+➤ Fastest migration method
+➤ Lower initial cost
+➤ No code changes
+
+❌ Cons
+➤ No cloud-native benefits
+➤ Higher operational costs long-term
+
+
+2️⃣ Replatform — Lift & Optimize
+Minor cloud optimizations → without changing application core code.
+
+🔄 Common Optimization Examples
+| Before             | After                    |
+| ------------------ | ------------------------ |
+| Local DB           | RDS/Aurora               |
+| Local File Storage | Amazon S3                |
+| Self-managed Cache | ElastiCache              |
+| Cron Jobs on VM    | AWS Lambda / EventBridge |
+
+⭐ Pros
+➤ Better performance + scalability
+➤ Limited effort vs full refactor
+
+❌ Cons
+➤ Still partial automation
+➤ Not fully cloud-native
+
+
+3️⃣ Repurchase — Drop and Shop
+Replace a custom-built app with a SaaS alternative.
+
+✅ Example
+| Current System | Replacement    |
+| -------------- | -------------- |
+| Custom CRM     | Salesforce     |
+| Custom CMS     | WordPress SaaS |
+| Jira Server    | Jira Cloud     |
+
+⭐ Pros
+➤ Fast transformation
+➤ Zero maintenance burden
+
+❌ Cons
+➤ Data migration challenges
+➤ Loss of customization capability
+
+
+4️⃣ Refactor / Re-Architect — Cloud-Native Modernization
+Rewrite entire application to leverage cloud-native services.
+
+🔁 Key Modernization Components
+| From             | To (AWS Native)            |
+| ---------------- | -------------------------- |
+| Monolithic App   | Microservices + Serverless |
+| VM based deploy  | ECS/EKS/Lambda             |
+| Manual Scaling   | Auto Scaling               |
+| Local Messaging  | SQS/SNS/MQS                |
+| Batch Processing | Lambda/EventBridge         |
+| Local Logs       | CloudWatch                 |
+
+⭐ Pros
+➤ Significant cost savings long-term
+➤ Highly scalable + highly resilient
+
+❌ Cons
+➤ Most expensive
+➤ Requires skilled cloud engineers
+➤ Long migration timelines
+➤ Used when the business wants future-proof modernization.
+
+
+5️⃣ Retire — Decommission
+Identify resources that are:
+    ✔️ Unused
+    ✔️ Obsolete
+    ✔️ No longer needed
+    ✔️ Then → Remove them entirely
+
+⭐ Benefits
+➤ Cost reduction
+➤ Simplifies overall architecture
+
+
+6️⃣ Retain — Revisit / Hybrid Strategy
+Keep some services on-prem and integrate with cloud.
+
+Often because:
+    ✔️ Application too critical/risky to migrate yet
+    ✔️ Compliance/government regulations
+    ✔️ Hardware still has unexpired value
+
+
+🔁 Typical Hybrid Components
+| On-Prem          | AWS                |
+| ---------------- | ------------------ |
+| Active Directory | AWS Managed AD     |
+| Backup Systems   | AWS Backup         |
+| VPN/MPLS         | AWS Direct Connect |
+
+
+7️⃣ Relocate — VM Migration at Scale
+Move entire VM clusters as is → without application redesign
+(like VMware VMs → VMware Cloud on AWS)
+
+Tools Used
+➤ AWS Application Migration Service (MGN)
+➤ VMware HCX
+
+⭐ Pros
+➤ Fast adoption
+➤ No re-architecture overhead
+
+❌ Cons
+➤ No modern cloud benefits yet
+
+
+🔁 Strategy Selection — How to Decide?
+| Business Goal                                | Recommended Strategy |
+| -------------------------------------------- | -------------------- |
+| Need fast migration                          | Rehost / Relocate    |
+| Want some cloud benefits but limited budget  | Replatform           |
+| Replace outdated systems                     | Repurchase           |
+| Major performance/scalability boost required | Refactor             |
+| Remove unused apps                           | Retire               |
+| Regulatory restrictions                      | Retain               |
+
+
+🚀 Migration Phases (AWS Migration Lifecycle)
+
+1️⃣ Assess
+➤ TCO analysis
+➤ Application discovery (AWS Migration Evaluator)
+
+2️⃣ Mobilize
+➤ Skills & team readiness
+➤ Landing zone creation
+➤ Networking & security setup
+
+3️⃣ Migrate & Modernize
+➤ Execute chosen R-strategy
+➤ Use migration tools
+    ✔️ DMS (Database Migration Service)
+    ✔️ MGN (Application Migration Service)
+    ✔️ S3 Transfer Acceleration
+    ✔️ Snowball / Snowmobile for large data
+
+
+🔄 Major AWS Services for Migration
+| Service                      | Role                                  |
+| ---------------------------- | ------------------------------------- |
+| AWS Migration Hub            | Central migration tracking            |
+| AWS DMS                      | Database migration with CDC           |
+| AWS MGN                      | Rehost (lift & shift automation)      |
+| Snowball/Snowmobile          | Petabyte scale offline migration      |
+| CloudEndure                  | Disaster recovery migration           |
+| Transfer Family              | SFTP/FTP migration                    |
+| SCT (Schema Conversion Tool) | For heterogeneous database conversion |
+
+
+
+#############################################
+🔷 3-Tier Architecture Implementation on AWS
+#############################################
+A 3-tier application architecture is a classic multi-layered design that separates:
+1️⃣ Presentation Layer (UI / Client)
+2️⃣ Application Layer (Business Logic)
+3️⃣ Data Layer (Database & Storage)
+
+
+🔄 Architecture Overview Diagram (Conceptual)
+ User
+   ↓  (HTTPS)
+[ Amazon Route 53 ]
+   ↓
+[ Elastic Load Balancer (ALB) ]
+   ↓
+[ Public Subnet - Web Tier EC2s ]
+   ↓
+[ Private Subnet - App Tier EC2s / ECS ]
+   ↓
+       [ Database Tier ]
+       (Amazon RDS / DynamoDB)
+
+
+Networking:
+    ✔️ Web Tier → Public Subnet (internet-facing)
+    ✔️ App + DB Tier → Private Subnets (internal only)
+
+Security:
+    ✔️ Security Groups + NACLs enforce Zero-Trust Communication
+
+
+1️⃣ Presentation Tier (Web Layer)
+
+🔄 Components Used:
+| Component                               | Purpose                          |
+| --------------------------------------- | -------------------------------- |
+| **Route 53**                            | DNS Mapping → domain → ALB       |
+| **Application Load Balancer**           | Smart routing, https termination |
+| **EC2 / ECS Fargate / S3 + CloudFront** | Hosts website UI                 |
+| **Public Subnet**                       | Internet access allowed          |
+
+
+🔄 Responsibilities:
+    ✔️ Handles HTTP/HTTPS traffic
+    ✔️ SSL/TLS termination (HTTPS)
+    ✔️ Redirect to app layer
+
+🔄 Security:
+    ✔️ SG: Allow 80/443 inbound from Internet
+    ✔️ NACL: Inbound from 0.0.0.0/0 allowed only on web ports
+Auto-scaling setup for high availability.
+
+
+2️⃣ Application Tier (Business Logic Layer)
+Resides in Private Subnet, not accessible directly from internet
+
+✔️ Options:
+| Option           | Benefit                           |
+| ---------------- | --------------------------------- |
+| EC2 Auto Scaling | Flexible self-managed deployments |
+| ECS / Fargate    | Container orchestration           |
+| Lambda           | Serverless compute                |
+
+
+🔄 Integrations
+➤ Connects to RDS using IAM Roles or DB Credentials from Secrets Manager
+➤ Reads static assets from S3
+➤ Sends logs to CloudWatch Logs
+➤ Pushes events to SQS/SNS for async workflows
+
+🔄 Security:
+    ✔️ SG: Allow inbound only from Web-Tier SG
+    ✔️ No direct public IP on app servers
+
+
+3️⃣ Data Tier (Database Layer)
+✔️ Options:
+| AWS Service                                 | Purpose                                 |
+| ------------------------------------------- | --------------------------------------- |
+| **RDS (MySQL/PostgreSQL/Oracle/SQ Server)** | Transactional DB                        |
+| DynamoDB                                    | Serverless NoSQL                        |
+| ElastiCache Redis/Memcached                 | Cache for performance                   |
+| S3                                          | Object storage (images, files, backups) |
+
+
+🔄 Best Practices
+➤ Multi-AZ for HA
+➤ Automatic Backup + PITR
+➤ Read Replicas for scaling reads
+➤ DB Subnet Group using private subnets only
+
+🔄 Security:
+➤ SG: Inbound allowed only from App Tier
+➤ No public access enabled
+
+
+🔄 VPC & Networking Setup — Full Flow
+| Layer    | Subnet Type      | Routing                                        |
+| -------- | ---------------- | ---------------------------------------------- |
+| Web Tier | Public Subnets   | Route to **Internet Gateway**                  |
+| App Tier | Private Subnets  | Route to **NAT Gateway** for outbound internet |
+| DB Tier  | Private Isolated | No internet access                             |
+
+
+🔄 Additional networking:
+| Resource         | Purpose                              |
+| ---------------- | ------------------------------------ |
+| Internet Gateway | Connect public subnet to Internet    |
+| NAT Gateway      | Allows app servers outbound updates  |
+| Route Tables     | Define network routing for each tier |
+
+
+🔄 Security Architecture
+| Layer    | Allowed Inbound   | Blocked                |
+| -------- | ----------------- | ---------------------- |
+| Web Tier | 80/443 from world | SSH from world         |
+| App Tier | Only from Web SG  | Any external traffic   |
+| DB Tier  | Only from App SG  | Direct Internet Access |
+➤ WAF in front of ALB for layer-7 filtering
+➤ IAM roles for least-privilege access
+➤ KMS encryption for RDS & S3
+
+
+🔄 CI/CD Pipeline (Recommended)
+| Stage            | AWS Service                 |
+| ---------------- | --------------------------- |
+| Code Repo        | CodeCommit / GitHub         |
+| Build            | CodeBuild                   |
+| Deploy           | CodeDeploy / ECS Deployment |
+| Infra Automation | CloudFormation / Terraform  |
+| Monitoring       | CloudWatch & X-Ray          |
+Automated blue-green deployments supported via ELB.
+
+
+🔄 Scalability Patterns
+| Layer          | Method                 |
+| -------------- | ---------------------- |
+| Web & App Tier | Auto Scaling Groups    |
+| DB Tier        | Read Replicas          |
+| S3             | Automatically scalable |
+Elastic Load Balancer distributes load across multiple AZs → fault tolerance.
+
+
+🔄 Performance Techniques
+| Feature     | Benefit                               |
+| ----------- | ------------------------------------- |
+| ElastiCache | Reduce DB load                        |
+| CloudFront  | Edge caching for UI                   |
+| SQS         | Smooth peak load via async processing |
+| RDS Proxy   | Connection pooling for RDS            |
+
+
+🔄 High Availability & DR
+✔️ Multi-AZ ALB
+✔️ EC2 across minimum 2 AZs
+✔️ RDS Multi-AZ Failover
+✔️ S3 Cross-Region Replication for backups
+✔️ CloudWatch Alarms + EventBridge for auto recovery
+
+
+🔄 Monitoring & Observability
+| Tool       | What it Tracks                       |
+| ---------- | ------------------------------------ |
+| CloudWatch | CPU, memory, logs                    |
+| AWS X-Ray  | Request tracing across microservices |
+| CloudTrail | API access governance                |
+| WAF Logs   | Security inspection logs             |
