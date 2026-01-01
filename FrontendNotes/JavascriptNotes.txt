@@ -1,0 +1,733 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX✅ Core Concepts Of JavaScript ✅XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+###########################################
+🌊 Variables and Scoping (var, let, const)
+###########################################
+🔷 Scopes in JavaScript
+| Scope              | Applies to            | Stored in                              |
+| ------------------ | --------------------- | -------------------------------------- |
+| **Global Scope**   | `window` / `global`   | Global Object                          |
+| **Function Scope** | `var` inside function | Execution Context Variable Environment |
+| **Block Scope**    | `{ }`, loops, if      | Lexical Environment                    |
+
+
+🔷 var vs let vs const
+| Feature                            | `var`                            | `let`            | `const`          |
+| ---------------------------------- | -------------------------------- | ---------------- | ---------------- |
+| Scope                              | Function                         | Block            | Block            |
+| Hoisted?                           | Yes (initialized as `undefined`) | Yes (but in TDZ) | Yes (but in TDZ) |
+| Re-declaration                     | Allowed                          | ❌ Not allowed   | ❌ Not allowed  |
+| Re-assignment                      | Allowed                          | Allowed          | ❌ Not allowed   |
+| Attached to Global Object?         | Yes                              | ❌               | ❌              |
+| Can be declared without assignment | Yes                              | Yes              | ❌ No            |
+👉 TDZ- Temporal Dead Zone
+A zone between the start of the scope and declaration where let/const exist but cannot be accessed.
+
+
+🔷 Hoisting Behavior
+console.log(a); // undefined
+var a = 10;
+
+console.log(b); // ReferenceError (TDZ)
+let b = 20;
+
+console.log(c); // ReferenceError (TDZ)
+const c = 30;
+
+🔷 const != Immutable ❌ Misconception
+const obj = {name: "A"};
+obj.name = "B"; // ❌ Allowed! (mutation)
+obj = {}; // ❌ Error (reassignment)
+➤ To freeze an object, use Object.freeze(obj)
+
+
+🔷 Closure + Loop Traps
+❓ Why does var fail inside the loops?
+for(var i = 1; i <= 3; i++){
+  setTimeout(() => console.log(i), 1000);
+}
+// Output: 4 4 4
+👉 All callbacks share one i variable, from the function scope and not from the loop scope. This is called a closure.
+
+
+❓ How to fix? Modern Solution
+for(let i = 1; i <= 3; i++){
+  setTimeout(() => console.log(i), 1000);
+}
+// Output: 1 2 3
+👉 Each iteration has its own i variable, from the loop scope.
+
+
+🔷 Global Leaks(Real-world Bug)
+function test() {
+  x = 100; // ❌ creates global variable
+}
+test();
+console.log(x); // 100 (bad!)
+
+
+✅ Use "use strict" to prevent this:
+"use strict";
+x=100; // ❌ ReferenceError
+
+
+#############
+🌊 Hoisting
+#############
+JavaScript moves declarations to the top of the current scope (compile phase) before code execution.
+
+Only declarations are hoisted — not initializations.
+
+| Type                 | Hoisted?           | Value Before Declaration         | Notes                        |
+| -------------------- | ------------------ | -------------------------------- | ---------------------------- |
+| `var`                | Yes                | `undefined`                      | Function-scoped              |
+| `let`                | Yes                | TDZ (ReferenceError if accessed) | Block-scoped                 |
+| `const`              | Yes                | TDZ + must be initialized        | Block-scoped                 |
+| Function Declaration | Yes                | Actual function                  | Can be called before defined |
+| Function Expression  | Only variable name | `undefined` if accessed early    | Depends on var/let/const     |
+
+
+✅ Examples
+1️⃣ var Hoisting
+console.log(a); // undefined
+var a = 10;
+
+2️⃣ let/const Hoisting+ TDZ
+console.log(b); //❌ ReferenceError (TDZ)
+let b = 20;
+
+3️⃣ Function Declaration Hoisting
+greet(); //"Hello"
+function greet(){
+  console.log("Hello");
+}
+
+4️⃣ Function Expression Hoisting
+greet(); // ❌ TypeError greet is not a function
+var greet = function(){
+  console.log("Hello");
+}
+✅ greet becomes undefined during hoisting
+
+4️⃣.1️⃣ Using const/let
+greet(); // ❌ Cannot access 'greet' before initialization
+const greet = function(){
+  console.log("Hello");
+}
+
+🔷 Tricky Questions
+❓Q1: foo();
+function foo(){
+    console.log("Called");
+}
+✅ Output: Called
+
+❓Q2: var a=1;
+function foo(){
+    console.log(a);
+    var a=2;
+}
+test();
+✅ Output: undefined (inner a shadowed + hoisted)
+
+❓Q3: console.log(a);
+let a=10;
+✅ Output: Uncaught ReferenceError: a is not defined because typeof also fails in TDZ
+
+❓Q4: hello();
+function hello() {
+  console.log("A");
+}
+var hello = function() {
+  console.log("B");
+};
+✅ Output: "A" Function declaration hoisted first ─────────▶ overwrites var declaration.
+
+
+#################################
+🌊 Primitive vs Reference Types
+#################################
+🔷 Primitive Types
+✔️ Stored directly in stack.
+✔️ Copied by value.
+✔️ Immutable (value cannot be changed in memory).
+👉 Types: string, number, boolean, null, undefined, symbol, bigint.
+
+let a = 10;
+let b = a;
+b = 20;
+
+console.log(a); // 10 (unchanged)
+console.log(b); // 20
+
+🔷 Reference Types
+✔️ Stored in heap.
+✔️ Variables stores reference(pointer) to memory.
+✔️ Copied by reference.
+👉 Types: object, array, function, date, etc.
+
+let obj1 = { x: 1 };
+let obj2 = obj1;
+obj2.x = 99;
+console.log(obj1.x); // 99 (same reference)
+
+🔷 Comparing Values (===)
+10 === 10           // true (value check)
+{a:1} === {a:1}     // false (different references)
+
+🔷 Cloning Reference Types 
+👉 Shallow Copy
+const obj1 = {a:1, b:{c:2}};
+const obj2 = {...obj1};
+obj2.b.c = 5;
+
+console.log(obj1.b.c); // 5 (nested ref shared)
+
+👉 Deep Copy
+const obj1 = {a:1, b:{c:2}};
+const obj2 = JSON.parse(JSON.stringify(obj1));
+obj2.b.c = 5;
+
+console.log(obj1.b.c); // 2 (nested ref not shared)
+❗ Loses functions, Date, undefined, Infinity
+
+🔷 Primitive Wrappers
+JS auto-boxes primitives into temporary objects:
+"abc".toUpperCase(); // "ABC" (temporary object)
+
+🔷 Tricky Questions
+❓Q1: let a="hi";
+a.name="test";
+console.log(a.name); 
+✅ Output: undefined (primitives cannot hold properties)
+
+❓Q2: let a=[1,2,3];
+let b=a;
+b.push(4);
+console.log(a);
+✅ Output: [1,2,3,4] (shared reference)
+
+❓Q3: console.log({}==={});
+console.log([]===[]);
+✅ Output: false false ( different heap references)
+
+❓Q4: let a=null;
+console.log(typeof a);
+✅ Output: object (JS historical bug- still part of the specification)
+
+❓Q5: let p = 5;
+let q = new Number(5);
+
+console.log(p == q);  // ?
+console.log(p === q); // ?
+✅ Output: true // coercion
+false // strict equality different types(primtive vs object)
+
+❓Q6: let obj = {a: 1};
+const arr = [obj];
+
+arr[0].a = 10;
+console.log(obj.a);
+✅ Output: 10 (arr holds reference to obj)
+
+
+#################################
+🌊 Type Conversion and Coercion
+#################################
+🔷 Type Conversion vs Type Coercion
+| Term                | Who triggers? | Explicit?     | Example      |
+| ------------------- | ------------- | ------------- | ------------ |
+| **Type Conversion** | Developer     | Yes           | `String(10)` |
+| **Type Coercion**   | JavaScript    | No (implicit) | `"5" * 2`    |
+
+🔷 Explicit Conversion
+➤ To Number
+Number("10") // 10
+Number("10a") // NaN
+parseInt("10px") // 10
+parseFloat("3.14") // 3.14
+
+➤ To String    
+String(100) // "100"
+(100).toString() // "100"
+
+➤ To Boolean
+Falsy values only: false, 0, "", null, undefined, NaN
+
+🔷 Implicit Coercion
+➤ Arithmetic
+"5" - 1   // 4 (string → number)
+"5" * 2   // 10
+"5" + 2   // "52" (string concat rule)
+'+' operator ─────────▶ if any operand is string ─────────▶ concatenation
+
+
+➤ Boolean 
+if("hello") console.log("true"); // true
+if(0) console.log("true"); // won't execute
+
+➤ Equality Coercion (==)
+"5" == 5   // true (coercion)
+" " == 0   // true
+false == 0 // true
+[] == false // true
+[] == 0    // true
+
+✔️ Special Cases
+null == undefined // true
+null === undefined // false 
+
+
+🔷 Tricky Questions
+❓Q1: console.log("10" - "2");
+✅ Output:8
+
+❓Q2: console.log("10" + 2 + 3);
+console.log(10 + 2 + "3");
+✅ Output: 
+"1023"
+"123"
+
+❓Q3: console.log(true + true); 
+console.log(true + false);
+✅ Output:
+2
+1 (boolean → number)
+
+❓Q4: console.log([] == 0);
+console.log([1] == 1);
+✅ Output:
+true   // [] → "" → 0
+true   // [1] → "1" → 1
+
+❓Q5:console.log(null == 0);
+console.log(null >= 0);
+console.log(null > 0);
+✅ Output:
+false
+true
+false
+👉 Reason -> Relational comparison converts to number, equality does not.
+
+❓Q6: console.log("abc" - 1);
+✅ Output:NaN
+
+❓Q7: console.log([] + []); 
+console.log([] + {});
+console.log({} + []);
+✅ Output:
+""
+"[object Object]"
+0   (in console behaves differently but JS sees unary + on {})
+
+❓Q8: console.log(!"");
+console.log(!"hello");
+✅ Output:
+true
+false
+👉 Reason -> Falsy vs truthy coercion
+
+
+########################################################
+🌊 Operators (Arithmetic, Logical, Comparison, Bitwise)
+########################################################
+🔷 Arithmetic Operators(+, -, *, /, %, ++, --, **)
+
+let a = 10;
+let b = 3;
+console.log(a + b); // 13
+console.log(a % b); // 1
+console.log(a ** 2); // 100
+
+👉 + also does string concatenation: "5" + 2 // "52"
+
+
+🔷 Comparison Operators
+Ordinary Comparisons(<, >, <=, >=)
+2 < 3  // true
+
+🔄 Equality
+| Operator | Behavior                          |
+| -------- | --------------------------------- |
+| `==`     | loose equality → coercion happens |
+| `===`    | strict equality → **no coercion** |
+"5" == 5   // true
+"5" === 5  // false
+👉 Always prefer === in interviews & real projects.
+
+
+🔷 Logical Operators(&&, ||, !)
+👉 They return the actual operand, not boolean always:
+console.log("A" && "B"); // "B"  (first truthy stops)
+console.log(0 || 42);    // 42   (returns first truthy)
+console.log(!"test");    // false
+
+🔄 Short-Circuiting
+1️⃣ && stops on first falsy
+2️⃣ || stops on first truthy
+
+Used commonly for:
+user && user.name // safe access
+name || "Guest"   // default value
+
+
+🔷 Bitwise Operators(&, |, ^, ~, <<, >>, >>>)
+Work on 32-bit signed integers.
+
+console.log(5 & 3); // 1   (AND)
+console.log(5 | 3); // 7   (OR)
+console.log(5 ^ 3); // 6   (XOR)
+console.log(~5);    // -6  (NOT --> -(n+1))
+console.log(5 << 1); // 10 (left shift)
+console.log(5 >> 1); // 2  (arith right shift)
+
+Zero-fill right shift (>>>)
+console.log(-5 >>> 1); // big positive number (fills zero from left)
+
+
+🔷 Trick Questions (Only Operator-Based)
+❓Q1: console.log(1 < 2 < 3);
+✅ Output: true
+( 1 < 2 → true → true < 3 → 1 < 3 → true )
+
+❓Q2: console.log(3 > 2 > 1);
+✅ Output: false
+( 3 > 2 → true → true > 1 → 1 > 1 → false )
+
+❓Q3: console.log("5" - 2);
+console.log("5" + 2);
+✅ Output:
+3   (number op)
+"52" (string op)
+
+❓Q4: console.log("hello" && 0 && "world");
+✅ Output:
+ 0 (stops on first falsy)
+
+❓Q5:console.log(0 || null || "Hi" || false);
+✅ Output:
+"Hi" (first truthy value)
+
+❓Q6: console.log(~0);
+✅ Output:
+ -1 (~n = -(n + 1))
+
+❓Q7: console.log(5 & 1);
+✅ Output:
+ 1 (Binary: 0101 & 0001)
+
+❓Q8:console.log(10 == [10]);
+console.log(10 === [10]);
+✅ Output:
+true   (array → "10" → number)
+false  (type mismatch)
+
+
+
+###########################
+🌊 Control Flow and Loops
+###########################
+🔷 Control Flow in JavaScript
+Control flow defines the order in which code is executed.
+
+🔷 Conditional Statements
+| Statement       | Usage                                     |
+| --------------- | ----------------------------------------- |
+| `if`            | Runs code only if condition is true       |
+| `if…else`       | Runs alternate code if condition is false |
+| `else if`       | Multiple conditions                       |
+| `switch`        | Compare value against multiple cases      |
+| Ternary (`? :`) | Short if-else for simple expressions      |
+
+✅ Example
+let age = 18;
+
+if (age > 18) {
+  console.log("Adult");
+} else if (age === 18) {
+  console.log("Just turned adult");
+} else {
+  console.log("Minor");
+}
+
+✅ Switch Example
+let day = 2;
+
+switch(day) {
+  case 1: console.log("Mon"); break;
+  case 2: console.log("Tue"); break;
+  default: console.log("Other day");
+}
+
+✅ Ternary Example
+let x = 10;
+let result = x > 5 ? "Greater" : "Smaller";
+console.log(result);
+
+
+🔷 Loops in JavaScript
+Loops help repeat tasks until a condition is met.
+| Loop Type    | Best Use Case                               |
+| ------------ | ------------------------------------------- |
+| `for`        | Known number of iterations                  |
+| `while`      | Loop until condition becomes false          |
+| `do…while`   | Runs at least once                          |
+| `for…of`     | Iterating over **arrays / iterable values** |
+| `for…in`     | Iterating over **object keys**              |
+| `.forEach()` | Array iteration (callback based)            |
+
+✅ For Loop Example
+for (let i = 0; i < 5; i++) {
+  console.log(i);
+}
+
+✅ While Loop Example
+let i = 0;
+while (i < 5) {
+  console.log(i);
+  i++;
+}
+
+✅ Do While Loop Example
+let i = 0;
+do {
+  console.log(i);
+  i++;
+} while (i < 5);
+
+✅ For of Loop Example
+const arr = [10, 20, 30];
+for (const item of arr) {
+  console.log(item);
+}
+
+✅ For in Loop Example
+const user = { name: "John", age: 20 };
+
+for (const key in user) {
+  console.log(key, user[key]);
+}
+
+✅ forEach Loop Example
+const nums = [1, 2, 3];
+
+nums.forEach((n, i) => {
+  console.log(`Index ${i}: ${n}`);
+});
+
+🔷 Loop Control Keywords
+| Keyword    | Purpose                                   |
+| ---------- | ----------------------------------------- |
+| `break`    | Stop the loop entirely                    |
+| `continue` | Skip current iteration & move to next one |
+
+✅ Example
+for (let i = 1; i <= 5; i++) {
+  if (i === 3) continue;
+  console.log(i);
+}
+✅ Output: 1,2,4,5
+
+
+
+######################################
+🌊 Error Handling (try, catch, throw)
+######################################
+JavaScript uses exceptions to handle errors in runtime
+The main keyword used:
+| Keyword   | Purpose                          |
+| --------- | -------------------------------- |
+| `try`     | Wraps code that may throw error  |
+| `catch`   | Handles the error if thrown      |
+| `throw`   | Manually create/customize errors |
+| `finally` | Runs always (success OR error)   |
+
+🔷 Basic Syntax
+try {
+  // Code that might cause an error
+} catch(err) {
+  // Handle the error
+} finally {
+  // Always runs (optional)
+}
+
+✅ Example: Handling an undefined variable
+try {
+  console.log(x); // x is not defined
+} catch (err) {
+  console.log("Error occurred:", err.message);
+} finally {
+  console.log("Execution completed");
+}
+
+🔷 Throwing Custom Errors
+Can throw any types: string, number, object, etc.
+function divide(a, b) {
+  if (b === 0) {
+    throw new Error("Cannot divide by zero");
+  }
+  return a / b;
+}
+
+try {
+  console.log(divide(10, 0));
+} catch (err) {
+  console.log(err.message);
+}
+
+🔷 finally Always Executes
+Even if there is a return inside try/catch,
+try {
+  return 10;
+} catch (err) {
+  return 20;
+} finally {
+  console.log("Cleanup action runs always!");
+}
+
+🔷 Error Types in JavaScript
+| Error Type     | Example Reason                  |
+| -------------- | ------------------------------- |
+| ReferenceError | Using undefined variable        |
+| TypeError      | Invalid data type operation     |
+| SyntaxError    | Code syntax mistake             |
+| RangeError     | Invalid length/range            |
+| EvalError      | Issues in eval()                |
+| URIError       | Wrong encodeURI/decodeURI usage |
+
+✅ Example
+let num=5;
+num.toUpperCase();
+✅ Output: TypeError: num.toUpperCase is not a function
+
+🔷 Custom Error Class
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
+function validateAge(age) {
+  if (age < 18) throw new ValidationError("User must be 18+");
+}
+
+try {
+  validateAge(15);
+} catch (err) {
+  console.log(err.name + ": " + err.message);
+}
+
+🔷 "use strict"- Strict Mode in JavaScript
+Strict mode enforces a stricter set of JavaScript rules to prevent silent bugs.
+
+Enabled by placing directive:
+"use strict";
+
+At top of file/function:
+function myFunction() {
+  //strict here
+}
+
+🔷 What Strict Mode fixes 
+1️⃣ Prevents implicit global variables
+"use strict";
+x = 10; // ❌ ReferenceError
+
+
+2️⃣ Disallows duplicate parameter names
+"use strict";
+function fn(a, a) {} // ❌ SyntaxError
+
+
+3️⃣ Prevents deletion of non-deletable properties
+"use strict";
+delete Object.prototype; // ❌ TypeError
+
+
+4️⃣ this in functions becomes undefined
+(No auto global binding)
+
+"use strict";
+function show() {
+  console.log(this); // undefined
+}
+show();
+👉 In non-strict → this = global object (window)
+
+
+5️⃣ Blocks usage of bad syntax like octal literals
+"use strict";
+let num = 010; // ❌ SyntaxError
+
+
+6️⃣ Prevents writing to read-only properties
+"use strict";
+const obj = {};
+Object.freeze(obj);
+obj.a = 10; // ❌ TypeError
+
+
+7️⃣ arguments.callee is forbidden
+"use strict";
+function x() {
+  console.log(arguments.callee); // ❌ TypeError
+}
+
+🔷 Why Do We Use Strict Mode?
+| Benefit               | Explanation                            |
+| --------------------- | -------------------------------------- |
+| Safer code            | Disallows silent failures              |
+| Fast performance      | Allows better engine optimizations     |
+| Cleaner scoping       | Prevents accidental globals            |
+| Early error detection | Shows errors that otherwise would hide |
+
+
+🔷 Trick Questions
+❓Q1: function test() {
+  console.log(this);
+}
+test();
+✅ Output:
+Non-strict: window
+Strict: undefined
+
+❓Q2:
+"use strict";
+function foo() {
+  bar = 5;
+}
+foo();
+console.log(bar);
+✅ Output:
+ ReferenceError (Implicit global is blocked)
+
+❓Q3:"use strict";
+var obj = { name: "A" };
+Object.defineProperty(obj, "name", { writable: false });
+obj.name = "B";
+console.log(obj.name);
+✅ Output:
+ TypeError thrown (Silent failure in non-strict)
+
+❓Q4: "use strict";
+function sum(a, a) {
+  return a + a;
+}
+sum(2, 3);
+✅ Output: SyntaxError — duplicate params not allowed
+
+❓Q5: "use strict";
+console.log(this);
+✅ Output: Browser → undefined in modules or functions, but at top-level inside script → still window (Node ─────────▶ {} in modules)
+
+🔷
+🔷
+🔷
+🔷🔷
+
+🔷🔷
+🔷
+
+🔷
+🔷
+
