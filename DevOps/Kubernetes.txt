@@ -1283,3 +1283,9 @@ Kubernetes:
 ➤ Deployment → manages Pods
 ➤ Never deploy Pods directly in production
 ➤ Deployment = scaling + self-healing + rolling updates
+
+
+
+##############################################################
+KUBERNETES SERVICES | DISCOVERY | LOAD BALANCING | NETWORKING
+##############################################################

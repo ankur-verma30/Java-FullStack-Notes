@@ -35,9 +35,58 @@ const c = 30;
 
 🔷 const != Immutable ❌ Misconception
 const obj = {name: "A"};
-obj.name = "B"; // ❌ Allowed! (mutation)
+obj.name = "B"; // ✅ Allowed! (mutation)
 obj = {}; // ❌ Error (reassignment)
-➤ To freeze an object, use Object.freeze(obj)
+➤ To freeze an object, use Object.freeze(obj);
+
+❄️ Object.freeze(obj) — What Exactly Happens?
+After freezing:
+✋ You cannot:
+❌ Add new properties
+❌ Remove existing properties
+❌ Change existing property values
+❌ Re-configure properties (writable/configurable becomes false)
+❌ Change the prototype
+❌ Modify nested objects (because freeze is shallow)
+
+👍 You can:
+✔️ Read property values
+✔️ Work with the same object reference
+
+✅ Example:
+const person = {
+  name: "John",
+  age: 25
+};
+
+Object.freeze(person);
+
+person.age = 30;      // ❌ Ignored (no effect in non-strict mode)
+person.city = "NY";   // ❌ Not added
+delete person.name;   // ❌ Not deleted
+
+console.log(person);  // { name: "John", age: 25 }
+
+👉 Freeze is shallow
+Nested objects are still mutable:
+const user = {
+  name: "Alex",
+  address: { city: "Delhi" }
+};
+
+Object.freeze(user);
+user.address.city = "Mumbai"; // ✔️ Allowed (inner object not frozen)
+
+To make everything frozen → deep freeze using recursive function:
+function deepFreeze(obj) {
+  Object.keys(obj).forEach(key => {
+    if (typeof obj[key] === "object" && obj[key] !== null) {
+      deepFreeze(obj[key]);
+    }
+  });
+  return Object.freeze(obj);
+}
+👉 In strict mode ─────────▶ JavaScript will throw a TypeError if modification is attempted.
 
 
 🔷 Closure + Loop Traps
@@ -720,13 +769,465 @@ sum(2, 3);
 console.log(this);
 ✅ Output: Browser → undefined in modules or functions, but at top-level inside script → still window (Node ─────────▶ {} in modules)
 
-🔷
-🔷
-🔷
-🔷🔷
 
-🔷🔷
-🔷
+###############################################
+🌊 Function Declaration vs Function Expression
+###############################################
+🔷 Function Declaration
+function add(a, b) {
+  return a + b;
+}
+
+🔄 Key Properties
+➤ Hoisted completely (function body available before declaration)
+➤ Can be called before it appears in code
+➤ Has its own function name binding
+➤ add(2, 3); // ✅ works
+
+
+🔷 Function Expression
+const add = function (a, b) {
+  return a + b;
+};
+
+🔄 Key Properties
+➤ Not hoisted as a function
+➤ Variable is hoisted (depends on var / let / const)
+➤ Callable only after assignment
+➤ add(2, 3); // ❌ ReferenceError / TypeError (before definition)
+
+
+🔷 Named vs Anonymous Function Expression
+const fn = function inner() {
+  console.log(inner.name);
+};
+fn();       // "inner"
+inner();    // ❌ ReferenceError
+
+➤ Name is scoped inside function only
+➤ Useful for recursion & debugging
+
+
+🔷 Hoisting Comparison
+sayHi(); // ✅ works
+function sayHi() {
+  console.log("Hi");
+}
+
+sayHi(); // ❌ TypeError
+var sayHi = function () {
+  console.log("Hi");
+};
+Reason:
+var sayHi;        // hoisted
+sayHi = function() {}; // assigned later
+
+
+🔷 Function Expression with let / const
+sayHi(); // ❌ ReferenceError (TDZ)
+const sayHi = function () {};
+
+
+🔷 When to Use Which
+| Scenario                   | Prefer               |
+| -------------------------- | -------------------- |
+| Utility / helper functions | Function Declaration |
+| Conditional functions      | Function Expression  |
+| Callbacks / closures       | Function Expression  |
+| Prevent hoisting misuse    | Function Expression  |
+
+
+🔷 Trick Questions
+❓Q1: foo();
+function foo() {
+  console.log("A");
+}
+var foo = function () {
+  console.log("B");
+};
+✅ Output: "A" (Function declaration wins during hoisting)
+
+❓Q2: bar();
+var bar = function () {
+  console.log("Hello");
+};
+✅ Output : TypeError (bar is undefined at call time)
+
+❓Q3: const test = function abc() {
+  console.log(typeof abc);
+};
+test();
+console.log(typeof abc);
+✅ Output:
+function
+undefined
+
+❓Q4: if (true) {
+  function x() {}
+}
+x(); // ?
+✅ Output:
+Non-strict: works (environment dependent)
+Strict mode: ❌ ReferenceError
+(Function declarations are block-scoped in strict)
+
+❓Q5: let fn = function () {};
+typeof fn;
+✅ Output: "function"
+
+
+####################
+🌊 Arrow Functions
+####################
+🔷 Syntax
+const add = (a, b) => a + b;
+
+Single param: x => x * 2
+No params: () => 42
+
+Block body (explicit return):
+(a, b) => {
+  return a + b;
+}
+
+🔷 Key Differences vs Normal Functions
+1️⃣ No own this
+➤ Arrow functions lexically bind this
+➤ this is taken from outer scope
+
+const obj = {
+  name: "A",
+  greet: () => {
+    console.log(this.name);
+  }
+};
+obj.greet(); // undefined
+
+
+✔ Correct usage:
+
+const obj = {
+  name: "A",
+  greet() {
+    setTimeout(() => {
+      console.log(this.name);
+    }, 100);
+  }
+};
+
+
+2️⃣ No arguments object
+const fn = () => {
+  console.log(arguments);
+};
+fn(1,2); // ❌ ReferenceError
+Use rest instead: const fn = (...args) => console.log(args);
+
+
+3️⃣ Cannot be used as constructor
+const A = () => {};
+new A(); // ❌ TypeError
+(No [[Construct]], no prototype)
+
+
+4️⃣ No hoisting
+sayHi(); // ❌ ReferenceError
+const sayHi = () => {};
+
+
+5️⃣ Implicit return
+const square = x => x * x;
+
+
+⚠️ Returning object needs parentheses:
+const getUser = () => ({ name: "A" });
+
+🔄 Valid Use Cases
+  ✔️ Callbacks
+  ✔️ Closures
+  ✔️ Functional utilities (map, filter)
+  ✔️ Preserving this inside async code
+
+❌ Avoid for:
+  ✔️ Object methods
+  ✔️ Constructors
+  ✔️ Event handlers needing dynamic this
+
+⚠️ Trick Questions 
+❓Q1:const obj = {
+  x: 10,
+  fn: () => console.log(this.x)
+};
+obj.fn();
+✅ Output: undefined
+
+❓Q2:const obj = {
+  x: 10,
+  fn() {
+    const arrow = () => console.log(this.x);
+    arrow();
+  }
+};
+obj.fn();
+✅ Output: 10
+
+❓Q3: const fn = () => ({});
+console.log(typeof fn());
+✅ Output: "object"
+
+❓Q4: const fn = () => {};
+console.log(fn.prototype);
+✅ Output: undefined
+
+❓Q5: (() => {
+  console.log(this);
+})();
+✅ Output:
+Browser (non-module): window
+Module / strict: undefined
+
+
+######################
+🌊 Default Parameter
+######################
+✔️ Basic Usage
+function greet(name = "Guest") {
+  return name;
+}
+greet();        // "Guest"
+greet("Ankur"); // "Ankur"
+👉 Default value is used only when argument is undefined.
+
+
+✔️ When Default Applies 
+function test(x = 10) {
+  return x;
+}
+test(undefined); // 10  ✅
+test(null);      // null ❌ (no default)
+test(0);         // 0
+
+
+✔️ Default Parameters Are Evaluated at Call Time
+let count = 0;
+function fn(x = ++count) {
+  return x;
+}
+fn(); // 1
+fn(); // 2
+
+
+✔️ Using Previous Parameters as Defaults
+function sum(a, b = a) {
+  return a + b;
+}
+sum(5); // 10
+❌ Not allowed (right → left only):
+function test(a = b, b = 5) {} // ReferenceError
+
+
+✔️ Default Parameters Create Their Own Scope
+let x = 10;
+function foo(a = x) {
+  let x = 20;
+  return a;
+}
+foo(); // 10
+(Default params evaluated before function body)
+
+
+✔️ Interaction with arguments
+function fn(a = 1) {
+  console.log(arguments.length);
+}
+fn();    // 0
+fn(5);   // 1
+Default params do NOT sync with arguments.
+
+
+✔️ Default + Destructuring
+function createUser({ name = "Guest" } = {}) {
+  return name;
+}
+createUser(); // "Guest" (Important real-world pattern)
+
+This pattern is used to safely extract values from objects/arrays while providing fallback defaults.
+
+✔️ Why It’s Needed
+
+Calling a function with:
+
+missing object
+
+missing properties
+
+would normally cause errors.
+
+✔️ Basic Pattern (Most Important)
+function createUser({ name = "Guest", age = 18 } = {}) {
+  console.log(name, age);
+}
+
+How it behaves:
+createUser(); 
+// name = "Guest", age = 18
+
+createUser({ name: "Ankur" });
+// name = "Ankur", age = 18
+
+✔️ What = {} Actually Does
+function fn({ a } = {}) {}
+
+Prevents this error:
+fn(); // ❌ Cannot destructure property 'a' of undefined
+= {} provides a safe fallback object
+
+✔️ Property-Level Defaults
+function test({ x = 10 }) {
+  console.log(x);
+}
+test({});        // 10
+test({ x: 5 });  // 5
+
+⚠️ Default applies only when property is undefined, not null.
+test({ x: null }); // null
+
+✔️ Nested Destructuring + Defaults
+function config({ server: { port = 3000 } = {} } = {}) {
+  console.log(port);
+}
+config(); 
+config({ server: {} });
+Both output: 3000
+
+✔️ Array Destructuring + Defaults
+function sum([a = 0, b = 0] = []) {
+  return a + b;
+}
+sum();        // 0
+sum([5]);     // 5
+sum([5, 3]);  // 8
+
+
+⚠️ Trick Questions
+❓Q1: function test(a = 10) {
+  console.log(a);
+}
+test(null);
+✅ Output: null
+
+❓Q2: function fn(a = 1, b = a) {
+  console.log(a, b);
+}
+fn(5);
+✅ Output: 5 5
+
+❓Q3: function fn(a = 1) {
+  a = 5;
+  console.log(a);
+}
+fn();
+✅ Output: 5 (Default only applies at call time)
+
+❓Q4: function test(a = 10) {
+  console.log(arguments[0]);
+}
+test();
+✅ Output: undefined
+
+❓Q5: let x = 100;
+function foo(a = x) {
+  let x = 200;
+  console.log(a);
+}
+foo();
+✅ Output: 100
+
+
+#######################
+🌊 High Order Function
+#######################
+A Higher-Order Function is a function that does at least one of the following:
+1️⃣ Takes one or more functions as arguments
+2️⃣ Returns a function
+
+✅ Example: Function as Argument
+function operate(a, b, operation) {
+  return operation(a, b);
+}
+operate(2, 3, (x, y) => x + y); // 5
+
+✅ Example: Function Returning Function
+function multiplier(factor) {
+  return function (num) {
+    return num * factor;
+  };
+}
+const double = multiplier(2);
+double(5); // 10
+
+
+✔️ Built-in Higher-Order Functions
+➤ map
+➤ filter
+➤ reduce
+➤ forEach
+➤ find
+➤ some
+➤ every
+
+[1, 2, 3].map(x => x * 2); // [2, 4, 6]
+
+🔄 Callback = Core of HOF
+function fetchData(callback) {
+  callback("data");
+}
+fetchData(result => console.log(result));
+➤ Callback is just a function passed to another function
+➤ All callbacks → HOF usage
+
+✅ Pure HOF Example
+const add = x => y => x + y;
+add(2)(3); // 5 (Returning function enables currying)
+
+✔️ Why HOFs Are Used
+1️⃣ Code reuse
+2️⃣ Abstraction
+3️⃣ Cleaner logic
+4️⃣ Functional programming style
+
+
+🔷 Trap Questions
+❓Q1: function hof(fn) {
+  return fn;
+}
+console.log(typeof hof(() => {}));
+✅ Output: "function"
+
+❓Q2: function hof(fn) {
+  fn();
+}
+hof(console.log("Hello"));
+✅ Output: "Hello" printed before hof is called (you passed result, not function)
+✅ Correct: hof(() => console.log("Hello"));
+
+❓Q3: const arr = [1, 2, 3];
+const result = arr.map(console.log);
+✅ Output:
+console.log receives (value, index, array)
+Output is unexpected → returns [undefined, undefined, undefined]
+
+❓Q4: const add = x => y => x + y;
+typeof add(5);
+✅ Output: "function"
+
+❓Q5: function test() {
+  return function () {
+    return 10;
+  };
+}
+test()(); // ?
+✅ Output: 10
 
 🔷
 🔷
