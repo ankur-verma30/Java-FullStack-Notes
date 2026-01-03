@@ -1229,6 +1229,317 @@ typeof add(5);
 test()(); // ?
 ✅ Output: 10
 
-🔷
-🔷
+
+##############
+🌊 Callbacks
+##############
+A callback is a function passed as an argument to another function and executed later.
+
+function greet(name, callback) {
+  callback(name);
+}
+
+greet("Ankur", n => console.log("Hello", n));
+
+🔄 Why Callbacks Exist
+1️⃣ Handle async operations
+2️⃣ Defer execution
+3️⃣ Control flow after an operation completes
+
+
+🔄 Synchronous Callbac
+Executed immediately.
+
+[1, 2, 3].forEach(x => console.log(x));
+
+
+🔄 Asynchronous Callback
+Executed later.
+
+setTimeout(() => {
+  console.log("Async");
+}, 1000);
+
+
+🔄 Callback Signature Matters
+Many JS APIs pass extra arguments.
+
+[10, 20].map((value, index, array) => value);
+
+
+🔄 Error-First Callback (Node.js pattern)
+function readData(callback) {
+  callback(null, "data");
+}
+
+readData((err, result) => {
+  if (err) return;
+  console.log(result);
+});
+✔️ err is always first
+✔️ If err exists → ignore result
+
+
+🔄 Callback Hell (Problem)
+setTimeout(() => {
+  setTimeout(() => {
+    setTimeout(() => {
+      console.log("Hell");
+    }, 1000);
+  }, 1000);
+}, 1000);
+✔️ Deep nesting
+✔️ Hard to read & maintain
+
+
+🔄 How Callback Hell Is Mitigated
+✔️ Named callbacks
+✔️ Promises
+✔️ async / await
+(Callbacks still exist under the hood)
+
+⚠️ Trap Questions
+❓Q1: function test(cb) {
+  cb();
+}
+test(console.log("Hi"));
+✅ Output:
+"Hi" prints immediately
+❌ Passed result, not callback
+🔄 Correct:
+test(() => console.log("Hi"));
+
+
+❓Q2: setTimeout(console.log("Hello"), 1000);
+✅ Output:
+Prints immediately
+Timeout receives undefined
+
+
+❓Q3: function hof(cb) {
+  return cb;
+}
+hof(() => 10)();
+✅ Output: 10
+
+
+❓Q4: try {
+  setTimeout(() => {
+    throw new Error("Error");
+  }, 1000);
+} catch (e) {
+  console.log("Caught");
+}
+❌ Error is not caught
+Callbacks run in a different call stack
+
+❓Q5: [1, 2, 3].map(parseInt);
+✅ Output:
+Unexpected result → [1, NaN, NaN]
+Because: parseInt(value, index)
+
+
+######################
+🌊 Function Currying
+######################
+Currying is the process of transforming a function with multiple arguments into a sequence of functions, each taking one argument.
+
+function add(a, b, c) {
+  return a + b + c;
+}
+
+🔄 Curried version:
+const add = a => b => c => a + b + c;
+add(1)(2)(3); // 6
+
+
+🔄 Why Currying Is Used
+➤ Partial application
+➤ Reusability
+➤ Function composition
+➤ Clean functional style
+
+
+🔄 Partial Application via Currying
+const multiply = a => b => a * b;
+
+const double = multiply(2);
+double(5); // 10
+
+
+🔄 Currying vs Normal Function Call
+add(1, 2, 3);   // ❌ not curried
+add(1)(2)(3);  // ✅ curried
+
+
+🔄 Currying Using Closures
+function curry(a) {
+  return function (b) {
+    return function (c) {
+      return a + b + c;
+    };
+  };
+}
+👉 Each inner function remembers previous arguments
+
+
+🔄 Generic Curry Function
+function curry(fn) {
+  return function curried(...args) {
+    if (args.length >= fn.length) {
+      return fn(...args);
+    }
+    return (...next) => curried(...args, ...next);
+  };
+}
+const sum = (a, b, c) => a + b + c;
+const curriedSum = curry(sum);
+
+curriedSum(1)(2)(3); // 6
+curriedSum(1, 2)(3); // 6
+
+
+⚠️ Trap Questions
+❓Q1: const add = a => b => a + b;
+add(2, 3);
+✅ Output: Returns a function, ignores 3
+
+
+❓Q2: const add = a => b => a + b;
+typeof add(5);
+✅ Output: "function"
+
+❓Q3: function sum(a, b, c) {
+  return a + b + c;
+}
+sum(1)(2)(3);
+✅ Output:
+❌ TypeError
+Function is not curried
+
+
+❓Q4: const multiply = a => b => a * b;
+multiply(2)(3)(4);
+✅ Output:
+ ❌ TypeError
+Extra function call on number
+
+
+❓Q5: const add = a => b => c => a + b + c;
+add(1, 2)(3);
+✅ Output:
+2 is ignored → returns function expecting b
+
+
+##################################################
+🌊 IIFE (Immediately Invoked Function Expression)
+##################################################
+An IIFE is a function expression that is executed immediately after it is defined.
+
+(function () {
+  console.log("IIFE");
+})();
+
+
+🔄 Why IIFE Exists
+➤ Create a private scope
+➤ Avoid global variable pollution
+➤ Execute code once immediately
+
+
+🔄 Function Expression Requirement
+❌ This is invalid:
+function test() {}();
+
+
+🔄 Must be an expression:
+(function test() {})();
+
+
+🔄 Arrow Function IIFE
+(() => {
+  console.log("Arrow IIFE");
+})();
+
+
+🔄 Passing Arguments to IIFE
+(function (name) {
+  console.log(name);
+})("Ankur");
+
+
+🔄 IIFE with Return Value
+const result = (function () {
+  return 10;
+})();
+console.log(result); // 10
+
+
+🔄 IIFE for Data Encapsulation
+const counter = (function () {
+  let count = 0;
+
+  return {
+    increment() {
+      count++;
+    },
+    getCount() {
+      return count;
+    }
+  };
+})();
+✔️ count is private
+✔️ Public methods exposed
+
+
+🔄 Multiple IIFEs (Semicolon Trap)
+(function () {
+  console.log("First");
+})();
+
+(function () {
+  console.log("Second");
+})();
+❗ Missing semicolon before second IIFE can break execution
+
+
+⚠️ Trap Questions 
+❓Q1: (function () {
+  var a = 10;
+})();
+console.log(a);
+✅ Output: ❌ ReferenceError
+
+
+❓Q2: (function () {
+  console.log(this);
+})();
+✅ Output:
+✔️ Non-strict → window
+✔️ Strict mode → undefined
+
+
+❓Q3: (() => {
+  console.log(this);
+})();
+✅ Output: Arrow IIFE inherits this from outer scope
+
+
+❓Q4: (function (a) {
+  console.log(a);
+})();
+✅ Output: undefined
+
+
+❓Q5: +function () {
+  console.log("IIFE");
+}();
+✅ Output: Valid IIFE using unary operator (+)
+
+
+🔄 Valid IIFE Syntax Variants
+(function(){})()
+(function(){}())
+!function(){}()
++function(){}()
 
