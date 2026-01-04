@@ -356,7 +356,7 @@ public class A {
 #####################
 🔷 Static variables
 #####################
-A static variable is a class-level variable, meaning:
+A static variable is a class-level variable.
 ➤ It belongs to the class, not the object.
 ➤ It is shared among all instances of the class.
 ➤ Only one copy exists in memory, regardless of how many objects are created.
@@ -409,15 +409,15 @@ public class Demo {
         System.out.println(PI);       // instead of Math.PI
     }
 }
-
 Outside the class, you need to use either:
 ➤ ClassName.x (best), or
 ➤ object.x (works but discouraged).
 
+
 3️⃣ objectAddress.variableName (Wrong Approach, but will work)
-➤This works because the object refers to the class, and the static variable belongs to the class.
-➤When you do a1.x, Java still resolves it as A.x internally.
-➤But it's misleading because it looks like x is instance-specific when it's shared across all instances.
+➤ This works because the object refers to the class, and the static variable belongs to the class.
+➤ When you do a1.x, Java still resolves it as A.x internally.
+➤ But it's misleading because it looks like x is instance-specific when it's shared across all instances.
 
 🔁 Bonus Tip:
 A a1 = null;
@@ -440,7 +440,7 @@ public class A {
 
 
 🔷 Types of variables in Java
-1. Local Variable
+1️⃣ Local Variable
 ➤ Local variables should be created inside methods
 ➤ We should use local variables within the created method only
 ➤ Without initialization, if you are using a local variable, you will get an error.
@@ -463,7 +463,8 @@ public class A {
         System.out.println(A.y);	//✅ Correct because y is a static variable
 	}
 }
-✅ Question based on Local Variable
+
+✅ Trap Question based on Local Variable
 public class Test {
     public static void main(String[] args) {
         int x = 100;
@@ -473,54 +474,55 @@ public class Test {
         }
     }
 }
-
 ➤ The code will give a compile-time error, but not because of creating a new scope — that is allowed in Java.
 The actual issue is:
 ➤ You are declaring two local variables with the same name, x, in overlapping scopes.
 ➤ Even though you're trying to redeclare int x = 200; in an inner block, Java does not allow hiding a local variable in an inner block with the same name.
 👉 Also each method has its stack frame, and local variables are stored there, so naming conflicts like this are not allowed even in nested blocks.
 
-2. Static variable
-🔎 Do we need to initialize?
-➤ No, it’s not mandatory.
+
+2️⃣ Static variable
+➤ It’s not mandatory to initialize the static variable.
 ➤ If you don’t initialize, Java provides default values:
 	✔️ 0 → numeric types (int, long, double, etc.)
 	✔️ false → boolean
 	✔️ null → reference types
 
-📌 Where are static variables stored in Java?
+
+🔄 Storage of Stack Variables
 ➤ In Java, memory is divided into different areas managed by the JVM (Java Virtual Machine):
-➤ Heap → For objects.
-➤ Stack → For local variables and method calls.
-➤ Method Area / Metaspace (Java 8+) → For class-level data like:
+➤ Heap ─────────▶ For objects.
+➤ Stack ─────────▶ For local variables and method calls.
+➤ Method Area / Metaspace (Java 8+) ─────────▶ For class-level data like:
 	✔️ Class metadata (name, methods, fields)
 	✔️ Static variables
 	✔️ Constant pool
 ➤ PC Register → Keeps track of execution in threads.
 ➤ Native Method Stack → For native (C/C++) calls.
 
-3. Non-static variable/instance variable
 
-4. Reference Variable
-A reference variable in Java is a variable that stores the memory address (reference) of an object, not the actual object itself.
+3️⃣ Non-static variable/instance variable
+4️⃣ Reference Variable
+A reference variable in Java is a variable that stores the memory address(reference) of an object, not the actual object itself.
 a. Can hold either an Object address or a null value.
-b. The datatype of the reference variable is the class. 
+b. The datatype of the reference variable is the class.
 
 In the example below, "a1" is created inside main, hence it is a local variable. We cannot access that outside the main method
 ⚡ If we do not initialize a static reference variable, then by default null value will be stored in it.
-✅Example : 
+✅ Example:
 public class A {
-	static A a4;  //null
+	static A a4;  ─────────▶ null
 	public static void main(String[] args) {
 		A a1 = null;
 		A a2 = new A();
-    		A a3; // Reference Local Variable
-    		System.out.println(a3);// Error because "a3" is local variable and not initialized   
+    	A a3; ─────────▶ Reference Local Variable
+    	System.out.println(a3); ─────────▶ Error because "a3" is local variable and not initialized
 	}
   	public void test() {
-		System.out.println(a1);//Error
+		System.out.println(a1); ─────────▶ Error
 	}
 }
+
 
 🧱 Stack Memory – LIFO (Last In First Out)
 ➤ Stores:
@@ -531,17 +533,23 @@ public class A {
 ➤ Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
 ➤ Faster but limited in size.
 
-🧠 Example:
+✅ Example:
 When a method is called, its variables go on the stack. When it returns, they’re removed.
 
-🗃️ Heap Memory
+
+################
+🌊 Heap Memory
+################
 ➤ Used to store objects/instance variables.
 ➤ Every time you do new ClassName(), it creates an object in the heap.
 ➤ Objects stay in memory until they're no longer referenced.
 
-📍 Note: All reference variables (in the stack) point to objects in the heap.
+⚡ Note: All reference variables (in the stack) point to objects in the heap.
 
-🧠 What is Garbage Collection in Java?
+
+###############################
+🌊 Garbage Collection in Java
+###############################
 ➤ Garbage Collection is a process by which the Java Virtual Machine (JVM) automatically removes unused objects (objects that are no longer reachable) from memory to free up space and avoid memory leaks.
 ➤ Java developers don’t manually free memory (unlike in C/C++). Instead, the Garbage Collector (GC) handles it.
 
@@ -556,23 +564,27 @@ When a method is called, its variables go on the stack. When it returns, they’
 ➤ You can suggest GC using System.gc(), but the JVM may ignore it.
 ➤ Only Heap memory is subject to GC.
 
-🔍 Object Lifecycle in Java
-1. The object is created using new
-2. The reference variable holds the object
-3. Once the reference is lost or goes out of scope, the object becomes unreachable
-4. JVM marks it as garbage
-5. GC reclaims that memory
 
+🔷 Object Lifecycle in Java
+1️⃣ The object is created using new
+2️⃣ The reference variable holds the object
+3️⃣ Once the reference is lost or goes out of scope, the object becomes unreachable
+4️⃣ The JVM marks it as garbage
+5️⃣ GC reclaims that memory
+
+
+####################
 🔷 Methods in Java
-1. void keyword: A void method cannot return any value
+####################
+void keyword: A void method cannot return any value
 
 ✅ Example :
 public class C {
 	public static void main(String[] args) {
 		C c1 = new C();
-		int x = c1.test1(); //Error
+		int x = c1.test1(); ─────────▶ Error
     		int y= c1.test2();
-		System.out.println(y);// Output :100
+		System.out.println(y); ─────────▶ Output :100
 	}
 	public void test1() {
 		return 100;//Error
@@ -581,6 +593,7 @@ public class C {
 		return 100;
   	}
 }
+
 
 🔄 Return without value vs Return value in Java
 The difference between return and return value lies in what you're returning and why.
@@ -604,7 +617,8 @@ public class C {
 	      System.out.println(200);
 	}
 }
-Output: unreachable code error
+✅ Output: unreachable code error
+
 
 🔄 Returning "value"
 ➤ The method has to be non-void.
@@ -613,10 +627,10 @@ Output: unreachable code error
 
 public class C {
 	public static void main(String[] args) {}
-	public int test1() {}// Error
+	public int test1() {} ────────────────▶ Error
   	public int test2() {
 		return 100; 
-		System.out.println(300);// Unreachable code error
+		System.out.println(300); ────────────────▶ Unreachable code error
 	}
 }
 
@@ -640,7 +654,6 @@ public class C {
 	  System.out.println(x);
 	}
 }
-
 👉 Note: When the method argument type is Object, then we can supply any value to it.
 
 ✅ Example
