@@ -700,11 +700,12 @@ public class C {
 	}
 }  
 
-
+###################
 🔷 Java Data Types 
+###################
 Java data types are divided into 2 main categories:
 
-🔄 1. Primitive Data Types (8 types)
+1️⃣ Primitive Data Types (8 types)
 Built-in, fixed-size types that store actual values directly.
 
 🔸 Integer Types (for whole numbers)
@@ -733,7 +734,8 @@ Type	    Size	            Default Value	          Description
 boolean	    (JVM dependent)	    false                   Only true or false
 char	    2 bytes	            ' ' (blank)	            0 to 65,535 (Unicode characters)
 
-🔄 2. Non-Primitive / Reference Data Types
+
+2️⃣ Non-Primitive / Reference Data Types
 Type	               Description	                        Default Value
 String	        A class (sequence of characters)	          null
 Array	        Object that holds multiple values	          null
@@ -744,6 +746,32 @@ String is not a primitive type, but a class in java.lang package.
 All reference types default to null.
 ➤ Use long literals with L or l: long x = 123456789L;
 ➤ Use float literals with F or f: float y = 3.14F;
+
+
+################
+🔷 String Pool
+################
+Creating a String object with new String("literal") always creates two distinct String instances: one in the heap (the actual object referenced by your variable) and one in the String Constant Pool (the literal itself).
+​
+🔄 Object Creation Process
+When executing String s1 = new String("Hello");, Java first checks the String pool for "Hello". 
+Since it's a literal, JVM creates it in the pool if absent, then new String() allocates a separate copy in heap memory, referencing the pool's char array internally. 
+The variable s1 points to the heap object, not the pool one, so s1 == "Hello" returns false despite identical content.
+​
+✅ Memory Layout Example
+String pool: ["Hello"] ← Literal created first
+Heap: [String object → references pool's "Hello"] ← new String() object
+A second String s2 = new String("Hello"); creates another heap object (total 3 Strings: 1 pool + 2 heap), proving new bypasses pooling. Use intern() on heap objects to return pool reference and save memory.
+​
+❓ Why two objects?
+Literal mandates pool entry for sharing; new guarantees distinct heap instance for explicit control.
+​​
+🔗 Verification Code
+String s1 = new String("Hello");
+String s2 = "Hello";
+System.out.println(s1 == s2);       // false (different objects)
+System.out.println(s1.intern() == s2); // true (both pool refs)
+
 
 🔄 A new type was introduced in Java version 10
 🟢 var type
@@ -771,7 +799,10 @@ public class C {
 ➤ It cannot be a method argument
 ➤ It cannot be a method return type
 
+
+###################
 🔷 Wrapper Classes
+###################
 ➤ Java is object-oriented, but primitive types (int, float, char, etc.) are not objects.
 ➤ To treat them as objects, Java provides Wrapper Classes in the java.lang package.
 ➤ A wrapper class wraps (encloses) a primitive type inside an object.
@@ -876,7 +907,10 @@ b → new Integer(128)
 ❓ What is the default value of Integer vs int?
  int → 0, Integer → null
 
+
+########################
 🔷 Constructors in Java
+########################
 Constructors are special methods used to initialize objects when they are created.
 
 🔄 Basic Rules:
@@ -894,10 +928,12 @@ public class C {
 		C c1 = new C();
 	}	
 }
-
 ⚡ Note: Method, Variable name can be the same as the class name
 
-🔁 Constructor Overloading in Java
+
+###################################
+🔷 Constructor Overloading in Java
+###################################
 Constructor overloading refers to having more than one constructor in the same class, but with different parameter lists.
 
 ✅ Why Use Constructor Overloading?
@@ -922,11 +958,14 @@ public class A {
 	}
 }
 
+
+########################
 🔷 This keyword in Java
+########################
 This keyword in Java is a reference variable that refers to the current object — the object whose method or constructor is being executed.
 
 🔄 Uses of this Keyword
-1. Differentiate Between Instance and Local Variables
+1️⃣ Differentiate Between Instance and Local Variables
 When local variable names are the same as instance variables, use this to refer to the instance variable.
 ✅ Example:
 class Student {
@@ -936,7 +975,7 @@ class Student {
     }
 }
 
-2. Call One Constructor from Another (Constructor Chaining)
+2️⃣ Call One Constructor from Another (Constructor Chaining)
 Use this() to call another constructor within the same class.
 ✅ Example:
 class Student {
@@ -951,7 +990,7 @@ class Student {
     }
 }
 
-3. Pass the Current Object as an Argument
+3️⃣ Pass the Current Object as an Argument
 ✅ Example:
 class Student {
     void display() {
@@ -964,7 +1003,7 @@ class Helper {
     }
 }
 
-4. Return Current Object
+4️⃣ Return Current Object
 Useful in method chaining.
 ✅ Example:
 class Person {
@@ -989,7 +1028,7 @@ class Person {
     }
 }
 
-5. Access Instance Methods and Variables
+5️⃣ Access Instance Methods and Variables
 You can use this to call other instance methods or access fields within the class explicitly.
 
 void print() {
@@ -1119,7 +1158,7 @@ public class A {
 ✅ Types of Constructor Chaining
 ➤ When we call one constructor from another constructor, it will form a chain-like flow structure. This is called constructor chaining.
 
-🔸 1. Within the Same Class → Use this().
+1️⃣ Within the Same Class → Use this().
 You can use this() to call another constructor in the same class.
 ✅ Example:
 class Student {
@@ -1148,7 +1187,8 @@ class Student {
 The parameterized constructor called  
 The default constructor is called 
 
-🔸 2. From Subclass to Superclass → Use super()
+
+2️⃣ From Subclass to Superclass → Use super()
 You can call a constructor from the parent class using super().
 ✅ Example:
 class Person {
@@ -1169,15 +1209,18 @@ class Student extends Person {
 ✅ Must be the first statement in the constructor	
 ❌ Cannot mix this() and super() in the same constructor
 
+
+#####################
 📦 Packages in Java
+#####################
 A package in Java is a namespace that organizes classes and interfaces into a structured folder system, making code modular, reusable, and easy to manage.
 
 🔷 Naming Convention for packages
-➤ ❌ Package name cannot be a keyword like - new, static, public, etc...
-➤ ❌ Do not start the package name with capital letters
-➤ ❌ Package name not to be given as java
-➤ When you create a class inside a package, you have to define the package keyword in your program as shown below:
+❌ Package name cannot be a keyword like - new, static, public, etc...
+❌ Do not start the package name with capital letters
+❌ Package name not to be given as java
 
+➤ When you create a class inside a package, you have to define the package keyword in your program as shown below:
 ✅ Example:
 package p1;
 public class A {}
@@ -1247,12 +1290,15 @@ public class B {
 }
 
 🔷 Object-Oriented Programming 
-a. Inheritance
-b. Polymorphism
-c. Encapsulation
-d. Abstraction
+1️⃣ Inheritance
+2️⃣ Polymorphism
+3️⃣ Encapsulation
+4️⃣ Abstraction
 
+
+################
 🌟 Inheritance
+################
 ✔️ Inheritance is one of the core pillars of Object-Oriented Programming (OOP).
 ✔️ It allows a class (subclass) to inherit fields and methods from another class (superclass).
 
@@ -1295,8 +1341,9 @@ public class Root {
 	}
 }
 
- 🔄 Multilevel inheritance
-Example:
+
+🔄 Multilevel inheritance
+✅ Example:
 package app_java_1;
 public class A {
 	public void test1() {
@@ -1318,6 +1365,7 @@ public class C extends B{
 	}
 }
 
+
 🔄 Multiple inheritance
 When a child class has more than one parent class, it is called multiple inheritance
 ➤ Java classes do not support multiple inheritance because of the diamond problem.
@@ -1328,7 +1376,7 @@ When a child class has more than one parent class, it is called multiple inherit
 
 Note: We can do multiple inheritance on an interface.
 
-Example: Multiple inheritance error❌
+✅ Example: Multiple inheritance error❌
 package app_java_1;
 public class A {}
 
@@ -1338,6 +1386,7 @@ public class B{}
 package app_java_1;
 public class C extends A, B{ ❌Error	
 }
+
 
 🔷 Access Specifiers in Java
 | Access Context                | `public` |         `protected`          | `default` (no modifier)   | `private`  |
@@ -1349,31 +1398,33 @@ public class C extends A, B{ ❌Error
 | Subclass in Other Package     |     ✅   | ✅ (via inheritance only)   |            ❌            |     ❌     |
 | Non-Subclass in Other Package |     ✅   |              ❌             |            ❌            |     ❌     |
 
-a. private: When a variable/method is made private, then we can access it in the same class but not outside the class
-b. default: A variable/method with a default access specifier can work only inside the same class or the same package, but cannot be accessed in a different package
-c. protected: We can access variables/methods in the same class/same package, and inside different packages only when inheritance is done
-d. public: When we make a variable/method public, then we can access that in the same class/the same package/different package
+1️⃣ private: When a variable/method is made private, then we can access it in the same class but not outside the class
+2️⃣ default: A variable/method with a default access specifier can work only inside the same class or the same package, but cannot be accessed in a different package
+3️⃣ protected: We can access variables/methods in the same class/same package, and inside different packages only when inheritance is done
+4️⃣ public: When we make a variable/method public, then we can access that in the same class/the same package/different package
+
 
 🔷 Access Specifier on Constructors
-❗Can we inherit the Constructor?
+❓ Can we inherit the Constructor?
 No, constructors cannot be inherited in Java.
 Even though a subclass gets access to all public and protected members of the superclass, constructors are not part of inheritance.
 
-🔍 Why Are Constructors Not Inherited?
-✅ 1. Constructors are not members
+❓ Why Are Constructors Not Inherited?
+1️⃣ Constructors are not members
 Constructors are not inherited because they are not class members, such as methods or fields.
 
-✅ 2. Constructors are class-specific
+2️⃣ Constructors are class-specific
 A constructor is tightly bound to its class name.
 
-✅ 3. Subclass should define how it initializes its members
+3️⃣ Subclass should define how it initializes its members
 A subclass may have new fields or different logic for initialization.
 Therefore, it requires a constructor to control its initialization.
 
-✅ 4. Java automatically provides a default constructor
+4️⃣ Java automatically provides a default constructor
 If you don't define any constructors, Java will insert a default no-arg constructor.
 But this doesn't mean the superclass constructor is inherited — it's just that Java calls the superclass constructor from the subclass constructor.
 They are special blocks used to initialize objects of a specific class.
+
 
 🔐 Private Constructor in Java
 A private constructor is a constructor that cannot be accessed outside its class.
@@ -1383,6 +1434,7 @@ A private constructor is a constructor that cannot be accessed outside its class
 ✅ Implement Singleton Pattern		Ensure only one instance is created
 🔐 Hide object instantiation		Force object creation through factory methods
 ➤ If a constructor is made private, then its object cannot be created outside the class.
+
 
 🔁 Singleton Pattern Implementation
 ➤ A Singleton pattern is a design pattern that ensures that a class has only one instance, and provides a global point of access to it.
@@ -1396,21 +1448,24 @@ public class A {
 		A a1 = new A();
 	}
 }
+
 package p1;
 public class B {
 	public static void main(String[] args) {
-		A a1 = new A();//--->Error
+		A a1 = new A(); ─────────▶ Error❌
 	}
 }
+
 package p2;
 import p1.A;
 public class C {
 	public static void main(String[] args) {
-		A a1 = new A();//-->Error
+		A a1 = new A(); ─────────▶ Error❌
 	}
 }
-
 ➤ When a constructor is made private, then inheritance of that class is not allowed
+
+
 ✅ Example 2:
 package p1;
 public class A {
@@ -1418,13 +1473,14 @@ public class A {
 }
 
 package p1;
-public class B extends A{//-->Error	
+public class B extends A{ ─────────▶Error❌	
 }
 
 package p2;
 import p1.A;
-public class C extends A{//-->Error	
+public class C extends A{ ─────────▶Error❌	
 }
+
 
 🏗️ Default Constructor in Java
 A default constructor is a no-argument constructor that the Java compiler automatically provides if you do not define any constructors in your class.
@@ -1437,7 +1493,7 @@ Initializes variables,			sets fields to default values (e.g., 0, null)
 Used for object creation		Allows creation of objects without parameters
 ➤ If a constructor is made default, then its object can be created in the same class/same package, but not outside the package.
 
-Example 1:
+✅ Example 1:
 package p1;
 public class A {
 	A() {}
@@ -1459,7 +1515,8 @@ public class C{
 	}
 }
 
-Example 2:
+
+✅ Example 2:
 package p1;
 public class A {
 	A() {}
@@ -1471,6 +1528,7 @@ package p2;
 import p1.A;
 public class C extends A{//-->Error	
 }
+
 
 🔐 Protected Constructor in Java
 A protected constructor means the constructor can only be accessed:
@@ -1506,6 +1564,7 @@ public class C {
 	}
 }
 ➤ When a constructor is made protected, then inheritance of that class is allowed in the same package / outside the package (both).
+
 
 ✅ Example 2:
 package p1;
