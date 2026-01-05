@@ -1380,6 +1380,188 @@ http://localhost:8080/actuator/metrics/resilience4j.circuitbreaker.calls
 
 
 
+
+🔷 Send Email Using Spring Boot
+1️⃣ Add Dependency
+
+If you’re using Maven:
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+
+2️⃣ Configure application.properties
+
+For Gmail SMTP:
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_app_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.debug=true
+spring.mail.default-encoding=UTF-8
+
+⚠️ Use an App Password for Gmail, not your normal password.
+
+3️⃣ Create a Mail Service
+Plain Text Email
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MailService {
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    public void sendSimpleEmail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        message.setFrom("your_email@gmail.com");
+
+        mailSender.send(message);
+        System.out.println("✅ Email sent successfully to " + to);
+    }
+}
+
+HTML Email with Attachment
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import java.io.File;
+
+@Service
+public class AdvancedMailService {
+
+    private final JavaMailSender mailSender;
+
+    public AdvancedMailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void sendHtmlEmailWithAttachment(String to, String subject, String htmlBody, String filePath) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlBody, true); // true = HTML
+        helper.setFrom("your_email@gmail.com");
+
+        FileSystemResource file = new FileSystemResource(new File(filePath));
+        helper.addAttachment(file.getFilename(), file);
+
+        mailSender.send(message);
+        System.out.println("✅ HTML Email with attachment sent to " + to);
+    }
+}
+
+
+
+🔷 Scheduling Tasks with Cron Jobs in Spring Boot
+🔄 Enabling Scheduling
+Before you can schedule tasks, you must enable scheduling in your Spring Boot application.
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EnableScheduling  // ✅ Enables Spring’s scheduling capability
+public class SchedulerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SchedulerApplication.class, args);
+    }
+}
+
+🔄 Creating a Scheduled Task
+You can schedule any method to run automatically using the @Scheduled annotation.
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EmailScheduler {
+
+    // Runs every 10 seconds
+    @Scheduled(fixedRate = 10000)
+    public void sendEmailReminder() {
+        System.out.println("Sending reminder email at: " + java.time.LocalTime.now());
+    }
+}
+
+🔄 Using Cron Expressions
+For more flexible scheduling, you can use a cron expression.
+
+@Component
+public class CronJobScheduler {
+
+    // Runs every day at 10:30 AM
+    @Scheduled(cron = "0 30 10 * * ?")
+    public void runDailyReport() {
+        System.out.println("Running daily report at: " + java.time.LocalTime.now());
+    }
+}
+
+🔄 Cron Expression Format
+┌───────────── second (0–59)
+│ ┌───────────── minute (0–59)
+│ │ ┌───────────── hour (0–23)
+│ │ │ ┌───────────── day of month (1–31)
+│ │ │ │ ┌───────────── month (1–12)
+│ │ │ │ │ ┌───────────── day of week (0–6) (Sunday=0 or 7)
+│ │ │ │ │ │
+│ │ │ │ │ │
+* * * * * *
+
+✅ Examples
+Cron Expression	Meaning
+| Cron Expression      | Meaning                               |
+| -------------------- | ------------------------------------- |
+| `0 * * * * *`        | Every minute                          |
+| `0 0 * * * *`        | Every hour                            |
+| `0 0 10 * * *`       | Every day at 10 AM                    |
+| `0 0 10 * * MON-FRI` | Every weekday at 10 AM                |
+| `0 */5 * * * *`      | Every 5 minutes                       |
+| `0 0 0 1 * *`        | On the 1st of every month at midnight |
+
+
+🔄 Scheduling with Zone and Initial Delay
+You can specify time zones or add a delay before execution.
+
+@Component
+public class ReportScheduler {
+
+    // Runs at 9 AM in IST time zone
+    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Kolkata")
+    public void generateReport() {
+        System.out.println("Generating report at: " + java.time.ZonedDateTime.now());
+    }
+
+    // Runs 10 seconds after startup, then every 30 seconds
+    @Scheduled(initialDelay = 10000, fixedRate = 30000)
+    public void sendStartupNotification() {
+        System.out.println("Running after startup: " + java.time.LocalTime.now());
+    }
+}
+
+🔄 Use Cases
+➤ Sending periodic emails (daily reports, reminders)
+➤ Cleaning up database logs
+➤ Generating reports
+➤ Triggering backup jobs
+➤ Running batch processes
+
+
 🔷 Spring Boot With Redis Cache Integration
 1️⃣ Redis
 Redis (Remote Dictionary Server) is an in-memory key–value data store.

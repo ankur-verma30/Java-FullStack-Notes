@@ -301,7 +301,37 @@ Content-Length: 1234
 | **DELETE** | Delete a resource.                                |
 | **HEAD**   | Same as GET but returns only headers.             |
 
+=====================
 🔹 HTTP Status Codes
+======================
+
+➤ An HTTP status code is a three-digit numeric code returned by a web server as parto of the response to an HTTP request made by a client.
+➤ These status codes are used to convey information about the result or status of the requested operation.
+➤ HTTP status codes are grouped into five categories based on the first digit of the code:
+1️⃣ 1xx (Informational): These status codes indicate that the request was received and understood, and the server is continuing to process it.
+These are typically used for informational purposes and are not commonly seen in everyday web interactions.
+
+2️⃣ 2xx (Successful): These status codes indicate that the request was successfully received, understood, and accepted by the server.
+  ✔️ 200 OK: The request has been successfully processed, and the server is returning the requested resource.
+  ✔️ 201 Created: The request has been fulfilled, resulting in the creation of a new resource.
+  ✔️ 204 No Content: The request has been fulfilled, but there is no response body(typically used for operation that don't return data, like a DELETE request).
+
+3️⃣ 3xx (Redirection): These status codes indicate that further action is needed to complete the request. These are used when the client needs to take additional steps to access the requested resource.
+  ✔️ 301 Moved Permanently: The requested resource has been permanently moved to a new URL.
+  ✔️ 302 Found: The requested resource is temporarily located at a different URL.When server sends a response with a 302 status code, it typically includes a Location header that specifies the new URL where the resource can be found. The client is expected to make a new request to this URL to access the resource.
+  ✔️ 304 Not Modified: The resource has not been modified since the last request. The client can use its cached version.
+
+4️⃣ 4xx (Client Error): It indicates that there was an error on the client's side, such as malformed request or authentication issues.
+  ✔️ 400 Bad Request: The server cannot process the request due to client error (e.g., malformed request syntax).
+  ✔️ 401 Unauthorized: Authentication is required and has failed or has not yet been provided.
+  ✔️ 403 Forbidden: The server understands the request but refuses to authorize it.
+  ✔️ 404 Not Found: The requested resource could not be found on the server.
+
+5️⃣ 5xx (Server Error): The server failed to fulfill a valid request.
+  ✔️ 500 Internal Server Error: A generic error message indicating that the server encountered an unexpected condition.
+  ✔️ 502 Bad Gateway: The server received an invalid response from an inbound server while acting as a gateway or proxy.
+  ✔️ 503 Service Unavailable: The server is currently unable to handle the request due to temporary overload or maintenance.
+
 | Code Range | Meaning       | Example                        |
 | ---------- | ------------- | ------------------------------ |
 | **1xx**    | Informational | 100 Continue                   |
@@ -352,6 +382,104 @@ Accept: application/json
 
 2️⃣ HTTP Response
 An HTTP response is the message sent by the server back to the client after processing the request.
+
+
+
+🔷 Headers in HTTP
+➤ HTTP Headers are key-value pairs sent between the client and server in an HTTP request or response.
+➤ They carry metadata about the request/response — such as content type, authorization token, user agent, etc.
+
+✅ Example of Common HTTP Headers
+GET /api/weather HTTP/1.1
+Host: api.weatherstack.com
+Authorization: Bearer abc123
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.32.2
+
+👉 Here:
+    ✔️ Authorization → carries credentials or API keys
+    ✔️ Content-Type → tells the server the data format (JSON, XML, etc.)
+    ✔️ User-Agent → describes the client making the request
+
+🔷 Pass Headers in Code (Spring Boot using RestTemplate)
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class WeatherService {
+
+    private static final String API = "https://api.weatherstack.com/current?access_key={key}&query={city}";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public WeatherResponse getWeather(String apiKey, String city) {
+
+        // 1️⃣ Create headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/json"); // tells server to respond in JSON
+        headers.set("User-Agent", "SpringBootApp");
+        headers.set("Authorization", "Bearer some_token_here"); // example of passing token
+
+        // 2️⃣ Build HttpEntity (headers + body)
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // 3️⃣ Send request
+        ResponseEntity<WeatherResponse> response = restTemplate.exchange(
+                API,
+                HttpMethod.GET,
+                entity,                // includes headers
+                WeatherResponse.class,
+                apiKey, city           // replaces placeholders in URL
+        );
+
+        // 4️⃣ Return only body
+        return response.getBody();
+    }
+}
+
+
+🔄 Sending Headers + Body in a POST request
+String url = "https://api.example.com/users";
+
+// 1️⃣ Create headers
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.APPLICATION_JSON);
+headers.set("Authorization", "Bearer xyz123");
+
+// 2️⃣ Create request body
+User user = new User("Ankur", "ankur@example.com");
+
+// 3️⃣ Combine headers and body
+HttpEntity<User> entity = new HttpEntity<>(user, headers);
+
+// 4️⃣ Make POST request
+ResponseEntity<String> response = restTemplate.exchange(
+        url,
+        HttpMethod.POST,
+        entity,
+        String.class
+);
+
+🔄 Key Classes for HTTP Headers in Spring
+| Class                   | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| `HttpHeaders            | Represents HTTP header values                      |
+| `HttpEntity<T           | Represents request entity (headers + body)         |
+| `ResponseEntity<T       | Represents the response (status, headers, body)    |
+| `MediaType              | Helps specify content type like `application/json` |
+
+
+🔄 Common HTTP Headers and Their Purposes
+| Header          | Purpose                                                           |
+| --------------- | ----------------------------------------------------------------- |
+| `Content-Type`  | Tells server what type of data is being sent (`application/json`) |
+| `Accept`        | Tells server what response format client expects                  |
+| `Authorization` | Sends tokens, API keys, or credentials                            |
+| `User-Agent`    | Identifies client making the request                              |
+| `Cache-Control` | Caching policies                                                  |
+| `Custom-Header` | You can define your own headers                                   |
+
 
 🔄 Structure of an HTTP Response
 Protocol-Version Status-Code Status-Message
@@ -888,6 +1016,64 @@ You can expose them in the same config class:
 config.exposeIdsFor(Student.class);
 
 
+=========================================================
+🔷 MongoTemplate, Criteria, and Query in Spring Boot
+==========================================================
+➤ MongoTemplate is a core class in Spring Data MongoDB that provides:
+    ✔️ Fine-grained control over queries,
+    ✔️ Custom query building (beyond @Query or repository methods),
+    ✔️ Access to MongoDB’s full query and aggregation power.
+👉 It’s similar to how JdbcTemplate works for relational databases.
+
+✅ Example:
+  @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public List<User> getUserForSentimentAnalysis() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userName").is("Ram"));
+        return mongoTemplate.find(query, User.class);
+
+    }
+
+➤ MongoTemplate is auto-configured by Spring Boot if MongoDB connection details exist in application.properties.
+➤ Using @Autowired injects the template, allowing you to directly interact with the MongoDB database.
+
+Query query = new Query();
+👉 Creates a blank query object that can be configured with filters, sort, projection, etc.
+
+query.addCriteria(Criteria.where("userName").is("Ram"));
+👉 Builds a filter condition using Criteria.
+
+This is equivalent to MongoDB’s JSON query:
+{ "userName": "Ram" }
+👉 You can chain multiple criteria using .and(), .orOperator(), .gt(), etc.
+
+return mongoTemplate.find(query, User.class);
+➤ Executes the query on the User collection (Spring automatically maps the class to the MongoDB collection).
+➤ Converts each matching MongoDB document into a User Java object.
+➤ Returns a List<User>
+
+✅ Extended Examples: Find by multiple fields:
+Query query = new Query();
+query.addCriteria(Criteria.where("userName").is("Ram").and("age").gte(25));
+List<User> users = mongoTemplate.find(query, User.class);
+
+✅ Example: Using OR condition
+Query query = new Query();
+query.addCriteria(new Criteria().orOperator(
+    Criteria.where("userName").is("Ram"),
+    Criteria.where("email").is("ram@ram")
+));
+List<User> users = mongoTemplate.find(query, User.class);
+
+❓ Why Use MongoTemplate Instead of MongoRepository?
+| Use Case                                        | Prefer            |
+| ----------------------------------------------- | ----------------- |
+| Simple CRUD, auto queries                       | `MongoRepository` |
+| Complex filters, dynamic criteria, aggregations | `MongoTemplate`   |
+
+
 🔷 REST API Exception handling
 In springboot we can handle exception in 2 ways:
 | Type                         | Description                                                                 | Scope               |
@@ -1292,6 +1478,254 @@ You’ll get this:
 ➤ EntityModel<Student> wraps your Student object.
 ➤ _links section shows possible navigation options (self, all-students).
 ➤ Client doesn’t need to know URL structure — it just follows these links.
+
+
+
+==================================
+🔷 Logging in Spring Boot: SLF4J
+==================================
+➤ Logging is an essential aspect of the application development that allows developers to monitor and troubleshoot their applications.
+
+➤ Spring Boot supports various logging frameworks, such as Logback, Log4J2, and Java Util Logging (JUL) out of the box.
+
+🔄 understanding frameworks:
+1️⃣ Logback: A popular logging framework that serves as default in many SpringBoot applications. It offers a flexible configuration and good performance.
+
+2️⃣ Log4J2: A logging framework similar to Logback with features such as asynchronous logging and support various output formats.
+
+3️⃣ Java Util Logging (JUL): A logging framework that is a part of the Java platform. While it's less feature rich than some third-party frameworks, it is straightforward to use.
+
+4️⃣ Log Monitoring Tools
+1. Putty -- CLI tool
+2. WinScp -- GUI tool
+   ➤ Using WinScp we can upload and download files from windows to linux or vice versa using the file explorer.
+3. ELK -- GUI tool
+    ➤ E = Elasticsearch, L = Logstash, K = Kibana     
+4. Splunk(Licensed) -- GUI tool
+
+🔄 How to Connect to Putty
+1️⃣ Open Putty CLI in your machine
+2️⃣ Enter the IP address of your server
+4️⃣ Enter the port number
+5️⃣ Enter the username
+6️⃣ Enter the password
+7️⃣ Connect
+ 
+Enter the keypair file in Auth --> Credentials and enter the username and password for authentication on linux server and access the log file.
+
+✔️ Spring Boot uses Logback as the default logging framework provides a good balance between simplicity and performance.
+✔️ The default configuration is embedded within the Spring Boot libraries, and it may not be visible in your application's source code.
+✔️ If you want to customize the logging configuration, you can create your own logback-spring.xml or logback.xml file in the src/main/resources directory.
+✔️ When SpringBoot detects this file in your project, it will use it instead of the default configuration.
+
+🔄 Logging Levels
+Spring Boot supports the following logging levels:
+| Level     | Description             | Example                |
+| --------- | ----------------------- | ---------------------- |
+| TRACE     | Detailed debugging info | Fine-grained flow logs |
+| DEBUG     | Useful for debugging    | Dev-time logs          |
+| INFO      | General app flow        | Startup, shutdown      |
+| WARN      | Potential issues        | Deprecated method used |
+| ERROR     | Errors & exceptions     | DB connection failed   |
+| OFF       | Turns off logging       | —                      |
+
+We can set the desired logging levels for specific packages or classes, allowing them to control the amount of information logged at runtime.
+
+Spring Boot provides annotations like @Slf4j and @Log4j2 to help with logging, that can be used to automatically inject logger instance
+
+
+🔷 SLF4J
+➤ SLF4J (Simple Logging Facade for Java) is a logging abstraction layer.
+➤ It provides a common interface for various logging frameworks (Logback, Log4j2, JUL, etc.).
+➤ Spring Boot internally uses SLF4J + Logback by default.
+➤ Think of SLF4J as a “universal adapter” that lets you switch logging backends easily without changing your application code.
+
+❓ Why Use SLF4J 
+➤ Abstraction layer: decouples logging framework from code.
+➤ Better performance: lazy evaluation of log messages ({} placeholders).
+➤ Integration: widely supported in Spring, Hibernate, etc.
+➤ Flexibility: easily switch from Logback → Log4j2 without code changes.
+
+❓ How Logging Works in Spring Boot
+➤ By defaultSLF4J API is used in code.
+➤ Logback is the underlying implementation.
+➤ Configurations are auto-loaded from:
+  ✔️ application.properties or
+  ✔️ logback-spring.xml
+
+✅Example:
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    public void createUser(String name) {
+        logger.info("Creating user: {}", name); 
+        logger.debug("Debug info while creating user");
+        logger.warn("This is a warning message");
+        logger.error("Error occurred while creating user");
+    }
+}
+✅ Output:
+Creating user: Mike
+Debug info while creating user
+This is a warning message
+Error occurred while creating user
+
+🧠 Why {} ?
+Because SLF4J supports parameterized logging — efficient and avoids string concatenation.
+
+👉 We have to write:
+ private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+ to use this line of code for every class for logging in Spring Boot.
+ ⚡ We have to write log instead of logger in the code as well
+
+ instead of this we can use:
+ @Slf4j // annotation provided by lambok library
+ @Service
+ public class UserService {
+     public void createUser(String name) {
+         log.info("Creating user: {}", name);
+         log.debug("Debug info while creating user");
+         log.warn("This is a warning message");
+         log.error("Error occurred while creating user");
+     }
+ }
+
+🔄 Configure Logging in application.properties
+
+🔗 Code Example:
+# Root logging level
+logging.level.root=INFO 
+👉 this gives logs for all packages and classes of level info or severe than info i.e trace and debug will never get printed.
+
+# Package-specific level
+logging.level.net.engineeringdigest.journalApp=DEBUG
+
+# Log file output
+logging.file.name=app.log
+logging.file.path=logs/
+
+# Pattern for console output
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+
+🔄 Logging with Profiles
+You can set different logging levels for each Spring profile:
+
+🔗 Code Example:
+# application-dev.properties
+logging.level.root=DEBUG
+
+# application-prod.properties
+logging.level.root=ERROR
+
+And activate profile:
+spring.profiles.active=dev
+
+🔄  Access Logs in Code
+You can print the active profile in your logs:
+
+🔗 Code Example:
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Autowired
+private Environment env;
+
+@PostConstruct
+public void init() {
+    String activeProfile = env.getActiveProfiles()[0];
+    logger.info("Active profile: {}", activeProfile);
+}
+
+🔄 Logback Architecture (Default in Spring Boot)
+🔗 Logger → Appender → Layout → Destination
+
+➤ Logger: The entry point in your code (LoggerFactory.getLogger(...))
+➤ Appender: Defines where to send logs (console, file, socket)
+➤ Layout / Encoder: Defines how the log message looks
+➤ Destination: Final output (file, stdout,+ Database etc.)
+
+🔄 Configure in logback-spring.xml (Advanced)
+When we have application.properties, we should use logback-spring.xml for logging configuration specifically.
+
+🔗 Code Example:
+<configuration>
+
+👉 Console Appender 
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder> // encoder is a formatter for the output 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+👉 File appender
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <file>PAth_of_the_file</file>
+    </appender>
+👉  Database appender use jdbcAppender
+
+👉 Set the root level and attach the console appender
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+👉 Set the log level for a specific package or classes
+    <logger name="net.engineeringdigest.journalApp" level="DEBUG"/>
+
+</configuration>
+
+Understanding structure:
+1️⃣ <configuration>
+<!-- Appender and Logger configuration go here -->
+</configuration>
+➤ The <configuration> elements is the root element of the logback.xml file. All logback configuration is enclosed within this element.
+
+🔄 Patter Syntax:
+  ✔️ %d{yyyy-MM-dd HH:mm:ss} - date and time
+  ✔️ [%thread] - thread name
+  ✔️ %-5level - logging level(left justified text with atmost 5 characters)
+  ✔️ %logger{36} - logger name upto 36 characters
+  ✔️ %msg  %n - message and new line
+
+🔄 Rolling FileAppender Based on Time
+✅Example:
+
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+</configuration>
+
+
+🔄 Rolling FileAppender Based on Size of File
+✅Example:
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeBasedRollingPolicy">
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+</configuration>
+👉 Rolling based of size and time can be used at the same time whatever happens first will make logs accordingly.
+
 
 
 🔷 SpringBoot Acuators
