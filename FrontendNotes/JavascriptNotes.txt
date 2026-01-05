@@ -769,6 +769,7 @@ sum(2, 3);
 console.log(this);
 ✅ Output: Browser → undefined in modules or functions, but at top-level inside script → still window (Node ─────────▶ {} in modules)
 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX✅ Functions ✅XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 ###############################################
 🌊 Function Declaration vs Function Expression
@@ -1982,61 +1983,47 @@ function counter(n) {
   };
 }
 
-⚠️ Interview Trap Questions (Recursion Only)
-❓ Q1
-function test(n) {
+
+⚠️ Trap Questions 
+❓Q1: function test(n) {
   if (n === 0) return;
   test(n--);
 }
 test(3);
-
-
-Answer: ❌ Infinite recursion
+✅ Output: ❌ Infinite recursion
 n-- passes old value
+✔ Fix: test(--n);
 
-✔ Fix:
 
-test(--n);
-
-❓ Q2
-function foo(n) {
+❓Q2: function foo(n) {
   if (n === 1) return 1;
   return foo(n - 1);
 }
 foo(0);
-
-
-Answer: ❌ Stack overflow
+✅ Output: ❌ Stack overflow
 Base case never reached
 
-❓ Q3
-function f(n) {
+
+❓Q3: function f(n) {
   if (n <= 1) return 1;
   return f(n - 1) + f(n - 2);
 }
+✅ Output: Fibonacci❌ Exponential time complexity
 
 
-Answer: Fibonacci
-❌ Exponential time complexity
-
-❓ Q4
-let count = 0;
+❓Q4: let count = 0;
 function recurse() {
   if (count === 3) return;
   count++;
   recurse();
 }
+✅ Output: Works, but ❌ impure (external state)
 
 
-Answer: Works, but ❌ impure (external state)
-
-❓ Q5
-function f() {
+❓Q5: function f() {
   return f();
 }
-
-
-Answer: ❌ Stack overflow (no base case)
+✅ Output: ❌ Stack overflow (no base case)
 
 
 🔄 Common Interview Mistakes
@@ -2044,3 +2031,5 @@ Answer: ❌ Stack overflow (no base case)
 ➤ Not reducing the problem
 ➤ Using recursion where loop is simpler
 ➤ Ignoring stack overflow risk
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX✅ Execution Model ✅XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
