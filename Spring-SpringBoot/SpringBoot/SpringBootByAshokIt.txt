@@ -1,18 +1,22 @@
+==============
 🔷 SpringBoot
+==============
 ➤ SpringBoot is a framework that simplifies the development of Spring applications by providing a set of pre-configured features and tools.
 ➤ SpringBoot=Spring - XML configuration.
 ➤ It makes easy to create stand-alone, production-grade spring based application that you can just run.
 ➤ SpringBoot is not a replacement for Spring Framework. It was developed on top of Spring Framework to provide a more simplified and efficient way to develop Spring applications.
 
 🔄 Key Features
-➤ Auto-Configuration → Automatically configure Spring application based on dependencies in the classpath.
-➤ Starter Dependencies → Predefined dependency sets (e.g., spring-boot-starter-web, spring-boot-starter-data-jpa) to reduce manual configuration.
-➤ Embedded Servers → Comes with Tomcat, Jetty, Undertow embedded servers, so no need to deploy WAR files separately.
-➤ Production Ready → Provides health checks, metrics, logging, and monitoring with Spring Boot Actuator.
-➤ Convention over Configuration → Focus more on logic, less on XML/bean configuration.
+➤ Auto-Configuration ─────────▶ Automatically configure Spring application based on dependencies in the classpath.
+➤ Starter Dependencies ─────────▶ Predefined dependency sets (e.g., spring-boot-starter-web, spring-boot-starter-data-jpa) to reduce manual configuration.
+➤ Embedded Servers ─────────▶ Comes with Tomcat, Jetty, Undertow embedded servers, so no need to deploy WAR files separately.
+➤ Production Ready ─────────▶ Provides health checks, metrics, logging, and monitoring with Spring Boot Actuator.
+➤ Convention over Configuration ─────────▶ Focus more on logic, less on XML/bean configuration.
 
 
+=============================================
 🔷 SpringBBoot Application Folder Structure
+=============================================
 ➤ src/main/java
 ➤ src/main/resources
 ➤ src/test/java
@@ -21,7 +25,9 @@
 ➤ pom.xml
 
 
+===========================
 🔷 SpringBoot Main Method
+===========================
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
@@ -43,7 +49,9 @@ public class Application {
 ➤ If we have multiple basePackage we have to manually tell the SpringBootApplication which package to scan by using @ComponentScan annotation and passing the array of basePackages.  
 
 
+===================================
 🔷 SpringApplication.run() Method
+===================================
 ➤ It is used to start the Spring Boot application.
 ➤ It takes 2 arguments:
     ✔️ Application class
