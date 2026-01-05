@@ -50,8 +50,8 @@ After freezing:
 ❌ Modify nested objects (because freeze is shallow)
 
 👍 You can:
-✔️ Read property values
-✔️ Work with the same object reference
+✔️️ Read property values
+✔️️ Work with the same object reference
 
 ✅ Example:
 const person = {
@@ -75,7 +75,7 @@ const user = {
 };
 
 Object.freeze(user);
-user.address.city = "Mumbai"; // ✔️ Allowed (inner object not frozen)
+user.address.city = "Mumbai"; // ✔️️ Allowed (inner object not frozen)
 
 To make everything frozen → deep freeze using recursive function:
 function deepFreeze(obj) {
@@ -196,9 +196,9 @@ var hello = function() {
 🌊 Primitive vs Reference Types
 #################################
 🔷 Primitive Types
-✔️ Stored directly in stack.
-✔️ Copied by value.
-✔️ Immutable (value cannot be changed in memory).
+✔️️ Stored directly in stack.
+✔️️ Copied by value.
+✔️️ Immutable (value cannot be changed in memory).
 👉 Types: string, number, boolean, null, undefined, symbol, bigint.
 
 let a = 10;
@@ -209,9 +209,9 @@ console.log(a); // 10 (unchanged)
 console.log(b); // 20
 
 🔷 Reference Types
-✔️ Stored in heap.
-✔️ Variables stores reference(pointer) to memory.
-✔️ Copied by reference.
+✔️️ Stored in heap.
+✔️️ Variables stores reference(pointer) to memory.
+✔️️ Copied by reference.
 👉 Types: object, array, function, date, etc.
 
 let obj1 = { x: 1 };
@@ -321,7 +321,7 @@ false == 0 // true
 [] == false // true
 [] == 0    // true
 
-✔️ Special Cases
+✔️️ Special Cases
 null == undefined // true
 null === undefined // false 
 
@@ -904,7 +904,7 @@ const obj = {
 obj.greet(); // undefined
 
 
-✔ Correct usage:
+✔️ Correct usage:
 
 const obj = {
   name: "A",
@@ -943,15 +943,15 @@ const square = x => x * x;
 const getUser = () => ({ name: "A" });
 
 🔄 Valid Use Cases
-  ✔️ Callbacks
-  ✔️ Closures
-  ✔️ Functional utilities (map, filter)
-  ✔️ Preserving this inside async code
+  ✔️️ Callbacks
+  ✔️️ Closures
+  ✔️️ Functional utilities (map, filter)
+  ✔️️ Preserving this inside async code
 
 ❌ Avoid for:
-  ✔️ Object methods
-  ✔️ Constructors
-  ✔️ Event handlers needing dynamic this
+  ✔️️ Object methods
+  ✔️️ Constructors
+  ✔️️ Event handlers needing dynamic this
 
 ⚠️ Trick Questions 
 ❓Q1:const obj = {
@@ -990,7 +990,7 @@ Module / strict: undefined
 ######################
 🌊 Default Parameter
 ######################
-✔️ Basic Usage
+✔️️ Basic Usage
 function greet(name = "Guest") {
   return name;
 }
@@ -999,7 +999,7 @@ greet("Ankur"); // "Ankur"
 👉 Default value is used only when argument is undefined.
 
 
-✔️ When Default Applies 
+✔️️ When Default Applies 
 function test(x = 10) {
   return x;
 }
@@ -1008,7 +1008,7 @@ test(null);      // null ❌ (no default)
 test(0);         // 0
 
 
-✔️ Default Parameters Are Evaluated at Call Time
+✔️️ Default Parameters Are Evaluated at Call Time
 let count = 0;
 function fn(x = ++count) {
   return x;
@@ -1017,7 +1017,7 @@ fn(); // 1
 fn(); // 2
 
 
-✔️ Using Previous Parameters as Defaults
+✔️️ Using Previous Parameters as Defaults
 function sum(a, b = a) {
   return a + b;
 }
@@ -1026,7 +1026,7 @@ sum(5); // 10
 function test(a = b, b = 5) {} // ReferenceError
 
 
-✔️ Default Parameters Create Their Own Scope
+✔️️ Default Parameters Create Their Own Scope
 let x = 10;
 function foo(a = x) {
   let x = 20;
@@ -1036,7 +1036,7 @@ foo(); // 10
 (Default params evaluated before function body)
 
 
-✔️ Interaction with arguments
+✔️️ Interaction with arguments
 function fn(a = 1) {
   console.log(arguments.length);
 }
@@ -1045,7 +1045,7 @@ fn(5);   // 1
 Default params do NOT sync with arguments.
 
 
-✔️ Default + Destructuring
+✔️️ Default + Destructuring
 function createUser({ name = "Guest" } = {}) {
   return name;
 }
@@ -1053,7 +1053,7 @@ createUser(); // "Guest" (Important real-world pattern)
 
 This pattern is used to safely extract values from objects/arrays while providing fallback defaults.
 
-✔️ Why It’s Needed
+✔️️ Why It’s Needed
 
 Calling a function with:
 
@@ -1063,7 +1063,7 @@ missing properties
 
 would normally cause errors.
 
-✔️ Basic Pattern (Most Important)
+✔️️ Basic Pattern (Most Important)
 function createUser({ name = "Guest", age = 18 } = {}) {
   console.log(name, age);
 }
@@ -1075,14 +1075,14 @@ createUser();
 createUser({ name: "Ankur" });
 // name = "Ankur", age = 18
 
-✔️ What = {} Actually Does
+✔️️ What = {} Actually Does
 function fn({ a } = {}) {}
 
 Prevents this error:
 fn(); // ❌ Cannot destructure property 'a' of undefined
 = {} provides a safe fallback object
 
-✔️ Property-Level Defaults
+✔️️ Property-Level Defaults
 function test({ x = 10 }) {
   console.log(x);
 }
@@ -1092,7 +1092,7 @@ test({ x: 5 });  // 5
 ⚠️ Default applies only when property is undefined, not null.
 test({ x: null }); // null
 
-✔️ Nested Destructuring + Defaults
+✔️️ Nested Destructuring + Defaults
 function config({ server: { port = 3000 } = {} } = {}) {
   console.log(port);
 }
@@ -1100,7 +1100,7 @@ config();
 config({ server: {} });
 Both output: 3000
 
-✔️ Array Destructuring + Defaults
+✔️️ Array Destructuring + Defaults
 function sum([a = 0, b = 0] = []) {
   return a + b;
 }
@@ -1167,7 +1167,7 @@ const double = multiplier(2);
 double(5); // 10
 
 
-✔️ Built-in Higher-Order Functions
+✔️️ Built-in Higher-Order Functions
 ➤ map
 ➤ filter
 ➤ reduce
@@ -1190,7 +1190,7 @@ fetchData(result => console.log(result));
 const add = x => y => x + y;
 add(2)(3); // 5 (Returning function enables currying)
 
-✔️ Why HOFs Are Used
+✔️️ Why HOFs Are Used
 1️⃣ Code reuse
 2️⃣ Abstraction
 3️⃣ Cleaner logic
@@ -1276,8 +1276,8 @@ readData((err, result) => {
   if (err) return;
   console.log(result);
 });
-✔️ err is always first
-✔️ If err exists → ignore result
+✔️️ err is always first
+✔️️ If err exists → ignore result
 
 
 🔄 Callback Hell (Problem)
@@ -1288,14 +1288,14 @@ setTimeout(() => {
     }, 1000);
   }, 1000);
 }, 1000);
-✔️ Deep nesting
-✔️ Hard to read & maintain
+✔️️ Deep nesting
+✔️️ Hard to read & maintain
 
 
 🔄 How Callback Hell Is Mitigated
-✔️ Named callbacks
-✔️ Promises
-✔️ async / await
+✔️️ Named callbacks
+✔️️ Promises
+✔️️ async / await
 (Callbacks still exist under the hood)
 
 ⚠️ Trap Questions
@@ -1488,8 +1488,8 @@ const counter = (function () {
     }
   };
 })();
-✔️ count is private
-✔️ Public methods exposed
+✔️️ count is private
+✔️️ Public methods exposed
 
 
 🔄 Multiple IIFEs (Semicolon Trap)
@@ -1515,8 +1515,8 @@ console.log(a);
   console.log(this);
 })();
 ✅ Output:
-✔️ Non-strict → window
-✔️ Strict mode → undefined
+✔️️ Non-strict → window
+✔️️ Strict mode → undefined
 
 
 ❓Q3: (() => {
@@ -1543,3 +1543,504 @@ console.log(a);
 !function(){}()
 +function(){}()
 
+
+#############
+🔷 Closures
+#############
+A closure is created when a function remembers and accesses variables from its lexical scope, even after the outer function has finished execution.
+
+🔄 Basic Closure Example
+function outer() {
+  let count = 0;
+
+  return function inner() {
+    count++;
+    return count;
+  };
+}
+
+const fn = outer();
+fn(); // 1
+fn(); // 2
+➤ inner closes over count
+➤ count is not destroyed
+
+
+🔄 Lexical Scope = Foundation of Closure
+function outer() {
+  let x = 10;
+  function inner() {
+    console.log(x);
+  }
+  inner();
+}
+Scope decided at write time, not runtime
+
+
+🔄 Closure with Private State
+function createCounter() {
+  let count = 0;
+
+  return {
+    inc() {
+      count++;
+    },
+    get() {
+      return count;
+    }
+  };
+}
+Encapsulation without classes
+
+✅Explanation:
+1️⃣ What Happens When createCounter() Is Called
+const counter = createCounter();
+
+Execution steps:
+1️⃣ A new execution context is created for createCounter
+2️⃣ count is created inside that function scope:
+count = 0
+
+3️⃣ The function returns an object with two functions: inc and get
+4️⃣ Normally, local variables are destroyed after function execution
+❌ BUT here they are not
+
+❓ Why?
+Because both inc and get reference count
+👉 This creates a closure
+
+
+2️⃣ Closure Formation
+➤ count lives in the lexical environment of createCounter
+➤ inc and get close over that environment
+➤ JS keeps count alive in memory
+➤ So even after createCounter() finishes, count still exists
+
+
+3️⃣ Calling inc()
+counter.inc();
+What happens:
+  ✔️️ JS looks for count
+  ✔️️ Not found inside inc
+  ✔️️ Goes to outer lexical scope
+  ✔️️ Finds count
+  ✔️️ Increments it
+count = 1
+
+4️⃣ Calling get()
+counter.get();
+What happens:
+  ✔️️ JS again looks for count
+  ✔️️ Finds it via closure
+  ✔️️ Returns current value
+return 1;
+
+
+5️⃣ Why count Is Private
+counter.count; // ❌ undefined
+➤ count is not a property of the returned object
+➤ It exists only in the closed-over scope
+➤ Can be accessed only via inc and get
+
+
+6️⃣ Multiple Counters = Separate Closures
+const c1 = createCounter();
+const c2 = createCounter();
+
+c1.inc();
+c1.get(); // 1
+c2.get(); // 0
+
+👉 Each call creates:
+➤ A new count
+➤ A new closure
+
+7️⃣ Memory Model
+➤ count is stored in heap
+➤ Closure holds a reference, not a copy
+➤ As long as counter exists → count exists
+➤ Once counter is garbage-collected → count is released
+
+
+🔄 Closures in Loops
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0);
+}
+✅ Output: 3 3 3
+
+
+🔄 Fix using let:
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0);
+}
+
+
+🔄 Fix using IIFE:
+for (var i = 0; i < 3; i++) {
+  (function (j) {
+    setTimeout(() => console.log(j), 0);
+  })(i);
+}
+
+
+🔄 Closure + Function Currying
+const add = a => b => a + b;
+add(5)(2); // 7
+b function closes over a
+
+
+🔄 Closure + Event Handlers
+function attachHandler() {
+  let count = 0;
+  document.addEventListener("click", () => {
+    count++;
+    console.log(count);
+  });
+}
+count persists across clicks
+
+
+🔄 Memory Implication
+➤ Closed variables stay in memory
+➤ Can cause memory leaks if not released
+
+
+⚠️ Trap Questions 
+❓Q1: function test() {
+  let a = 10;
+  return function () {
+    console.log(a);
+  };
+}
+test()();
+✅ Output: 10
+
+❓Q2: function outer() {
+  let x = 5;
+  return function inner(x) {
+    console.log(x);
+  };
+}
+
+outer()(10);
+✅ Output: 10 (inner parameter shadows outer variable)
+
+❓Q3: let x = 100;
+
+function outer() {
+  console.log(x);
+  let x = 10;
+}
+
+outer();
+✅ Output: ❌ ReferenceError (TDZ, not closure yet)
+
+
+❓Q4: function outer() {
+  let x = 10;
+  return () => {
+    x++;
+    return x;
+  };
+}
+
+const fn1 = outer();
+const fn2 = outer();
+
+fn1(); // ?
+fn2(); // ?
+✅ Output: Both return 11 (separate closures)
+
+
+❓Q5: function build() {
+  let arr = [];
+  for (var i = 0; i < 3; i++) {
+    arr.push(() => i);
+  }
+  return arr;
+}
+build().map(fn => fn());
+
+✅ Output: [3, 3, 3]
+
+🔄 Common Interview Misconceptions
+➤ Closure ≠ function
+➤ Closure ≠ copy of variable
+➤ Closure holds reference, not value
+
+
+###################
+🔷 Pure Functions
+###################
+1️⃣ Always returns the same output for the same input
+2️⃣ Has no side effects
+That’s it. Both conditions must hold.
+
+✅ Pure Function Example
+function add(a, b) {
+  return a + b;
+}
+➤ Same inputs → same output
+➤ No external dependency
+➤ No mutation
+
+
+❌ Impure Function Examples
+1️⃣ Depends on external state
+let tax = 10;
+
+function calculate(price) {
+  return price + tax;
+}
+
+
+2️⃣ Causes side effects
+function increment(obj) {
+  obj.count++;
+}
+
+3️⃣ Uses non-deterministic values
+function getRandom() {
+  return Math.random();
+}
+
+
+🔄 What Counts as Side Effects 
+A function is impure if it:
+➤ Modifies external variables
+➤ Mutates arguments
+➤ Performs I/O (console.log, API calls)
+➤ Uses current time / randomness
+➤ Depends on DOM / global state
+
+🔄 Pure Function with Objects 
+function updateCount(obj) {
+  return { ...obj, count: obj.count + 1 };
+}
+✔️ No mutation
+✔️ New object returned
+✔️ Still pure
+
+
+🔄 Pure Functions & Referential Transparency
+add(2, 3); // can be replaced by 5 everywhere
+This property = referential transparency
+
+
+🔄 Why Pure Functions Matter
+➤ Easy to test
+➤ Predictable behavior
+➤ Safe to cache (memoization)
+➤ No hidden bugs
+
+
+🔄 Pure Functions in Array Methods
+const nums = [1, 2, 3];
+const doubled = nums.map(n => n * 2);
+✔️ Callback is pure
+✔️ map does not mutate original array
+
+
+❌ Common Mistake (Looks Pure but Isn’t)
+function addItem(arr, item) {
+  arr.push(item);
+  return arr;
+}
+❌ Mutates input
+
+✅Correct:
+function addItem(arr, item) {
+  return [...arr, item];
+}
+
+
+🔄 Pure Function vs Impure Function
+| Aspect        | Pure          | Impure   |
+| ------------- | ------------- | -------- |
+| Output        | Deterministic | Can vary |
+| Side effects  | ❌ None      | ✅ Yes   |
+| Mutates input | ❌ No        | Possible |
+| Testability   | Easy          | Hard     |
+
+
+⚠️ Trap Questions
+❓Q1: function pure(x) {
+  return x++;
+}
+✅ Output: ❌ Impure (post-increment mutates local state)
+
+❓Q2: function log(x) {
+  console.log(x);
+  return x;
+}
+✅ Output: ❌ Impure (console.log is a side effect)
+
+❓Q3: function sum(arr) {
+  return arr.reduce((a, b) => a + b, 0);
+}
+✅ Output: Pure (no mutation, deterministic)
+
+
+❓Q4: let count = 0;
+function increment(x) {
+  return x + count++;
+}
+✅ Output: ❌ Impure (external mutation)
+
+
+❓Q5: function getUser() {
+  return fetch("/user");
+}
+✅ Output: ❌ Impure (I/O, async side effect)
+
+
+🔄 Common Interview Misconceptions
+➤ Returning a value ≠ pure
+➤ Not mutating arguments is mandatory
+➤ Arrow functions are not automatically pure
+➤ const does not guarantee purity
+
+
+##############
+🔷 Recursion
+##############
+Recursion is a technique where a function calls itself to solve a problem by breaking it into smaller subproblems.
+
+Every recursive function must have:
+➤ Base case → stops recursion
+➤ Recursive case → reduces the problem
+
+
+🔄 Basic Recursive Example
+function factorial(n) {
+  if (n === 0) return 1;   // base case
+  return n * factorial(n - 1); // recursive case
+}
+
+🔄 Call Stack Behavior
+factorial(3)
+
+Call stack:
+factorial(3)
+→ factorial(2)
+→ factorial(1)
+→ factorial(0)
+Then it unwinds: 1 → 1 → 2 → 6
+
+✅ Base Case Is Mandatory
+function infinite() {
+  return infinite();
+}
+❌ Stack overflow (no base case)
+
+
+🔄 Direct vs Indirect Recursion
+1️⃣ Direct
+function f(n) {
+  if (n === 0) return;
+  f(n - 1);
+}
+
+2️⃣ Indirect
+function even(n) {
+  if (n === 0) return true;
+  return odd(n - 1);
+}
+
+function odd(n) {
+  if (n === 0) return false;
+  return even(n - 1);
+}
+
+🔄 Recursion with Data Structures
+function sum(arr) {
+  if (arr.length === 0) return 0;
+  return arr[0] + sum(arr.slice(1));
+}
+
+🔄 Recursion vs Loop
+➤ Recursion uses call stack
+➤ Loop uses iteration
+➤ Recursion is cleaner for tree/graph problems
+
+
+🔄 Tail Recursion (Conceptual)
+function sum(n, acc = 0) {
+  if (n === 0) return acc;
+  return sum(n - 1, acc + n);
+}
+➤ Recursive call is the last operation
+➤ JS engines do not reliably optimize this
+
+
+🔄 Recursion with Closures
+function counter(n) {
+  return function recurse() {
+    if (n === 0) return;
+    console.log(n--);
+    recurse();
+  };
+}
+
+⚠️ Interview Trap Questions (Recursion Only)
+❓ Q1
+function test(n) {
+  if (n === 0) return;
+  test(n--);
+}
+test(3);
+
+
+Answer: ❌ Infinite recursion
+n-- passes old value
+
+✔ Fix:
+
+test(--n);
+
+❓ Q2
+function foo(n) {
+  if (n === 1) return 1;
+  return foo(n - 1);
+}
+foo(0);
+
+
+Answer: ❌ Stack overflow
+Base case never reached
+
+❓ Q3
+function f(n) {
+  if (n <= 1) return 1;
+  return f(n - 1) + f(n - 2);
+}
+
+
+Answer: Fibonacci
+❌ Exponential time complexity
+
+❓ Q4
+let count = 0;
+function recurse() {
+  if (count === 3) return;
+  count++;
+  recurse();
+}
+
+
+Answer: Works, but ❌ impure (external state)
+
+❓ Q5
+function f() {
+  return f();
+}
+
+
+Answer: ❌ Stack overflow (no base case)
+
+
+🔄 Common Interview Mistakes
+➤ Forgetting base case
+➤ Not reducing the problem
+➤ Using recursion where loop is simpler
+➤ Ignoring stack overflow risk
