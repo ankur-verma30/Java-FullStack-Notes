@@ -332,8 +332,6 @@ public class ResourceManager {
 | `@PostConstruct` | Runs **after bean creation**     |
 | `@PreDestroy`    | Runs **before bean destruction** |
 
-
-
 🔄 @PreDestroy vs DisposableBean
 Using DisposableBean
 @Component
@@ -344,7 +342,6 @@ public class MyBean implements DisposableBean {
         System.out.println("Destroy method called");
     }
 }
-
 
 🔄 Why @PreDestroy is better?
 ➤ No interface coupling
@@ -418,8 +415,8 @@ Spring Boot allows overriding configuration from the command line.
 🔗 java -jar myapp.jar --server.port=9090 --spring.datasource.username=ankur
 
 Here:
-🔗 --server.port=9090 → overrides server.port
-🔗 --spring.datasource.username=ankur → overrides username
+🔗 --server.port=9090 ─────────▶ overrides server.port
+🔗 --spring.datasource.username=ankur ─────────▶ overrides username
 
 4️⃣ Accessing Values Inside Code
 You can fetch values in your beans with @Value or @ConfigurationProperties.
