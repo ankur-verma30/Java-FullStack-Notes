@@ -1676,16 +1676,19 @@ import p1.A;
 public class C extends A {}
 
 
-✅ Access Specifiers on Top-Level Classes:
+===========================================
+🔷 Access Specifiers on Top-Level Classes
+===========================================
 Access Specifier				Usage							Visibility
 public							public class ClassName {}		Visible to all classes everywhere (within the same package or other packages).
 Default (no modifier)			class ClassName {}				Visible to classes within the same package only.
 
 ❌ Not allowed on top-level classes:
-private
-protected
+1️⃣ private
+2️⃣ protected
 
-🔍 Reason: Java's Design Philosophy
+
+🔄 Java's Design Philosophy
 ✅ 1. Top-level classes must be accessible to the JVM & compiler
 ➤ If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
 ➤ That breaks the point of having it at the top level — it becomes useless.
@@ -1700,11 +1703,11 @@ package p1;
 class A {}
 
 package p1;
-public class B extends A{} //Because A is default and inherited in B
+public class B extends A{} ─────────▶ Because A is default and inherited in B
 
 package p2;
-import p1.A;//-->❌ Error
-public class C extends A{//-->❌ Error	
+import p1.A;	─────────▶	❌ Error
+public class C extends A{	─────────▶	❌ Error
 }
 
 ✅ Example 2:
@@ -1733,7 +1736,7 @@ public class C {
 🔄 Polymorphism
 Two types of polymorphism:
 
-a. Overriding (Run-time polymorphism):
+1️⃣ Method Overriding (Run-time polymorphism):
 ➤ Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
 ➤ It is used to achieve Run-time Polymorphism.
 ➤ The method signature (name + parameters) must be the same in both parent and child classes.
@@ -1766,14 +1769,16 @@ public class PlatinumAccount extends GoldAccount {
 	public static void main(String[] args) {
 		PlatinumAccount p = new PlatinumAccount();
 		p.onlineBanking();
-		p.rateOfInterest()// Output: 6% PA
+		p.rateOfInterest(); ─────────▶ Output: 6% PA
 		GoldAccount g = new GoldAccount();
 		g.onlineBanking();
-		g.rateOfInterest();//-->Output: nill
+		g.rateOfInterest(); ─────────▶ Output: nill
 	}
 }
 
-❓ What are Annotations?
+===============
+🔷 Annotations
+===============
 ➤ Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
 ➤ They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
 
@@ -1791,13 +1796,13 @@ package p1;
 package p1;
 public class PlatinumAccount extends GoldAccount {
 	@Override
-	public void rateOfInterests() {//-->❌ Error because method name mismatch
+	public void rateOfInterests() { ─────────▶ ❌ Error because method name mismatch
 		System.out.println("6% PA");
 	}	
 }
 
 ❗Access Specifier should be the same, or can it be different during Overriding?
- During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
+During overriding, we can increase the scope of the access specifier, but we cannot reduce the scope of the access specifier
 
 ✅ Example 1:
 package p1;
@@ -1809,7 +1814,7 @@ public class GoldAccount {
 
 package p1;
 public class PlatinumAccount extends GoldAccount {
-👉 //No Error Because the default scope is increased to public	
+👉 // ─────────▶ No Error Because the default scope is increased to public	
 	@Override
 	public void rateOfInterest() {
 		System.out.println("6% PA");
@@ -1827,7 +1832,7 @@ public class GoldAccount {
 package p1;
 public class PlatinumAccount extends GoldAccount {
 	@Override
-	void rateOfInterest() { //❌Error: Because the public scope is reduced to the default
+	void rateOfInterest() { ─────────▶ ❌Error: Because the public scope is reduced to the default
 		System.out.println("6% PA");
 	}
 }
@@ -1845,7 +1850,7 @@ public class GoldAccount {
 package p1;
 public class PlatinumAccount extends GoldAccount {
 	@Override
-	protected void rateOfInterest(){  //❌Error: Because private methods cannot be inherited, without inheritance, overriding cannot be done
+	protected void rateOfInterest(){  ─────────▶ ❌Error: Because private methods cannot be inherited, without inheritance, overriding cannot be done
 		System.out.println("6% PA");
 	}
 }
@@ -1853,8 +1858,7 @@ public class PlatinumAccount extends GoldAccount {
 ❓ Are Static Members Inherited in Java?
 ✅ Technically, static members are inherited — but they are not polymorphic, and they do not behave like instance members in inheritance.
 
-🔥 Common Misconception:
-❌ "Static members cannot be inherited." But that's not entirely accurate.
+🔥 Common Misconception:❌ "Static members cannot be inherited." But that's not entirely accurate.
 
 ✅ What Happens:
 1. Static members belong to the class, not to objects.
@@ -1863,7 +1867,7 @@ So they are shared across the inheritance hierarchy.
 So yes, static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
 
 ⚠️ Why Static Members Are Not "Truly" Inherited:
-✅ 1. They don’t participate in runtime polymorphism
+1️⃣ They don’t participate in runtime polymorphism
 
 class A {
     static void show() {
@@ -1896,7 +1900,7 @@ A obj = new B();
 static = class-based decision (compile-time)
 non-static = object-based decision (run-time)
 
-✅ 2. They're not part of the instance, so “inheritance” isn’t meaningful
+2️⃣ They're not part of the instance, so “inheritance” isn’t meaningful
 Since they don’t get copied to each object or act differently per subclass instance, calling it "inheritance" is misleading.
 
 ✅ Example:
@@ -1918,19 +1922,19 @@ public class PlatinumAccount extends GoldAccount {
         System.out.println(PlatinumAccount.x); // Outuput: 100
     }
 }
-
-🔍 What Is This Program Teaching?
-✅ 1. Static Methods and Variables Are Not Polymorphic. Even though PlatinumAccount inherits from GoldAccount, calling PlatinumAccount.rateOfInterest();
+🔄 Overview of Above Program
+1️⃣ Static Methods and Variables Are Not Polymorphic. Even though PlatinumAccount inherits from GoldAccount, calling PlatinumAccount.rateOfInterest();
 It is resolved at compile time based on the class name, not the object type.
 
-Since PlatinumAccount does not override the method (it doesn’t define its rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
+2️⃣ Since PlatinumAccount does not override the method (it doesn’t define its rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
 is effectively the same as: GoldAccount.rateOfInterest();
 
-The same logic applies to the static variable x:
-PlatinumAccount.x; // resolves to GoldAccount.x (100)
+3️⃣ The same logic applies to the static variable x: PlatinumAccount.x; ─────────▶ resolves to GoldAccount.x (100)
 
-✅ Overloading in Java (Compile-Time Polymorphism)
-🔄 What is Method Overloading?
+
+=====================================================
+🔷 Overloading in Java (Compile-Time Polymorphism)
+=====================================================
 ➤ Method Overloading means defining multiple methods with the same name in a class but with different parameter lists (type, number, or order of parameters).
 ➤ It allows compile-time polymorphism, where the method to be called is determined at compile time based on the method signature.
 
@@ -1943,14 +1947,13 @@ PlatinumAccount.x; // resolves to GoldAccount.x (100)
 | Change access modifier only | ❌ No                    | Doesn't affect method signature         |
 | Change method name          | ❌ No                    | It's not overloading, it's a new method |
 
-🔸 Characteristics of Overloading:
-	Feature						Description
-✔️ Method name					must be the same
-✔️ Parameter list				must be different (type, number, or order)
-✔️ Return type					can be the same or different, but doesn't affect overloading
-✔️ Access modifier				can be the same or different
-✔️ Inheritance					is not required for overloading
-✔️ Polymorphism type			Compile-time polymorphism
+🔄 Characteristics of Overloading:
+Feature						Description
+Method name					must be the same
+Parameter list				must be different (type, number, or order)
+Return type					can be the same or different, but doesn't affect overloading
+Access modifier				can be the same or different
+Inheritance					is not required for overloading
 
 ✅ Example:
 package p1;
@@ -1968,7 +1971,10 @@ public class EmailService {
 	}
 }
 
+
+==================
 🔷 Final Keyword
+==================
 ➤ If you make a variable final, then we cannot change its value(Just like constant variables).
 ➤ If you make a static/non-static variable final, then initialization is mandatory.
 
@@ -1982,24 +1988,23 @@ public interface A {
 package p1;
 public class B {
 	public static void main(String[] args) {
-		System.out.println(A.MAX_VAL);//Output: 100
-		System.out.println(A.MIN_VAL);//Output: 0
+		System.out.println(A.MAX_VAL); ─────────▶ Output: 100
+		System.out.println(A.MIN_VAL); ─────────▶ Output: 0
 	}
 }
-
 ➤ If you make a method final, then overriding is not allowed, but inheritance is allowed
+
 🔒 Why Use final on a Method?
-1. You want to prevent subclassing from changing the logic of a method.
-2. You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
+1️⃣ You want to prevent subclasses from changing the logic of a method.
+2️⃣ You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
+
 
 ➤ If you make a class final, then inheritance is not allowed
 A final class:
 ❌ Cannot be extended/inherited.
 ✅ Can have regular (non-final) methods.
 ✅ Can have final methods too.
-
-But since the class itself cannot be inherited:
-🔒 No methods inside it — final or not — can ever be overridden.
+👉 But since the class itself cannot be inherited: No methods inside it — final or not — can ever be overridden.
 
 ✅ Example 1: 
 package p1;
@@ -2007,10 +2012,10 @@ package p1;
 public class A {
 	public static void main(String[] args) {
 		final int x = 10;
-		x=20;//-->Cannot change the value of a final variable
-		final int y;//->final mandatory to be initialized
-	        final static int z;//->final mandatory to be initialized
-	        //❌The above errors are called blank field errors
+		x=20; ─────────▶ Cannot change the value of a final variable
+		final int y; ─────────▶ final mandatory to be initialized
+	        final static int z;─────────▶ final mandatory to be initialized
+		//❌The above errors are called blank field errors
 		System.out.println(y);
 	}
 }
@@ -2027,7 +2032,7 @@ package p1;
 
 public class B extends A{
 	@Override
-	public void test() {//❌ Error because we cannot override final methods
+	public void test() { ─────────▶ ❌ Error because we cannot override final methods
 		System.out.println(100);
 	}
 }
@@ -2037,7 +2042,7 @@ package p1;
 final public class A {}
 
 package p1;
-public class B extends A{//❌ Error because we cannot inherit final class	
+public class B extends A{ ─────────▶ ❌ Error because we cannot inherit final class	
 }
 
 ❓ What Happens When a Reference Variable is marked final?
@@ -2053,8 +2058,8 @@ class Student {
 public class Test {
     public static void main(String[] args) {
         final Student s = new Student();
-        s.marks = 90;         // ✅ Allowed
-        // s = new Student(); // ❌ Not allowed (Compile-time error)
+        s.marks = 90;         ─────────▶ ✅ Allowed
+        // s = new Student(); ─────────▶ ❌ Not allowed (Compile-time error)
         System.out.println(s.marks); // 90
     }
 }
@@ -2063,7 +2068,9 @@ public class Test {
 To prevent reassignment, ensure safe dependency injection, and make code more thread-safe and readable. It’s also a key part of writing immutable classes and predictable lambdas.
 
 
+==========================================
 🔷 How to Make a Class Immutable in Java
+==========================================
 To make class immutable, follow these 7 rules:
 1️⃣ Declare the class as final
 Prevents subclassing (inheriting) because subclass can add setters and break immutability.
