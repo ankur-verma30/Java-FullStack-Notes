@@ -169,7 +169,103 @@ At different times and for different people:
 ➡️ Insight:
 Many confuse JVM = Java compiler → Wrong! Compiler (javac) converts Java code → bytecode; JVM executes that bytecode.
 
-The purpose of the JIT (Just-In-Time) compiler in the JVM is to improve the performance of Java programs by compiling bytecode into native machine code at runtime. While the Java compiler (javac) converts Java source code into platform-independent bytecode, it is the JVM that executes this bytecode. 
+🔷 Java Compilation and Execution Process
+🔗 Compile Time
+➤ This is the phase where source code is checked and translated into bytecode.
+➤ Java source files (.java) are compiled by the Java Compiler (javac).
+➤ The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
+
+[Source Code (.java file)]
+             |
+             v
+[JDK - javac Compiler]
+   (Compiles to Bytecode)
+             |
+             v
+[.class File (Bytecode)]
+             |
+             v
+[JVM Class Loader]
+   (Loads class into memory)
+             |
+             v
+[Bytecode Verifier]
+   (Validates bytecode)
+             |
+             v
+[Execution by JVM]
+     /           \
+    v             v
+[Interpreter]   [JIT Compiler]
+ (line-by-line)   (compiles hot code to native)
+             |
+             v
+[Native Machine Code]
+             |
+             v
+[CPU Executes Code → Output]
+
+The JVM uses both an interpreter and a JIT (Just-In-Time) compiler because it’s designed to balance fast startup with high runtime performance.
+
+1️⃣ Roles of Each
+Interpreter
+➤ Reads bytecode line by line and executes it directly.
+➤ Advantage: Immediate execution → fast startup.
+➤ Disadvantage: Slower in the long run because every instruction has to be interpreted again and again.
+
+JIT Compiler
+➤ Detects “hot code” (frequently executed methods/loops).
+➤ Translates those bytecode parts into native machine code.
+➤ Advantage: Native code runs much faster (close to C/C++ speeds).
+➤ Disadvantage: Compilation takes time and memory.
+
+2️⃣ Why JVM Combines Them
+If the JVM only used:
+➤ Interpreter only → Quick startup but poor long-term performance.
+➤ JIT only → Very slow startup (needs to compile everything first).
+
+By combining:
+➤ Start with the interpreter → get the program running instantly.
+➤ Monitor execution → detect methods/loops used often.
+➤ Switch to JIT for those hot parts → gain native-speed execution.
+
+This is called adaptive optimization.
+
+3️⃣ Real-Life Analogy
+➤ Interpreter = You read a speech word-by-word from paper → you can start immediately, but it’s slow if you have to repeat it.
+➤ JIT = You memorize the speech (compile to native) → takes time initially, but then you can say it much faster.
+➤ JVM = First read it from the paper, and for parts you repeat often, memorize them.
+
+4️⃣ Execution Flow in JVM
+➤ Bytecode Verifier checks safety.
+➤ Interpreter starts running bytecode.
+➤ JVM profiling detects “hot” methods.
+➤ JIT compiles those into native code.
+➤ Native code replaces the interpreted version for future calls.
+
+Command: javac MyProgram.java
+Result: Creates MyProgram.class file.
+
+🔗 Run Time
+➤ This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
+➤ The JVM loads the .class file and executes the bytecode.
+➤ Any exceptions or logical errors may occur during this phase.
+
+Command: java MyProgram
+Result: Runs the program using the bytecode inside MyProgram.class.
+
+✅ What Makes Java Platform Independent?
+Java is platform-independent because of its "Write Once, Run Anywhere" capability.
+This is mainly due to:
+🔑 1. Bytecode
+When you compile a Java program (.java file), the Java compiler (javac) doesn't generate platform-specific machine code.
+It generates bytecode (.class file) — an intermediate, platform-neutral code.
+
+// You write this
+HelloWorld.java
+↓
+// Compiled by javac to
+HelloWorld.class (bytecode)
 
 
 2️⃣ JRE (Java Runtime Environment)
@@ -1633,105 +1729,6 @@ public class C {
 		A a1 = new A();//--->Error
 	}
 }
-
-🔷 Java Compilation and Execution Process
-🔗 Compile Time
-➤ This is the phase where source code is checked and translated into bytecode.
-➤ Java source files (.java) are compiled by the Java Compiler (javac).
-➤ The compiler checks for syntax errors and converts the code into bytecode (platform-independent code).
-
-[Source Code (.java file)]
-             |
-             v
-[JDK - javac Compiler]
-   (Compiles to Bytecode)
-             |
-             v
-[.class File (Bytecode)]
-             |
-             v
-[JVM Class Loader]
-   (Loads class into memory)
-             |
-             v
-[Bytecode Verifier]
-   (Validates bytecode)
-             |
-             v
-[Execution by JVM]
-     /           \
-    v             v
-[Interpreter]   [JIT Compiler]
- (line-by-line)   (compiles hot code to native)
-             |
-             v
-[Native Machine Code]
-             |
-             v
-[CPU Executes Code → Output]
-
-The JVM uses both an interpreter and a JIT (Just-In-Time) compiler because it’s designed to balance fast startup with high runtime performance.
-
-1️⃣ Roles of Each
-Interpreter
-➤ Reads bytecode line by line and executes it directly.
-➤ Advantage: Immediate execution → fast startup.
-➤ Disadvantage: Slower in the long run because every instruction has to be interpreted again and again.
-
-JIT Compiler
-➤ Detects “hot code” (frequently executed methods/loops).
-➤ Translates those bytecode parts into native machine code.
-➤ Advantage: Native code runs much faster (close to C/C++ speeds).
-➤ Disadvantage: Compilation takes time and memory.
-
-2️⃣ Why JVM Combines Them
-If the JVM only used:
-➤ Interpreter only → Quick startup but poor long-term performance.
-➤ JIT only → Very slow startup (needs to compile everything first).
-
-By combining:
-➤ Start with the interpreter → get the program running instantly.
-➤ Monitor execution → detect methods/loops used often.
-➤ Switch to JIT for those hot parts → gain native-speed execution.
-
-This is called adaptive optimization.
-
-3️⃣ Real-Life Analogy
-➤ Interpreter = You read a speech word-by-word from paper → you can start immediately, but it’s slow if you have to repeat it.
-➤ JIT = You memorize the speech (compile to native) → takes time initially, but then you can say it much faster.
-➤ JVM = First read it from the paper, and for parts you repeat often, memorize them.
-
-4️⃣ Execution Flow in JVM
-➤ Bytecode Verifier checks safety.
-➤ Interpreter starts running bytecode.
-➤ JVM profiling detects “hot” methods.
-➤ JIT compiles those into native code.
-➤ Native code replaces the interpreted version for future calls.
-
-Command: javac MyProgram.java
-Result: Creates MyProgram.class file.
-
-🔗 Run Time
-➤ This is the phase where the compiled bytecode is executed by the Java Virtual Machine (JVM).
-➤ The JVM loads the .class file and executes the bytecode.
-➤ Any exceptions or logical errors may occur during this phase.
-
-Command: java MyProgram
-Result: Runs the program using the bytecode inside MyProgram.class.
-
-✅ What Makes Java Platform Independent?
-Java is platform-independent because of its "Write Once, Run Anywhere" capability.
-This is mainly due to:
-🔑 1. Bytecode
-When you compile a Java program (.java file), the Java compiler (javac) doesn't generate platform-specific machine code.
-It generates bytecode (.class file) — an intermediate, platform-neutral code.
-
-// You write this
-HelloWorld.java
-↓
-// Compiled by javac to
-HelloWorld.class (bytecode)
-
 
 🔄 Polymorphism
 Two types of polymorphism:

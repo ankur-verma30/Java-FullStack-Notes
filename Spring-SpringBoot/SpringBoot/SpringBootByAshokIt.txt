@@ -79,16 +79,18 @@ public class Application {
 👉 If all there dependencies are added priority is given to web app.
 
 ➤ If we want to remove the banner of the spring in application.properties file we can add:
-🔗 spring.main.banner-mode=off      ----> have 3 modes off, console, log
+🔗 spring.main.banner-mode=off  ─────────▶ have 3 modes off, console, log
 
 ➤ If we want to change the banner message we can add:
-🔗 spring.banner.image.location=classpath:banner.txt    ----> will print the banner message from this file
+🔗 spring.banner.image.location=classpath:banner.txt ─────────▶ will print the banner message from this file
 ➤ Or we can put the banner.txt file inside the src/main/resources folder where out application.properties file is there.
 
 URL is:  https://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=SpringBoot
 
 
+=========================
 🔷 Runners In SpringBoot
+=========================
 ➤ When a Spring Boot application starts, sometimes you want to run custom logic — for example:
     ✔️ Loading initial data into the database
     ✔️ Sending a notification at startup
@@ -155,7 +157,6 @@ Debug mode is enabled!
 
 🔄 Execution Order
 ➤ If both CommandLineRunner and ApplicationRunner are defined, they will run in the order they are declared in the application context.
-
 ➤ If you have multiple runners, you can control their order using the @Order annotation.
 
 import org.springframework.core.annotation.Order;
@@ -229,10 +230,10 @@ public class DataLoader {
 ➤ Executes only once per bean lifecycle.
 
 🔄 Common Use Cases
-    ✔️  Loading initial data into the database
-    ✔️  Validating configuration after injection
-    ✔️  Establishing a connection or preloading cache
-    ✔️  Printing startup messages
+✔️  Loading initial data into the database
+✔️  Validating configuration after injection
+✔️  Establishing a connection or preloading cache
+✔️  Printing startup messages
 
 ✅ Example with Logging and Config
 @Component
@@ -266,12 +267,128 @@ public class StartupListener {
         System.out.println("✅ Application is fully started and ready!");
     }
 }
-👉 This ns after the full Spring context is initialized (safer for web apps).
+👉 This runs after the full Spring context is initialized (safer for web apps).
+
 ❓ Difference between @PostConstruct and Runners?
 @PostConstruct: Runs right after bean initialization.
 Runners: Run after the entire Spring context is initialized (i.e., all beans are ready).
 
-=========================================================================================
+
+===============================
+🔷 @PreDestroy in Spring Boot
+===============================
+➤ @PreDestroy is a lifecycle callback annotation used to execute cleanup logic just before a Spring bean is destroyed.
+➤ Part of JSR-250 (jakarta.annotation)
+➤ Called when the Spring container is shutting down
+➤ Used to release resources gracefully
+    import jakarta.annotation.PreDestroy;
+
+🔄 When is @PreDestroy executed?
+@PreDestroy method is invoked when:
+    ✔️ Application is stopped
+    ✔️ JVM receives SIGTERM (e.g. Ctrl + C)
+    ✔️ Spring context is closed
+    ✔️ Kubernetes / Docker sends termination signal
+➡️ Runs before the bean is removed from memory
+
+✅ Example:
+@Component
+public class ResourceManager {
+
+    @PreDestroy
+    public void cleanup() {
+        System.out.println("Releasing resources before shutdown...");
+    }
+}
+👉 Execution order:
+1️⃣ Spring starts shutdown
+2️⃣ @PreDestroy method runs
+3️⃣ Bean destroyed
+4️⃣ JVM exits
+
+
+🔄 Common Use Cases
+➤ Closing database connections
+➤ Stopping background threads
+➤ Shutting down executors / schedulers
+➤ Flushing logs / buffers
+➤ Releasing file handles
+➤ Graceful shutdown of Kafka / RabbitMQ consumers
+
+
+🔄 Important Rules for @PreDestroy
+➤ Method must be:
+    ✔️ void return type
+    ✔️ No arguments
+➤ Only one @PreDestroy method per bean
+➤ Method must not throw checked exceptions
+➤ Works only for Spring-managed beans
+❌ Not called if you use new keyword
+    new ResourceManager(); // @PreDestroy will NOT run
+
+@PreDestroy 🆚 @PostConstruct
+| Annotation       | Purpose                          |
+| ---------------- | -------------------------------- |
+| `@PostConstruct` | Runs **after bean creation**     |
+| `@PreDestroy`    | Runs **before bean destruction** |
+
+
+
+🔄 @PreDestroy vs DisposableBean
+Using DisposableBean
+@Component
+public class MyBean implements DisposableBean {
+
+    @Override
+    public void destroy() {
+        System.out.println("Destroy method called");
+    }
+}
+
+
+🔄 Why @PreDestroy is better?
+➤ No interface coupling
+➤ Cleaner and more readable
+➤ Annotation-based (preferred in modern Spring)
+
+🔄 Multiple Shutdown Hooks – Execution Order
+➤ @PreDestroy
+➤ DisposableBean.destroy()
+➤ Custom destroyMethod in @Bean
+
+🔄 @PreDestroy with @Bean
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ExecutorService executorService() {
+        return Executors.newFixedThreadPool(5);
+    }
+
+    @PreDestroy
+    public void shutdownExecutor() {
+        executorService().shutdown();
+    }
+}
+
+⚠️ Cases Where @PreDestroy is NOT called
+➤ Application crashes (kill -9)
+➤ Bean scope is prototype
+➤ JVM forcefully terminated
+➤ Bean is not managed by Spring
+
+✅ Real-World Example (Production)
+@Component
+public class KafkaConsumerManager {
+
+    @PreDestroy
+    public void shutdown() {
+        kafkaConsumer.wakeup();
+        kafkaConsumer.close();
+    }
+}
+
+========================================================================================
 🔷 Properties | YAML | How to pass command line arguments in spring boot application ?
 ========================================================================================
 1️⃣ application.properties
