@@ -1837,7 +1837,7 @@ public class PlatinumAccount extends GoldAccount {
 	}
 }
 
-🔗 Order of Access Specifiers: Private -> Default -> Proctected -> Public
+🔗 Order of Access Specifiers: Private ─────────▶ Default ─────────▶ Proctected ─────────▶ Public
 
 ✅ Example 3:
 package p1;

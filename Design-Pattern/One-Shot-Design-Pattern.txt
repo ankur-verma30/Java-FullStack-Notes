@@ -1,0 +1,1222 @@
+#############################
+🔷 Creational Design Pattern
+#############################
+===============================
+1️⃣ Singleton Design Pattern
+===============================
+➤ Singleton Pattern ensures that only one instance of a class exists in the entire application.
+➤ It also provides a global access point to that single instance.
+➤ In Java, this is commonly used for shared resources that must be centrally controlled.
+
+
+🔁 Problem It Solves
+Prevents multiple objects from being created for something that should exist only once.
+Without Singleton:
+    ✔️ Multiple instances → inconsistent state
+    ✔️ Wasted memory/resources
+    ✔️ Hard-to-track bugs in large applications
+Especially critical when:
+    ✔️ Managing shared configuration
+    ✔️ Handling centralized services
+    ✔️ Controlling access to limited resources
+
+
+🔁 Real-Life Analogy
+Country’s Prime Minister
+    ✔️ Only one Prime Minister exists at a time.
+    ✔️ Everyone refers to the same authority.
+    ✔️ If multiple PMs existed → chaos and conflicting decisions.
+Same idea: one object, one authority, global access.
+
+
+🔁 Real-World Project Usage (Java / Spring – No Code)
+1️⃣ Configuration Management
+    ✔️ Application configuration is loaded once and shared across services.
+
+2️⃣ Logging System
+    ✔️ A single logger instance handles logs from all parts of the application.
+
+3️⃣ Database Connection Manager
+    ✔️ Controls access to database connections to avoid overload.
+
+4️⃣ Caching Layer
+    ✔️ One cache instance shared across multiple services.
+
+5️⃣ Spring Boot Context
+    ✔️ By default, Spring beans are Singleton-scoped, meaning the framework manages one instance per container.
+
+
+🔁 Obervational Questions 
+Tests understanding of:
+    ✔️ Object lifecycle
+    ✔️ Resource management
+    ✔️ Concurrency implications
+
+Often followed by:
+    ✔️ “Is Singleton good or bad?”
+    ✔️ “How does Spring handle Singleton internally?”
+
+===========================
+🔷 Factory Design Pattern
+===========================
+➤ Factory Design Pattern provides a centralized way to create objects without exposing the object creation logic to the client.
+➤ The client only asks for an object; the factory decides which concrete class to instantiate.
+➤ Focuses on object creation abstraction.
+
+
+🔁 Problem It Solves
+➤ Removes tight coupling between client code and concrete classes.
+➤ Without Factory:
+    ✔️ Client code contains many new operations
+    ✔️ Adding a new type requires modifying existing logic
+    ✔️ Violates Open–Closed Principle
+➤ Factory solves:
+    ✔️ Object creation complexity
+    ✔️ Frequent condition-based instantiation (if–else, switch)
+    ✔️ Scalability issues when new types are added
+
+
+🔁 Real-Life Analogy
+➤ Restaurant Kitchen
+    ✔️ You order food (Pizza / Burger / Pasta)
+    ✔️ You don’t know how it’s cooked or who cooks it
+    ✔️ The kitchen (factory) decides which chef prepares your order
+➤ You ask → Factory decides → You receive the object
+
+
+🔁 Real-World Project Usage 
+1️⃣ Payment Processing Systems
+    ✔️ Factory returns different payment handlers (Card, UPI, Wallet) based on input.
+
+2️⃣ Notification Systems
+    ✔️ Factory provides Email, SMS, or Push notification service.
+
+3️⃣ Document / File Processing
+    ✔️ Factory creates PDF, Excel, or Word processors.
+
+4️⃣ Spring Framework Internals
+    ✔️ Spring uses factories internally to create beans based on configuration.
+
+5️⃣ Microservices Integration
+    ✔️ Choosing different client implementations based on environment or version.
+
+
+🔁 Obervational Questions
+Tests understanding of:
+✔️ Loose coupling
+✔️ SOLID principles
+✔️ Extensibility in large systems
+
+Follow-up questions often include:
+✔️ Difference between Factory and Abstract Factory
+✔️ Why Factory is preferred over direct object creation
+
+
+====================================
+🔷 Abstract Factory Design Pattern
+====================================
+➤ Abstract Factory Pattern provides an interface to create families of related or dependent objects without specifying their concrete classes.
+➤ It is essentially a factory of factories.
+➤ Focuses on grouped object creation with consistency.
+
+
+2️⃣ Problem It Solves
+➤ When multiple related objects must be created together and compatible with each other.
+➤ Without Abstract Factory:
+    ✔️ Mixing incompatible objects (wrong combinations)
+    ✔️ Too many conditional checks
+    ✔️ Difficult to switch entire product families
+➤ Solves:
+    ✔️ Consistency across related objects
+    ✔️ Easy switching between entire families
+    ✔️ Cleaner architecture for large systems
+
+
+3️⃣ Real-Life Analogy
+➤ Car Manufacturing Plant
+    ✔️ One plant produces SUV parts
+    ✔️ Another produces Sedan parts
+    ✔️ Each plant provides:
+            🔗 Engine
+            🔗 Tyres
+            🔗 Interior
+    ✔️ You never mix SUV engine with Sedan interior
+➤ Each plant = Abstract Factory
+➤ Each part set = Product family
+
+
+4️⃣ Real-World Project Usage
+1️⃣ UI Theme Systems
+    ✔️ Light theme factory produces light buttons, light dialogs, light inputs
+    ✔️ Dark theme factory produces dark variants of all components
+
+2️⃣ Cloud Provider Integrations
+    ✔️ AWS factory vs Azure factory providing storage, messaging, and compute services
+
+3️⃣ Cross-Database Support
+    ✔️ MySQL factory vs Oracle factory creating compatible DAOs and query executors
+
+4️⃣ Enterprise Applications
+    ✔️ Switching entire implementations based on client, region, or environment
+
+5️⃣ Spring Profiles
+    ✔️ Different factories activated based on environment (dev, prod, test)
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Object families
+    ✔️ High-level abstraction
+    ✔️ Enterprise-level architecture thinking
+
+Common follow-ups:
+    ✔️ Factory vs Abstract Factory
+    ✔️ When Abstract Factory is overkill
+
+
+=============================
+🔷 Builder Design Pattern
+=============================
+➤ Builder Design Pattern separates the construction of a complex object from its representation.
+➤ It allows creating objects step by step, giving control over which parts are built.
+➤ Especially useful when an object has many optional parameters.
+
+
+🔁 Problem It Solves
+Solves the telescoping constructor problem:
+    ✔️ Too many constructors
+    ✔️ Confusing parameter order
+    ✔️ Poor readability and maintainability
+
+Without Builder:
+    ✔️ Hard-to-understand object creation
+    ✔️ Bugs due to wrong parameter positioning
+    ✔️ Difficult to enforce immutability
+
+Builder provides:
+    ✔️ Clear, readable object creation
+    ✔️ Flexibility with optional fields
+    ✔️ Safer construction of complex objects
+
+
+🔁 Real-Life Analogy
+Ordering a Custom Burger
+    ✔️ Choose bun, patty, cheese, sauces, toppings step by step
+    ✔️ You don’t have to choose everything
+    ✔️ Final burger is assembled only when you’re done
+Builder = Burger customization counter
+
+
+🔁 Real-World Project Usage 
+1️⃣ User Registration / Profile Objects
+    ✔️ Many optional fields like address, preferences, social links
+
+2️⃣ API Request / Response Objects
+    ✔️ Constructing complex request payloads with optional parameters
+
+3️⃣ Configuration Objects
+    ✔️ Database, security, or client configuration with optional settings
+
+4️⃣ Immutable Domain Models
+    ✔️ Objects created once and never modified afterward
+
+5️⃣ Spring Framework Usage
+    ✔️ Widely used in Java libraries (e.g., HTTP clients, ORM configurations)
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Object construction vs object usage
+    ✔️ Immutability concepts
+    ✔️ Clean and readable APIs
+
+Common follow-ups:
+    ✔️ Builder vs Factory
+    ✔️ When Builder is better than constructors
+
+
+
+===========================
+🔷 Prototye Design Pattern
+===========================
+➤ Prototype Design Pattern creates new objects by cloning an existing object (prototype) instead of creating them from scratch.
+➤ Object creation is based on copying, not instantiation.
+➤ Especially useful when object creation is costly or complex.
+
+🔁 Problem It Solves
+When creating an object:
+    ✔️ Is expensive (database calls, heavy computations)
+    ✔️ Requires complex setup or configuration
+
+Without Prototype:
+    ✔️ Repeated heavy initialization
+    ✔️ Performance overhead
+    ✔️ Duplicate setup logic everywhere
+
+Prototype solves:
+    ✔️ Faster object creation
+    ✔️ Reduced initialization cost
+    ✔️ Cleaner and reusable object setup
+
+
+🔁 Real-Life Analogy 
+➤ Photocopy Machine
+    ✔️ You don’t rewrite the entire document
+    ✔️ You copy an existing one and make small changes
+➤ Prototype = Original document
+➤ New object = Photocopy
+
+
+🔁 Real-World Project Usage 
+1️⃣ Game Development
+    ✔️ Cloning enemies or characters with similar attributes
+
+2️⃣ Document / Template Systems
+    ✔️ Creating reports or invoices from predefined templates
+
+3️⃣ Caching Systems
+    ✔️ Store a prototype object and clone it on demand
+
+4️⃣ Configuration Objects
+    ✔️ Base configuration cloned and customized per request
+
+5️⃣ ORM / Persistence Contexts
+    ✔️ Creating entity copies for transactional or sandbox operations
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Object lifecycle
+    ✔️ Deep vs shallow copy concepts
+    ✔️ Performance optimization techniques
+Common follow-ups:
+    ✔️ When cloning is dangerous
+    ✔️ How Prototype differs from Factory
+
+
+#############################
+🔷 Behavioral Design Pattern
+#############################
+==========================================
+🔷 Chain of Responsibility Design Pattern
+==========================================
+➤ Chain of Responsibility Pattern allows a request to be passed through a chain of handlers, where each handler can:
+    ✔️ Process the request, or
+    ✔️ Pass it to the next handler in the chain
+➤ The sender of the request does not know which handler will process it.
+
+
+🔁 Problem It Solves
+➤ Eliminates tight coupling between the sender and receiver of a request.
+➤ Without this pattern:
+    ✔️ Large if-else or switch blocks
+    ✔️ Hard-coded processing order
+    ✔️ Difficult to add or remove processing logic
+➤ Solves:
+    ✔️ Flexible request handling
+    ✔️ Dynamic processing pipelines
+    ✔️ Cleaner and extensible design
+
+
+🔁 Real-Life Analogy
+➤ Customer Support Escalation
+    ✔️ Level 1 support tries to resolve the issue
+    ✔️ If not resolved → escalates to Level 2
+    ✔️ Then Level 3 if needed
+➤ Each support agent = Handler
+➤ Issue moves along the chain until handled
+
+
+🔁 Real-World Project Usage
+1️⃣ Authentication & Authorization Pipelines
+    ✔️ Request passes through multiple security checks
+2️⃣ Validation Frameworks
+    ✔️ Multiple validators applied sequentially
+3️⃣ Logging Systems
+    ✔️ Different log levels handled by different log processors
+4️⃣ Workflow Engines
+    ✔️ Each step processes or forwards the request
+5️⃣ Spring Security
+    ✔️ Filter chain where each filter decides to act or pass the request
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Decoupling request sender and processor
+    ✔️ Dynamic behavior chaining
+    ✔️ Extensibility in enterprise systems
+Common follow-ups:
+    ✔️ Chain vs Pipeline
+    ✔️ Drawbacks like debugging complexity
+
+
+===========================
+🔷 Command Design Pattern
+===========================
+➤ Command Design Pattern encapsulates a request as an object, allowing you to:
+    ✔️ Parameterize clients with different requests
+    ✔️ Queue, log, or undo operations
+➤ It separates the object that invokes an action from the object that performs it.
+
+
+🔁 Problem It Solves
+Without Command Pattern:
+    ✔️ Invoker directly calls business logic
+    ✔️ Tight coupling between UI / controller and service logic
+    ✔️ Hard to support undo, redo, or request history
+Command solves:
+    ✔️ Decoupling request sender and executor
+    ✔️ Flexible execution of operations
+    ✔️ Easy extension of new commands without changing invoker
+
+
+🔁 Real-Life Analogy
+➤ TV Remote Control
+    ✔️ Buttons don’t know how TV works
+    ✔️ Each button sends a command (ON, OFF, Volume Up)
+    ✔️ TV executes the command
+➤ Remote = Invoker
+➤ Button action = Command
+➤ TV = Receiver
+
+
+🔁 Real-World Project Usage 
+1️⃣ UI Action Handling
+    ✔️ Menu buttons triggering different operations
+2️⃣ Undo / Redo Functionality
+    ✔️ Text editors, IDEs, drawing applications
+3️⃣ Job Queues
+    ✔️ Encapsulating tasks to be executed later
+4️⃣ Transactional Systems
+    ✔️ Each operation stored as a command for audit or rollback
+5️⃣ Spring Framework
+    ✔️ Encapsulating requests in controllers or task executors
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Behavioral decoupling
+    ✔️ Command history & rollback concepts
+    ✔️ Clean separation of concerns
+Common follow-ups:
+    ✔️ Command vs Strategy
+    ✔️ How undo/redo is implemented conceptually
+
+
+================================
+🔷 Interpreter Design Pattern
+================================
+➤ Interpreter Design Pattern defines a way to evaluate or interpret language grammar or expressions.
+➤ It represents grammar rules as classes and uses them to interpret sentences in that language.
+➤ Mainly used for simple, repetitive rule-based languages.
+
+
+🔁 Problem It Solves
+When you need to:
+✔️  Interpret expressions repeatedly
+✔️  Apply custom business rules dynamically
+Without Interpreter:
+✔️  Hard-coded rule logic
+✔️  Poor extensibility for new grammar rules
+✔️  Complex conditional statements
+Interpreter solves:
+✔️  Clean separation of grammar and logic
+✔️  Easy extension of language rules
+✔️  Readable and maintainable rule evaluation
+
+
+🔁 Real-Life Analogy 
+➤ Language Translator
+✔️  Each word or grammar rule has meaning
+✔️  Sentences are interpreted word by word
+➤ Grammar rules = Expressions
+➤ Translator = Interpreter
+
+
+🔁 Real-World Project Usage 
+1️⃣ Rule Engines
+✔️  Evaluating business rules like discounts or eligibility
+2️⃣ Search Filters
+✔️  Parsing search queries with conditions
+3️⃣ Expression Evaluators
+✔️  Mathematical or logical expression parsing
+4️⃣ Access Control Rules
+✔️  Permission expressions interpreted at runtime
+5️⃣ Configuration Parsing
+✔️  Interpreting DSLs (Domain Specific Languages)
+
+
+🔁 Obervational Questions
+Tests understanding of:
+✔️  Grammar-based design
+✔️  Expression trees
+✔️  Trade-offs between flexibility and complexity
+Common follow-ups:
+✔️  Why Interpreter is rarely used
+✔️  Alternatives like rule engines or scripting
+
+============================
+🔷 Iterator Design Pattern
+============================
+➤ Iterator Design Pattern provides a standard way to access elements of a collection sequentially without exposing its internal structure.
+➤ It separates iteration logic from collection implementation.
+
+
+🔁 Problem It Solves
+Without Iterator:
+    ✔️ Client code depends on collection’s internal representation
+    ✔️ Different traversal logic for different data structures
+    ✔️ Tight coupling between data storage and traversal
+Iterator solves:
+    ✔️ Uniform way to traverse collections
+    ✔️ Encapsulation of internal structure
+    ✔️ Cleaner, more maintainable client code
+
+
+🔁 Real-Life Analogy 
+➤ TV Channel Remote
+    ✔️ You press “Next” to move forward
+    ✔️ You don’t know how channels are stored internally
+➤ Remote = Iterator
+➤ Channels list = Collection
+
+
+🔁 Real-World Project Usage
+1️⃣ Java Collections Framework
+    ✔️ Iterating over lists, sets, maps using a common interface
+2️⃣ Database Result Processing
+    ✔️ Traversing query results row by row
+3️⃣ Log Processing
+    ✔️ Sequentially reading log entries
+4️⃣ Pagination Systems
+    ✔️ Iterating over large datasets in chunks
+5️⃣ Custom Data Structures
+    ✔️ Providing traversal without exposing internals
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Encapsulation
+    ✔️ Separation of concerns
+    ✔️ Internal vs external iteration
+Common follow-ups:
+    ✔️ Iterator vs For-each loop
+    ✔️ Fail-fast vs Fail-safe iterators
+
+
+============================
+🔷 Mediator Design Pattern
+============================
+➤ Mediator Design Pattern defines a central object (mediator) that handles communication between multiple objects.
+➤ Objects do not communicate directly with each other; they communicate only through the mediator.
+➤ Promotes loose coupling by reducing direct dependencies.
+
+
+🔁 Problem It Solves
+When many objects interact directly:
+    ✔️ Too many dependencies
+    ✔️ Difficult to change behavior
+    ✔️ Hard-to-maintain “spaghetti communication”
+Without Mediator:
+    ✔️ Every object knows about every other object
+    ✔️ Small change breaks multiple components
+Mediator solves:
+    ✔️ Centralized communication logic
+    ✔️ Reduced coupling
+    ✔️ Easier system evolution
+
+
+🔁 Real-Life Analogy 
+➤ Airport Air Traffic Control (ATC)
+    ✔️ Planes don’t talk to each other directly
+    ✔️ All communication goes through ATC
+➤ ATC = Mediator
+➤ Planes = Colleague objects
+
+
+🔁 Real-World Project Usage
+1️⃣ Chat Applications
+    ✔️ Chat server mediates message exchange between users
+2️⃣ UI Components Interaction
+    ✔️ Buttons, text fields, and dialogs communicate via a controller
+3️⃣ Workflow Orchestration
+    ✔️ Central service coordinating multiple microservices
+4️⃣ Event-Based Systems
+    ✔️ Mediator handles event routing and responses
+5️⃣ Spring MVC
+    ✔️ Controller acts as mediator between view and service layers
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Decoupling
+    ✔️ Centralized control vs distributed logic
+    ✔️ Trade-offs of single point of control
+Common follow-ups:
+    ✔️ Mediator vs Observer
+    ✔️ When Mediator becomes too complex
+
+
+============================
+🔷 Memento Design Pattern
+============================
+➤ Memento Design Pattern captures and stores an object’s internal state so it can be restored later without violating encapsulation.
+➤ The object itself decides what state to save and restore.
+
+
+🔁 Problem It Solves
+When you need:
+    ✔️ Undo / rollback functionality
+    ✔️ Temporary state preservation
+Without Memento:
+    ✔️ Exposing internal state (breaking encapsulation)
+    ✔️ Complex manual state tracking
+Memento solves:
+    ✔️ Safe state restoration
+    ✔️ Clean undo/redo mechanisms
+    ✔️ Encapsulation-friendly backups
+
+
+🔁 Real-Life Analogy
+➤ Game Save Point
+    ✔️ You save the game state
+    ✔️ If you fail, you reload the saved state
+➤ Save file = Memento
+➤ Game = Originator
+
+
+🔁 Real-World Project Usage
+1️⃣ Undo / Redo Features
+    ✔️ Text editors, IDEs, design tools
+2️⃣ Transactional Rollbacks
+    ✔️ Restoring object state after failure
+3️⃣ Versioning Systems
+    ✔️ Reverting to previous versions
+4️⃣ Form State Management
+    ✔️ Restoring user input after navigation
+5️⃣ Workflow Systems
+    ✔️ Step-by-step state rollback
+
+
+🔁 Obervational Questions
+Tests understanding of:
+    ✔️ Encapsulation
+    ✔️ State management
+    ✔️ Object responsibility separation
+Common follow-ups:
+    ✔️ Memento vs Snapshot
+    ✔️ Memory impact of storing states
+
+
+============================
+🔷 Observer Design Pattern
+============================
+➤ Observer Design Pattern defines a one-to-many dependency where:
+    ✔️ One object (Subject) changes state
+    ✔️ All dependent objects (Observers) are automatically notified
+➤ Observers react without tightly coupling to the subject.
+
+
+🔁 Problem It Solves
+➤ When multiple components need to stay in sync with a single source of truth.
+➤ Without Observer:
+    ✔️ Manual notifications
+    ✔️ Tight coupling between components
+    ✔️ Missed or inconsistent updates
+➤ Observer solves:
+    ✔️ Automatic updates
+    ✔️ Loose coupling
+    ✔️ Event-driven communication
+
+
+🔁 Real-Life Analogy
+➤ YouTube Channel Subscriptions
+    ✔️ You subscribe to a channel
+    ✔️ When a new video is uploaded, you’re notified automatically
+➤ Channel = Subject
+➤ Subscribers = Observers
+
+
+🔁 Real-World Project Usage
+1️⃣ Event-Driven Systems
+    ✔️ Publishing events and notifying listeners
+2️⃣ UI Frameworks
+    ✔️ UI components updating when data changes
+3️⃣ Microservices
+    ✔️ Services reacting to domain events
+4️⃣ Spring Framework
+    ✔️ Application events and listeners
+5️⃣ Stock / Price Monitoring
+    ✔️ Multiple clients notified on price changes
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Event handling
+    ✔️ Loose coupling
+    ✔️ Reactive design
+➤ Common follow-ups:
+    ✔️ Observer vs Pub-Sub
+    ✔️ Problems like memory leaks with observers
+
+
+=========================
+🔷 State Design Pattern
+=========================
+➤ State Design Pattern allows an object to change its behavior when its internal state changes.
+➤ The object appears to change its class, but actually delegates behavior to state-specific objects.
+
+
+🔁 Problem It Solves
+➤ When an object has multiple states and behavior varies based on the current state.
+➤ Without State:
+    ✔️ Large if-else or switch statements
+    ✔️ Hard-to-maintain logic
+    ✔️ Difficult to add new states
+➤ State solves:
+    ✔️ Cleaner state-based behavior
+    ✔️ Easy addition of new states
+    ✔️ Eliminates conditional complexity
+
+
+🔁 Real-Life Analogy
+➤ Traffic Light
+    ✔️ Red → Stop
+    ✔️ Yellow → Ready
+    ✔️ Green → Go
+➤ Same object, different behavior based on state
+
+
+🔁 Real-World Project Usage
+1️⃣ Order Lifecycle Management
+    ✔️ Created → Paid → Shipped → Delivered → Cancelled
+2️⃣ Authentication Flow
+    ✔️ Logged out → Logged in → Session expired
+3️⃣ Workflow Engines
+    ✔️ Each workflow step behaves differently
+4️⃣ Game Development
+    ✔️ Character behavior changes based on state
+5️⃣ Connection Management
+    ✔️ Open, closed, suspended connections
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ State-driven behavior
+    ✔️ Eliminating conditionals
+    ✔️ Clean extensibility
+➤ Common follow-ups:
+    ✔️ State vs Strategy
+    ✔️ State transition control
+
+============================
+🔷 Strategy Design Pattern
+============================
+➤ Strategy Design Pattern defines a family of algorithms, encapsulates each one, and makes them interchangeable at runtime.
+➤ The behavior of an object can be changed dynamically without modifying its code.
+
+
+🔁 Problem It Solves
+➤ When multiple algorithms exist for the same task.
+➤ Without Strategy:
+    ✔️ Large if-else or switch logic
+    ✔️ Tight coupling between algorithm and client
+    ✔️ Hard to add new algorithms
+➤ Strategy solves:
+    ✔️ Clean separation of algorithms
+    ✔️ Open–Closed Principle compliance
+    ✔️ Runtime flexibility
+
+
+🔁 Real-Life Analogy
+➤ Google Maps Route Selection
+    ✔️ Fastest route
+    ✔️ Shortest route
+    ✔️ Toll-free route
+➤ Same destination, different strategies
+
+
+4️⃣ Real-World Project Usage
+1️⃣ Payment Processing
+    ✔️ Different payment algorithms (Card, UPI, Wallet)
+2️⃣ Sorting / Filtering Logic
+    ✔️ Different sorting strategies based on criteria
+3️⃣ Authentication Mechanisms
+    ✔️ OAuth, JWT, Basic Auth strategies
+4️⃣ Pricing & Discount Engines
+    ✔️ Different discount calculation rules
+5️⃣ Compression / Encryption
+    ✔️ Multiple algorithms selected at runtime
+
+
+5️⃣ Obervational Questions
+➤ Tests understanding of:
+    ✔️ Algorithm abstraction
+    ✔️ Runtime polymorphism
+    ✔️ Clean architecture
+➤ Common follow-ups:
+    ✔️ Strategy vs State
+    ✔️ When Strategy becomes over-engineering
+
+
+==================================
+🔷 Template Method Design Pattern
+==================================
+➤ Template Method Design Pattern defines the skeleton of an algorithm in a base class and lets subclasses override specific steps without changing the overall structure.
+➤ The algorithm flow is fixed, but certain steps are customizable.
+
+
+🔁 Problem It Solves
+➤ When multiple algorithms follow the same steps but differ in specific parts.
+➤ Without Template Method:
+    ✔️ Code duplication across similar workflows
+    ✔️ Inconsistent execution order
+    ✔️ Difficult maintenance
+➤ Template Method solves:
+    ✔️ Reuse of common logic
+    ✔️ Controlled extensibility
+    ✔️ Consistent algorithm flow
+
+
+🔁 Real-Life Analogy
+➤ Cooking Recipe
+    ✔️ Steps like prepare → cook → serve are fixed
+    ✔️ Ingredients or cooking style may vary
+➤ Recipe structure = Template
+➤ Variations = Custom steps
+
+
+🔁 Real-World Project Usage
+1️⃣ Authentication Workflows
+    ✔️ Validate → Authenticate → Authorize → Respond
+2️⃣ Data Processing Pipelines
+    ✔️ Read → Process → Save
+3️⃣ Spring Framework Development
+    ✔️ Base classes defining lifecycle methods
+4️⃣ Batch Processing Jobs
+    ✔️ Common job flow with customizable steps
+5️⃣ Spring Framework
+    ✔️ Lifecycle hooks where framework controls flow, developers plug logic
+
+
+5️⃣ Obervational Questions
+➤ Tests understanding of:
+    ✔️ Inheritance-based design
+    ✔️ Control inversion
+    ✔️ Reusability vs flexibility
+➤ Common follow-ups:
+    ✔️ Template vs Strategy
+    ✔️ When inheritance becomes limiting
+
+
+==========================
+🔷 Visitor Design Pattern
+==========================
+➤ Visitor Design Pattern allows you to add new operations to existing object structures without modifying their classes.
+➤ The operation logic is separated from the objects on which it operates.
+
+🔁 Problem It Solves
+➤ When you need to perform multiple unrelated operations on a set of objects.
+➤ Without Visitor:
+    ✔️ Adding new operations requires modifying every class
+    ✔️ Violates Open–Closed Principle
+➤ Visitor solves:
+    ✔️ Easy addition of new behaviors
+    ✔️ Cleaner separation of concerns
+    ✔️ Centralized operation logic
+
+
+🔁 Real-Life Analogy
+➤ Tax Auditor Visiting Departments
+    ✔️ Auditor visits HR, Finance, Sales
+    ✔️ Departments don’t implement tax logic
+➤ Auditor = Visitor
+➤ Departments = Elements
+
+
+🔁 Real-World Project Usage
+1️⃣ Report Generation
+    ✔️ Generating different reports from same data structure
+2️⃣ Compiler Design
+    ✔️ Syntax tree traversal for validation or optimization
+3️⃣ Billing & Pricing Engines
+    ✔️ Applying different calculations on order components
+4️⃣ Analytics Systems
+    ✔️ Collecting metrics from various object types
+5️⃣ Enterprise Rule Processing
+    ✔️ Running cross-cutting operations on domain models
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Open–Closed Principle
+    ✔️ Separation of data and behavior
+    ✔️ Double dispatch concept
+➤ Common follow-ups:
+    ✔️ Visitor drawbacks
+    ✔️ When Visitor becomes rigid
+
+
+#############################
+🔷 Structural Design Pattern
+#############################
+============================
+🔷 Adapter Design Pattern
+============================
+➤ Adapter Design Pattern allows two incompatible interfaces to work together.
+➤ It acts as a bridge between an existing class and a client that expects a different interface.
+➤ The adapter converts one interface into another that the client understands.
+
+
+🔁 Problem It Solves
+➤ When you want to use an existing or third-party class but its interface does not match what your system expects.
+➤ Without Adapter:
+    ✔️ You must modify existing code (often impossible for third-party libs)
+    ✔️ Duplicate logic
+    ✔️ Tight coupling
+➤ Adapter solves:
+    ✔️ Reuse of existing classes
+    ✔️ Integration without code changes
+    ✔️ Clean compatibility layer
+
+
+🔁 Real-Life Analogy
+Mobile Charger Adapter
+    ✔️ Wall socket ≠ mobile plug
+    ✔️ Adapter converts socket output to what phone understands
+➤ Socket = Existing system
+➤ Phone = Client
+➤ Charger adapter = Adapter
+
+
+🔁 Real-World Project Usage
+1️⃣ Third-Party API Integration
+    ✔️ Adapting external API responses to internal DTOs
+2️⃣ Legacy System Integration
+    ✔️ Wrapping old code to match new service interfaces
+3️⃣ Payment Gateway Integration
+    ✔️ Unified interface for multiple payment providers
+4️⃣ Logging Frameworks
+    ✔️ Adapting different logging libraries to a common interface
+5️⃣ Spring Framework
+    ✔️ Adapters between HTTP requests and controller method signatures
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Interface compatibility
+    ✔️ Reusability
+    ✔️ Integration design
+➤ Common follow-ups:
+    ✔️ Adapter vs Facade
+    ✔️ Class Adapter vs Object Adapter
+
+
+============================
+🔷 Bridge Design Pattern
+============================
+➤ Bridge Design Pattern decouples abstraction from implementation so that both can evolve independently.
+➤ It avoids tight binding between what an object does (abstraction) and how it does it (implementation).
+
+
+🔁 Problem It Solves
+➤ When abstraction and implementation grow together:
+    ✔️ Class explosion (too many subclasses)
+    ✔️ Rigid inheritance hierarchies
+➤ Without Bridge:
+    ✔️ Every combination needs a new subclass
+    (e.g., Shape + Color → CircleRed, CircleBlue, SquareRed…)
+➤ Bridge solves:
+    ✔️ Independent extensibility
+    ✔️ Reduced class count
+    ✔️ Cleaner separation of concerns
+
+
+🔁 Real-Life Analogy
+➤ Remote Control and Devices
+    ✔️ Remote = abstraction
+    ✔️ TV, AC, Music System = implementations
+    ✔️ Same remote can control different devices
+➤ You can change:
+    ✔️ Remote behavior
+    ✔️ Device implementation independently
+
+
+🔁 Real-World Project Usage
+1️⃣ Cross-Platform Applications
+    ✔️ Same business logic working on different platforms
+2️⃣ Messaging Systems
+    ✔️ Message abstraction + different delivery mechanisms (Email, SMS, Push)
+3️⃣ Payment Systems
+    ✔️ Payment abstraction + multiple payment providers
+4️⃣ Persistence Layers
+    ✔️ Repository abstraction + different databases
+5️⃣ Framework Design
+    ✔️ APIs decoupled from low-level implementations
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Composition over inheritance
+    ✔️ Avoiding class explosion
+    ✔️ Long-term scalability
+➤ Common follow-ups:
+    ✔️ Bridge vs Adapter
+    ✔️ Bridge vs Strategy
+
+
+============================
+🔷 Composite Design Pattern
+============================
+➤ Composite Design Pattern allows you to treat individual objects and compositions of objects uniformly.
+➤ It lets you build tree-like structures where both leaf objects and composite objects are handled the same way.
+
+
+🔁 Problem It Solves
+➤ When working with hierarchical or tree structures.
+➤ Without Composite:
+    ✔️ Client code must distinguish between single objects and groups
+    ✔️ Complex conditional logic
+➤ Composite solves:
+    ✔️ Uniform treatment of objects and groups
+    ✔️ Simplified client logic
+    ✔️ Clean hierarchical representation
+
+
+🔁 Real-Life Analogy
+➤ Company Organization Structure
+    ✔️ Employee → individual object
+    ✔️ Manager → manages multiple employees
+➤ Both employee and manager are treated as company members
+➤ Manager is just a composite of employees
+
+
+🔁 Real-World Project Usage
+1️⃣ File System
+    ✔️ Files and folders handled the same way
+2️⃣ UI Component Trees
+    ✔️ Buttons, panels, containers
+3️⃣ Menu Systems
+    ✔️ Menus containing sub-menus
+4️⃣ Permission / Role Hierarchies
+    ✔️ Roles composed of sub-roles
+5️⃣ Expression Trees
+    ✔️ Simple and compound expressions evaluated uniformly
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Tree structures
+    ✔️ Recursive design
+    ✔️ Uniform interface usage
+➤ Common follow-ups:
+    ✔️ Composite vs Decorator
+    ✔️ Handling leaf-specific behavior
+
+
+============================
+🔷 Decorator Design Pattern
+============================
+➤ Decorator Design Pattern allows you to add new behavior to an object dynamically without modifying its original class.
+➤ It wraps the original object and enhances its behavior at runtime.
+➤ Follows Open–Closed Principle.
+
+
+🔁 Problem It Solves
+➤ When you need to add features dynamically.
+➤ Without Decorator:
+    ✔️ Class explosion due to inheritance
+    (Base + FeatureA + FeatureB + FeatureA+B …)
+    ✔️ Rigid design
+➤ Decorator solves:
+    ✔️ Flexible feature extension
+    ✔️ Avoids subclass explosion
+    ✔️ Runtime behavior composition
+
+
+🔁 Real-Life Analogy
+➤ Coffee Shop Add-ons
+    ✔️ Base coffee
+    ✔️ Add milk, sugar, cream, chocolate
+➤ Each add-on wraps the previous one
+➤ Final cost & taste are combined
+➤ Add-ons = Decorators
+
+
+🔁 Real-World Project Usage
+1️⃣ Logging Enhancements
+    ✔️ Base logger + file logging + async logging
+2️⃣ Input / Output Streams
+    ✔️ Wrapping streams for buffering, compression, encryption
+3️⃣ Security
+    ✔️ Adding authentication or authorization layers
+4️⃣ UI Components
+    ✔️ Scrollbars, borders added dynamically
+5️⃣ Spring Framework
+    ✔️ AOP proxies behave like decorators around beans
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Composition over inheritance
+    ✔️ Runtime flexibility
+    ✔️ Cross-cutting concerns
+➤ Common follow-ups:
+    ✔️ Decorator vs Adapter
+    ✔️ Decorator vs Proxy
+
+
+============================
+🔷 Facade Design Pattern
+============================
+➤ Facade Design Pattern provides a simplified, unified interface to a complex subsystem.
+➤ It hides internal complexity and exposes only what the client needs.
+
+
+🔁 Problem It Solves
+➤ When a system has:
+    ✔️ Multiple classes
+    ✔️ Complex interactions
+    ✔️ Hard-to-use APIs
+➤ Without Facade:
+    ✔️ Client depends on many subsystem classes
+    ✔️ High coupling
+    ✔️ Difficult usage and maintenance
+➤ Facade solves:
+    ✔️ Simpler client interaction
+    ✔️ Reduced coupling
+    ✔️ Clear separation between client and subsystem
+
+
+🔁 Real-Life Analogy
+➤ Hotel Reception
+    ✔️ You don’t talk to housekeeping, kitchen, billing directly
+    ✔️ Reception coordinates everything for you
+➤ Reception = Facade
+➤ Hotel services = Subsystems
+
+
+🔁 Real-World Project Usage
+1️⃣ Service Layer in Spring Boot
+    ✔️ Controller talks to a single service instead of multiple repositories
+2️⃣ Complex Business Workflows
+    ✔️ One facade method triggers multiple internal operations
+3️⃣ Third-Party Library Wrapping
+    ✔️ Simplified wrapper over complex external APIs
+4️⃣ Microservices Gateways
+    ✔️ API Gateway acting as a facade for multiple services
+5️⃣ Spring Boot Startup / Bootstrap Logic
+    ✔️ Single entry point to initialize multiple subsystems
+
+
+🔁 Why Interviewers Like This Pattern
+➤ Tests understanding of:
+    ✔️ API design
+    ✔️ System abstraction
+    ✔️ Coupling reduction
+➤ Common follow-ups:
+    ✔️ Facade vs Adapter
+    ✔️ Does Facade restrict subsystem usage?
+
+
+============================
+🔷 Flyweight Design Pattern
+============================
+➤ Flyweight Design Pattern minimizes memory usage by sharing common object state instead of creating many similar objects.
+➤ It separates:
+    ✔️ Intrinsic state → shared, immutable
+    ✔️ Extrinsic state → provided from outside, varies per use
+
+
+🔁 Problem It Solves
+➤ When an application creates a large number of similar objects.
+➤ Without Flyweight:
+    ✔️ High memory consumption
+    ✔️ Performance degradation
+    ✔️ Possible OutOfMemory errors
+➤ Flyweight solves:
+    ✔️ Object reuse
+    ✔️ Memory optimization
+    ✔️ Efficient handling of massive object counts
+
+
+🔁 Real-Life Analogy
+➤ Text Editor Characters
+    ✔️ Each character (A, B, C) is stored once
+    ✔️ Font, size, position are applied externally
+➤ Character shape = Intrinsic state
+➤ Position/style = Extrinsic state
+
+
+🔁 Real-World Project Usage
+1️⃣ Java String Pool
+    ✔️ Reusing identical string literals
+2️⃣ Caching Systems
+    ✔️ Reusing frequently accessed objects
+3️⃣ Game Development
+    ✔️ Trees, bullets, or NPCs shared across map
+4️⃣ UI Rendering
+    ✔️ Reusing icons or graphical elements
+5️⃣ ORM Frameworks
+    ✔️ Metadata and mapping information shared across entities
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Memory optimization
+    ✔️ Intrinsic vs extrinsic state
+    ✔️ Performance trade-offs
+➤ Common follow-ups:
+    ✔️ Flyweight vs Singleton
+    ✔️ When Flyweight is harmful
+
+============================
+🔷 Proxy Design Pattern
+============================
+➤ Proxy Design Pattern provides a placeholder or surrogate object that controls access to another real object.
+➤ The proxy sits between the client and the real object and may add extra behavior.
+
+
+🔁 Problem It Solves
+➤ When direct access to an object is:
+    ✔️ Expensive
+    ✔️ Unsafe
+    ✔️ Unnecessary at all times
+➤ Without Proxy:
+    ✔️ Client directly accesses heavy or sensitive objects
+    ✔️ No control over access, performance, or security
+➤ Proxy solves:
+    ✔️ Access control
+    ✔️ Lazy initialization
+    ✔️ Additional behavior without modifying real object
+
+
+🔁 Real-Life Analogy
+➤ Credit Card
+    ✔️ You don’t give cash directly
+    ✔️ Card acts as a proxy to your bank account
+➤ Credit card = Proxy
+➤ Bank account = Real object
+
+
+🔁 Real-World Project Usage
+1️⃣ Spring AOP
+    ✔️ Proxies wrap beans to add logging, security, transactions
+2️⃣ Lazy Loading
+    ✔️ Load heavy objects only when required
+3️⃣ Security Proxies
+    ✔️ Check permissions before accessing real service
+4️⃣ Remote Proxies
+    ✔️ Represent remote services locally
+5️⃣ Caching Proxies
+    ✔️ Cache results before calling real object
+
+
+🔁 Obervational Questions
+➤ Tests understanding of:
+    ✔️ Structural control
+    ✔️ Cross-cutting concerns
+    ✔️ Runtime behavior wrapping
+➤ Common follow-ups:
+    ✔️ Proxy vs Decorator
+    ✔️ JDK Dynamic Proxy vs CGLIB

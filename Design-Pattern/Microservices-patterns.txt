@@ -5,7 +5,7 @@ Instead of using a global transaction (which is impossible across microservices)
 Simple idea:
 Each microservice completes its step and triggers the next. If any step fails, compensating actions undo the previous successful steps.
 
-❓ Why Do We Need Saga (Interview Points)
+❓ Why Do We Need Saga
 ➤ No distributed ACID transactions across microservices
 ➤ Ensures eventual consistency
 ➤ Avoids 2-Phase Commit (2PC) which is slow & blocking
