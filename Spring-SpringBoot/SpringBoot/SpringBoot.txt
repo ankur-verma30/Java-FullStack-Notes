@@ -441,21 +441,21 @@ public class DBConfig {
 ==================
 ➤ Lombok is a Java library that reduces boilerplate code by using annotations.
 ➤ It generates common code like getters, setters, constructors, toString, equals, hashCode, builders, etc. at compile time.
-➤ Achieved via annotation processing → IDE & compiler insert the code for you.
+➤ Achieved via annotation processing ─────────▶ IDE & compiler insert the code for you.
 
 ❓ Why use Lombok?
-➤ Saves time → no need to manually write getters/setters.
+➤ Saves time ─────────▶ no need to manually write getters/setters.
 ➤ Makes code cleaner & readable.
 ➤ Reduces errors in repetitive boilerplate code.
 
 🔄 Common Lombok Annotations
-✔️ @Getter / @Setter → Generates getters & setters.
-✔️ @ToString → Generates toString().
-✔️ @EqualsAndHashCode → Generates equals() & hashCode().
-✔️ @NoArgsConstructor / @AllArgsConstructor → Generates constructors.
-✔️ @Data → Combines @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor.
-✔️ @Builder → Provides builder pattern.
-✔️ @Slf4j → Provides a ready-to-use logger.
+✔️ @Getter / @Setter ─────────▶ Generates getters & setters.
+✔️ @ToString ─────────▶ Generates toString().
+✔️ @EqualsAndHashCode ─────────▶ Generates equals() & hashCode().
+✔️ @NoArgsConstructor / @AllArgsConstructor ─────────▶ Generates constructors.
+✔️ @Data ─────────▶ Combines @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor.
+✔️ @Builder ─────────▶ Provides builder pattern.
+✔️ @Slf4j ─────────▶ Provides a ready-to-use logger.
 
 ✅ Example Without Lombok
 public class Student {
@@ -494,6 +494,7 @@ public class Student {
     ✔️ Field Injection
     ✔️ Setter Injection
     ✔️ Constructor Injection
+
 1️⃣ Field Injection (@Autowired directly on fields)
 ✅ Example:
 @Service
@@ -510,12 +511,13 @@ public class UserService {
 👉 Spring uses reflection to set the dependency field directly, even if it’s private.
 
 ⚠️ Disadvantages:
-❌ Not testable easily – can’t inject mock dependencies manually for unit testing.
-❌ Hidden dependencies – dependencies aren’t visible in the constructor.
-❌ No immutability – dependencies can’t be declared final.
-❌ Difficult for mandatory dependencies – Spring doesn’t enforce that the field must be set.
+❌ Not testable easily ─────────▶ can’t inject mock dependencies manually for unit testing.
+❌ Hidden dependencies ─────────▶ dependencies aren’t visible in the constructor.
+❌ No immutability ─────────▶ dependencies can’t be declared final.
+❌ Difficult for mandatory dependencies ─────────▶ Spring doesn’t enforce that the field must be set.
 
 👉 Field injection is considered the worst practice for maintainable and testable code.
+
 
 2️⃣ Setter Injection
 ✅ Example:
@@ -533,6 +535,7 @@ public class UserService {
         System.out.println(userRepository.findAll());
     }
 }
+
 ✅ Advantages:
 ➤ Allows optional dependencies (useful if bean might not always be required).
 ➤ Makes it easier to change dependencies later.
@@ -549,7 +552,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Autowired  //----------➤ Not required since Spring 4.3+
+    @Autowired  ─────────▶ Not required since Spring 4.3+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -560,9 +563,9 @@ public class UserService {
 }
 
 ✅ Advantages:
-💪 Immutable dependencies → mark fields as final.
-🧠 Clear dependencies → visible in the constructor.
-🧪 Best for testing → easy to pass mock objects in unit tests.
+💪 Immutable dependencies ─────────▶ mark fields as final.
+🧠 Clear dependencies ─────────▶ visible in the constructor.
+🧪 Best for testing ─────────▶ easy to pass mock objects in unit tests.
 🔐 Ensures all mandatory dependencies are available during bean creation.
 💡 Recommended by Spring Team (and used by Spring itself internally).
 
@@ -581,10 +584,11 @@ public class UserService {
 ➤ Adding all 3 types of DI in one class is not a good practice. It creates confusion and makes the code hard to maintain.
 ➤ Choose one type of DI per class, preferably constructor injection for better maintainability and testability.
 
+
 ==========================================
 🔷 @Component vs @Service in Spring Boot
 ==========================================
-➤ Both @Component and @Service are annotations used in Spring to define beans, but they serve different purposes and convey different semantics. 
+➤ Both @Component and @Service are annotations used in Spring to define beans, but they serve different purposes and convey different semantics.
 | Annotation   | Description                                                                                                     |
 | ------------ | --------------------------------------------------------------------------------------------------------------- |
 | `@Component` | Generic stereotype annotation that marks a class as a Spring-managed bean.                                      |
@@ -637,10 +641,315 @@ public class UserService {
 | AOP (Aspect-Oriented Programming)     | No special behavior  | May be used by Spring for transactional or proxy logic |
 | Readability                           | Less descriptive     | More expressive for business services                  |
 
-🔄 AOP (Aspect-Oriented Programming) Note
-➤ Spring often applies aspects (like @Transactional, @Async, etc.) at the service layer.
-So using @Service:
-➤ Helps Spring automatically detect it as a target for business logic–related aspects.
+
+======================================
+🔷 AOP (Aspect-Oriented Programming)
+======================================
+➤ Aspect-Oriented Programming (AOP) is a programming paradigm used to separate cross-cutting concerns from business logic.
+➤ Cross-cutting concerns = logic that is required in multiple places across an application but is not part of core business logic.
+
+Examples of cross-cutting concerns
+➤ Logging
+➤ Security / Authorization
+➤ Transaction management
+➤ Performance monitoring
+➤ Exception handling
+➤ Auditing
+➤ Caching
+⚡ Without AOP, this code gets repeated everywhere, making the application hard to maintain.
+
+🔄 Why AOP is Needed (Problem Without AOP)
+❌ Without AOP
+public void transferMoney() {
+    log.info("Method started");
+    checkSecurity();
+    try {
+        // business logic
+    } catch (Exception e) {
+        log.error(e);
+    }
+    log.info("Method ended");
+}
+Now imagine this in 100+ services 😵
+➡️ Code duplication
+➡️ Tight coupling
+➡️ Hard to change logging/security rules
+
+✅ With AOP
+public void transferMoney() {
+    // pure business logic only
+}
+➤ All logging, security, transactions are handled outside the method using AOP.
+
+🔄 Core Purpose of AOP
+✔️ Separate business logic from infrastructure logic
+✔️ Improve code readability & maintainability
+✔️ Follow Single Responsibility Principle (SRP)
+✔️ Apply logic centrally instead of repeating
+✔️ Cleaner & more professional enterprise-level code
+
+
+🔄 Key AOP Terminologies 
+🌟 Aspect
+A module/class that contains cross-cutting logic.
+
+@Aspect
+@Component
+public class LoggingAspect {
+}
+
+🌟 Join Point
+A point during program execution where advice can be applied.
+👉 In Spring AOP: Method execution only
+
+Example:
+@Around("execution(* com.app.service.*.*(..))")
+public void logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+    System.out.println("Method started");
+    Object result = joinPoint.proceed(); ─────────▶ Before this line is the code that runs before the matching pointcut method execution and after this line is the code that runs after the matching pointcut method execution
+    System.out.println("Method ended");
+}
+
+
+🌟 Advice
+Actual code that runs at a join point.
+| Advice Type       | When it Runs                      |
+| ----------------- | --------------------------------- |
+| `@Before`         | Before method execution           |
+| `@After`          | After method (success or failure) |
+| `@AfterReturning` | After successful return           |
+| `@AfterThrowing`  | After exception                   |
+| `@Around`         | Before + After (most powerful)     |
+
+
+🌟 Pointcut
+In Spring AOP, pointcuts define where an advice should be applied.
+Types of Pointcuts in Spring AOP:
+
+1️⃣ Execution Pointcut
+➤ Matches method execution
+➤ Most commonly used in real projects
+
+✔️ Syntax
+execution(modifiers? returnType declaringType? methodName(params))
+
+🔄 Wildcards in Pointcut
+1️⃣ * (Single-level wildcard): Matches any one thing.
+✔️️ Any return type: execution(* com.app.service.UserService.save(..))
+2️⃣ .. (Multi-level / any arguments wildcard): Matches any number of things.
+✔️️ Any number of parameters: execution(* com.app.service.UserService.save(..))
+
+✅ Example
+execution(* com.app.service.*.*(..))
+
+✔️ Any return type
+✔️ Any method
+✔️ Any parameters
+✔️ All classes in service package
+
+2️⃣ Within Pointcut
+➤ Matches all methods inside a class or package
+➤ No method-level control
+
+✅ Example: within(com.app.service.*)
+✔️ All methods in service package
+
+
+🆚 Difference from execution:
+➤ within → class/package scope
+➤ execution → method-level control
+
+
+3️⃣ Args Pointcut
+Matches methods based on runtime argument types
+
+✅ Example: args(String, int)
+✔️ Methods with (String, int) parameters
+
+
+4️⃣ Annotation-based Pointcuts
+1️⃣ @annotation: Matches methods with a specific annotation
+🔗 @annotation(org.springframework.transaction.annotation.Transactional)
+
+2️⃣ @within: Matches all methods in classes annotated with a specific annotation
+🔗 @within(org.springframework.stereotype.Service)
+
+3️⃣ @target: Matches methods where the target object has an annotation
+🔗 @target(org.springframework.stereotype.Repository)
+
+4️⃣ @args: Matches any method with particular parameters and that parameter class is annotated with particular annotation
+🔗 @Before("@args(org.springframework.stereotype.Service)")
+
+ 
+5️⃣ This Pointcut
+Matches based on proxy type
+this(com.app.service.UserService)
+👉 Rarely used
+
+6️⃣ Target Pointcut
+Matches based on target object type of class/interface
+target(com.app.service.UserService)
+
+
+🆚 Difference:
+➤ this → proxy object
+➤ target → actual object
+
+7️⃣ Bean Pointcut (Spring-Specific)
+Matches based on Spring bean name
+bean(userService)
+
+⚡ Combining two pointcuts using &&(boolean and) and ||(boolean or)
+✅Example:
+🔗 @Before("execution(* com.app.service.*.*(..)) && bean(userService)")
+🔗 @Before("execution(* com.app.service.*.*(..)) || bean(userService)")
+
+
+🔄 Named Pointcut
+@Pointcut("execution(* com.app.service.*.*(..))")
+public void allServiceMethods() {} ─────────▶ should not have a method body 
+
+@Before("allServiceMethods()")
+public void logBefore() {
+    System.out.println("Method started");
+}
+
+
+🌟 Target Object
+The actual business class being advised.
+
+🌟 Proxy
+Spring creates a proxy object that wraps the target and applies AOP logic.
+JDK Dynamic Proxy (Interfaces)
+CGLIB Proxy (Classes)
+
+🔄 How AOP Works Internally
+When Application startup happens
+        |
+        |1️⃣ ─────────▶ Looks for @Aspect annotation classes
+        |
+        |2️⃣ ─────────▶ Parse the Pointcut Expressions
+        |              |─────────▶ Done by PointcutParser.java class
+        |
+        |3️⃣ ─────────▶ Stored in an efficient data structure or cache after parsing
+        |
+        |4️⃣ ─────────▶ Looks for @Component @Service @Controller etc. annotation classes
+        |
+        |5️⃣ ─────────▶ For each class if its eligible for interception based on pointcuts Expression
+        |              |─────────▶ Done by AbstractAutoProxyCreator.java class
+        |
+        |6️⃣ ─────────▶1️⃣ If yes, creates a Proxy using JDK Dynamic proxy or CGLIB(Code Generation Library) proxy
+        |              2️⃣ JDK Dynamic Proxy is used when matching class is already child of an interface then it will create a new proxy child class with injected code to execute the advice
+        |              3️⃣ CGLIB Proxy is used when matching class is the parent class so it will create a new proxy sub class with injected code to execute the advice
+        |              4️⃣ This proxy class, has code, which executes advice before the method, then method execution happens and after than advice if any.
+⚡Spring never directly calls your service method — it goes via a proxy.
+
+🔄 How to Use AOP in Spring Boot
+1️⃣ Dependency (Auto included in spring-boot-starter)
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+
+2️⃣ Create an Aspect (Logging Example)
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.app.service.*.*(..))")
+    public void logBefore() {
+        System.out.println("Method started");
+    }
+
+    @After("execution(* com.app.service.*.*(..))")
+    public void logAfter() {
+        System.out.println("Method ended");
+    }
+}
+
+3️⃣ Business Service (Clean Code)
+@Service
+public class UserService {
+    public void registerUser() {
+        System.out.println("Registering user...");
+    }
+}
+
+🔄 @Around Advice (MOST USED IN REAL PROJECTS)
+@Around("execution(* com.app.service.*.*(..))")
+public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+    long start = System.currentTimeMillis();
+
+    Object result = joinPoint.proceed(); // call actual method
+
+    long end = System.currentTimeMillis();
+    System.out.println("Time taken: " + (end - start));
+
+    return result;
+}
+✔️️ Controls method execution
+✔️️ Can modify return value
+✔️️ Used for performance monitoring & transactions
+
+🔄 Real-World Use Cases of AOP
+✅ Logging
+➤ Request/Response logging
+➤ Debugging production issues
+
+✅ Security
+@Before("@annotation(RequiresRole)")
+
+➤ Role-based access control
+➤ Authorization checks
+
+✅ Transactions
+@Transactional
+👉 Internally implemented using AOP
+
+✅ Exception Handling
+➤ Centralized error logging
+➤ Consistent exception response
+
+✅ Auditing
+➤ Track who changed what & when
+➤ Used in banking & enterprise systems
+
+✅ Performance Monitoring
+➤ Measure API latency
+➤ Identify slow methods
+
+
+🔄 Why We Use AOP Instead of Filters / Interceptors?
+| Feature                   | AOP            | Filter        | Interceptor      |
+| ------------------------- | -------------- | ------------- | ---------------- |
+| Layer                     | Service/Method | Servlet       | Controller       |
+| Granularity               | Method-level   | Request-level | Controller-level |
+| Reusability               | Very High      | Medium        | Medium           |
+| Business logic separation | ✅ Best         | ❌             | ❌                |
+
+
+🔄 Benefits of AOP 
+✔️️ No code duplication
+✔️️ Clean business logic
+✔️️ Centralized cross-cutting concerns
+✔️ Easy to modify behavior globally
+✔️ Better scalability
+✔️ Enterprise-ready architecture
+✔️ Improves testability
+
+
+🔄 Common Interview Traps ⚠️
+❌ AOP does NOT work on:
+    ✔️ Private methods
+    ✔️ Final methods
+    ✔️ Internal method calls (this.method())
+👉  Because proxy is bypassed
+
+🔄 When NOT to Use AOP
+❌ Simple applications
+❌ Overuse leads to debugging complexity
+❌ Logic tightly coupled to business flow
+
 
 ======================
 🔷 @Value Annotation
@@ -693,7 +1002,7 @@ private String javaHome;
 ✅ Example 4: Using SpEL (Spring Expression Language)
 You can perform calculations or logic:
 @Value("#{2 * 10}")
-private int value; // 20
+private int value; ─────────▶ 20
 
 @Value("#{systemProperties['user.home']}")
 private String userHome;
@@ -701,7 +1010,7 @@ private String userHome;
 ✅ Example 5: Injecting Lists or Arrays
 🔗 application.properties
 
-app.cities=Delhi,Mumbai,Bangalore
+app.cities=Delhi, Mumbai, Bangalore
 
 🔗 Java Class
 @Value("${app.cities}")
@@ -711,7 +1020,7 @@ private List<String> cities;
 ➤ For simple property injection (like strings, numbers, or constants).
 ➤ When you don’t need a full configuration class.
 
-🔄 Better Alternative for Multiple Values → @ConfigurationProperties
+🔄 Better Alternative for Multiple Values ─────────▶ @ConfigurationProperties
 For injecting multiple related properties, prefer:
 
 @ConfigurationProperties(prefix = "app")
@@ -754,8 +1063,8 @@ It can be applied at:
 1️⃣ Method Level → Only that method runs in a transaction.
 2️⃣ Class Level → All public methods in the class run in transactions.
 
-Key Features
 
+🔄 Key Features
 1️⃣ Rollback Rules
 ➤ By default, rolls back on unchecked exceptions (RuntimeException, Error).
 ➤ Checked exceptions don’t trigger rollback unless configured.
@@ -786,8 +1095,9 @@ Optimizes performance for queries.
 
 @Transactional(readOnly = true)
 
-
+================================================================
 🔷 application.properties vs application.yml in Spring Boot
+================================================================
 1️⃣ application.properties (Default format)
 This is a key-value pair file.
 
@@ -801,10 +1111,10 @@ spring.datasource.username=root
 spring.datasource.password=1234
 
 🧠 Syntax Rules:
-Each property is a key=value pair.
-Hierarchical configs use dots (.).
-Comments start with #.
-Easy for simple configurations, but harder for nested data.
+➤ Each property is a key=value pair.
+➤ Hierarchical configs use dots (.).
+➤ Comments start with #.
+➤ Easy for simple configurations, but harder for nested data.
 
 2️⃣ application.yml ((Yet Another Markup Language)YAML format)
 YAML is a human-readable hierarchical format (preferred for complex configs).
@@ -829,27 +1139,23 @@ emails:
   - ankur@gmail.com
   - test@example.com
 
-You can use both files together — Spring Boot automatically merges them.
-Priority order:
-application.properties (if defined later)
-application.yml (if both exist, last loaded wins)
+➤ You can use both files together — Spring Boot automatically merges them.
+➤ application.properties has higher precedence than application.yml.
+➤ If the same property is defined in both, application.properties wins.
 
-Properties files are used only in java language based projects.
-YAML files can be used in any language based projects.
+➤ Properties files are used only in java language based projects.
+➤ YAML files can be used in any language based projects.
+➤ However, in real-world projects — prefer YAML (.yml) for readability & structure,
 
-
-However, in real-world projects —
-👉 prefer YAML (.yml) for readability & structure,
 
 🔄 Advantages of YAML over Properties:
-| Feature            | `.properties` | `.yml`                      |
-| ------------------ | ------------- | ------------------------    |
-| Readability        | ❌ Average     | ✅ Excellent              |
-| Hierarchical Data  | ❌ Complex     | ✅ Natural                |
-| Array/List Support | ❌ Hard        | ✅ Easy                   |
-| Structure          | Flat          | Nested                      |
-| Popularity         | Legacy style  | Modern Spring Boot style    |
-| Comments           | ✅ Supported   | ✅ Supported (`#`)        |
+| Feature            | `.properties`   | `.yml`                      |
+| ------------------ | -------------   | ------------------------    |
+| Readability        | ❌ Average     | ✅ Excellent                |
+| Hierarchical Data  | ❌ Complex     | ✅ Natural                  |
+| Array/List Support | ❌ Hard        | ✅ Easy                     |
+| Structure          | Flat            | Nested                      |
+| Popularity         | Legacy style    | Modern Spring Boot style    |
 
 
 =======================
@@ -974,6 +1280,7 @@ public class UserServiceTest {
 ✅ Output:
 Running under profile: test
 
+
 🔄 Multiple Profiles at Once
 You can activate more than one profile:
 👉 spring.profiles.active=dev,local
@@ -1007,13 +1314,16 @@ server:
   port: 9090
 👉 Depending on which profile is active, the corresponding section will apply.
 
+
 🔄 Checking Active Profile in Console (Quick Check)
 In any Spring Boot class:
 System.out.println(context.getEnvironment().getActiveProfiles()[0]);
 👉 Prints the current active profile — very useful for debugging or verifying environment setup.
 
 
+================
 🔷 Spring MVC
+================
 Spring MVC (Model-View-Controller) is a web framework within the Spring Framework used to build web applications (both traditional and RESTful).
 
 It follows the MVC design pattern, which separates the application into:
@@ -1027,13 +1337,13 @@ To separate concerns and make the application flexible, maintainable, and testab
 ⚙️ Architecture Overview
 Client (Browser)
    ↓
-DispatcherServlet  ←── Front Controller
+DispatcherServlet  ─────────▶ Front Controller
    ↓
 HandlerMapping
    ↓
 Controller
    ↓
-Service / DAO / Model
+Service / DAO(Data Access Object) / Model
    ↓
 ViewResolver
    ↓
@@ -1057,8 +1367,8 @@ Response to Client
 4️⃣ Controller
 Contains request-handling methods (business logic triggers).
 
-✅ Example:
 
+✅ Example:
 @Controller
 public class PatientController {
 
@@ -1179,7 +1489,10 @@ Spring Web MVC module provide Form Tag library to simplify form handling.
 </body>
 </html>
 
+
+===============
 🔷 H2 database
+===============
 H2 Database is a lightweight, fast, open-source relational database written in Java. It’s often used for development, testing, and small-scale production applications, especially when you don’t want to set up a full external database like MySQL or PostgreSQL.
 
 ⚙️ Key Features
@@ -1201,7 +1514,8 @@ Very fast startup & execution speed.
 ➤ Running unit/integration tests without needing MySQL/PostgreSQL.
 ➤ Prototyping new applications before connecting to a real database.
 
-✅ Example (Spring Boot Application)
+
+✅ Example
 application.properties
 
 spring.datasource.url=jdbc:h2:mem:testdb
@@ -1210,8 +1524,7 @@ spring.datasource.username=sa
 spring.datasource.password=
 spring.h2.console.enabled=true
 
-Now you can access the database console at:
-👉 http://localhost:8080/h2-console
+Now you can access the database console at: http://localhost:8080/h2-console
 
 🗃️ Example Query
 CREATE TABLE users (
@@ -1227,14 +1540,16 @@ SELECT * FROM users;
 ➤ Extremely lightweight and fast.
 ➤ No setup required.
 ➤ Ideal for testing and development.
-➤ 
+
+
 🚫 Limitations
 ➤ Not designed for high concurrency or large-scale production.
 ➤ Data in memory mode is temporary.
 ➤ Limited performance compared to enterprise DBs like PostgreSQL or MySQL. 
 
-
+=======================================================
 🔷 @Valid Annottion and Binding result in Spring Boot
+=======================================================
 To enable validation in our spring project we have to add dependency:
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -1324,8 +1639,9 @@ Validation failed: [Field error in object 'user' on field 'name': rejected value
  Field error in object 'user' on field 'age': rejected value [15]; 
  message: Age must be at least 18]
 
-
-❓ How to configure Jetty as embedded server?
+========================================
+🔷 Configuring Jetty as Embedded Server
+========================================
 Even if you remove the spring-boot-starter-tomact-dependency from pom.xml file it will still work.
 for that we have to use exclusions
 
@@ -1341,22 +1657,19 @@ for that we have to use exclusions
   <artifactId>spring-boot-starter-jetty</artifactId>
 </dependency> 
 
-@RestController is used to send direct response to client without any view files.
 
 =================================
 🔷 Payload and DTO in SpringBoot
 =================================
 ❓ What is a Payload?
 In Spring Boot (and in general web development), a payload is the data sent by the client (browser, Postman, frontend app) to the server in an HTTP request.
-
 ✅ Example: When you fill a form and click Submit, all form fields (firstName, lastName, email, etc.) are sent as the payload of the HTTP request.
 
 🔄 Types of Payload:
 ➤ Form Data (like in your JSP form)
 ➤ JSON/XML Payload (common in REST APIs)
 
-👉 In your example:
-When the user submits the registration.jsp form, this data is sent as payload:
+👉 In your example: When the user submits the registration.jsp form, this data is sent as payload:
 
 🔗 Code Block (registration.jsp)
 <body>
@@ -1411,86 +1724,14 @@ public class EmployeeDto {
 
     // getters and setters
 }
-👉 When the user submits the form → Spring automatically binds request payload → this EmployeeDto object using @ModelAttribute.
+👉 When the user submits the form ─────────▶ Spring automatically binds request payload ─────────▶ this EmployeeDto object using @ModelAttribute.
 
-❓ How Payload and DTO Work Together in above Example
-Step 1️⃣:  Payload Submission
-User fills the form → clicks Save → Payload sent:
-firstName=John&lastName=Doe&email=john@gmail.com&mobile=12345&city=Delhi&state=Delhi&pinCode=110001&addressLine=Street 5
-
-Step2️⃣: Controller Receives Payload via DTO
-🔗 EmployeeController.java
-@Controller
-public class EmployeeController {
-	
-	@Autowired
-	private EmployeeService employeeService;
-
-	@GetMapping("/view")
-	public String viewRegisterPage() {
-		return "employee";
-	}
-	
-	@PostMapping("/saveReg")
-	public String saveEmployee(@ModelAttribute EmployeeDto employeeDto, Model model) {
-		employeeService.saveEmployeeDetails(employeeDto);
-		model.addAttribute("msg", "Record is saved successfully!");
-        return "employee";
-	}
-}
-➤ @ModelAttribute EmployeeDto employeeDto → Spring automatically maps form fields (payload) to EmployeeDto fields.
-
-✅ Example:
-    ✔️ firstName → employeeDto.setFirstName("John")
-    ✔️ city → employeeDto.setCity("Delhi")
-
-🔗 Address.java (Entity)
-package com.app.entity;
-
-import jakarta.persistence.*;
-
-@Entity
-public class Address {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-
-	private String city;
-	private String state;
-	private int pinCode;
-	private String addressLine;
-
-	// Getters & Setters
-}
-
-Step 3️⃣: Service Converts DTO → Entities
-EmployeeService.java
-
-@Service
-public class EmployeeService {
-	
-	@Autowired
-	private EmployeeRepository employeeRepository;
-	
-	@Autowired
-	private AddressRepository addressRepository;
-	
-	public void saveEmployeeDetails(EmployeeDto employeeDto) {
-		// Convert DTO → Entity
-		Employee emp = new Employee();
-		BeanUtils.copyProperties(employeeDto, emp);
-		employeeRepository.save(emp);
-		
-		Address address = new Address();
-		BeanUtils.copyProperties(employeeDto, address);
-		addressRepository.save(address);
-	}
-}
 ➤ DTO is not directly saved in DB.
 ➤ Instead:
     ✔️ Employee entity stores employee-specific info.
     ✔️ Address entity stores address info.
     ✔️ BeanUtils.copyProperties() copies data from DTO → Entities.
+
 
 ❓ Why Not Use Entity Instead of DTO?
 Imagine you bound form data directly to Employee entity:
@@ -1498,17 +1739,16 @@ Imagine you bound form data directly to Employee entity:
 public String saveEmployee(@ModelAttribute Employee employee) { ... }
 
 ❗ Problems:
-1️⃣ Tight Coupling → If DB schema changes, your form & API also break.
-2️⃣ Security Risk → Someone could inject malicious values into DB-only fields (like id or roles).
-3️⃣ Validation → DTO can have @NotNull, @Email annotations to validate payload before saving.
-4️⃣ Different Structures → Payload structure (form/JSON) may not exactly match DB structure. DTO solves this mismatch.
+1️⃣ Tight Coupling ─────────▶ If DB schema changes, your form & API also break.
+2️⃣ Security Risk ─────────▶ Someone could inject malicious values into DB-only fields (like id or roles).
+3️⃣ Validation ─────────▶ DTO can have @NotNull, @Email annotations to validate payload before saving.
+4️⃣ Different Structures ─────────▶ Payload structure (form/JSON) may not exactly match DB structure. DTO solves this mismatch.
 
 
 ==================================
 🔷 Interceptor in Spring Web MVC
 ===================================
-An Interceptor in Spring MVC is a component that intercepts HTTP requests and responses —
-before they reach the controller and after the controller has executed.
+An Interceptor in Spring MVC is a component that intercepts HTTP requests and responses — before they reach the controller and after the controller has executed.
 
 Think of it as a middleware that can:
 ➤ Pre-process requests (like checking authentication)
@@ -1562,8 +1802,9 @@ However, interceptors are still useful for:
 ➤ So if the app is reactive, you’ll rarely see traditional interceptors.
 
 
-
+======================================
 🔷 Exception Handling in Spring MVC
+======================================
 1️⃣ Using @ExceptionHandler (Method-Level)
 Used inside a specific controller to handle exceptions thrown only by that controller.
 
@@ -1656,8 +1897,9 @@ If multiple exception handlers match:
         ➤ default Spring error JSON if none found
 
 
-
+=================
 🔷 Spring Batch
+=================
 ➤ Spring Batch is a lightweight, robust, and scalable batch processing framework built on top of the Spring framework.
 ➤ It is used for automating large-volume, repetitive, or scheduled data processing tasks — such as reading data from a database or file, processing it, and writing the output elsewhere.
 
@@ -1675,6 +1917,7 @@ If multiple exception handlers match:
 | **Integration**            | Works easily with Spring Boot, Spring Data, JPA, JDBC, etc.             |
 | **Monitoring**             | Tracks job metadata (start time, end time, status, etc.) automatically. |
 
+
 🔄 Real-World Use Cases
 | Use Case                       | Example                                                |
 | ------------------------------ | ------------------------------------------------------ |
@@ -1683,6 +1926,7 @@ If multiple exception handlers match:
 | Report generation              | Generate PDF/Excel reports daily.                      |
 | Log processing                 | Process and summarize server logs.                     |
 | Invoice generation             | Generate bills for customers periodically.             |
+
 
 🔄 Key Concepts in Spring Batch
 | Concept           | Description                                                         |
@@ -1696,6 +1940,7 @@ If multiple exception handlers match:
 | **JobLauncher**   | Used to start the batch job.                                        |
 | **JobParameters** | External inputs to a batch job (e.g., file path, date).             |
 
+
 🔄 How Spring Batch Works (Flow Diagram)
         ┌─────────────────────────────┐
         │         JobLauncher         │
@@ -1704,16 +1949,16 @@ If multiple exception handlers match:
                 (launch job)
                       ↓
              ┌──────────────────┐
-             │       Job         │
+             │       Job        │
              └──────────────────┘
                       │
             ┌─────────┴─────────┐
             │                   │
           Step 1              Step 2
      ┌───────────────┐   ┌───────────────┐
-     │ ItemReader     │   │ ItemReader     │
-     │ ItemProcessor  │   │ ItemProcessor  │
-     │ ItemWriter     │   │ ItemWriter     │
+     │ ItemReader    │   │ ItemReader    │
+     │ ItemProcessor │   │ ItemProcessor │
+     │ ItemWriter    │   │ ItemWriter    │
      └───────────────┘   └───────────────┘
 
 🔄 Spring Batch Workflow in Simple Terms
@@ -1830,11 +2075,11 @@ public void runJob() throws Exception {
 | **Database-backed Metadata** | Stores job execution data in DB via `JobRepository`.         |
 
 
+=========================
 🔷 Reactive Programming
+=========================
 Reactive Programming is a programming paradigm that focuses on asynchronous data streams and non-blocking communication.
-
 Instead of executing tasks sequentially and blocking threads (like traditional Spring MVC), it works by reacting to events (like incoming data, user requests, or errors).
-
 
 🔄 Traditional vs Reactive Thinking
 | Type             | Traditional (Imperative)       | Reactive (Declarative)                 |

@@ -2347,7 +2347,7 @@ Complete Abstraction (Java 7)
 3️⃣ Hard to maintain and extend
 	  ✔️ Over time, inherited code becomes fragile.
 	  ✔️ Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
-
+ 
 ✅ Example 1:
 package p1;
 
