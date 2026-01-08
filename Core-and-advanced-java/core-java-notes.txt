@@ -2074,35 +2074,27 @@ To prevent reassignment, ensure safe dependency injection, and make code more th
 To make class immutable, follow these 7 rules:
 1️⃣ Declare the class as final
 Prevents subclassing (inheriting) because subclass can add setters and break immutability.
-
 public final class Student { ... }
 
 2️⃣ Make all fields private and final
-➤ private → no direct access from outside.
-➤ final → value assigned only once, in constructor.
-
+➤ private ─────────▶ no direct access from outside.
+➤ final ─────────▶ value assigned only once, in constructor.
 private final String name;
-
 
 3️⃣ Don’t provide any setter methods
 Only allow initialization through constructor.
 
-
 4️⃣ Initialize all fields through a constructor
 Constructor assigns values once, cannot be changed later.
-
 public Student(String name, int age) {
     this.name = name;
     this.age = age;
 }
 
-
 5️⃣ Ensure deep copy for mutable fields
 If a field is mutable (e.g., Date, List, Map) never expose the original reference.
-
 👉 Why?
-If you expose the original object, someone can change it → your class is no longer immutable.
-
+If you expose the original object, someone can change it ─────────▶ your class is no longer immutable.
 ✅ Solution
 Clone the object inside the constructor.
 Clone again inside the getter.
@@ -2115,18 +2107,15 @@ public Date getJoiningDate() {
     return new Date(joiningDate.getTime()); // return copy
 }
 
-
 6️⃣ Don’t allow subclasses to override methods
 Already solved with final class, but if class is not final:
 	✔️ Make methods final or
 	✔️ Make constructor private and use static factory.
 
-
 7️⃣ Don’t expose internal references
 ➤ Never return internal collections directly.
 ➤ Return unmodifiable:
-
-return Collections.unmodifiableList(new ArrayList<>(subjects));
+		return Collections.unmodifiableList(new ArrayList<>(subjects));
 
 ✅Example:
 public final class Student {
@@ -2327,40 +2316,43 @@ public class Demo {
 }
 
 
+=====================================
 🔷 Interfaces in Java - Abstraction
+=====================================
 Interfaces are a fundamental feature in Java used to achieve abstraction and enforce design contracts between classes.
 
 🔄 Key Points:
 Complete Abstraction (Java 7)
 ➤ In Java 7 and earlier, interfaces could only have abstract methods (no method bodies).
 ➤ They define what should be done, not how.
-
 ➤ All Variables are public static final.
 ➤ No need to specify these modifiers—they are applied by default.
 ➤ No Object creation
+
 
 ❗ Drawback of Inheritance – Tightly Coupled Programming
 ➤ When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
 ➤ In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
 
-🔸 How Inheritance Causes Tight Coupling:
-Child class depends heavily on the parent class:
-➤ In inheritance, the child class inherits both behavior and structure from the parent.
-➤ If the parent class changes, it can break or affect the behavior of all child classes.
 
-Strong binding:
-➤ The child class is strongly bound to the specific parent class.
-➤ You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
+🔄 How Inheritance Causes Tight Coupling
+1️⃣ Child class depends heavily on the parent class
+	  ✔️ In inheritance, the child class inherits both behavior and structure from the parent.
+	  ✔️ If the parent class changes, it can break or affect the behavior of all child classes.
 
-Hard to maintain and extend:
-➤ Over time, inherited code becomes fragile.
-➤ Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
+2️⃣ Strong binding
+	  ✔️ The child class is strongly bound to the specific parent class.
+	  ✔️ You cannot easily switch to a different parent or change the inheritance hierarchy without impacting the child classes.
+
+3️⃣ Hard to maintain and extend
+	  ✔️ Over time, inherited code becomes fragile.
+	  ✔️ Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
 
 ✅ Example 1:
 package p1;
 
 public interface A {
-	public void test1() {} //❌ Error because complete methods are not allowed in an interface	
+	public void test1() {} //❌ Error because complete methods are not allowed in an interface before Java 7.
 	public void test2();  // ✅ Correct version
 }
 
@@ -2444,23 +2436,23 @@ public class MainCalc {
 }
 
 🧠 Interview Questions:
-❓ Question 1. Could this have been done with an abstract class?
+❓ Question 1️⃣. Could this have been done with an abstract class?
 ✅ Yes — abstract classes allow incomplete methods and inheritance.
 But the real reason for using an interface here is that you're defining pure behavior (what calculators must do), not common implementation logic.
 So:
 Interface → for capabilities
 Abstract class → for partial implementation + common state
 
-❓ Question 2. Biggest advantage of using an interface instead of an Abstract Class?
+❓ Question 2️⃣. Biggest advantage of using an interface instead of an Abstract Class?
 ✅ Loose coupling and flexibility.
 Interfaces let you add new types of calculators later without changing the existing hierarchy.
 Also, Java allows multiple interfaces, but only single inheritance with abstract classes.
 
-✅ Advantages of Interfaces in Java
+
+🔄 Advantages of Interfaces in Java
 1️⃣ Abstraction
 ➤ Interfaces facilitate complete abstraction.
 ➤ They allow you to hide implementation details and only expose what needs to be done, not how.
-
 ✅ Example: A Database interface may define connect(), disconnect(), but not how these are implemented.
 
 2️⃣ Contract Enforcement
@@ -2485,9 +2477,9 @@ Also, Java allows multiple interfaces, but only single inheritance with abstract
 ➤ Interface-based design makes it easy to swap implementations (e.g., using different payment gateways, databases, or services) without changing the dependent code.
 
 Note:
-➤ Class to Class Inheritance --> extends
-➤ Interface to Interface Inheritance --> extends
-➤ Interface to Class Inheritance --> implements
+➤ Class to Class Inheritance ─────────▶ extends
+➤ Interface to Interface Inheritance ─────────▶ extends
+➤ Interface to Class Inheritance ─────────▶ implements
 ⚡ Similar type then extends otherwise implements
 
 ✅ Example :
@@ -2569,7 +2561,8 @@ interface B {
 class C implements A, B {
     // ??----------------->// It does not compile
 }
-🧠Interview Question on the above example
+
+🧠 Question on the above example
 ❓ Will this compile?
 ❓ If not, what do you do in class C to fix it?
 ❓ Why does Java force you to resolve this?
@@ -2649,8 +2642,8 @@ class C extends A, B {
 ➤ So there’s no syntax like A.super.show() with classes, because Java never allows a class to inherit from two classes in the first place.
 
 🔄 Core Difference
-➤ Interfaces → only method declarations (and optional default methods). No state (except static/final constants). Ambiguities are easy to resolve with InterfaceName.super.method().
-➤ Classes → can have full state (fields, constructors, method implementations). Resolving conflicts here is way more complex and risky → so Java designers disallowed multiple class inheritance.
+➤ Interfaces ─────────▶ only method declarations (and optional default methods). No state (except static/final constants). Ambiguities are easy to resolve with InterfaceName.super.method().
+➤ Classes ─────────▶ can have full state (fields, constructors, method implementations). Resolving conflicts here is way more complex and risky ─────────▶ so Java designers disallowed multiple class inheritance.
 
 ❓ Can I develop an incomplete static method in an interface?
 We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
@@ -2661,7 +2654,10 @@ public interface A {
 	public static void test2();//❌ Error
 }
 
+
+===================
 🔷 Java 8 Features
+===================
 1️⃣ default keyword:
 ➤ We can create complete methods inside an interface. This was introduced in Java version 8.
 
@@ -2730,7 +2726,10 @@ class C implements A, B {
 }
 ➤ This allows controlled multiple behavior inheritance.
 
-2️⃣ Functional Interface
+
+========================
+🔷 Functional Interface
+========================
 ➤ A Functional Interface is an interface that has exactly one abstract (incomplete) method.
 ➤ Can have multiple default or static methods (complete methods).
 ➤ It enables lambda expressions and functional programming in Java.
@@ -2836,10 +2835,10 @@ A Lambda Expression is a short block of code that:
 ➤ Requires a functional interface to work
 
 🔸 Key Points:
-➤ Introduced in Java 8 →  Part of Java’s functional programming enhancements.
-➤ Reduces Code Length → Allows writing concise code by eliminating boilerplate like anonymous class syntax.
-➤ Works With Functional Interfaces → Lambda expressions can only be used where a functional interface (i.e., one abstract method) is expected.
-➤ Commonly Used in Stream API → Lambdas  are widely used in filtering, mapping, sorting, and reducing data in the Java Stream API.
+➤ Introduced in Java 8 ─────────▶  Part of Java’s functional programming enhancements.
+➤ Reduces Code Length ─────────▶ Allows writing concise code by eliminating boilerplate like anonymous class syntax.
+➤ Works With Functional Interfaces ─────────▶ Lambda expressions can only be used where a functional interface (i.e., one abstract method) is expected.
+➤ Commonly Used in Stream API ─────────▶ Lambdas  are widely used in filtering, mapping, sorting, and reducing data in the Java Stream API.
 
 🔄 Syntax of Lambda Expression:
 (parameters) -> { body }
@@ -2969,7 +2968,10 @@ STATIC LOG: Hello from static method
 ❓ Are private methods mandatory in interfaces?
 ❌ No, they are optional—use them to clean up repeated logic.
 
+
+=====================
 🔷 Marker interface 
+=====================
 ➤ An empty interface is called a marker interface
 ➤ Purpose: To mark a class as having a specific property so that JVM or frameworks can handle it differently at runtime.
 Example:
@@ -2977,7 +2979,10 @@ Example:
 2. java.lang.Cloneable
 3. java.util.RandomAccess
 
-✅ Abstract Class in Java
+
+===========================
+🔷 Abstract Class in Java
+===========================
 An abstract class in Java is a class that is declared with the abstract keyword. It cannot be instantiated directly and is typically used to provide a partial implementation that its subclasses must complete.
 
 🔄 Key Features of Abstract Class
@@ -3034,8 +3039,7 @@ abstract class Launcher {
 abstract class Animal {
     abstract void makeSound();
 }
-
-// Animal a = new Animal(); // ❌ Compile-time error
+// Animal a = new Animal(); // ─────────▶ ❌ Compile-time error
 
 6️⃣ Does Not Support Multiple Inheritance with Classes
 ➤ Java does not allow multiple inheritance with classes (i.e., a class cannot extend more than one class, abstract or not).
@@ -3058,9 +3062,9 @@ abstract public class A {
 	public void test1() {}
 	abstract public void test2();
 	public static void test3() {}
-	public static void test4();//❌ Error
+	public static void test4(); ─────────▶ ❌ Error
 	public static void main(String[] args) {
-		A a1 = new A();//❌ Error
+		A a1 = new A(); ─────────▶ ❌ Error
 	}
 }
 
@@ -3071,8 +3075,9 @@ package p1;
 abstract public class B{}
 
 package p1;
-public abstract class C extends A,B{//❌ Error
+public abstract class C extends A,B{ ─────────▶ ❌ Error
 }
+
 
 🧠 So, Why Use an Interface if an Abstract Class Can Have Abstract Methods?
 ➤ Java doesn't support multiple inheritance for classes; interfaces allow it.
@@ -3080,6 +3085,7 @@ public abstract class C extends A,B{//❌ Error
 ➤ Use abstract classes when you want to provide a common base with shared code.
 ➤ Use interfaces when you want to enforce a common behavior across unrelated classes.
 ➤ All variables in an interface by default are final & static, whereas inside an abstract class, we can create static/non-static/final variables
+
 
 ✅ Real-World Analogy:
 | Concept        | Example                                                                     |
@@ -3095,8 +3101,8 @@ abstract public class A {
 		System.out.println(100);
 	}
 	public static void main(String[] args) {
-		System.out.println(A.x);//Output :10
-		A.test();// Output: 100
+		System.out.println(A.x); ─────────▶ Output :10
+		A.test(); ─────────▶ Output: 100
 	}
 }
 
@@ -3112,12 +3118,12 @@ package p1;
 public class B extends A {
 	public static void main(String[] args) {
 		B b1 = new B();
-		System.out.println(b1.x);// Outupt: 10
-		b1.test();// Output: 100
+		System.out.println(b1.x); ─────────▶ Outupt: 10
+		b1.test(); ─────────▶ Output: 100
 	}
 }
 
-✅ Example: Inheritance from interface-->abstract class-->class
+✅ Example: Inheritance from interface ─────────▶ abstract class ─────────▶ class
 package p1;
 public interface A {
 	public void test1();
@@ -3144,8 +3150,8 @@ public class C extends B{
 		c1.test2();
 	}
 }
-
 ⚡ Note: In Java 8, we can develop complete static methods & main method in an interface
+
 
 ✅ Example:
 package p1;
@@ -3155,13 +3161,15 @@ public interface A {
 		System.out.println("From test1");
 	}
 	public static void main(String[] args) {
-		System.out.println(A.x);// Output :100
-		A.test1();// Output: From test1
+		System.out.println(A.x); ─────────▶ Output :100
+		A.test1(); ─────────▶ Output: From test1
 	}
 }
 
-✅ Exception and Exception Handling in Java
-❓ What is an Exception?
+
+=============================================
+🔷 Exception and Exception Handling in Java
+=============================================
 ➤ An exception is an unexpected event that occurs during the execution of a program.
 ➤ It disrupts the normal flow of the program and may cause it to terminate abruptly if not handled properly.
 
@@ -3187,7 +3195,10 @@ public class A {
 ✅ Output:
 Exception in thread "main" java.lang.ArithmeticException: / by zero
 
+
+========================
 🔷 Exception handling
+========================
 ➤ To handle exceptions, we will use a "try & catch" block in Java
 ➤ When an exception occurs in the try block, it will create an exception object, and that object's address is given to the catch block. The catch block will suppress that exception, and further code will continue to execute
 
@@ -3207,12 +3218,15 @@ public class A {
 	}
 }
 
+
 🔄 Types of Exception in Java
 There are two types of exceptions in Java:
-➤ Compile Time / Checked Exception - These exceptions will occur when a .java file is compiled to a .class file. That is, during compilation, we will get this exception.
-➤ Runtime / Unchecked Exception - These exceptions will occur when we run a .class file. That is during runtime
+1️⃣ Compile Time / Checked Exception - These exceptions will occur when a .java file is compiled to a .class file. That is, during compilation, we will get this exception.
+2️⃣ Runtime / Unchecked Exception - These exceptions will occur when we run a .class file. That is during runtime
 
+==================================
 🔷 Runtime / unchecked Exceptions
+==================================
 1️⃣ ArithmeticException: This exception will occur when invalid mathematical operations are performed
 
 ✅ Example:
@@ -3233,6 +3247,7 @@ public class A {
 ✅ Output:
 java.lang.ArithmeticException: / by zero
 Welcome
+
 
 2️⃣ Null Pointer Exception: This exception will occur when with null reference variable we try to access non-static members of the class
 ✅ Example 1:
@@ -3260,15 +3275,17 @@ public class A {
 	public static void main(String[] args) {
 		try {
 			A a1 = null;
-			System.out.println(a1.x);//A.x  Output: 10
+			System.out.println(a1.x); ─────────▶ A.x  Output: 10
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Welcome");//Output: Welcome
+		System.out.println("Welcome"); ─────────▶ Output: Welcome
 	}
 }
 
+==============================
 🔷 Unary Operators in Java
+==============================
 1️⃣ Increment Operator
    ✔️  Post-Increment: Increment the value of the variable next time you see the same variable
 ✅ Example 1:
@@ -3337,14 +3354,14 @@ public class A {
 ✅ Type Casting of Data Types in Java
 In Java, type casting is used to convert a variable of one data type into another. This is commonly done between primitive types or object references (in case of inheritance).
 
-🔄 1. Type Casting Between Primitive Data Types
+🔄 Type Casting Between Primitive Data Types
 There are two types:
 
 1️⃣ Widening Casting (Implicit & Upcasting)
-➤ Smaller type → Larger type
+➤ Smaller type ─────────▶ Larger type
 ➤ Safe, automatic, without any loss of data
 
-byte → short → int → long → float → double
+byte ─────────▶ short ─────────▶ int ─────────▶ long ─────────▶ float ─────────▶ double
 
 ✅ Example:
 int a = 10;
@@ -3352,29 +3369,32 @@ double b = a;  // int to double (widening)
 double x=10.3d;
 long y=x; // Larger -> Smaller, there is a loss of data so it will give an error.
 
+
 2️⃣ Narrowing Casting (Explicit & Downcasting)
-➤ Larger type → Smaller type
+➤ Larger type ─────────▶ Smaller type
 ➤ Risky, must be done manually using cast () 
 ➤ Loss of data can take place
 
-double → float → long → int → short → byte
+double ─────────▶ float ─────────▶ long ─────────▶ int ─────────▶ short ─────────▶ byte
 
 ✅ Example:
 double x = 10.99;
 long i=10;
 int y = (int) x;  // output: 10 double to int (narrowing)
-byte j=i; // ----------> ❌ Throws error
+byte j=i; ─────────▶ ❌ Throws error
 
 ✅ Example:
 long i=100;
-byte j=(byte)(int)i; //multiple downcasting is possible
+byte j=(byte)(int)i; ─────────▶ multiple downcasting is possible
 
 ✅ Example:
 int i=100;
-long j=(long)i; // No error
+long j=(long)i; ─────────▶ No error
 
-🔍 Why is float → long considered downcasting, even though size increases?
+
+🔍 Why is float ─────────▶ long considered downcasting, even though size increases?
 Because type casting in Java is not only about memory size, but also about type compatibility and precision:
+
 
 ❗ float → long is narrowing because:
 ➤ You are going from floating-point to integer, which involves:
@@ -3382,16 +3402,8 @@ Because type casting in Java is not only about memory size, but also about type 
 ➤ Potential data loss if the value is too large
 ➤ Even if you're increasing memory size, you're going from a more complex representation (float) to a simpler one (integer).
 
-Primitive    Wrapper Class
-byte		Byte
-short		Short
-int			Integer
-long		Long
-float		Float
-double		Double
-char		Character
 
-✅ Example 1: I want to convert a String to an Integer
+✅ Example 1️⃣: Convert a String to an Integer
 public class A {
 	public static void main(String[] args) {
 		String x = "100";
@@ -3400,13 +3412,13 @@ public class A {
 	}
 }
 
-✅ Example 2:I want to convert a String to a Float
+✅ Example 2️⃣: Convert a String to a Float
 float  y = Float.parseFloat(x);
 
-✅ Example 3:I want to convert a String to a Double
+✅ Example 3️⃣: Convert a String to a Double
 double  y = Double.parseDouble(x);
 
-✅ Example 4:
+✅ Example 4️⃣
 package p1;
 
 public class A {
@@ -3426,10 +3438,12 @@ public class A {
 java.lang.NumberFormatException: For input string: "10.3dasdsd"
 Welcome
 
-❓ What is class upcasting?
+======================
+🔷 Class upcasting
+======================
 ➤ Here we store the child class object address into the parent class reference variable, so that the reference variable becomes reusable
 
-✅ Example: Reusing a reference variable
+✅ Example 1️⃣: Reusing a reference variable
 
 public class A {}
 public class B extends A{}
@@ -3443,7 +3457,7 @@ public class C extends A{
 	}
 }
 
-✅ Example 2: How can we implement polymorphism for multiple child classes by using the same reference variable
+✅ Example 2️⃣: How can we implement polymorphism for multiple child classes by using the same reference variable
 public class A {
 	void display() {
         System.out.println("Inside class A");
@@ -3464,9 +3478,9 @@ public class C extends A{
 	    }
 	public static void main(String[] args) {		
 		A a1 = new B();
-		a1.display();    // Calls B's version => "Inside class B"
+		a1.display();    // Calls B's version ─────────▶ "Inside class B"
 		a1 = new C();
-		a1.display();    // Calls C's version => "Inside class C"
+		a1.display();    // Calls C's version ─────────▶ "Inside class C"
 	}
 }
 
@@ -3497,21 +3511,17 @@ class B extends A {
 
 public class Test {
     public static void main(String[] args) {
-        A a1 = new B();   // Reference of A, object of B
+        A a1 = new B();   ─────────▶ Reference of A, object of B
 
-        a1.display();   // ✅ Allowed, prints "Inside B" (runtime polymorphism)
-        a1.onlyInA();   // ✅ Allowed, prints "Method only in A"
+        a1.display();   ─────────▶ ✅ Allowed, prints "Inside B" (runtime polymorphism)
+        a1.onlyInA();   ─────────▶ ✅ Allowed, prints "Method only in A"
         
-        // a1.onlyInB(); // ❌ Compile-time error (reference type A doesn’t know B’s extra methods)
+        // a1.onlyInB(); ─────────▶ ❌ Compile-time error (reference type A doesn’t know B’s extra methods)
     }
 }
-
-
-Note:
-✔️ instanceof - It will check which class object address is present inside the reference variable
+⚡Note: instanceof - It will check which class object address is present inside the reference variable
 
 ✅ Example:
-
 public class A {}
 
 public class B extends A{}
@@ -3524,14 +3534,18 @@ public class C extends A{
 	}
 }
 
-What is class downcasting?
+
+======================
+🔷 Class downcasting
+======================
 ➤ Here we store the parent class object address into the child class reference variable
 ➤ To perform downcasting, first do upcasting and then perform downcasting
+
 ✅ Example:
 public class A {}
 public class B extends A{}
 
-public class C extends A{	 
+public class C extends A{
 	public static void main(String[] args) {
 		A a1 = new B();
 		if(a1 instanceof B) {
@@ -3540,6 +3554,7 @@ public class C extends A{
 		}
 	}
 }
+
 
 ✅ Example:
 class Vehicle {
@@ -3562,32 +3577,32 @@ class Bike extends Vehicle {
 
 public class DowncastingDemo {
     public static void main(String[] args) {
-        Vehicle v1 = new Car();   // Upcasting (Car → Vehicle)
-        Vehicle v2 = new Bike();  // Upcasting (Bike → Vehicle)
+        Vehicle v1 = new Car();   // Upcasting (Car ─────────▶ Vehicle)
+        Vehicle v2 = new Bike();  // Upcasting (Bike ─────────▶ Vehicle)
 
-        v1.start();  // Vehicle started
-        v2.start();  // Vehicle started
+        v1.start();  ─────────▶ Vehicle started
+        v2.start();  ─────────▶ Vehicle started
 
-        // ✅ Downcasting to access Car-specific method
+        ✅ Downcasting to access Car-specific method
         if(v1 instanceof Car) {
             Car c = (Car) v1;
-            c.openTrunk();   // "Trunk is open"
+            c.openTrunk();   ─────────▶ "Trunk is open"
         }
 
-        // ✅ Downcasting to access Bike-specific method
+         ✅ Downcasting to access Bike-specific method
         if(v2 instanceof Bike) {
             Bike b = (Bike) v2;
-            b.kickStart();   // "Bike started with a kick"
+            b.kickStart();   ─────────▶ "Bike started with a kick"
         }
     }
 }
-
-Note:
+⚡ Note:
 ➤ Using upcasting, we can access only parent class members, you cannot access child class members
 ➤ After upcasting to access child class members, we have to perform downcasting
 
-
+===================
 🔷 Arrays in Java
+===================
 🔄 Arrays Hold a Collection of Values
 ➤ An array is a container object that can hold a fixed number of elements of the same data type.
 ➤ Instead of creating multiple individual variables for related values (like 10 integers), we can store all of them in one array.
@@ -3633,7 +3648,7 @@ public class A {
 		age[1] = 89;
 		System.out.println(age[0]);
 		System.out.println(age[1]);
-	} 
+	}
 }
 ➤ To find the size of an array dynamically, we will use the  public final field "length". When the array is created this variable will get initialized
 
@@ -3647,9 +3662,11 @@ public class A {
 	} 
 }
 
-🔷 Scanner class - Is used to provide user input
 
-✅ Example 1:
+==================================================
+🔷 Scanner class - Is used to provide user input
+==================================================
+✅ Example 1️⃣:
 package p1;
 import java.util.Scanner;
 public class A {
@@ -3670,7 +3687,7 @@ public class A {
 		System.out.println("Your ans is "+ans);
 		scan.close();
 		
-	} 
+	}
 	
 }
 
@@ -3688,7 +3705,8 @@ Enter your Answer:
 true
 Your ans is true
 
-✅ Example 2: How to read multiple String words using the nextLine() method
+
+✅ Example 2️⃣: How to read multiple String words using the nextLine() method
 package p1;
 import java.util.Scanner;
 public class A {
@@ -3703,6 +3721,7 @@ public class A {
 ⚠️ Note:
 ➤ Always close the scanner with sc.close() to free system resources.
 ➤ Use nextLine() carefully after nextInt() or next() due to newline issues.
+
 
 ⚠️ Issue: nextLine() after nextInt() or next() doesn't behave as expected.
 ⚠️ Root Cause:
@@ -3730,6 +3749,7 @@ Age: 25
 Name:
 ❗Oops! name is empty because nextLine() consumed the leftover newline from nextInt().
 
+
 ✅ How to Fix It:
 Solution: Add a sc.nextLine() dummy call after nextInt() or next() to consume the leftover newline.
 
@@ -3740,7 +3760,10 @@ sc.nextLine(); // ← eat the leftover newline
 System.out.print("Enter name: ");
 String name = sc.nextLine();
 
+
+========================================
 🔷 IIB — Instance Initialization Block
+========================================
 ➤ It runs every time an object is created, before the constructor, and is used to initialize instance (non-static) data.
 ➤ You can think of an IIB as an anonymous constructor fragment that runs before the real constructor.
 ✅Example:
@@ -3786,13 +3809,17 @@ When you create an object, Java executes:
 ➤ Runs whenever an object creation takes place.
 ➤ Every time a new object is created, IIB runs.
 
+
 ✅ When to Use IIB?
 ➤ When all constructors need to run some common code.
 ➤ To reduce duplication across overloaded constructors.
 
-Note: A Static variable/method can be accessed inside the IIB
+⚡ Note: A Static variable/method can be accessed inside the IIB
 
+
+=======================================
 🔷 SIB — Static Initialization Block
+=======================================
 ➤ It runs once when the class is loaded, before the main() method or any static method/variable is accessed.
 
 ✅Example:
@@ -3847,20 +3874,21 @@ Constructor of A called
 SIB
 Entered Main
 
+
+==================
 🔷 Super in Java
+==================
 ➤ The super keyword is a reference variable used within a subclass to refer to its immediate parent class (superclass) members, including variables, methods, and constructors.
 ➤ It helps achieve proper inheritance behavior and overriding control.
 
 🔄 Uses of super in Java
 1️⃣ Access Parent Class Fields (Variables)
-When the subclass has a variable with the same name as the parent class, super helps distinguish the parent class version.
-It cannot access the private members of the super class.
+➤ When the subclass has a variable with the same name as the parent class, super helps distinguish the parent class version.
+➤ It cannot access the private members of the super class.
 
 🎓 Real-World Analogy
-Imagine super as saying:
-"Hey, I want the version of this thing that came from my parent class."
-Just like a child might say:
-"I want to use my dad’s phone, not mine — because it's different."
+Imagine super as saying: "Hey, I want the version of this thing that came from my parent class."
+Just like a child might say: "I want to use my dad’s phone, not mine — because it's different."
 
 ✅ Example:
 class A {
@@ -3869,8 +3897,8 @@ class A {
 class B extends A {
     int num = 20;
     void display() {
-        System.out.println("Child num: " + num);       // 20
-        System.out.println("Parent num: " + super.num); // 10
+        System.out.println("Child num: " + num);       ─────────▶ 20
+        System.out.println("Parent num: " + super.num); ─────────▶ 10
     }
 }
 
@@ -3908,8 +3936,8 @@ public class B extends A {
 
 ✅ Best Practice:
 Always access static members using the class name, not super or this.
-🔗 ParentClass.staticMethod(); // Good
-🔗 super.staticMethod(); // Bad (misleading)
+🔗 ParentClass.staticMethod(); ─────────▶ ✅ Good
+🔗 super.staticMethod(); ─────────▶ ❌ Bad (misleading)
 
 3️⃣ Call Parent Class Constructor
 ➤ super() is used to call the constructor of the parent class from the child class constructor only.
@@ -3924,7 +3952,7 @@ class A {
 }
 class B extends A {
     B() {
-        super();  // Must be first statement
+        super();  ─────────▶ Must be first statement
         System.out.println("Constructor of B");
     }
 }
@@ -3936,7 +3964,7 @@ Constructor of B
 	✔️ Even If we don't explicitly write the constructor, Java internally calls the constructor and add the super() keyword inside it(but only calls the default constructor of the parent class).
 
 B() {
-    super(); // inserted automatically by compiler
+    super(); ─────────▶ inserted automatically by compiler
     System.out.println("Constructor of B");
 }
 
@@ -3952,7 +3980,7 @@ class A {
 }
 class B extends A {
     B() {
-        super("Hello"); // Pass value to superclass constructor
+        super("Hello"); ─────────▶ Pass value to superclass constructor
         System.out.println("Constructor of B");
     }
 }
@@ -3969,8 +3997,8 @@ class A {
 }
 class B extends A {
     static void staticTest() {
-        // System.out.println(super.x); ❌ Compile-time error
-        // super.staticShow();          ❌ Compile-time error
+        // System.out.println(super.x); ─────────▶ ❌ Compile-time error
+        // super.staticShow();          ─────────▶ ❌ Compile-time error
     }
 }
 🚫 Both lines give:
@@ -3982,10 +4010,13 @@ Cannot use 'super' in a static context
 
 ✅ What You Can Do in Static Methods:
 If you need to access static members of the parent class in a static method:
-A.staticShow();  // ✅ Correct
-System.out.println(A.someStaticVariable);  // ✅ Correct
+A.staticShow();  ─────────▶ ✅ Correct
+System.out.println(A.someStaticVariable);  ─────────▶ ✅ Correct
 
+
+===================
 🔷 Loops in Java
+===================
 1️⃣ for loop
 
 ✅ Example 1;
@@ -4200,8 +4231,9 @@ public class A {
 		} else {
 			System.out.println("Invalid Input");
 		}
-	}	
+	}
 }
+
 
 🔄 Switch Case
 ✅Example:
@@ -4228,62 +4260,12 @@ public class A {
 			System.out.println("Invalid input");
 			break;
 		}
-	}	
-}
-
-🔷 Coding Questions
-1️⃣ Removing Duplicate elements from an array
-➤ For the below logic array should be sorted
-
-Steps:
-1. Create a temp array which same size as that of x
-int[] x = {3,3,4,5,6,6,7};
-int[] temp = new int[x.length];
-
-2. Compare i with i+1 of array x, if not equal copy the value from x[i] to temp[j] and increment j by 1
-
-3. When you reach last index of array x, copy that value directly to temp[j];
-
-🔗 Code:
-
-package p1;
-public class A {
-	public static void main(String[] args) {
-		int[] x = {3,3,4,5,6,6};
-		int[] temp = new int[x.length];
-		int j=0;
-		for(int i=0;i<x.length-1;i++) {//i=5
-			if(x[i]!=x[i+1]) {//with index 5 to 6
-				temp[j] = x[i];
-				j++;
-			}
-		}
-		temp[j] = x[x.length-1];
-		
-		for(int arr:temp) {
-			System.out.println(arr);
-		}
 	}
 }
 
-2️⃣ Logic For Swapping
-
-🔗 Code:
-package p1;
-public class A {
-	public static void main(String[] args) {
-		int x = 10;
-		int y = 20;
-		int temp;
-		temp=y;
-		y=x;
-		x=temp;
-		System.out.println(x);
-		System.out.println(y);
-	}
-}
-
+==========================
 🔷 File Handling in Java
+==========================
 ➤ File handling allows Java programs to create, read, write, and delete files or directories stored on disk.
 ➤ Java uses the java.io, java.nio.file, and java.util packages for file operations.
 
