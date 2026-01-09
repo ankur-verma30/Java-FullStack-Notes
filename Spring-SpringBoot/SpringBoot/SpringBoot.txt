@@ -1748,44 +1748,87 @@ public String saveEmployee(@ModelAttribute Employee employee) { ... }
 ==================================
 🔷 Interceptor in Spring Web MVC
 ===================================
+A Spring MVC Interceptor intercepts requests between DispatcherServlet and Controller.
 An Interceptor in Spring MVC is a component that intercepts HTTP requests and responses — before they reach the controller and after the controller has executed.
+
+🔗 Package: org.springframework.web.servlet.HandlerInterceptor
+
+🔄 Lifecycle Methods
+preHandle()      // before controller
+postHandle()     // after controller, before view
+afterCompletion()// after request completion
 
 Think of it as a middleware that can:
 ➤ Pre-process requests (like checking authentication)
 ➤ Post-process responses (like adding custom headers)
 ➤ Handle after-completion logic (like logging or cleanup)
 
-🔄 Use Case of Interceptor
-➤ Calculate each request processing time
-➤ Log Request and Response details
-➤ Add custom headers to responses
-➤ Add analytics/tracking events
+🔄 Typical Use Cases
+➤ Logging controller execution
+➤ Locale / Theme change
+➤ Performance monitoring
+➤ User session validation
+➤ Modifying ModelAndView
 
-✅ Example: Interceptor in Spring Boot
+✅ Example
+public class LoggingInterceptor implements HandlerInterceptor {
+    public boolean preHandle(...) {
+        return true;
+    }
+}
+
+
+🔄 Creating Custom Interceptor
 import org.springframework.web.servlet.HandlerInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
+    ─────────▶ Will be run before controller, if return false, next filter and controller won't be executed
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         System.out.println("➡️ Request URL: " + request.getRequestURL());
         return true; // continue to controller
     }
-
+    
+    ─────────▶ Post will be run after success of controller execution
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, 
                            Object handler, org.springframework.web.servlet.ModelAndView modelAndView) {
         System.out.println("✅ Controller executed successfully.");
     }
 
+    ─────────▶ Will be run after controller execution even if controller throws exception similar to finally in Java
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, 
                                 Object handler, Exception ex) {
         System.out.println("🏁 Request completed.");
     }
 }
+
+
+🔄 Adding Interceptors to Spring Boot
+@Configuration
+public class AppConfig implements WebMvcConfigurer {
+    
+    @Autowired
+    private LoggingInterceptor loggingInterceptor;
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loggingInterceptor1)
+        .addPathPatterns("/**") ─────────▶ Apply to these URL Patterns
+        .excludePathPatterns("/static/**"); ─────────▶ Exclude these URL Patterns
+    }
+
+    registry.addInterceptor(loggingInterceptor2)
+    .addPathPatterns("/**")
+    .excludePathPatterns("/static/**");   
+}
+─────────▶ same sequence will be followed by all interceptors as it was added in the code 
+
 
 🔄 Microservices / Spring Boot REST APIs
     ✔️ Interceptors are still used, but less often for security, because:
@@ -1800,6 +1843,361 @@ However, interceptors are still useful for:
 🔄 In modern alternatives (Reactive apps)
 ➤ For Spring WebFlux (reactive), the equivalent concept is called a WebFilter, not an interceptor.
 ➤ So if the app is reactive, you’ll rarely see traditional interceptors.
+
+
+============
+🔷 Filters
+============
+A Servlet Filter is part of the Servlet API and intercepts requests before they reach Spring.
+
+🔗 Package: javax.servlet.Filter
+
+👉 Runs:
+    ✔️ Before DispatcherServlet
+    ✔️ After response leaves Spring
+
+
+🔄 Typical Use Cases
+➤ Authentication
+➤ Authorization
+➤ Request/Response logging
+➤ CORS
+➤ Compression
+➤ XSS protection
+
+
+🔄 Creating Custom Filter
+1️⃣ Implement Filter Interface
+import jakarta.servlet.*;
+
+public class CustomFilter implements Filter {
+
+    @Override
+    public void init(FilterConfig filterConfig) {
+        // runs once when filter is created
+    }
+
+    @Override
+    public void doFilter(ServletRequest request,
+                         ServletResponse response,
+                         FilterChain chain)
+                         throws IOException, ServletException {
+
+        System.out.println("Request intercepted by Filter");
+
+        ─────────▶ pass request to next filter / servlet
+        chain.doFilter(request, response);
+
+        System.out.println("Response intercepted by Filter");
+    }
+
+    @Override
+    public void destroy() {
+        // cleanup logic
+    }
+}
+
+
+2️⃣ Register Filter in Spring Boot
+✅ Option 1️⃣: Using @Component (Simplest)
+@Component
+public class CustomFilter implements Filter {
+}
+👉 Applies to all URLs
+
+
+Option 2️⃣: Using FilterRegistrationBean (Recommended)
+@Configuration
+public class FilterConfig {
+
+    @Bean
+    public FilterRegistrationBean<CustomFilter> customFilter() {
+        FilterRegistrationBean<CustomFilter> bean = new FilterRegistrationBean<>();
+        bean.setFilter(new CustomFilter());
+        bean.addUrlPatterns("/api/*");
+        bean.setOrder(1);
+        return bean;
+    }
+}
+✔️ URL-based
+✔️ Order control
+
+🔄 Authentication Filter Example (Real-World)
+public class AuthFilter implements Filter {
+
+    @Override
+    public void doFilter(ServletRequest req,
+                         ServletResponse res,
+                         FilterChain chain)
+                         throws IOException, ServletException {
+
+        HttpServletRequest request = (HttpServletRequest) req;
+
+        String token = request.getHeader("Authorization");
+
+        if (token == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        chain.doFilter(req, res);
+    }
+}
+
+
+🔄 Filter Lifecycle Methods
+➤ init() → called once
+➤ doFilter() → called for every request
+➤ destroy() → called when app shuts down
+
+➤ Order of Multiple Filters
+bean.setOrder(1); // lower value = higher priority
+
+
+🔄 Important Rules & Traps ⚠️
+❌ Filter cannot access:
+    ✔️ Controller method name
+    ✔️ Request mapping
+    ✔️ Spring beans directly (unless managed)
+❌ Filter is NOT Spring MVC specific
+
+➤ Filter runs even for:
+    ✔️ Static resources
+    ✔️ Errors
+    ✔️ Non-Spring endpoints
+
+
+🔄 When NOT to Use Filters
+❌ Business logic
+❌ Method-level logic
+❌ Controller-specific logic
+➡️ Use Interceptor or AOP instead
+
+===========================
+🔷 Filters 🆚 Interceptors
+===========================
+➤ Both Filters and Interceptors are used to intercept requests, but they work at different layers and serve different purposes.
+➤ Filter works at Servlet container level, while Interceptor works at Spring MVC level.
+
+
+🔄 Execution Flow
+Client
+  ↓
+Filter
+  ↓
+DispatcherServlet ─────────▶ Java class, which accepts the incoming request and process it and return the response
+  ↓
+Interceptor (preHandle)
+  ↓
+Controller
+  ↓
+Interceptor (postHandle)
+  ↓
+Interceptor (afterCompletion)
+  ↓
+Filter
+  ↓
+Client
+
+
+🔄 Comparison between Filter and Interceptor
+| Feature                   | Filter                           | Interceptor       |
+| ------------------------- | -------------------------------- | ----------------- |
+| Layer                     | Servlet container                | Spring MVC        |
+| API                       | Servlet API                      | Spring Framework  |
+| Executes                  | Before DispatcherServlet         | Before Controller |
+| Aware of Spring Beans     | ❌                                | ✅                 |
+| Access to Controller info | ❌                                | ✅                 |
+| Can modify ModelAndView   | ❌                                | ✅                 |
+| Configuration             | web.xml / FilterRegistrationBean | WebMvcConfigurer  |
+| Framework dependent       | ❌                                | ✅                 |
+
+
+🔄 Filter vs Interceptor vs AOP
+| Feature               | Filter         | Interceptor | AOP                    |
+| --------------------- | -------------- | ----------- | ---------------------- |
+| Level                 | Request        | Controller  | Method                 |
+| Scope                 | Global         | MVC         | Business logic         |
+| Access to method args | ❌              | ❌           | ✅                      |
+| Best for              | Security, CORS | MVC logic   | Cross-cutting concerns |
+
+
+🔄 Use Filter when
+➤ You want framework-independent logic
+➤ You need request preprocessing
+➤ You want to intercept all requests
+
+🔄 Use Interceptor when
+➤ You need Spring context
+➤ You need controller-level logic
+➤ You want to access handler details
+
+❌ Don’t use either when:
+Logic is business-related ➡️ Use AOP
+
+
+⚠️ Common Traps ⚠️
+❌ “Interceptor is replacement of Filter”
+❌ “Filter can access controller”
+❌ “Interceptor works before DispatcherServlet”
+
+
+==================================
+🔷 Creation of Custom Annotation
+===================================
+A custom annotation is a user-defined metadata that provides additional information to:
+    ✔️ Compiler
+    ✔️ JVM
+    ✔️ Frameworks (Spring, Hibernate, AOP)
+👉  Annotations do not contain business logic, only metadata.
+
+
+🔄 Why We Create Custom Annotations?
+➤ Clean & readable code
+➤ Remove repetitive logic
+➤ Centralize cross-cutting concerns
+➤ Used with AOP, Reflection, Validation
+➤ Improve maintainability
+
+
+🔄 Syntax to Create a Custom Annotation
+public @interface AnnotationName {
+}
+
+
+🔄 Creation Step 
+1️⃣ Define the Annotation
+public @interface LogExecution {}
+👉 This alone is not enough.
+
+🔄 Meta-Annotations(Annotations used over annotations)
+| Annotation    | Purpose                 |
+| ------------- | ----------------------- |
+| `@Target`     | Where it can be used    |
+| `@Retention`  | Lifecycle               |
+| `@Documented` | Appears in Javadoc      |
+| `@Inherited`  | Inherited by subclasses |
+
+
+2️⃣ @Target – Where Annotation Can Be Used
+➤ Defines where the annotation can be applied.
+@Target(ElementType.METHOD)
+
+➤ Common ElementType values:
+    ✔️ TYPE → class, interface
+    ✔️ METHOD → methods
+    ✔️ FIELD → variables
+    ✔️ PARAMETER → method parameters
+    ✔️ CONSTRUCTOR
+    ✔️ ANNOTATION_TYPE
+
+
+3️⃣ @Retention – How Long Annotation Exists 
+@Retention(RetentionPolicy.RUNTIME)
+
+Retention Types:
+| Policy    |                                         Available At                                                     |
+| --------- | ---------------------------------------------------------------------------------------------------------|
+| `SOURCE`  | Compile time only, It will be discarded by compiler itself and its not even recored in .class file       |
+| `CLASS`   | Will be recorded in .class file but ignored by JVM duirng runtime                                        |
+| `RUNTIME` | Recorded in .class file and available at runtime (Reflection, AOP)                                       |
+👉 Spring & AOP need RUNTIME retention
+
+
+4️⃣ Complete Custom Annotation Example
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface LogExecution {
+}
+
+
+🔄 Using Custom Annotation
+@Service
+public class UserService {
+
+    @LogExecution
+    public void registerUser() {
+        // business logic
+    }
+}
+
+🔄 Important Rules for Annotation Attributes
+➤ No parameters
+➤ Return types allowed:
+        ✔️ Primitive
+        ✔️ String
+        ✔️ Class
+        ✔️ Enum
+        ✔️ Annotation
+        ✔️ Array of above
+❌ No null
+❌ No method body
+
+
+🔄 Custom Annotation with Attributes
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TrackTime {
+    String value() default "";
+    boolean enabled() default true;
+}
+
+
+🔄 Usage
+@TrackTime(value = "User Registration", enabled = true)
+public void registerUser() {
+}
+
+
+🔄 Reading Custom Annotation (Reflection)
+Method method = UserService.class.getMethod("registerUser");
+
+TrackTime annotation = method.getAnnotation(TrackTime.class);
+
+System.out.println(annotation.value());
+
+
+🔄 Custom Annotation with AOP (REAL PROJECT USE)
+1️⃣ Annotation
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Loggable {
+}
+
+2️⃣ Aspect
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Around("@annotation(Loggable)")
+    public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
+        System.out.println("Before method");
+        Object result = joinPoint.proceed();
+        System.out.println("After method");
+        return result;
+    }
+}
+
+3️⃣ Usage
+@Loggable
+public void placeOrder() {
+}
+➤ Clean
+➤ Reusable
+➤ No duplicate code
+
+⚠️ Common  Traps ⚠️
+❌ Forgetting @Retention(RUNTIME)
+❌ Expecting annotation to execute logic
+❌ Using annotation without processor (AOP / reflection)
+
+
+🔄 Real-World Examples
+➤ @Transactional
+➤ @Cacheable
+➤ @PreAuthorize
+➤ @NotNull
+➤ @RestController
+👉 All are custom annotations internally.
 
 
 ======================================
