@@ -796,6 +796,59 @@ public class C {
 	}
 }  
 
+
+########################
+🔷 Java Reflection API 
+########################
+➤ Reflection API in Java = Mechanism to inspect and manipulate classes, methods, fields, and constructors at runtime.
+➤ Part of java.lang.reflect package.
+➤ Lets you bypass compile-time checks and work dynamically.
+👉 In simple words: Reflection allows Java programs to analyze or modify runtime behavior of objects and classes.
+
+🔄 Key Features of Reflection
+✔️ Get class information at runtime (Class.forName, getClass()).
+✔️ Create objects dynamically (clazz.getDeclaredConstructor().newInstance()).
+✔️ Access private fields & methods (setAccessible(true)).
+✔️ Call methods dynamically (method.invoke()).
+✔️ Useful when class/method names are not known at compile-time.
+
+🔄 Use Cases of Reflection
+👉 Frameworks (Spring, Hibernate) use reflection to create and inject objects without new.
+👉 Dependency Injection (DI) → like assigning engine into Car dynamically.
+👉 Testing tools (JUnit, Mockito) → access private methods/fields.
+👉 Serialization libraries (Jackson, Gson) → inspect fields and methods.
+👉 Plugins / Runtime loading → load classes dynamically.
+
+✅Example: 
+import in.ankur.reflection.Car;
+import in.ankur.reflection.PetrolEngine;
+import java.lang.reflect.Field;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        ➤ Loads Car class dynamically using its name (string).
+        ➤ We don’t user new Car() directly.
+        Class<?> clazz = Class.forName("in.ankur.reflection.Car");
+
+        ➤ Creates a Car object at runtime without using new Car().
+        Object object = clazz.getDeclaredConstructor().newInstance();
+        Car carObj = (Car) object;
+
+        ➤ Gets a reference to the private field engine.
+        Field engineField = clazz.getDeclaredField("engine");
+
+        ➤ Bypasses Java’s access modifier restrictions (private → accessible).
+        engineField.setAccessible(true);  // break encapsulation
+
+        ➤ Injects a PetrolEngine object into Car’s private engine field.
+        engineField.set(carObj, new PetrolEngine());
+
+        ➤ Now Car uses the injected engine to perform its logic.
+        carObj.drive();
+    }
+}
+
+
 ###################
 🔷 Java Data Types 
 ###################
@@ -4288,12 +4341,13 @@ File f = new File("E:\\april\\t1.txt");
 System.out.println(f);
 ➤ This prints the path stored in the object — it does not interact with the actual file.
 
-✅ exists() Method in Java
+
+1️⃣ exists() Method 
 ➤ It is a non-static method present inside the File class
 ➤ The return type of this method is boolean
 ➤ It checks whether the file exists in the given path.
 
-💡 Interview Insights
+💡 Insights
 ❓ Does it check only files or also directories?
 ➤ It checks both files and directories.
 ➤ exists() does not distinguish between files and directories.
@@ -4308,10 +4362,9 @@ if (f.exists()) {
 
 🔍 Syntax
 File f = new File("path_to_file");
-boolean result = f.exists(); //if exist then true otherwise than false
+boolean result = f.exists(); ─────────▶ if exist then true otherwise than false
 
 ✅ Example:
-
 package p1;
 import java.io.File;
 public class A {
@@ -4322,7 +4375,8 @@ public class A {
 	}
 }
 
-✅ delete() Method in Java
+
+2️⃣ delete() Method
 ➤ It is a non-static method present inside the File class
 ➤ The return type of this method is boolean
 ➤ It deletes the file that exists in the given path.
@@ -4332,12 +4386,12 @@ public class A {
 File f = new File("path_to_file");
 boolean result = f.delete();
 
-💡 Interview Insights
+💡 Insights
 ❓ How can you delete a directory with files in it?
 You must recursively delete all contents before deleting the directory.
 
-✅ Example:
 
+✅ Example:
 package p1;
 import java.io.File;
 public class A {
@@ -4348,9 +4402,9 @@ public class A {
 	}
 }
 
-⚙️ Interview Exercise
-❓ How would you delete a non-empty folder in Java?
 
+⚙️ Coding Exercise
+❓ How would you delete a non-empty folder in Java?
 🔗 Code:
 public static void deleteDirectory(File dir) {
     if (dir.isDirectory()) {
@@ -4358,10 +4412,11 @@ public static void deleteDirectory(File dir) {
             deleteDirectory(file);
         }
     }
-    dir.delete(); // delete files/subdirs and finally the directory itself
+    dir.delete(); ─────────▶  delete files/subdirs and finally the directory itself
 }
 
-✅ mkdir() Method in Java
+
+3️⃣ mkdir() Method 
 ➤ It is a non-static method present inside the File class
 ➤ The return type of this method is boolean
 ➤ It creates a folder in the given path.
@@ -4372,7 +4427,7 @@ public static void deleteDirectory(File dir) {
 File f = new File("path_to_directory");
 boolean created = f.mkdir();
 
-💡 Interview Insights
+💡 Insights
 ❓ Will mkdir() create parent folders if they don’t exist?
 ❌ No. It will return false if the parent directory is missing.
 
@@ -4380,29 +4435,29 @@ boolean created = f.mkdir();
 ➤ mkdir() → Creates only the last directory if the parent exists
 ➤ mkdirs() → Creates entire directory hierarchy if needed
 
-🧠 Bonus Tip for Interviews
+✅ Example 1️⃣:
 If you want to create nested directories like G:\\april\\p2\\test\\demo, use:
-
 File f = new File("G:\\april\\p2\\test\\demo");
-f.mkdirs();  // creates all non-existing parent directories
+f.mkdirs();  ─────────▶ creates all non-existing parent directories
 
-✅ Example:
+✅ Example 2️⃣:
 package p1;
 import java.io.File;
 public class A {
 	public static void main(String[] args) {
 		File f = new File("G:\\april\\p2");
-		boolean val = f.mkdir(); // true if created, false if already exists or parent missing
+		boolean val = f.mkdir(); ─────────▶ true if created, false if already exists or parent missing
 		System.out.println(val);
 	}
 }
 
-✅ Deleting Folders Using delete() in Java
+
+🔄 Deleting Folders Using delete() 
 🔍 Syntax
 File f = new File("path_to_folder");
 boolean result = f.delete();
 
-💡 Interview Insights
+💡 Insights
 ❓ What happens if the folder contains files/subfolders?
 ❌ delete() will fail and return false.
 ➤ We have to use the recursive deletion method to delete a non-empty directory.
@@ -4415,16 +4470,16 @@ public class A {
 		System.out.println(val);
 	}
 }
-
 Note: The delete() method can delete both folders/files
 
-✅ length() Method in Java
+
+4️⃣ length() Method
 ➤ It is a non-static method present inside the File class
 ➤ The return type of this method is long
 ➤ length() returns size in bytes, not characters.
 1 character ≠ 1 byte always (especially in UTF-8 or Unicode encoding)
 ➤ White spaces and new lines are also counted as bytes.
-➤ Not valid for directories → returns 0 if used on a directory.
+➤ Not valid for directories ─────────▶ returns 0 if used on a directory.
 
 🔍 Syntax
 File f = new File("path_to_file");
@@ -4451,6 +4506,7 @@ public class A {
 	}
 }
 
+
 🧪 Bonus Tip: For Directory Size (Advanced)
 🔗 Code:
 public static long folderSize(File folder) {
@@ -4464,12 +4520,14 @@ public static long folderSize(File folder) {
     return total;
 }
 
+=============================================
 🔷 Compile-time Exception/Checked Exception
+=============================================
 ➤ Checked Exceptions are exceptions that are checked at compile time.
 ➤ The Java compiler forces you to either handle them using try-catch or declare them using throws.
 ➤ These exceptions must be addressed in code; otherwise, the code will not compile.
 
-✅ createNewFile()
+5️⃣ createNewFile()
 ➤ createNewFile() is a non-static method in the java.io.File class.
 ➤ It attempts to create a new file in the specified path.
 ➤ If the file already exists, it does not replace it — instead, it returns false.
@@ -4497,7 +4555,10 @@ public class A {
 ❓ Can createNewFile() create folders?
 ❌ No, it is only for creating files, not directories. Use mkdir() for folders.
 
+
+=========================
 🔷 IOException in Java
+=========================
 ➤ IOException is a checked exception in Java.
 ➤ It is part of the java.io package.
 ➤ It is thrown when an Input/Output operation fails or is interrupted.
@@ -4514,7 +4575,8 @@ public class IOException extends Exception
 | ❌ Stream closed       | Reading from or writing to a closed stream            |
 | 💾 Full disk           | Writing to disk when no space is available            |
 
-✅ list() Method
+
+6️⃣ list() Method
 ➤ list() is a non-static method present in the java.io.File class.
 ➤ It returns a String[] array containing the names of files and directories in the current directory.
 ➤ It does not include absolute or full paths—just the names.
@@ -4539,9 +4601,9 @@ public class A {
 
 🧠 Insights
 ❓ What is returned if the file object is not a directory?
-❌ null is returned, not an empty array — interview trap
+❌ null is returned, not an empty array — trap
 
-🧪 Common Mistakes (Interview Traps)
+🧪 Common Mistakes (Traps)
 | ❌ Mistake                                                | ✅ Correct Understanding                                               |
 | --------------------------------------------------------- | ----------------------------------------------------------------------- |
 | Assuming `list()` works on files                          | `list()` only works on directories                                      |
@@ -4550,7 +4612,9 @@ public class A {
 | Not handling security exceptions (e.g., read permissions) | `SecurityException` may occur — though it’s unchecked                   |
 
 
-2️⃣ FileReader:
+==============
+🔷 FileReader
+==============
 ➤ FileReader is a class in the java.io package used to read character-based files.
 ➤ It is typically used for reading text files (e.g., .txt, .csv).
 ➤ Return type is int, but it returns Unicode/ASCII value, so we often cast it to char.
@@ -4560,8 +4624,7 @@ public class A {
 🧱 Constructor Signature
 FileReader fr = new FileReader(String filePath);
 
-✅ Example 1:
-package app_java_3;
+✅ Example 1️⃣:
 import java.io.FileReader;
 
 public class A {
@@ -4575,8 +4638,7 @@ public class A {
 	}
 }
 
-✅ Example 2:
-package app_java_3;
+✅ Example 2️⃣:
 import java.io.File;
 import java.io.FileReader;
 public class A {
@@ -4594,7 +4656,7 @@ public class A {
 	}
 }
 
-⚠️ Interview Trap – Don’t Use f.length() with Unicode Files
+⚠️ Trap – Don’t Use f.length() with Unicode Files
 ✅ It works for simple English text files (ASCII), where 1 byte = 1 character
 ❌ NOT SAFE for files with Unicode (multi-byte) characters like Hindi, Chinese, or emojis — f.length() returns byte size, not character count.
 
@@ -4613,7 +4675,6 @@ while ((c = fr.read()) != -1) {
 ⚠️ It automatically converts bytes to characters using the platform's default charset
 
 ✅ FileReader read(char[] ch)
-
 char[] ch = new char[(int)f.length()];//type case to int because f.length returns long and array index only takes int values.
 
 ➤ Allocates a character array whose size is equal to the file size in bytes.
@@ -4658,39 +4719,43 @@ public class A {
 	}
 }
 
-3️⃣ FileWriter Class (java.io)
+
+=====================
+🔷 FileWriter Class
+=====================
 ➤ Used to write character data to a file.
 ➤ Belongs to the java.io package.
 ➤ Can create a new file if it doesn’t exist.
 ➤ The default behavior is to replace (overwrite) the existing file content.
 ➤ You can append to existing content by passing true as a second parameter during object creation.
 
-🔸 Constructor Variants
-1. FileWriter fw = new FileWriter("path")
+
+🔄 Constructor Variants
+1️⃣ FileWriter fw = new FileWriter("path")
 Overwrites content if the file exists.
 Creates the file if it doesn’t exist.
 
-2. FileWriter fw = new FileWriter("path", false)
+2️⃣ FileWriter fw = new FileWriter("path", false)
 Same as above — explicitly overwrites content.
 
-3. FileWriter fw = new FileWriter("path", true)
+3️⃣ FileWriter fw = new FileWriter("path", true)
 Appends to the existing file content if present.
 Creates a new file if it doesn’t exist.
 
 🔄 Common Methods
-1. write(int ch): Writes a single character (based on ASCII value).
-2. write(String str): Writes an entire string.
-3. write(char[] ch): Write a character array.
+1️⃣ write(int ch): Writes a single character (based on ASCII value).
+2️⃣ write(String str): Writes an entire string.
+3️⃣ write(char[] ch): Write a character array.
 
-close()
+
+🔄 close()
 ➤ Saves written content and closes the stream.
 ➤ Must be called to avoid data loss or resource leakage.
 
 ❓ "What happens if the file does not exist?" → FileWriter will create it only if the directory structure already exists; otherwise, it will throw a FileNotFoundException.
 
-✅ Example 1 – Overwriting a file
-package app_java_3;
 
+✅ Example 1️⃣ – Overwriting a file
 import java.io.FileWriter;
 
 public class A {
@@ -4707,9 +4772,7 @@ public class A {
 	}
 }
 
-✅ Example 2 – Writing multiple lines
-package app_java_3;
-
+✅ Example 2️⃣ – Writing multiple lines
 import java.io.FileWriter;
 
 public class A {
@@ -4726,21 +4789,24 @@ public class A {
 	}
 }
 
-📘 BufferedReader in Java
+
+==================
+🔷 BufferedReader
+==================
 ➤ BufferedReader is used to read text from a character-input stream, buffering characters for efficient reading of characters, arrays, and lines.
 ➤ It significantly improves performance over using FileReader alone.
 ➤ Introduced in the java.io package.
 
-➤ Improved Performance → Uses a buffer (default size: 8192 characters) to read chunks of data at once, reducing disk I/O.
-➤ Works with FileReader → BufferedReader wraps FileReader. On its own, it cannot read files because it doesn’t handle files directly.
-➤ readLine() Method → Allows reading one full line (till \n) at a time. Returns null when EOF (End Of File) is reached.
-➤ Supports Other Input Types → Can wrap any Reader (e.g., InputStreamReader, StringReader), not just FileReader
+➤ Improved Performance ─────────▶ Uses a buffer (default size: 8192 characters) to read chunks of data at once, reducing disk I/O.
+➤ Works with FileReader ─────────▶ BufferedReader wraps FileReader. On its own, it cannot read files because it doesn’t handle files directly.
+➤ readLine() Method ─────────▶ Allows reading one full line (till \n) at a time. Returns null when EOF (End Of File) is reached.
+➤ Supports Other Input Types ─────────▶ Can wrap any Reader (e.g., InputStreamReader, StringReader), not just FileReader
 
 📌 Commonly Used Constructors
 BufferedReader br = new BufferedReader(new FileReader("path"));
-BufferedReader br = new BufferedReader(new FileReader("path"), bufferSize); // optional buffer size
+BufferedReader br = new BufferedReader(new FileReader("path"), bufferSize); ─────────▶0 optional buffer size
 
-✅ Example 1: Reading one character
+✅ Example 1️⃣: Reading one character
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -4750,7 +4816,7 @@ System.out.println((char)br.read());  // Reads one character
 br.close();
 fr.close();
 
-✅ Example 2: Reading into a char array
+✅ Example 2️⃣: Reading into a char array
 FileReader fr = new FileReader("G://f1//t1.txt");
 BufferedReader br = new BufferedReader(fr);
 char[] ch = new char[4];
@@ -4761,7 +4827,7 @@ for(char c: ch) {
 br.close();
 fr.close();
 
-✅ Example 3: Reading multiple lines using readLine()
+✅ Example 3️⃣: Reading multiple lines using readLine()
 package p1;
 
 import java.io.BufferedReader;
@@ -4796,7 +4862,10 @@ public class A{
 ➤ Reduces file reading time, especially for large files.
 ➤ readLine() makes line-by-line processing much easier.
 
-📘 BufferedWriter in Java
+
+==================
+🔷 BufferedWriter
+==================
 ➤ BufferedWriter is a part of the java.io package.
 ➤ It is used to write text efficiently to character output streams by buffering characters.
 ➤ Improves performance by minimizing disk interaction (reducing write operations).
@@ -4804,9 +4873,9 @@ public class A{
 🔍 Core Features
 Buffers characters before writing to the destination (default size: 8192 characters).
 Can write:
-1. Strings (write(String str))
-2. Single characters (write(int c))
-3. Character arrays (write(char[] cbuf))
+1️⃣ Strings (write(String str))
+2️⃣ Single characters (write(int c))
+3️⃣ Character arrays (write(char[] cbuf))
 
 ➤ Supports newLine() to write platform-dependent line separator (\n, \r\n, etc.)
 ➤ Must be used with a Writer (e.g., FileWriter, OutputStreamWriter) — cannot directly write to files.
@@ -4829,7 +4898,9 @@ fw.close();
 ➤ Prefer flush() if writing in real-time or inside loops.
 
 
-💾 Serialization & Deserialization in Java
+====================================
+🔷 Serialization & Deserialization
+====================================
 Serialization is the process of converting a Java object into a byte stream.
 This byte stream can be:
 ➤ Written to a file
@@ -4839,10 +4910,10 @@ This byte stream can be:
 Deserialization is the reverse process: Converting a byte stream back into a Java object.
 
 🔄 Real-World Use Cases
-1. Saving the state of an object to a file (e.g., session persistence)
-2. Sending objects over a network (e.g., in RMI, sockets)
-3. Caching objects in memory/disk
-4. Java Messaging Service (JMS)
+1️⃣ Saving the state of an object to a file (e.g., session persistence)
+2️⃣ Sending objects over a network (e.g., in RMI, sockets)
+3️⃣ Caching objects in memory/disk
+4️⃣ Using Java Messaging Service (JMS)
 
 📘 Key Concepts
 | Concept             | Details                                                             |
@@ -4935,7 +5006,8 @@ But the auto-generated value is not consistent across:
 ➤ Different compilers (javac vs Eclipse)
 ➤ Even minor changes in the class (adding/removing a method or variable)
 
-🚨 Interview Trap
+
+🚨 Trap
 ❓ Can I remove or skip defining serialVersionUID if my class implements Serializable?
 ❌ Wrong Answer: Yes, it's optional
 ✅ Correct Answer: Technically optional, but highly recommended. Without it, even small changes in the class can cause InvalidClassException during deserialization.
@@ -4948,7 +5020,9 @@ But the auto-generated value is not consistent across:
 ✔️ Can static fields be serialized			❌ No. Static fields are class-level, not object-level, so not serialized.
 
 
+=====================================
 🔷 JDBC - Java Database Connectivity
+======================================
 ➤ Database: Here we store data in the form of tables permanently
 ➤ Popular Databases: MySQL, PostgreSQL, Oracle, SQL Server, MongoDB, Derby, h2Database
 ➤ Install MySQL Database
@@ -5067,7 +5141,10 @@ public class D {
 	}
 }
 
+
+==============================
 🔷  Custom Exception in Java
+==============================
 Custom exceptions are user-defined exceptions that extend either the Exception class (for checked exceptions) or the RuntimeException class (for unchecked exceptions).
 
 🔄 Syntax for Custom Exception
@@ -5174,7 +5251,7 @@ public class ThrowsExample {
 ➤ Use throws to inform the caller method to handle the exception.
 
 ⚠️ Common Traps
-| ❓ Trap Question                                               | ✅ Correct  Clarification                                                  
+| ❓ Trap Question                                               | ✅ Correct  Clarification                                                 |
 | Can we use `throw` without creating exception object?          | ❌ No, `throw` must be followed by a `Throwable` object.                  |
 | Can we write `throws` inside method body?                      | ❌ No, `throws` is only used in method signature**.                       |
 | Can we throw multiple exceptions with `throw`?                 | ❌ No, only one exception object at a time.                               |
