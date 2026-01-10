@@ -5352,7 +5352,7 @@ public class A {
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1", "root", "test");
 			Statement stmnt = con.createStatement();
-			stmnt.executeUpdate("insert into student values('adam','adam@gmail.com','9632629455')");				
+			stmnt.executeUpdate("insert into student values('adam','adam@gmail.com','9632629455')");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {

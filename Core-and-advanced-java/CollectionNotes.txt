@@ -1,96 +1,308 @@
-📒 Generics in Java
-1. What Are Generics?
-Generics in Java allow you to create classes, interfaces, and methods with type parameters.
+=============
+🔷 Generics
+=============
+➤ Generics allow you to define classes, interfaces, and methods with type parameters instead of fixed data types.
+➤ They bring compile-time type safety and code reusability to Java collections and other custom classes.
 
-This makes your code:
-➤ Type-safe → detects wrong types at compile time.
-➤ Reusable → works with any data type without rewriting code.
-➤ Flexible → works for multiple data types while keeping strong type checks.
 
-2. Syntax
-We use angle brackets < > to define a generic type.
-class ClassName<T> {
-    // T is a type parameter
+🔄 Why use Generics
+| **Purpose**                 | **Explanation**                                                        |
+| --------------------------- | ---------------------------------------------------------------------- |
+| **Type Safety**             | Detects invalid data types at compile time                             |
+| **Code Reusability**        | Allows writing one class or method that works with multiple data types |
+| **Eliminates Type Casting** | Removes the need for explicit `(Type)` casting while retrieving data   |
+| **Compile-Time Checking**   | Prevents runtime errors such as `ClassCastException`                   |
+
+
+✅ Example:
+List<String> names = new ArrayList<>();
+names.add("Ankur");
+names.add(100); // ❌ Compile-time error (Type safety)
+👉 Without Generics, this would only fail at runtime.
+
+
+🔄 Syntax
+We use angle brackets <> to define a generic type.
+class ClassName<T> { // T is a type parameter
 }
 Here:
-➤ T → Type parameter (can be replaced by any object type when using the class).
+➤ T ─────────▶ Type parameter (can be replaced by any object type when using the class).
 ➤ You can have multiple parameters: <T, U, V>.
+➤ Conventionally used letters:
+    ✔️ T → Type
+    ✔️ E → Element (used in collections)
+    ✔️ K → Key
+    ✔️ V → Value
+    ✔️ N → Number
 
-3. Advantages of Generics
-✅ Type Safety – Avoids ClassCastException at runtime.
-✅ Code Reusability – One generic class works for different data types.
-✅ Compile-time Checking – Errors detected earlier.
-✅ Eliminates Typecasting – No need to cast objects explicitly.
 
-4. Example – Generic Class
-GenericsIntro.java
-package p1;
-
+✅ Example – Generic Class
 public class GenericsIntro<T, U> {
-    public T name;
-    public U id;
+    private T name;
+    private U id;
 
     public GenericsIntro(T name, U id) {
         this.name = name;
         this.id = id;
     }
 
-    public U getId() {
-        return id;
-    }
-
-    public T getName() {
-        return name;
-    }
+    public T getName() { return name; }
+    public U getId() { return id; }
 }
-GenericsImpl.java
-package p1;
 
 public class GenericsImpl {
     public static void main(String[] args) {
         GenericsIntro<String, Integer> a1 = new GenericsIntro<>("Ankur", 120);
-        System.out.println(a1.getId());   // 120
-        System.out.println(a1.getName()); // Ankur
+        System.out.println(a1.getName()); ─────────▶ Ankur
+        System.out.println(a1.getId());   ─────────▶ 120
     }
 }
 
-5. Wildcards in Generics (?)
-The wildcard ? is an unknown type.
-Used when the exact type parameter is not important.
+✅ Advantages shown:
+    ✔️ Same class works for different data types.
+    ✔️ Compile-time safety.
+    ✔️ No casting needed.
 
-5.1 Unbounded Wildcard → <?>
-Means “any type”.
+
+🔄 Generic Methods
+A method can have its own type parameter even if the class is not generic.
+public class Util {
+    public static <T> void printArray(T[] array) {
+        for (T element : array)
+            System.out.println(element);
+    }
+
+    public static void main(String[] args) {
+        Integer[] numbers = {1, 2, 3};
+        String[] names = {"Ankur", "Verma"};
+        printArray(numbers);
+        printArray(names);
+    }
+}
+➤ Key<T> before return type indicates that is a generic method.
+
+
+=============================
+🔷 Wildcards in Generics (?)
+=============================
+➤ The wildcard ? is an unknown type.
+➤ Used when the exact type parameter is not important.
+➤ Wildcards allow flexibility when you don't know the exact type.
+
+1️⃣ Unbounded Wildcard ─────────▶ <?>
+➤ Means “any type”.
 public void printList(List<?> list) {
     for (Object obj : list) {
         System.out.println(obj);
     }
 }
+✅ Can read data
+❌ Cannot write(expect null).
 
-5.2 Upper Bounded Wildcard → <? extends Type>
-Means “Type or any subclass of Type”.
-Use when: You want to read data but not modify it.
+
+2️⃣ Upper Bounded Wildcard ─────────▶ <? extends Type>
+➤ Means “Type or any subclass of Type”.
+➤ Use when: You want to read data but not modify it.
 public void processNumbers(List<? extends Number> list) {
     for (Number num : list) {
         System.out.println(num.doubleValue());
     }
 }
+✅ Can read as Number
+❌ Cannot add new elements(because it might be List<Double> or List<Integer> ─────────▶ not safe).
 
-5.3 Lower Bounded Wildcard → <? super Type>
-Means “Type or any superclass of Type”.
-Use when: You want to write data.
+
+3️⃣ Lower Bounded Wildcard ─────────▶ <? super Type>
+➤ Means “Type or any superclass of Type”.
+➤ Use when: You want to write data.
 public void addIntegers(List<? super Integer> list) {
     list.add(10);
     list.add(20);
 }
 
+🔄 Producer ─────────▶ extends
+➤ If the list gives you data, use extends
+👉 Think: I am only taking things out of the list
 
-🔷 What is Collections?
-A collection is simly an Object that represents a group of objects, known as its elements.
+✅ Example: List<? extends Animal> animals;
+👉 This means:
+    ✔️ The list contains Animal or its children(Dog, Labrador etc.)
+    ✔️ You don't know the exact type.
+    ✔️ But whatever you get is at least an Animal.
 
-🔷 What is Collection Framework?
-It provides a set of iterfaces and classes that help in managing groups of objects.
+🔄 What you can do
+Animal a=animals.get(0); //✅ allowed
+animals.add(new Animal()); //❌ not allowed
 
-🧠 Before the introduction of Collection Framework in JDK 1.2, Java used to rely on a variety of classes like Vector, Stack, Hashtable, and arrays to store and manipulate groups of objects.
+🔄 Why?
+Because Java doesn't know:
+    ✔️ Is it a List<Dog>?
+    ✔️ Is it a List<Cat>?
+    ✔️ Is it a List<Animal>?
+
+🔄 Consumer ─────────▶ super
+"If the list takes your data, use super"
+👉 Think: I am putting things into the list
+
+✅ Example:
+List<? super Dog>dogs;
+This means:
+    ✔️ List<Dog>
+    ✔️ List<Labrador>
+    ✔️ List<Animal>
+    ✔️ List<Object>
+
+🔄 What you can do
+dogs.add(new Dog());       // ✅ allowed
+dogs.add(new Labrador()); // ✅ allowed
+
+🔄 What you CANNOT safely do
+Dog d=dogs.get(0); //❌ not allowed
+dogs.add(new Animal()); //❌ not allowed
+
+
+❓ Why?
+Because Java doesn't know: This list can hold Dogs, but I don't know what it actually stores."
+    ✔️ Is it a List<Dog>?
+    ✔️ Is it a List<Cat>?
+    ✔️ Is it a List<Animal>?
+
+
+🔄 Why not use both read and write?
+| **Type**                 | **Can Read**              | **Can Write** |
+| ------------------------ | ----------------------    | ------------- |
+| `extends`                | ✅ Yes (as parent type) | ❌ No          |
+| `super`                  | ❌ No (only `Object`)   | ✅ Yes         |
+| Exact type (`List<Dog>`) | ✅ Yes                  | ✅ Yes         |
+👉 Only exact type gives full freedom
+
+
+🔄 PECS(Producer Extends, Consumer Super) rule
+| **Situation**                      | **Wildcard to Use** | **Reason**                           |
+| ---------------------------------- | ------------------- | ------------------------------------ |
+| You only **read / produce** items  | `<? extends T>`     | Guarantees type safety while reading |
+| You only **write / consume** items | `<? super T>`       | Guarantees type safety while adding  |
+
+
+🔄 Trap Questions
+| **Trap**                                                 | **Explanation**                                                     |
+| -------------------------------------------------------  | ------------------------------------------------------------------- |
+| ❌ You can’t use primitive types with generics           | `List<int>` is invalid; use wrapper types like `List<Integer>`      |
+| ❌ Generic type info is erased at runtime (Type Erasure) | JVM removes generic type information after compilation              |
+| ❌ Cannot create instances of type parameter             | `T obj = new T();` ❌ not allowed due to type erasure               |
+| ❌ Cannot use static variables of generic type           | Static members are shared across all instantiations, but `T` varies |
+| ❌ Arrays and Generics don’t mix well                    | `new List<String>[10]` ❌ causes type-safety issues                 |
+
+🔄 Type Erasure
+Java removes generic type information at runtime and replaces it with Object(or a bound).
+👉 Generics are only for compile-time saftey, not runtime.
+
+
+🔄 Why does Java use Type Erasure?
+Main reason:
+✔️ Backward compatibility
+➤ Java generics were introduced in Java 5.
+➤ Old Java code (pre-generics) should still work.
+➤ So the JVM:
+    ✔️ Does not know List<String> or List<Integer>
+    ✔️ It only sees List
+
+
+✅ Example:
+Code you write:
+List<String> names=new ArrayList<>();
+names.add("Ankur");
+
+What JVM actually sees:
+List names=new ArrayList();
+names.add("Ankur");
+👉 The <String> part is erased
+
+
+🔄 Another Example
+List<String> list1 = new ArrayList<>();
+List<Integer> list2 = new ArrayList<>();
+
+System.out.println(list1.getClass() == list2.getClass());
+
+✅ Output: true
+
+🔄 Why?
+Because after type erasure, both become: List
+
+
+🔄 How Type Erasure Works Internally
+1️⃣ Unbounded generics
+class Box<T>{
+    T value;
+}
+
+After type erasure:
+class Box{
+    Object value;
+}
+
+
+2️⃣ Bounded generics
+class Box<T extends Number>{
+    T value;
+}
+
+After type erasure:
+class Box{
+    Number value;
+}
+👉 Bound replaces Object
+
+
+🔁 Why Some Things Are NOT Allowed in Generics
+Because type info is gone at runtime
+
+❌ Cannot create generic arrays
+T[] arr=new T[10]; //❌ not allowed
+➤ JVM doesn't know what T is at runtime
+
+❌ Cannot use instanceof with generics
+if (obj instanceof List<String>) // ❌ not allowed
+
+But this is allowed:
+if (obj instanceof List<?>) // ✅ allowed
+
+❌ Cannot overload methods only by generic type
+void print(List<String> list)
+void print(List<Integer> list) // ❌ compile-time error
+
+Add erasure, both look like: void print(List list)
+
+
+=====================================
+🔷How Java Still Ensures Type Safety
+=====================================
+🔄 Using compile-time checks + casting
+List<String> names = new ArrayList<>();
+names.add("Ankur");
+
+String name = names.get(0); // implicit cast
+
+👉 After erasure: String name=(String )names.get(0);
+
+
+================
+🔷 Collections
+================
+➤ Collections in Java refer to a framework (set of classes and interfaces) that provide ready-made data structures for storing, retrieving, and manipulating groups of objects efficiently.
+➤ It is defined in the package: java.util
+➤ Think of Collections Framework as a toolbox of reusable data structures (like Lists, Sets, Queues, Maps) that save you from writing custom logic for storage and searching.
+
+
+🔄 Why Collections Framework?
+Before Java 1.2, developers used arrays, Vectors, or Hashtables — which were:
+    ✔️ Fixed in size
+    ✔️ Lacked type safety
+    ✔️ Hard to manipulate
+
+The Java Collections Framework (JCF) unified these into a consistent architecture.
+
 
 ❌Drawbacks or limitations
 1. Inconsistency: Each class had a different way of managing collections, leading to confusion and a steep learning curve.
@@ -99,21 +311,108 @@ It provides a set of iterfaces and classes that help in managing groups of objec
 
 To solve those problems, the Collection Framework was introduced in JDK 1.2.
 
-🔄Features of Collection Framework:
-✅ Unified architecture: A consistent set of interfaces for all collections.
-✅ Inter-operability: Collections can be easily interchanged and manipulated.
-✅ Reusability: Generic algorithms can be written that work with any collections.
-✅ Efficiency: The framework provides efficient algorithms for basic operations like searching, sorting, and manipulation.
 
-🔷 Key Interfaces in Collection Framework:
-1. Collection: The root interface for all other collection types.
-2. List: An ordered collection that can contain duplicate elements.(e.g., ArrayList, LinkedList);
-3. Set: A collection that cannot contain duplicate elements (e.g., HashSet, TreeSet);
-4. Queue: A collection designed for holding elements prior to processing (e.g., PriorityQueue, LinkedList when used as a queue);
-5. Deque: A double-ended queue that allows insertion and removal from both ends (e.g., ArrayDeque);
-4. Map: An interface that represents a collection of key-value pairs. (e.g. HashMap, TreeMap);
+🔄 Key Features of Collections Framework
+1️⃣ Consistent Interfaces ─────────▶ Common methods across all collections (add(), remove(), size())
+2️⃣ Dynamic Size ─────────▶ Can grow or shrink at runtime
+3️⃣ Type Safety ─────────▶ Supports Generics
+4️⃣ Polymorphic Algorithms ─────────▶ Works with all types of collections (Collections.sort(), Collections.reverse())
+5️⃣ Ready Implementations ─────────▶ Efficient, tested data structures
+6️⃣ Thread-Safe Options ─────────▶ Concurrent collections (ConcurrentHashMap, CopyOnWriteArrayList)
 
-🔷 Hierarchy of Collection Framework:
+
+🔷 Key Interfaces in Collection Framework
+The hierarchy starts from the top-level interface Iterable and branches into key interfaces:
+
+1️⃣ Iterable
+➤ Root interface of the collection hierarchy.
+➤ All collection classes implement this indirectly.
+➤ Provides iterator() to traverse elements using Iterator.
+Iterator<T> iterator();
+
+
+2️⃣ Collection
+➤ Extends Iterable.
+➤ The base interface for all collections except Map.
+➤ Defines basic operations like add(), remove(), clear(), size().
+
+✅ Example:
+boolean add(E e);
+boolean remove(Object o);
+int size();
+
+🔄 Subinterfaces of Collection:
+1️⃣ List
+2️⃣ Set
+3️⃣ Queue
+4️⃣ (Since Java 21) SequencedCollection
+
+
+3️⃣ List Interface
+➤ Ordered collection (elements have index).
+➤ Allows duplicates.
+➤ Can access elements by index.
+
+Implementations:
+✔️ ArrayList
+✔️ LinkedList
+✔️ Vector
+✔️ Stack
+✔️ CopyOnWriteArrayList
+
+
+4️⃣ Set Interface
+➤ Unordered and unique elements (no duplicates).
+➤ Follows mathematical set behavior.
+
+Implementations:
+    ✔️ HashSet
+    ✔️ LinkedHashSet
+    ✔️ TreeSet
+    ✔️ EnumSet
+    ✔️ CopyOnWriteArraySet
+
+
+5️⃣ Queue Interface
+➤ Follows FIFO (First In, First Out) order.
+➤ Used to hold elements before processing.
+
+Implementations:
+    ✔️ LinkedList
+    ✔️ PriorityQueue
+    ✔️ ArrayDeque
+    ✔️ ConcurrentLinkedQueue
+    ✔️ BlockingQueue (and its subclasses)
+
+
+6️⃣ Deque Interface (extends Queue)
+ Double-ended queue → allows insertion/removal from both ends.
+ Supports both FIFO and LIFO behaviors.
+
+Implementations:
+    ✔️ ArrayDeque
+    ✔️ LinkedList
+    ✔️ ConcurrentLinkedDeque
+
+
+7️⃣ Map Interface (Separate Hierarchy)
+➤ Stores key–value pairs.
+➤ Unique keys, values can be duplicated.
+➤ Not a subtype of Collection.
+
+Implementations:
+    ✔️HashMap
+    ✔️LinkedHashMap
+    ✔️TreeMap
+    ✔️WeakHashMap
+    ✔️ConcurrentHashMap
+    ✔️Hashtable
+    ✔️EnumMap
+
+
+======================================
+🔷 Hierarchy of Collection Framework
+======================================
 Iterable
 └── Collection
     ├── SequencedCollection
@@ -148,15 +447,59 @@ Iterable
                 │   └── DelayQueue
                 └── ConcurrentLinkedQueue
 
- The hierarchy flows from Iterable → Collection → SequencedCollection → List → ArrayList.
+ The hierarchy flows from Iterable ─────────▶ Collection ─────────▶ SequencedCollection ─────────▶ List ─────────▶ ArrayList.
 
 Let’s break this down step by step:
-🧩 1. Iterable<E> (Interface)
-➤ Top-most interface in the collection hierarchy.
-➤ Introduced in: Java 5
+🔷 Iterable<E> (Interface)
+➤ Iterable is the top-most interface in the Java Collections Framework hierarchy.
+➤ Every collection class in Java (like List, Set, Queue, etc.) implements Iterable directly or indirectly.
 
-➤ Key Method:
+⚡Package: java.lang
+➤ Introduced in: Java 5 (as part of Generics & enhanced for-loop support)
+
+🔄 Syntax:
+public interface Iterable<T> {
+    Iterator<T> iterator();
+}
+👉 Here:
+    ✔️ T → Generic type parameter (the type of elements to iterate).
+    ✔️ Any class implementing Iterable must provide an implementation for the iterator() method.
+
+
+🔄 Purpose of Iterable
+➤ The main purpose of the Iterable interface is to provide a standard way to traverse elements of a collection, one by one.
+➤ It allows:
+    ✔️ Iteration using Iterator
+    ✔️ Enhanced for-loop (for-each loop)
+    ✔️ Stream creation (Java 8+)
+
+
+🔄 Key Methods of Iterable
+| **Method**                                         | **Description**                                                          | **Since** |
+| -------------------------------------------------- | ------------------------------------------------------------------------ | --------- |
+| `Iterator<T> iterator()`                           | Returns an **Iterator** over elements of type `T`.                       | Java 5    |
+| `default void forEach(Consumer<? super T> action)` | Performs the given action for each element (commonly used with lambdas). | Java 8    |
+
+
+🔄 Method 1️⃣:iterator()
+This is the core abstract method every implementing class must define.
 Iterator<T> iterator();
+
+It returns an Iterator, which has the following methods:
+🔗 boolean hasNext();
+🔗 T next();
+🔗 void remove(); // optional
+
+✅Example:
+List<String> names = new ArrayList<>();
+names.add("Ankur");
+names.add("Verma");
+
+Iterator<String> it = names.iterator();
+while (it.hasNext()) {
+    System.out.println(it.next());
+}
+
 
 ➤ Removal of elements is allowed while iterating.
 Iterator<Integer> itr=numbers.iterator();
@@ -180,10 +523,65 @@ while(itr.hasNext()){
 🔗 void set(E e);
 🔗 void remove();
 
+
+🔄 Method2: forEach()
+Introduced in Java 8- provides a functional way to iterate
+default void  forEach(Consumer<? super T> action)
+
+✅Example: names.forEach(n -> System.out.println(n.toUpperCase()));
+✔️ Simplifies iteration
+✔️ Works well with Lambda expressions and Streams
+
 ➤ Enables use of the enhanced for-each loop:
-✔️ for (String s : someCollection) {
-    // ...
+✔️ for (String s : someCollection) {}
+✅ So, any class implementing Iterable automatically supports enhanced for-loops.
+
+
+✅ Custom Iterable Example
+Can create our own class implementing Iterable:
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class MyIterable implements Iterable<Integer> {
+    private int[] data = {10, 20, 30, 40};
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new Iterator<Integer>() {
+            int index = 0;
+            public boolean hasNext() {
+                return index < data.length;
+            }
+            public Integer next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                return data[index++];
+            }
+        };
+    }
+
+    public static void main(String[] args) {
+        MyIterable obj = new MyIterable();
+        for (int val : obj) {
+            System.out.println(val);
+        }
+    }
 }
+✅ Output:
+10
+20
+30
+40
+
+
+🔄 Relationship with Iterator
+| **Feature** | **Iterable**                               | **Iterator**                         |
+| ----------- | ------------------------------------------ | ------------------------------------ |
+| **Type**    | Interface that provides `iterator()`       | Interface used to traverse elements  |
+| **Purpose** | Supplies an `Iterator` object              | Performs the actual iteration        |
+| **Methods** | `iterator()`, `forEach()`, `spliterator()` | `hasNext()`, `next()`, `remove()`    |
+| **Usage**   | Implemented by collection classes          | Used by `for-each` and `while` loops |
+
+
 
 📚 2. Collection<E> (Interface)
 ➤ Root interface for all collection types (except maps).
@@ -275,8 +673,8 @@ System.out.println(list3.getClass().getName());
 ✅ Output: java.util.ImmutableCollections$ListN
 
 ✅ Key Points
-➤ new ArrayList<>() → java.util.ArrayList (fully dynamic, resizable).
-➤ Arrays.asList() → java.util.Arrays$ArrayList (fixed-size, backed by array).
+➤ new ArrayList<>() ─────────▶ java.util.ArrayList (fully dynamic, resizable).
+➤ Arrays.asList() ─────────▶ java.util.Arrays$ArrayList (fixed-size, backed by array).
 ➤ With an existing array, modifications affect both list and array.
 ➤ Arrays$ArrayList is an inner class only meant as a lightweight adapter.
 
@@ -959,7 +1357,7 @@ TREEFY_THRESHOLD = 8 for converting linked list to balanced tree.
 ❗Problem:
 ➤ When you create a custom class Person with fields like id and name, and put it into a HashMap, then:
 ➤ By default, Object's implementation of hashCode() and equals() is used.
-➤ That implementation uses memory address → so two objects with the same values (id=1, name="Ankur") are considered different keys.
+➤ That implementation uses memory address ─────────▶ so two objects with the same values (id=1, name="Ankur") are considered different keys.
 
 Example (Problem Case):
 import java.util.*;
@@ -1136,11 +1534,11 @@ public class LinkedHashMapDemo {
 📌 Constructor
 LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)
 
-➤ initialCapacity → number of buckets initially.
-➤ loadFactor → controls resizing.
-➤ accessOrder →
-	✔️ false → maintains insertion order.
-	✔️ true → maintains access order (order changes when an entry is accessed with get() or put()).
+➤ initialCapacity ─────────▶ number of buckets initially.
+➤ loadFactor ─────────▶ controls resizing.
+➤ accessOrder ─────────▶
+	✔️ false ─────────▶ maintains insertion order.
+	✔️ true ─────────▶ maintains access order (order changes when an entry is accessed with get() or put()).
 
 ✅ Example 1: accessOrder = false (Insertion Order)
 import java.util.*;
@@ -1187,8 +1585,8 @@ public class Main {
 Access Order: {3=C, 2=B, 1=A}
 
 First inserted order: {1=A, 2=B, 3=C}
-After map.get(2) → 2 moves to end → {1=A, 3=C, 2=B}
-After map.get(1) → 1 moves to end → {3=C, 2=B, 1=A}
+After map.get(2) ─────────▶ 2 moves to end ─────────▶ {1=A, 3=C, 2=B}
+After map.get(1) ─────────▶ 1 moves to end ─────────▶ {3=C, 2=B, 1=A}
 
 ⚡Tip
 ✔️ accessOrder = true is often used to implement LRU Cache (Least Recently Used).
@@ -1206,7 +1604,7 @@ LinkedHashMap linkedHashMap= new LinkedHashMap(hashMap);
 
 🔄 Use of WeakHashMap
 ➤ Commonly used for caches where you don’t want unused objects to prevent GC.
-➤ If the key object is no longer in use anywhere else → its entry is automatically removed.
+➤ If the key object is no longer in use anywhere else ─────────▶ its entry is automatically removed.
 
 ✅ Example
 import java.util.WeakHashMap;
@@ -1258,28 +1656,28 @@ Creates a WeakHashMap where:
 	✔️ Value = Image object (normal strong reference)
 
 👉imageCache.put(new String("img1"), new Image("Image 1"));
-➤ Uses new String("img1") → ensures the key is not from String pool (important!).
+➤ Uses new String("img1") ─────────▶ ensures the key is not from String pool (important!).
 ➤ If we had used "img1" directly, it would come from the string pool (strongly referenced by JVM), and GC wouldn’t clear it.
 
 👉System.gc();
 Suggests JVM to run garbage collection (not guaranteed, but usually works in demos).
 
 👉simulation();
-Sleeps for 10 seconds → gives JVM time to clear weakly referenced keys.
+Sleeps for 10 seconds ─────────▶ gives JVM time to clear weakly referenced keys.
 
 👉 Class Image
 ➤ Just a wrapper with a name field.
-➤ toString() overridden → so when map is printed, values show as "Image 1", "Image 2", etc.
+➤ toString() overridden ─────────▶ so when map is printed, values show as "Image 1", "Image 2", etc.
 
 👉 Output Explaination:
 ➤ The second print may show {} or partially cleared entries depending on GC.
-➤ Because keys (new String("imgX")) are weakly referenced → once GC runs, they vanish.
+➤ Because keys (new String("imgX")) are weakly referenced ─────────▶ once GC runs, they vanish.
 
 ⚡ Important Points
 ✔️ WeakHashMap removes entries automatically when keys are weakly referenced and GC runs.
 🆚 Difference from HashMap:
-➤ HashMap → keys are strongly referenced (never removed unless explicitly).
-➤ WeakHashMap → keys are weak references (removed after GC if no strong reference exists).
+➤ HashMap ─────────▶ keys are strongly referenced (never removed unless explicitly).
+➤ WeakHashMap ─────────▶ keys are weak references (removed after GC if no strong reference exists).
 ✔️ Values (Image) are still strongly referenced, but without a strong key reference, they become unreachable.
 ✔️ Useful for memory-sensitive caching.
 
@@ -1381,9 +1779,9 @@ public class IdentityHashMapDemo {
 ➤ It has one method:
 🔗 public int compareTo(T o):
 Returns:
-	✔️ 0 → equal
-	✔️ <0 → current object < given object
-	✔️ >0 → current object > given object
+	✔️ 0 ─────────▶ equal
+	✔️ <0 ─────────▶ current object < given object
+	✔️ >0 ─────────▶ current object > given object
 
 🔸 Example: Student sorting by age (natural order)
 class Student implements Comparable<Student> {
@@ -1480,9 +1878,9 @@ public class Main {
 }
 
 🌟 Insights
-➤ Comparable → "I have a natural order, built inside the class."
-➤ Comparator → "I allow multiple sorting logics, outside the class."
-➤ Common trick: “Can a class implement both?” → ✅ Yes, a class can have a natural order (Comparable) and also be sorted by different comparators when needed.
+➤ Comparable ─────────▶ "I have a natural order, built inside the class."
+➤ Comparator ─────────▶ "I allow multiple sorting logics, outside the class."
+➤ Common trick: “Can a class implement both?” ─────────▶ ✅ Yes, a class can have a natural order (Comparable) and also be sorted by different comparators when needed.
 
 🔷 SortedMap
 An interface in Java that extends Map and guarantees ordering of keys in ascending order (natural ordering or custom Comparator).
@@ -1494,12 +1892,12 @@ An interface in Java that extends Map and guarantees ordering of keys in ascendi
 ➤ Provides range-view methods (headMap, tailMap, subMap).
 
 Important Methods:
-➤ K firstKey() → returns lowest key.
-➤ K lastKey() → returns highest key.
-➤ SortedMap<K,V> headMap(K toKey) → view of keys < toKey.
-➤ SortedMap<K,V> tailMap(K fromKey) → view of keys >= fromKey.
-➤ SortedMap<K,V> subMap(K fromKey, K toKey) → view between fromKey and toKey.
-➤ Comparator<? super K> comparator() → returns comparator used, or null if natural ordering.
+➤ K firstKey() ─────────▶ returns lowest key.
+➤ K lastKey() ─────────▶ returns highest key.
+➤ SortedMap<K,V> headMap(K toKey) ─────────▶ view of keys < toKey.
+➤ SortedMap<K,V> tailMap(K fromKey) ─────────▶ view of keys >= fromKey.
+➤ SortedMap<K,V> subMap(K fromKey, K toKey) ─────────▶ view between fromKey and toKey.
+➤ Comparator<? super K> comparator() ─────────▶ returns comparator used, or null if natural ordering.
 
 Use Cases:
 ✔️ Maintaining sorted dictionaries.
@@ -1530,7 +1928,7 @@ public class SortedMapDemo {
         System.out.println("HeadMap (<3): " + sortedMap.headMap(3));
         System.out.println("TailMap (>=3): " + sortedMap.tailMap(3));
         System.out.println("SubMap (2 to 5): " + sortedMap.subMap(2, 5));
-        System.out.println("Comparator Used: " + sortedMap.comparator()); // null → natural ordering
+        System.out.println("Comparator Used: " + sortedMap.comparator()); // null ─────────▶ natural ordering
     }
 }
 
@@ -1552,13 +1950,13 @@ An interface that extends SortedMap, providing navigation methods for key search
 ➤ Common implementation: TreeMap.
 
 🌟 Important Methods:
-➤ K lowerKey(K key) → greatest key < key.
-➤ K floorKey(K key) → greatest key <= key.
-➤ K ceilingKey(K key) → least key >= key.
-➤ K higherKey(K key) → least key > key.
-➤ Map.Entry<K,V> firstEntry() / lastEntry() → first and last entry.
-➤ Map.Entry<K,V> pollFirstEntry() → removes and returns first entry.
-➤ NavigableMap<K,V> descendingMap() → reverse order view.
+➤ K lowerKey(K key) ─────────▶ greatest key < key.
+➤ K floorKey(K key) ─────────▶ greatest key <= key.
+➤ K ceilingKey(K key) ─────────▶ least key >= key.
+➤ K higherKey(K key) ─────────▶ least key > key.
+➤ Map.Entry<K,V> firstEntry() / lastEntry() ─────────▶ first and last entry.
+➤ Map.Entry<K,V> pollFirstEntry() ─────────▶ removes and returns first entry.
+➤ NavigableMap<K,V> descendingMap() ─────────▶ reverse order view.
 
 🔄 Use Cases:
 ➤ Efficient searching for nearest values.
@@ -1617,27 +2015,27 @@ A legacy class (from JDK 1.0) that implements Map, storing key-value pairs in ha
 ➤ ✅ Thread-safe (all methods synchronized).
 ➤ ❌ Null keys/values not allowed (unlike HashMap).
 ➤ Slower than HashMap due to synchronization.
-➤ Introduced before Java Collections Framework → considered legacy.
+➤ Introduced before Java Collections Framework ─────────▶ considered legacy.
 ➤ Replaced by ConcurrentHashMap in modern concurrent apps.
 
 🔄 Internal Working:
 ➤ Uses array of buckets where each bucket stores a linked list of entries.
-➤ On collision → new entry appended to linked list of that bucket.
+➤ On collision ─────────▶ new entry appended to linked list of that bucket.
 ➤ Since Java 8, HashMap/ConcurrentHashMap optimize collision handling with balanced trees, but Hashtable still uses only linked list.
 
 🔄 Important Methods:
-➤ V put(K key, V value) → insert key-value.
-➤ V get(Object key) → retrieve value.
-➤ boolean containsKey(Object key) / containsValue(Object value) → check existence.
-➤ Enumeration<K> keys() / elements() → legacy iteration methods.
+➤ V put(K key, V value) ─────────▶ insert key-value.
+➤ V get(Object key) ─────────▶ retrieve value.
+➤ boolean containsKey(Object key) / containsValue(Object value) ─────────▶ check existence.
+➤ Enumeration<K> keys() / elements() ─────────▶ legacy iteration methods.
 
 🔄 Use Cases:
 ➤ Very limited today — mostly in legacy systems.
-➤ For thread-safe maps → use ConcurrentHashMap.
+➤ For thread-safe maps ─────────▶ use ConcurrentHashMap.
 
 🔄 Comparison with HashMap:
-➤ Hashtable → synchronized, no null keys/values, slower.
-➤ HashMap → not synchronized, allows one null key & multiple null values, faster.
+➤ Hashtable ─────────▶ synchronized, no null keys/values, slower.
+➤ HashMap ─────────▶ not synchronized, allows one null key & multiple null values, faster.
 
 ✅Code Implementation:
 import java.util.*;
@@ -1684,13 +2082,13 @@ Iterating with Enumeration:
 
 🔷 ConcurrentHashMap
 ✅ Java 7
-➤ Used segment-based locking (default: 16 segments → 16 smaller hash tables).
+➤ Used segment-based locking (default: 16 segments ─────────▶ 16 smaller hash tables).
 ➤ Only the segment being modified/read is locked.
 ➤ Read: doesn’t require locking unless concurrent write is happening.
 ➤ Write: locks only that segment (better concurrency than Hashtable).
 
 ✅ Java 8
-➤ Removed segmentation → now uses bucket-level locks.
+➤ Removed segmentation ─────────▶ now uses bucket-level locks.
 ➤ Uses CAS (Compare-And-Swap) for updates (almost lock-free).
 ➤ Locking only occurs during resizing or treeification (when collision chains convert to balanced trees).
 ➤ Much faster than Java 7 implementation.
@@ -1710,7 +2108,7 @@ public class ConcurrentHashMapDemo {
         // Retrieving
         System.out.println("ConcurrentHashMap: " + chm);
 
-        // Key already exists → old value replaced
+        // Key already exists ─────────▶ old value replaced
         chm.put(2, "Orange");
         System.out.println("After update: " + chm);
 
@@ -1875,15 +2273,15 @@ Map.ofEntries: {A=1, B=2, C=3, D=4}
 ➤ Not thread-safe by default.
 
 🔄 Common Implementations:
-➤ HashSet → backed by HashMap, no order guarantee.
-➤ LinkedHashSet → maintains insertion order.
-➤ TreeSet → maintains sorted order (uses Red-Black Tree).
-➤ EnumSet → optimized for enum constants.
+➤ HashSet ─────────▶ backed by HashMap, no order guarantee.
+➤ LinkedHashSet ─────────▶ maintains insertion order.
+➤ TreeSet ─────────▶ maintains sorted order (uses Red-Black Tree).
+➤ EnumSet ─────────▶ optimized for enum constants.
 
 👉 For thread-safety, we have special implementations:
-➤ Collections.synchronizedSet(set) → synchronized wrapper (rarely used).
-➤ ConcurrentSkipListSet → concurrent + sorted.
-➤ CopyOnWriteArraySet → concurrent + copy-on-write
+➤ Collections.synchronizedSet(set) ─────────▶ synchronized wrapper (rarely used).
+➤ ConcurrentSkipListSet ─────────▶ concurrent + sorted.
+➤ CopyOnWriteArraySet ─────────▶ concurrent + copy-on-write
 
 
 🔷 LinkedHashSet
@@ -1950,7 +2348,7 @@ SubSet(10 to 30): [10, 20]
 ➤ Backed by ConcurrentSkipListMap internally.
 ➤ Maintains ascending sorted order.
 ➤ Good for range-based operations (subSet, headSet, tailSet).
-➤ Weakly consistent iterators → do not throw ConcurrentModificationException, but may miss new updates.
+➤ Weakly consistent iterators ─────────▶ do not throw ConcurrentModificationException, but may miss new updates.
 
 ✅Code Implementation:
 import java.util.concurrent.*;
@@ -1980,7 +2378,7 @@ SubSet(10 to 40): [10, 20]
 🔷 CopyOnWriteArraySet
 ➤ Backed by CopyOnWriteArrayList.
 ➤ Thread-safe set.
-➤ On every write operation (add/remove) → creates a new copy of the underlying array.
+➤ On every write operation (add/remove) ─────────▶ creates a new copy of the underlying array.
 ➤ Reads are fast (no lock needed), but writes are expensive.
 ➤ Best suited for:
 	✔️ Read-heavy, write-light scenarios.
@@ -1988,7 +2386,7 @@ SubSet(10 to 40): [10, 20]
 
 🔄 Iterator Behavior
 ➤ Iterators are fail-safe (don’t throw ConcurrentModificationException).
-➤ Iterators work on a snapshot of the array at the time of iteration → modifications made after iterator creation are not reflected.
+➤ Iterators work on a snapshot of the array at the time of iteration ─────────▶ modifications made after iterator creation are not reflected.
 
 ✅Code Implementation
 import java.util.concurrent.*;
@@ -2109,8 +2507,8 @@ Key Features:
 
 🌟 Internal Working
 ➤ Implemented using a binary heap stored in an array.
-➤ For natural ordering → acts as a Min-Heap.
-➤ For reverse order (Comparator.reverseOrder()) → acts as a Max-Heap.
+➤ For natural ordering ─────────▶ acts as a Min-Heap.
+➤ For reverse order (Comparator.reverseOrder()) ─────────▶ acts as a Max-Heap.
 ➤ Operations like insertion and deletion work in O(log n).
 ➤ The head element of the queue is always the smallest (min-heap) or largest (max-heap) based on comparator.
 
@@ -2212,57 +2610,57 @@ public class PriorityQueueCustom {
 }
 
 ✅ Insights
-👉 PriorityQueue is not thread-safe → use PriorityBlockingQueue for concurrent cases.
+👉 PriorityQueue is not thread-safe ─────────▶ use PriorityBlockingQueue for concurrent cases.
 👉 Backed by a binary heap, not a balanced tree.
-👉 The iterator of PriorityQueue does not guarantee sorted order → only the head follows priority.
+👉 The iterator of PriorityQueue does not guarantee sorted order ─────────▶ only the head follows priority.
 👉 If ordering is important when iterating, use poll() repeatedly or move to a TreeSet/TreeMap.
 
 🔷 Deque (Double Ended Queue)
 ➤ A linear data structure that allows insertion & deletion at both ends (front & rear).
 ➤ More versatile than Queue and Stack:
-    ✔️ Queue → Insert at rear, delete at front
-    ✔️ Stack → Insert & delete at same end (LIFO)
-    ✔️ Deque → Supports both behaviors.
+    ✔️ Queue ─────────▶ Insert at rear, delete at front
+    ✔️ Stack ─────────▶ Insert & delete at same end (LIFO)
+    ✔️ Deque ─────────▶ Supports both behaviors.
 
 🔄 Implementations in Java
 Interface: Deque<E> (extends Queue<E> from java.util).
 
 🌟 Common Implementations:
-✔️ ArrayDeque<E> → Resizable circular array
+✔️ ArrayDeque<E> ─────────▶ Resizable circular array
     ➤ Fast iteration, no null allowed, better cache locality
     ➤ Preferred in most cases over LinkedList
 
-✔️ LinkedList<E> → Doubly linked list
+✔️ LinkedList<E> ─────────▶ Doubly linked list
     ➤ Allows null values, higher memory usage
     ➤ Slower iteration than ArrayDeque
 
 🔄 Methods in Deque
 ⚡ Insertion
-🔗 addFirst(E e) → Insert at front (throws exception if fails)
-🔗 addLast(E e) → Insert at end (throws exception if fails)
-🔗 offerFirst(E e) → Insert at front (returns false if fails)
-🔗 offerLast(E e) → Insert at end (returns false if fails)
+🔗 addFirst(E e) ─────────▶ Insert at front (throws exception if fails)
+🔗 addLast(E e) ─────────▶ Insert at end (throws exception if fails)
+🔗 offerFirst(E e) ─────────▶ Insert at front (returns false if fails)
+🔗 offerLast(E e) ─────────▶ Insert at end (returns false if fails)
 
 ⚡ Removal
-🔗 removeFirst() → Remove & return front (throws exception if empty)
-🔗 removLast() → Remove & return end (throws exception if empty)
-🔗 pollFirst() → Remove & return front (returns null if empty)
-🔗 pollLast() → Remove & return end (returns null if empty)
+🔗 removeFirst() ─────────▶ Remove & return front (throws exception if empty)
+🔗 removLast() ─────────▶ Remove & return end (throws exception if empty)
+🔗 pollFirst() ─────────▶ Remove & return front (returns null if empty)
+🔗 pollLast() ─────────▶ Remove & return end (returns null if empty)
 
 ⚡ Examination (Access without removal, exception if empty)
-🔗 getFirst() → Retrieve front element
-🔗 getLast() → Retrieve last element
+🔗 getFirst() ─────────▶ Retrieve front element
+🔗 getLast() ─────────▶ Retrieve last element
 
 ⚡ Peeking (Access without removal, safe)
-🔗 peekFirst() → Peek front element
-🔗 peekLast() → Peek last element
+🔗 peekFirst() ─────────▶ Peek front element
+🔗 peekLast() ─────────▶ Peek last element
 
 ⚡ Other Important Methods
-🔗 size() → Number of elements
-🔗 isEmpty() → Check if empty
-🔗 contains(Object o) → Check existence
-🔗 iterator() → Iterates from front → end
-🔗 descendingIterator() → Iterates from end → front
+🔗 size() ─────────▶ Number of elements
+🔗 isEmpty() ─────────▶ Check if empty
+🔗 contains(Object o) ─────────▶ Check existence
+🔗 iterator() ─────────▶ Iterates from front ─────────▶ end
+🔗 descendingIterator() ─────────▶ Iterates from end ─────────▶ front
 
 4. Example (Using ArrayDeque)
 import java.util.*;
@@ -2284,23 +2682,23 @@ public class DequeExample {
         System.out.println(deque1.getLast());  // 40
 
         // Removals
-        deque1.removeFirst();   // removes 30 → [10, 20, 40]
-        deque1.pollLast();      // removes 40 → [10, 20]
+        deque1.removeFirst();   // removes 30 ─────────▶ [10, 20, 40]
+        deque1.pollLast();      // removes 40 ─────────▶ [10, 20]
 
         System.out.println(deque1);  // [10, 20]
     }
 }
 
 🔄 Special Usages
-👉 As Queue → Only use addLast(), removeFirst()
-👉 As Stack → Use push(), pop(), peek()
+👉 As Queue ─────────▶ Only use addLast(), removeFirst()
+👉 As Stack ─────────▶ Use push(), pop(), peek()
     ➤ Internally mapped as addFirst(), removeFirst(), peekFirst()
 
 ✅ Example:
 Deque<Integer> stack = new ArrayDeque<>();
 stack.push(1);   // addFirst(1)
 stack.push(2);   // addFirst(2)
-System.out.println(stack.pop()); // removeFirst() → 2
+System.out.println(stack.pop()); // removeFirst() ─────────▶ 2
 
 🔄 Key Differences Between Implementations
 ✔️ ArrayDeque
@@ -2314,12 +2712,12 @@ System.out.println(stack.pop()); // removeFirst() → 2
     ➤ More memory overhead
 
 🧠 Traps / Notes
-➤ add/remove methods → Throw exceptions on failure
-➤ offer/poll methods → Return special values (false / null) instead of exception
+➤ add/remove methods ─────────▶ Throw exceptions on failure
+➤ offer/poll methods ─────────▶ Return special values (false / null) instead of exception
 ➤ Prefer ArrayDeque unless null values are required
 ➤ Iteration order:
-    ✔️ iterator() → head → tail
-    ✔️ descendingIterator() → tail → head
+    ✔️ iterator() ─────────▶ head ─────────▶ tail
+    ✔️ descendingIterator() ─────────▶ tail ─────────▶ head
 
 
 🔷 BlockingQueue in Java
@@ -2331,29 +2729,29 @@ System.out.println(stack.pop()); // removeFirst() → 2
 ➤ Simplifies classic concurrency problems like Producer–Consumer.
 
 🔄 Implementations
-👉 ArrayBlockingQueue → bounded, circular array-backed
-👉 LinkedBlockingQueue → optional capacity (unbounded by default), linked nodes
-👉 PriorityBlockingQueue → priority-based (like PriorityQueue, but thread-safe)
+👉 ArrayBlockingQueue ─────────▶ bounded, circular array-backed
+👉 LinkedBlockingQueue ─────────▶ optional capacity (unbounded by default), linked nodes
+👉 PriorityBlockingQueue ─────────▶ priority-based (like PriorityQueue, but thread-safe)
 👉 DelayQueue, SynchronousQueue, etc. (specialized cases)
 
 🔄 Core Methods
 ⚡ Insertion
-🔗 put(E e) → Blocks if queue is full until space is available.
-🔗 offer(E e) → Immediately returns false if queue is full.
-🔗 offer(E e, long timeout, TimeUnit unit) → Waits up to timeout for space.
+🔗 put(E e) ─────────▶ Blocks if queue is full until space is available.
+🔗 offer(E e) ─────────▶ Immediately returns false if queue is full.
+🔗 offer(E e, long timeout, TimeUnit unit) ─────────▶ Waits up to timeout for space.
 
 ⚡ Removal
-🔗 take() → Blocks if queue is empty until element is available.
-🔗 poll() → Returns null if queue is empty.
-🔗 poll(long timeout, TimeUnit unit) → Waits up to timeout for an element.
+🔗 take() ─────────▶ Blocks if queue is empty until element is available.
+🔗 poll() ─────────▶ Returns null if queue is empty.
+🔗 poll(long timeout, TimeUnit unit) ─────────▶ Waits up to timeout for an element.
 
 ⚡ Others
-🔗 peek() → Retrieves head without removing (null if empty).
-🔗 size() → Returns number of elements.
-🔗 remainingCapacity() → Available space before full.
+🔗 peek() ─────────▶ Retrieves head without removing (null if empty).
+🔗 size() ─────────▶ Returns number of elements.
+🔗 remainingCapacity() ─────────▶ Available space before full.
 
 🔄 Key Difference with Normal Queue
-➤ Normal Queue: No waiting → add/remove fail immediately if full/empty.
+➤ Normal Queue: No waiting ─────────▶ add/remove fail immediately if full/empty.
 ➤ BlockingQueue: Waits (blocks) until space or element becomes available.
 
 🌟 Using ArrayBlockingQueue
@@ -2412,7 +2810,7 @@ Consuming: 2
 Producing: 4
 Producing: 5
 Producing: 6  // Producer blocks if queue is full
-Consuming: 3  // Consumer frees space → Producer resumes
+Consuming: 3  // Consumer frees space ─────────▶ Producer resumes
 
 🧠 Traps & Notes
 ➤ put() and take() are blocking, unlike normal queue ops.
@@ -2429,17 +2827,17 @@ Consuming: 3  // Consumer frees space → Producer resumes
 ➤ A thread-safe blocking queue based on a linked list.
 ➤ Optionally bounded:
     ✔️ Default = unbounded (capacity = Integer.MAX_VALUE)
-    ✔️ Can be bounded at creation → safer (prevents memory issues).
+    ✔️ Can be bounded at creation ─────────▶ safer (prevents memory issues).
 ➤ Located in java.util.concurrent package.
 
 🔄 Characteristics
-➤ Unbounded by default → may cause OutOfMemoryError if producers are much faster than consumers.
-➤ Bounded form recommended → use constructor new LinkedBlockingQueue<>(capacity).
-➤ Backed by linked list → memory allocated per node.
+➤ Unbounded by default ─────────▶ may cause OutOfMemoryError if producers are much faster than consumers.
+➤ Bounded form recommended ─────────▶ use constructor new LinkedBlockingQueue<>(capacity).
+➤ Backed by linked list ─────────▶ memory allocated per node.
 ➤ Two separate locks:
     ✔️ One for enqueue (put/offer)
     ✔️ One for dequeue (take/poll)
-    ✔️ → Allows higher concurrency between producers and consumers.
+    ✔️ ─────────▶ Allows higher concurrency between producers and consumers.
 ➤ Supports more threads compared to ArrayBlockingQueue due to reduced contention.
 
 🔄 Core Methods (Same as BlockingQueue)
@@ -2495,7 +2893,7 @@ Memory Usage             Higher (node overhead per element)       Lower (contigu
 Null Allowed?            No                                       No
 
 🧠 Traps & Notes
-➤ Default is unbounded → may cause OutOfMemoryError. Always set capacity in real-world use.
+➤ Default is unbounded ─────────▶ may cause OutOfMemoryError. Always set capacity in real-world use.
 ➤ Higher concurrency because producers and consumers don’t block each other as much (separate locks).
 ➤ Preferred for high producer-consumer traffic.
 ➤ ArrayBlockingQueue is preferred for predictable, bounded workloads with better memory efficiency.
@@ -2509,7 +2907,7 @@ Null Allowed?            No                                       No
 ➤ Implemented using a binary heap (array-backed).
 
 🔄 Characteristics
-➤ Unbounded → capacity can grow dynamically (but bounded by memory).
+➤ Unbounded ─────────▶ capacity can grow dynamically (but bounded by memory).
 ➤ put() won’t block (unlike ArrayBlockingQueue or LinkedBlockingQueue) because the queue never becomes “full.”
 ➤ take() will block if the queue is empty until an element is available.
 ➤ Head = least element according to ordering.
@@ -2584,12 +2982,12 @@ Consuming: 50
 
 🌟 SynchronousQueue
 ➤ A special type of BlockingQueue in java.util.concurrent.
-➤ Capacity = 0 (or conceptually 1) → it cannot hold elements.
+➤ Capacity = 0 (or conceptually 1) ─────────▶ it cannot hold elements.
 ➤ Each put() must wait for a take() by another thread (and vice versa).
 ➤ Think of it as a handoff queue between threads.
 
 🔄 Characteristics
-➤ No element storage → acts as a direct handoff.
+➤ No element storage ─────────▶ acts as a direct handoff.
 ➤ Producer and consumer must rendezvous (meet) for an element transfer.
 ➤ Good for scenarios like thread pools, work handoff, or when tasks should not be queued.
 ➤ Has two modes internally:
@@ -2598,10 +2996,10 @@ Consuming: 50
 
 
 🔄Methods Behavior
-➤ put(E e) → Blocks until another thread calls take().
-➤ take() → Blocks until another thread calls put().
-➤ offer(E e, timeout, unit) → Waits for a consumer within timeout, else fails.
-➤ poll(timeout, unit) → Waits for a producer within timeout, else returns null.
+➤ put(E e) ─────────▶ Blocks until another thread calls take().
+➤ take() ─────────▶ Blocks until another thread calls put().
+➤ offer(E e, timeout, unit) ─────────▶ Waits for a consumer within timeout, else fails.
+➤ poll(timeout, unit) ─────────▶ Waits for a producer within timeout, else returns null.
     
 ✅Code Example:
 import java.util.concurrent.*;
@@ -2657,7 +3055,7 @@ Producer: put B successfully
 ➤ Use case:
     ✔️ Task handoff in thread pools (Executors.newCachedThreadPool() uses it internally).
     ✔️ Workflows where queueing is undesirable.
-➤ Constructor: new SynchronousQueue<>(true) → fair mode (FIFO order).
+➤ Constructor: new SynchronousQueue<>(true) ─────────▶ fair mode (FIFO order).
 
 
 🌟 DelayQueue
@@ -2667,24 +3065,24 @@ Producer: put B successfully
 ➤ Internally backed by a priority queue (ordered by remaining delay).
 
 Characteristics
-➤ Unbounded → grows dynamically (bounded by memory).
-➤ Ordering → element with the least remaining delay is at the head.
+➤ Unbounded ─────────▶ grows dynamically (bounded by memory).
+➤ Ordering ─────────▶ element with the least remaining delay is at the head.
 ➤ Blocking behavior:
-    ✔️ take() → waits until head element’s delay has expired.
-    ✔️ poll() → returns element if delay expired, else null.
+    ✔️ take() ─────────▶ waits until head element’s delay has expired.
+    ✔️ poll() ─────────▶ returns element if delay expired, else null.
 ➤ Cannot contain null elements.
 ➤ Useful for task scheduling, caching with timeouts, rate limiting.
 
 🔄 Core Methods
-➤ put(E e) → Inserts element (no blocking since unbounded).
-➤ take() → Blocks until an element with expired delay is available.
-➤ poll() → Returns head if delay expired, else null.
-➤ peek() → Returns head (even if delay not expired), does not remove.
+➤ put(E e) ─────────▶ Inserts element (no blocking since unbounded).
+➤ take() ─────────▶ Blocks until an element with expired delay is available.
+➤ poll() ─────────▶ Returns head if delay expired, else null.
+➤ peek() ─────────▶ Returns head (even if delay not expired), does not remove.
 
 🔄 Implementing Delayed Elements
 To use DelayQueue, elements must implement:
-    ✔️ getDelay(TimeUnit unit) → Remaining delay.
-    ✔️ compareTo(Delayed other) → Ordering (usually based on delay expiry time).
+    ✔️ getDelay(TimeUnit unit) ─────────▶ Remaining delay.
+    ✔️ compareTo(Delayed other) ─────────▶ Ordering (usually based on delay expiry time).
 
 ✅Code Example: DelayQueue with Delayed Tasks    
 import java.util.concurrent.*;
@@ -2740,7 +3138,7 @@ Executed: Task-3 at 3003
 
 🔄 Interview Traps / Notes
 ➤ Unlike PriorityBlockingQueue, an element is not available immediately — it must expire first.
-➤ Always unbounded → possible memory issues if too many delayed tasks are queued.
+➤ Always unbounded ─────────▶ possible memory issues if too many delayed tasks are queued.
 ➤ Common use cases:
     ✔️ Scheduling tasks after a delay.
     ✔️ Implementing retry mechanisms.
@@ -2753,21 +3151,21 @@ Executed: Task-3 at 3003
 ➤ Suitable for high-concurrency scenarios where blocking is undesirable.
 
 🔄 Characteristics
-➤ Unbounded → grows dynamically (bounded by memory).
+➤ Unbounded ─────────▶ grows dynamically (bounded by memory).
 ➤ Non-blocking:
-    ✔️ If empty → poll() returns null (does not wait).
-    ✔️ If full (theoretically never, since unbounded) → inserts always succeed.
+    ✔️ If empty ─────────▶ poll() returns null (does not wait).
+    ✔️ If full (theoretically never, since unbounded) ─────────▶ inserts always succeed.
 ➤ FIFO order maintained.
 ➤ Better scalability than synchronized collections (Vector, Collections.synchronizedList).
 ➤ Null elements not allowed.
 
 🔄 Core Methods
-🔗 add(E e) → Inserts element at tail (same as offer()).
-🔗 offer(E e) → Inserts element at tail.
-🔗 poll() → Retrieves & removes head, returns null if empty.
-🔗 peek() → Retrieves head without removing, returns null if empty.
-🔗 size() → Returns current size (but not constant-time, may be expensive).
-🔗 isEmpty() → Check if queue is empty.
+🔗 add(E e) ─────────▶ Inserts element at tail (same as offer()).
+🔗 offer(E e) ─────────▶ Inserts element at tail.
+🔗 poll() ─────────▶ Retrieves & removes head, returns null if empty.
+🔗 peek() ─────────▶ Retrieves head without removing, returns null if empty.
+🔗 size() ─────────▶ Returns current size (but not constant-time, may be expensive).
+🔗 isEmpty() ─────────▶ Check if queue is empty.
 
 ✅Code Example:Task Submission System
 import java.util.concurrent.*;
@@ -2841,9 +3239,9 @@ Thread-2 executing Task-P2-2
 
 🧠 Traps & Notes
 ➤ Non-blocking: no put() / take() like BlockingQueue.
-➤ CAS (Compare-And-Swap) ensures atomic updates without locks → high throughput.
+➤ CAS (Compare-And-Swap) ensures atomic updates without locks ─────────▶ high throughput.
 ➤ Best for message passing systems, task submission, event queues where blocking is not needed.
-➤ size() is not constant time → avoid in performance-critical code.
+➤ size() is not constant time ─────────▶ avoid in performance-critical code.
 
 🌟 ConcurrentLinkedDeque
 ➤ A non-blocking, thread-safe, double-ended queue (Deque).
@@ -2852,26 +3250,26 @@ Thread-2 executing Task-P2-2
 ➤ Allows concurrent insertions and removals at both ends.
 
 🔄 Characteristics
-➤ Unbounded → grows dynamically (limited by memory).
+➤ Unbounded ─────────▶ grows dynamically (limited by memory).
 ➤ Non-blocking:
     ✔️ No waiting (unlike BlockingDeque).
-    ✔️ If empty → retrieval methods return null.
-➤ Thread-safe → multiple producers/consumers can work simultaneously.
+    ✔️ If empty ─────────▶ retrieval methods return null.
+➤ Thread-safe ─────────▶ multiple producers/consumers can work simultaneously.
 ➤ Maintains FIFO order when used as a queue, or LIFO order when used as a stack.
 ➤ Null elements not allowed.
 
 🔄 Core Methods (Same as Deque, but thread-safe & lock-free)
 ➤ Insertion
-🔗  addFirst(E e) / offerFirst(E e) → Insert at head.
-🔗  addLast(E e) / offerLast(E e) → Insert at tail.
+🔗  addFirst(E e) / offerFirst(E e) ─────────▶ Insert at head.
+🔗  addLast(E e) / offerLast(E e) ─────────▶ Insert at tail.
 
 ➤ Removal
-🔗  pollFirst() / removeFirst() → Retrieve & remove head.
-🔗  pollLast() / removeLast() → Retrieve & remove tail.
+🔗  pollFirst() / removeFirst() ─────────▶ Retrieve & remove head.
+🔗  pollLast() / removeLast() ─────────▶ Retrieve & remove tail.
 
 ➤ Access (no removal)
-🔗  peekFirst() → Head element, or null if empty.
-🔗  peekLast() → Tail element, or null if empty.
+🔗  peekFirst() ─────────▶ Head element, or null if empty.
+🔗  peekLast() ─────────▶ Tail element, or null if empty.
 
 ✅Code Example: Concurrent Task Queue
 import java.util.concurrent.*;
@@ -2923,8 +3321,8 @@ Consumed Task-5
 
 🧠 Traps & Notes
 ➤ Difference from BlockingDeque:
-    ✔️ ConcurrentLinkedDeque → non-blocking (returns null if empty).
-    ✔️ BlockingDeque → blocking (take() waits if empty).
+    ✔️ ConcurrentLinkedDeque ─────────▶ non-blocking (returns null if empty).
+    ✔️ BlockingDeque ─────────▶ blocking (take() waits if empty).
 ➤ Best for highly concurrent producer-consumer systems where waiting is not required.
 ➤ Often used in work-stealing algorithms (threads can take tasks from both ends).
 ➤ Provides lock-free scalability for multiple threads.
@@ -3039,16 +3437,16 @@ Defect class:
 
 ReportDefect class:
     ➤ Calls method with an enum constant.
-    ➤ Output for Severity.CRITICAL → 5.
+    ➤ Output for Severity.CRITICAL ─────────▶ 5.
 
 🌟Key Enum Features Used Here
 ➤ Parameterized Enums: Storing extra information (fixingDays).
 ➤ Type-Safe Method Parameters: Accepting Severity instead of int.
 
 Built-in Enum Methods:
-    ➤ values() → Returns all constants.
-    ➤ valueOf(String name) → Returns constant by name.
-    ➤ ordinal() → Returns index of constant (0-based).
+    ➤ values() ─────────▶ Returns all constants.
+    ➤ valueOf(String name) ─────────▶ Returns constant by name.
+    ➤ ordinal() ─────────▶ Returns index of constant (0-based).
 
 Example:
 for (Severity s : Severity.values()) {
@@ -3248,9 +3646,9 @@ String str7 = "python";
 System.out.println(str6.compareTo(str7)); // -6
 
 ➤ Output Meaning:
-0 → Both strings are equal.
-< 0 → First string is lexicographically smaller.
-> 0 → First string is lexicographically greater.
+0 ─────────▶ Both strings are equal.
+< 0 ─────────▶ First string is lexicographically smaller.
+> 0 ─────────▶ First string is lexicographically greater.
 
 🔄 String Case Conversion
 ✅ toUpperCase()
@@ -3433,7 +3831,7 @@ public class StringBuilderDemo {
         System.out.println("Final Output Using StringBuilder: " + sb);
     }
 }
-➤ No locking/synchronization → fastest performance.
+➤ No locking/synchronization ─────────▶ fastest performance.
 ➤ Used where only one thread modifies the data.
 
 ✅ Code Example Showing StringBuffer Functioning (Thread-Safe via Synchronization)

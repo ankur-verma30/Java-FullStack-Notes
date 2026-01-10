@@ -1,4 +1,6 @@
-📌 Git Basics & Commands
+==========================
+🔷 Git Basics & Commands
+==========================
 ➤ Git ─────────▶ A distributed version control system (DVCS) used to track changes in source code.
 ➤ VCS (Version Control System): Manages changes, tracks history, allows rollbacks, and enables collaboration.
 ➤ DVCS vs CVCS:
@@ -18,7 +20,10 @@ git config --global user.email "Your Email"
 
 Email is used to associate commits with your GitHub/GitLab account.
 
-📌 Common Git Commands
+
+========================
+🔷 Common Git Commands
+========================
 🔄 Directory & File Management
 🔗 ls ─────────▶ Show directory content (Linux).
 🔗 ls -al ─────────▶ Show all files (including hidden) in long format (Linux).
@@ -47,7 +52,10 @@ Email is used to associate commits with your GitHub/GitLab account.
 🔗 :q! ─────────▶ Quit without saving.
 🔗 :wq ─────────▶ Save and quit.
 
+
+================
 🔷 Git Branches
+================
 In Git, a branch is a lightweight movable pointer to a commit.
 It represents an independent line of development.
 When you create a branch, you're essentially creating a copy of your codebase at that point.
@@ -72,7 +80,10 @@ When you create a branch, you're essentially creating a copy of your codebase at
 ⚠️ Note: git checkout is older and more confusing (used for both branch & file ops).
 git switch and git restore were introduced to make it cleaner.
 
-📌 File Operations
+
+===================
+🔷 File Operations
+===================
 🔗 git checkout fileName ─────────▶ Discard uncommitted changes in specific file (irreversible).
 If you have committed the file and then again you do some changes and then use git checkout filename then it will revert the changes to the last commit state.
 🔗 git checkout . ─────────▶ Discard uncommitted changes in all files (irreversible).
@@ -83,20 +94,29 @@ If you have committed the file and then again you do some changes and then use g
 🔗 git restore fileName ─────────▶ Discard changes in a file.
 🔗 git restore . ─────────▶ Discard changes in all files.
 
-📌 Logs & Commit Management
+
+============================
+🔷 Logs & Commit Management
+============================
 🔗 git log --oneline ─────────▶ Show commit history in one-line format (compact).
 🔗 git log --graph --oneline --all ─────────▶ Visual branch structure + history.
 🔗 git commit --amend -m "new message" ─────────▶ Change last commit message.
-🔗 git commit --amend ─────────▶ Edit last commit (can also add new changes).
+🔗 git commit --amend -m "amend message" ─────────▶ Edit last commit (can also add new changes).
 
 ⚠️ If commit was already pushed to remote ─────────▶ avoid amending (it rewrites history).
+🔗 touch .gitignore ─────────▶ Create .gitignore file.
+🔗 pwd ─────────▶ Show current directory(print working directory).
 
-touch .gitignore ─────────▶ Create .gitignore file.
-pwd ─────────▶ Show current directory(print working directory).
 
+======================
 🔷 Merging the branch
+======================
 🔗 git merge branchName ─────────▶ Merge a branch into the current branch.(Go to the branch in which you want to merge the changes. and run this Command).
 For example if you want to merge the changes of branch "dev" into the master branch, run the command "git merge dev" on master branch.
+🔗 git merge prod --allow-unrelated-histories ─────────▶ Allow Unrelated Histories
+✔️ Git will merge
+✔️ You may need to resolve conflicts
+
 
 🔗 git branch -m "newName" ─────────▶ Rename a branch (unsafe)
 🔗 git diff ─────────▶ Show changes between working directory and staging area.
@@ -104,7 +124,9 @@ For example if you want to merge the changes of branch "dev" into the master bra
 🔗 git diff commit1 commit2 ─────────▶ Show changes between two commits.
 
 
-🗂️ Git Stash Commands – Notes
+======================
+🔷 Git Stash Commands
+======================
 Stash temporarily shelves (or “stashes”) changes you’ve made in your working directory.
 
 Useful when you:
@@ -135,7 +157,10 @@ Useful when you:
 🔗 git stash --keep-index ─────────▶ Stash only unstaged changes, keeps staged files intact.
 🔗 git stash --include-untracked ─────────▶ Stash both tracked + untracked files.
 
-🗂️ Git Restore Commands – Notes
+
+========================
+🔷 Git Restore Commands
+========================
 Introduced in Git 2.23 (2019) as a safer alternative to git checkout.
 Used to discard changes in the working directory or staging area.
 Helps to avoid accidental overwriting when using git checkout.
@@ -157,7 +182,9 @@ Similar to: 🔗 git reset HEAD <file>
 ✅Example: 🔗 git restore --source=HEAD~2 file.txt ─────────▶ Brings back file state from 2 commits ago.
 
 
-🗂️ Git Reset Commands 
+======================
+🔷 Git Reset Commands
+======================
 ➤ Used to move HEAD (the current branch pointer) to another commit.
 ➤ Can also affect staging area (index) and working directory depending on mode.
 ➤ ⚠️ Dangerous if used carelessly (especially --hard), as it can permanently delete changes.
@@ -191,7 +218,10 @@ Similar to: 🔗 git reset HEAD <file>
 | `--mixed` | ✅ Yes      | ❌ Unstaged           | ✅ Keeps changes   |
 | `--hard`  | ✅ Yes      | ❌ Cleared            | ❌ Cleared (lost)  |
 
-🗂️ Git Revert Commands
+
+=======================
+🔷 Git Revert Commands
+=======================
 ➤ Safely undoes a commit by creating a new commit that reverses the changes.
 ➤ Unlike git reset, it does not delete history (safer for shared branches).
 
