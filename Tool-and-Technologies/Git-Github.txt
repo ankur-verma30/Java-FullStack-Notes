@@ -1,16 +1,16 @@
 📌 Git Basics & Commands
-➤ Git → A distributed version control system (DVCS) used to track changes in source code.
+➤ Git ─────────▶ A distributed version control system (DVCS) used to track changes in source code.
 ➤ VCS (Version Control System): Manages changes, tracks history, allows rollbacks, and enables collaboration.
 ➤ DVCS vs CVCS:
-    ✔️ DVCS → Each developer has a full copy of the repo (with complete history).
-    ✔️ CVCS → Single central repository, developers depend on it for history.git
+    ✔️ DVCS ─────────▶ Each developer has a full copy of the repo (with complete history).
+    ✔️ CVCS ─────────▶ Single central repository, developers depend on it for history.git
 
 🔄 What is a Repository?
 ➤ A repository is a storage location for source code + history.
 ➤ Git Repository: A repo managed by Git.
 ➤ Types:
-    ✔️ Local Repo → Stored on your computer.
-    ✔️ Remote Repo → Stored on a server (e.g., GitHub, GitLab, Bitbucket).
+    ✔️ Local Repo ─────────▶ Stored on your computer.
+    ✔️ Remote Repo ─────────▶ Stored on a server (e.g., GitHub, GitLab, Bitbucket).
 
 🔄 Configure Git
 git config --global user.name "Your Name"
@@ -20,32 +20,32 @@ Email is used to associate commits with your GitHub/GitLab account.
 
 📌 Common Git Commands
 🔄 Directory & File Management
-🔗 ls → Show directory content (Linux).
-🔗 ls -al → Show all files (including hidden) in long format (Linux).
-🔗 Get-ChildItem -Force → PowerShell equivalent of ls -al.
-🔗 rm -rf .git/ → Remove .git folder → uninitialize Git repo.
+🔗 ls ─────────▶ Show directory content (Linux).
+🔗 ls -al ─────────▶ Show all files (including hidden) in long format (Linux).
+🔗 Get-ChildItem -Force ─────────▶ PowerShell equivalent of ls -al.
+🔗 rm -rf .git/ ─────────▶ Remove .git folder ─────────▶ uninitialize Git repo.
 
 🔄 Initialize & Status
-🔗 git init → Initialize Git repository in current directory.
-🔗 git status → Show working directory & staging area status.
+🔗 git init ─────────▶ Initialize Git repository in current directory.
+🔗 git status ─────────▶ Show working directory & staging area status.
 
-❌ Error: fatal: not a git repository (or any of the parent directories): .git → means Git repo not initialized.
+❌ Error: fatal: not a git repository (or any of the parent directories): .git ─────────▶ means Git repo not initialized.
 
 🔄 Staging Files
-🔗 git add fileName1 fileName2 → Stage specific files.
-🔗 git add . → Stage all files.
-🔗 git rm --cached fileName → Remove file from staging area (but keep in working directory).
+🔗 git add fileName1 fileName2 ─────────▶ Stage specific files.
+🔗 git add . ─────────▶ Stage all files.
+🔗 git rm --cached fileName ─────────▶ Remove file from staging area (but keep in working directory).
 
 🔄 Commit
-🔗 git commit -m "message" → Commit staged changes.
-🔗 git commit -am "message" → Stage and commit tracked files in one step.
+🔗 git commit -m "message" ─────────▶ Commit staged changes.
+🔗 git commit -am "message" ─────────▶ Stage and commit tracked files in one step.
 
 🔄 Commit History
-🔗 git log → Show commit history.
+🔗 git log ─────────▶ Show commit history.
 
 🔄 Vim Editor Notes (when commit opens in Vim)
-🔗 :q! → Quit without saving.
-🔗 :wq → Save and quit.
+🔗 :q! ─────────▶ Quit without saving.
+🔗 :wq ─────────▶ Save and quit.
 
 🔷 Git Branches
 In Git, a branch is a lightweight movable pointer to a commit.
@@ -54,54 +54,54 @@ When you create a branch, you're essentially creating a copy of your codebase at
 
 📌 Git Branching & Related Commands
 🔄 Branch Management
-🔗 git branch branchName → Create a new branch.
-🔗 git branch -d branchName → Delete a branch (safe delete).
-🔗 git branch -D branchName → Force delete branch (unsafe).
-🔗 git branch → List all branches, highlight current branch (*).
+🔗 git branch branchName ─────────▶ Create a new branch.
+🔗 git branch -d branchName ─────────▶ Delete a branch (safe delete).
+🔗 git branch -D branchName ─────────▶ Force delete branch (unsafe).
+🔗 git branch ─────────▶ List all branches, highlight current branch (*).
 
 🔄 Switching Branches
-🔗 git switch branchName → Switch to a branch (newer syntax).
-🔗 git switch - → Switch to previous branch.
-🔗 git switch -c branchName → Create and switch to a new branch.
+🔗 git switch branchName ─────────▶ Switch to a branch (newer syntax).
+🔗 git switch - ─────────▶ Switch to previous branch.
+🔗 git switch -c branchName ─────────▶ Create and switch to a new branch.
 
 🔄 Older Syntax (Checkout for Branches)
-🔗 git checkout branchName → Switch to a branch.
-🔗 git checkout -b branchName → Create and switch to a new branch.
-🔗 git checkout - → Switch to previous branch.
+🔗 git checkout branchName ─────────▶ Switch to a branch.
+🔗 git checkout -b branchName ─────────▶ Create and switch to a new branch.
+🔗 git checkout - ─────────▶ Switch to previous branch.
 
 ⚠️ Note: git checkout is older and more confusing (used for both branch & file ops).
 git switch and git restore were introduced to make it cleaner.
 
 📌 File Operations
-🔗 git checkout fileName → Discard uncommitted changes in specific file (irreversible).
+🔗 git checkout fileName ─────────▶ Discard uncommitted changes in specific file (irreversible).
 If you have committed the file and then again you do some changes and then use git checkout filename then it will revert the changes to the last commit state.
-🔗 git checkout . → Discard uncommitted changes in all files (irreversible).
-🔗 cat fileName → View file content.
-🔗 cat -n fileName → View file content with line numbers.
+🔗 git checkout . ─────────▶ Discard uncommitted changes in all files (irreversible).
+🔗 cat fileName ─────────▶ View file content.
+🔗 cat -n fileName ─────────▶ View file content with line numbers.
 
 ⚠️ For discarding changes, newer syntax is:
-🔗 git restore fileName → Discard changes in a file.
-🔗 git restore . → Discard changes in all files.
+🔗 git restore fileName ─────────▶ Discard changes in a file.
+🔗 git restore . ─────────▶ Discard changes in all files.
 
 📌 Logs & Commit Management
-🔗 git log --oneline → Show commit history in one-line format (compact).
-🔗 git log --graph --oneline --all → Visual branch structure + history.
-🔗 git commit --amend -m "new message" → Change last commit message.
-🔗 git commit --amend → Edit last commit (can also add new changes).
+🔗 git log --oneline ─────────▶ Show commit history in one-line format (compact).
+🔗 git log --graph --oneline --all ─────────▶ Visual branch structure + history.
+🔗 git commit --amend -m "new message" ─────────▶ Change last commit message.
+🔗 git commit --amend ─────────▶ Edit last commit (can also add new changes).
 
-⚠️ If commit was already pushed to remote → avoid amending (it rewrites history).
+⚠️ If commit was already pushed to remote ─────────▶ avoid amending (it rewrites history).
 
-touch .gitignore → Create .gitignore file.
-pwd → Show current directory(print working directory).
+touch .gitignore ─────────▶ Create .gitignore file.
+pwd ─────────▶ Show current directory(print working directory).
 
 🔷 Merging the branch
-🔗 git merge branchName → Merge a branch into the current branch.(Go to the branch in which you want to merge the changes. and run this Command).
+🔗 git merge branchName ─────────▶ Merge a branch into the current branch.(Go to the branch in which you want to merge the changes. and run this Command).
 For example if you want to merge the changes of branch "dev" into the master branch, run the command "git merge dev" on master branch.
 
-🔗 git branch -m "newName" → Rename a branch (unsafe)
-🔗 git diff → Show changes between working directory and staging area.
-🔗 git diff --staged → Show changes between staging area and the last commit.
-🔗 git diff commit1 commit2 → Show changes between two commits.
+🔗 git branch -m "newName" ─────────▶ Rename a branch (unsafe)
+🔗 git diff ─────────▶ Show changes between working directory and staging area.
+🔗 git diff --staged ─────────▶ Show changes between staging area and the last commit.
+🔗 git diff commit1 commit2 ─────────▶ Show changes between two commits.
 
 
 🗂️ Git Stash Commands – Notes
@@ -116,24 +116,24 @@ Useful when you:
 ➤ Stashes current changes (both staged + unstaged).
 ➤ Cleans working directory back to the last commit state.
 
-🔗 git stash list → Shows list of all stashed changes with IDs like stash@{0}, stash@{1}, etc.
-🔗 git stash pop → Applies latest stashed changes and removes them from stash.
-🔗 git stash apply → Applies latest stashed changes without removing from stash.
+🔗 git stash list ─────────▶ Shows list of all stashed changes with IDs like stash@{0}, stash@{1}, etc.
+🔗 git stash pop ─────────▶ Applies latest stashed changes and removes them from stash.
+🔗 git stash apply ─────────▶ Applies latest stashed changes without removing from stash.
 ➤ Can also apply specific stash: git stash apply stash@{2}
-🔗 git stash drop stash@{n} → Deletes a specific stash entry.
-🔗 git stash clear → Removes all stash entries.
+🔗 git stash drop stash@{n} ─────────▶ Deletes a specific stash entry.
+🔗 git stash clear ─────────▶ Removes all stash entries.
 
 🔄 Stashing with Names / Messages
-🔗 git stash push -- "fileName" → Stash specific file changes.
-🔗 git stash -m "message" "fileName" → Stash with a custom message for clarity.
+🔗 git stash push -- "fileName" ─────────▶ Stash specific file changes.
+🔗 git stash -m "message" "fileName" ─────────▶ Stash with a custom message for clarity.
 
 🔄 Viewing Stashed Changes
-🔗 git stash show stash@{n} → Shows summary of changes in stash.
-🔗 git stash show -p stash@{n} → Shows detailed patch (line-by-line diff).
+🔗 git stash show stash@{n} ─────────▶ Shows summary of changes in stash.
+🔗 git stash show -p stash@{n} ─────────▶ Shows detailed patch (line-by-line diff).
 
 🔄 Advanced Options
-🔗 git stash --keep-index → Stash only unstaged changes, keeps staged files intact.
-🔗 git stash --include-untracked → Stash both tracked + untracked files.
+🔗 git stash --keep-index ─────────▶ Stash only unstaged changes, keeps staged files intact.
+🔗 git stash --include-untracked ─────────▶ Stash both tracked + untracked files.
 
 🗂️ Git Restore Commands – Notes
 Introduced in Git 2.23 (2019) as a safer alternative to git checkout.
@@ -141,20 +141,20 @@ Used to discard changes in the working directory or staging area.
 Helps to avoid accidental overwriting when using git checkout.
 
 🔄 Common Commands
-🔗 git restore --staged <file> → Unstages a file (moves it from staging → working directory).
+🔗 git restore --staged <file> ─────────▶ Unstages a file (moves it from staging ─────────▶ working directory).
 Similar to: 🔗 git reset HEAD <file>
 
-🔗 git restore <file> → Discards local changes from working directory (file reverts to last committed state).
+🔗 git restore <file> ─────────▶ Discards local changes from working directory (file reverts to last committed state).
 
-🔗 git restore --staged --worktree <file> → Restores a file from staging area → working directory.
-🔗 git restore --staged --worktree . → Restores all files from staging → working directory.
+🔗 git restore --staged --worktree <file> ─────────▶ Restores a file from staging area ─────────▶ working directory.
+🔗 git restore --staged --worktree . ─────────▶ Restores all files from staging ─────────▶ working directory.
 
 🔄 Restoring from Commits
-🔗 git restore --source=HEAD <file> → Restores file from last commit (HEAD).
-🔗 git restore --source=HEAD . → Restores all files from last commit.
+🔗 git restore --source=HEAD <file> ─────────▶ Restores file from last commit (HEAD).
+🔗 git restore --source=HEAD . ─────────▶ Restores all files from last commit.
 
-🔗 git restore --source=HEAD~n <file> → Restores file(s) from n commits before HEAD.
-✅Example: 🔗 git restore --source=HEAD~2 file.txt → Brings back file state from 2 commits ago.
+🔗 git restore --source=HEAD~n <file> ─────────▶ Restores file(s) from n commits before HEAD.
+✅Example: 🔗 git restore --source=HEAD~2 file.txt ─────────▶ Brings back file state from 2 commits ago.
 
 
 🗂️ Git Reset Commands 
@@ -195,7 +195,7 @@ Similar to: 🔗 git reset HEAD <file>
 ➤ Safely undoes a commit by creating a new commit that reverses the changes.
 ➤ Unlike git reset, it does not delete history (safer for shared branches).
 
-🔗 git revert <commit-hash> → Creates a new commit that undoes the changes introduced by <commit-hash>.
+🔗 git revert <commit-hash> ─────────▶ Creates a new commit that undoes the changes introduced by <commit-hash>.
 ✅ When to Use:
 ➤ When working in collaborative projects where you don’t want to rewrite history.
 ➤ To undo a buggy commit while keeping commit history intact.
@@ -221,49 +221,49 @@ General Syntax:
 git config --global alias.<shortcut> "<full command>"
 
 ✅ Examples:
-🔗 git config --global alias.co "commit -m" → Now git co "msg" = git commit -m "msg"
-🔗 git config --global alias.st "status" → Now git st = git status
-🔗 git config --global alias.lo1 "log --oneline" → Now git lo1 = git log --oneline
+🔗 git config --global alias.co "commit -m" ─────────▶ Now git co "msg" = git commit -m "msg"
+🔗 git config --global alias.st "status" ─────────▶ Now git st = git status
+🔗 git config --global alias.lo1 "log --oneline" ─────────▶ Now git lo1 = git log --oneline
 
 🗂️ Git Rebase
 ➤ Rebase = rewrite history.
 ➤ Moves or combines a sequence of commits to a new base commit.
-➤ Unlike merge (which creates a new commit), rebase applies commits one by one on top of another branch → results in a linear, cleaner history.
+➤ Unlike merge (which creates a new commit), rebase applies commits one by one on top of another branch ─────────▶ results in a linear, cleaner history.
 
 🔄 Important Rule
 ✅ Use rebase only on local branches (your private work).
-❌ Avoid rebasing shared/public branches → rewriting history can cause conflicts for other developers.
+❌ Avoid rebasing shared/public branches ─────────▶ rewriting history can cause conflicts for other developers.
 
 🔄 Common Commands
-🔗 git rebase <branch> → Rebases current branch onto <branch>.
+🔗 git rebase <branch> ─────────▶ Rebases current branch onto <branch>.
 
 ✅ Example:
 🔗 git checkout feature
 🔗 git rebase main
 Moves feature commits on top of main.
 
-🔗 git rebase -i <commit-hash> (interactive rebase) → Lets you edit history: squash, reorder, delete, or edit commits.
+🔗 git rebase -i <commit-hash> (interactive rebase) ─────────▶ Lets you edit history: squash, reorder, delete, or edit commits.
 
 ✅ Example:
-🔗 git rebase -i HEAD~3 → Interactively edit the last 3 commits.
+🔗 git rebase -i HEAD~3 ─────────▶ Interactively edit the last 3 commits.
 
-🔗 git rebase --continue → After resolving conflicts during rebase, continue the process.
-🔗 git rebase --abort → Abort rebase and return to original branch state.
-🔗 git rebase --skip → Skip the commit causing conflict and move to next.
+🔗 git rebase --continue ─────────▶ After resolving conflicts during rebase, continue the process.
+🔗 git rebase --abort ─────────▶ Abort rebase and return to original branch state.
+🔗 git rebase --skip ─────────▶ Skip the commit causing conflict and move to next.
 
 🗂️ GitHub Workflow
 🔄 What is GitHub?
 ➤ A web-based platform for hosting Git repositories.
 ➤ Provides:
-    ✔️ Remote hosting → Store code in the cloud.
-    ✔️ Collaboration tools → Issues, Pull Requests (PRs), Reviews.
-    ✔️ Version control → Track history, branches, and merges.
+    ✔️ Remote hosting ─────────▶ Store code in the cloud.
+    ✔️ Collaboration tools ─────────▶ Issues, Pull Requests (PRs), Reviews.
+    ✔️ Version control ─────────▶ Track history, branches, and merges.
 
 🔄 Collaboration Workflow (Team Scenario)
 ➤ Developers create branches
 ✅ Example:
-    ✔️ Dev A → feature/authentication
-    ✔️ Dev B → bugfix/data-retrieval
+    ✔️ Dev A ─────────▶ feature/authentication
+    ✔️ Dev B ─────────▶ bugfix/data-retrieval
 
 ➤ Push branches to GitHub
 Share work with team.
@@ -273,40 +273,40 @@ Share work with team.
 ➤ Code Review & Discussion
     ✔️ Team reviews, comments, suggests changes.
 ➤ Merge into Main Branch
-    ✔️ After approval → merged → changes reflected in project.
+    ✔️ After approval ─────────▶ merged ─────────▶ changes reflected in project.
 
 🔄 Common GitHub Commands
 1. Clone a Repository
 
-🔗 git clone <url> → Copies remote repo (files, branches, history) locally.
-🔗 git clone -b <branch> <url> → Clone a repo and directly checkout a branch
+🔗 git clone <url> ─────────▶ Copies remote repo (files, branches, history) locally.
+🔗 git clone -b <branch> <url> ─────────▶ Clone a repo and directly checkout a branch
 
 ✅ Example: 🔗 git clone https://github.com/user/repo.git
 
 2. Push Code
-🔗 git push origin <branch> → Push local <branch> to remote origin.
-🔗 git push -f → Force push (⚠️ overrides remote history). Use carefully.
+🔗 git push origin <branch> ─────────▶ Push local <branch> to remote origin.
+🔗 git push -f ─────────▶ Force push (⚠️ overrides remote history). Use carefully.
 
 3. View Branches
-🔗 git branch -r → List remote branches.
-🔗 git branch -a → List all branches (local + remote).
+🔗 git branch -r ─────────▶ List remote branches.
+🔗 git branch -a ─────────▶ List all branches (local + remote).
 
 4. Fetch & Pull
-🔗 git fetch origin <branch> → Download changes (but not merge).
-🔗 git fetch --all → Fetch all branches.
-🔗 git fetch → Fetch from default remote (origin).
-🔗 git pull origin <branch> → Fetch + Merge remote branch into local branch.
+🔗 git fetch origin <branch> ─────────▶ Download changes (but not merge).
+🔗 git fetch --all ─────────▶ Fetch all branches.
+🔗 git fetch ─────────▶ Fetch from default remote (origin).
+🔗 git pull origin <branch> ─────────▶ Fetch + Merge remote branch into local branch.
 
 5. Remote Management
-🔗 git remote add origin <url> → Connect local repo to remote.
-🔗 git remote -v → View remotes & URLs.
+🔗 git remote add origin <url> ─────────▶ Connect local repo to remote.
+🔗 git remote -v ─────────▶ View remotes & URLs.
 
 🔄 Key Differences
-🔗 git fetch → Downloads changes (does NOT merge).
-🔗 git pull → Downloads + merges in one step.
-🔗 git push → Uploads local changes to remote repo.
+🔗 git fetch ─────────▶ Downloads changes (does NOT merge).
+🔗 git pull ─────────▶ Downloads + merges in one step.
+🔗 git push ─────────▶ Uploads local changes to remote repo.
 
-🔗 Git Commands → https://git-scm.com/directories
+🔗 Git Commands ─────────▶ https://git-scm.com/directories
 
 🔄.gitignore (Ignore Files)
 Used to tell Git which files/folders to ignore.
@@ -330,7 +330,7 @@ Used for marking versions (important in deployment).
 
 🔄 Cherry-Pick (Selective Commit)
 Apply a specific commit from another branch:
-🔗 git cherry-pick <commit-hash> → Useful when you need only one fix/feature commit without merging entire branch.
+🔗 git cherry-pick <commit-hash> ─────────▶ Useful when you need only one fix/feature commit without merging entire branch.
 
 🔄 Squash Commits (in Merge)
 To keep history clean, multiple commits can be squashed into one:
@@ -338,4 +338,4 @@ To keep history clean, multiple commits can be squashed into one:
 🔗 git commit -m "Squashed commit"
 
 🔄 Forking Workflow (GitHub Specific)
-Fork repo → clone → make changes → push to fork → open PR → merge to upstream.
+Fork repo ─────────▶ clone ─────────▶ make changes ─────────▶ push to fork ─────────▶ open PR ─────────▶ merge to upstream.

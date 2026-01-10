@@ -14,6 +14,115 @@
 ➤ Convention over Configuration ─────────▶ Focus more on logic, less on XML/bean configuration.
 
 
+===================
+🔷 Spring Modules
+===================
+1️⃣ Spring Core
+➤ It is the fundamental module of the Spring framework. 
+➤ It  is all about managing dependencies among the classes with loosely coupling.
+➤ It provides the basic features of the Spring framework:
+    ✔️ Inversion of Control (IoC) 
+    ✔️ Dependency Injection (DI).
+    ✔️ Bean Life cycles
+    ✔️ Bean Scopes
+    ✔️ Autowiring etc..
+In project we will develop serveral classes. All those classes we can catergorize into 3 types:
+    📝 POJO (Plain Old Java Object) Classes: These classes will contain only properties and their getters and setters(ordinary java class).
+    📝 Java Bean Classes: Any class that follows bean specification rules.
+    🔄 Rules of bean specification:
+        👉 It should have a public no-argument constructor.
+        👉 Properties should be private with public getters and setters.
+        👉 It should be serializable (implements Serializable interface).
+        ⚡ Notes: 
+            1️⃣ All Java Beans are POJOs but all POJOs are not Java Beans.
+            2️⃣ Bean classes are used to write business logic and to store and retrieve data.
+
+    📝 Component Classes: Java class which contains business Classes logic and annotated with @Component annotation.
+        👉 It is a special type of bean class.
+        👉 It is used to define various layers of an application like Controller, Service, Repository etc..
+        👉 Controller classes will have logic to deal with request and response.
+        👉 Service classes will have business logic of out project.
+        👉 DAO classes will contain the logic to communicate with database.
+
+
+2️⃣ Spring Context
+➤ It is built on top of the Spring Core module.
+➤ It uses the concept of ApplicationContext which is a central interface to provide configuration for an application.
+➤ It provides support for internationalization (i18n), event propagation, resource loading, and application-layer specific contexts such as WebApplicationContext for web applications.
+
+
+3️⃣ Spring JDBC
+➤ It provides a simplified approach to interact with relational databases using JDBC (Java Database Connectivity).
+➤ It handles the creation and release of resources, which helps to avoid common errors such as forgetting to close database connections.
+➤ It provides a JdbcTemplate class that simplifies the execution of SQL queries, updates, and stored procedures.
+
+❌ Problems with JDBC:In java JDBC, developers often have to write a lot of boilerplate code for tasks like opening/closing connections, handling exceptions, and managing transactions. This can lead to repetitive and error-prone code. Spring JDBC addresses these issues by providing a higher-level abstraction that simplifies database interactions.
+
+
+4️⃣ Spring AOP (Aspect Oriented Programming)
+➤ It provides support for aspect-oriented programming, allowing the separation of cross-cutting concerns or secondary logic (like logging, security, and transaction management) from the main business logic.
+Example: Security, Logging, Transaction, Exception Handling etc..
+
+❌ Problems with AOP: If we combine business logic and cross-cutting concerns in the same class, it can lead to code that is hard to read and maintain. AOP helps to separate these concerns, making the code cleaner and more modular.
+
+
+5️⃣ Spring Web MVC
+➤ It provides a set of tools for building web applications and Distributed Applications using the Model-View-Controller (MVC) architectural pattern.
+    ✔️  Applications: Applications which are developed using web technologies like HTML, CSS, JavaScript etc.. and run on web browsers.For Example: Gmail, Facebook, Amazon etc..
+    ✔️ Distributed Applications: Applications which are developed in a distributed environment. For Example: IRCTC communicates with MakeMyTrip, Paytm etc.. to book tickets.
+➤ It supports RESTful web services and provides features like data binding, validation, and view resolution.
+
+
+6️⃣ Spring ORM
+➤ It provides integration with popular Object-Relational Mapping (ORM) frameworks like Hibernate, JPA (Java Persistence API), and MyBatis.
+➤ It simplifies the configuration and management of ORM frameworks, allowing developers to focus on writing business logic rather than boilerplate code. 
+Note: JDBC will represent data in text format whereases ORM will represent data in object format.
+
+
+7️⃣ Spring security
+➤ It provides a comprehensive security framework for Java applications, including authentication, authorization, and protection against common security threats.
+➤ It supports various authentication mechanisms, including form-based login, HTTP Basic authentication, and OAuth2.0
+
+
+8️⃣ Spring Batch
+➤ It provides support for batch processing, allowing the execution of large volumes of data in a reliable and efficient manner.
+➤ It provides features like chunk-based processing, transaction management, and job scheduling.
+➤ It simplifies the development of batch applications, making it easier to handle complex data processing tasks.
+
+
+9️⃣ Spring Test
+➤ It provides tools for testing Spring applications, including unit tests, integration tests, and end-to-end tests.
+➤ It supports various testing frameworks like JUnit, Mockito, and TestNG.
+
+
+1️⃣0️⃣ Spring Cloud
+➤ It provides tools for building cloud-native applications, including service discovery, load balancing, and distributed configuration management.
+➤ It simplifies the development of microservices-based architectures, making it easier to build and deploy scalable and resilient applications.
+➤ It provides monitoring facilities, circuit breakers, and retry mechanisms to handle failures gracefully. 
+➤ Distributed Messaging: It supports various messaging systems like RabbitMQ, Kafka, and ActiveMQ, allowing microservices to communicate asynchronously.
+➤ Routing and Load Balancing: It provides tools for routing requests to different microservices and load balancing traffic to ensure high availability and performance.
+
+👉 Spring is a flexible framework. It will not force to use all the modules. Based on requirements we can pickup particular modules and we can use it.
+👉 Spring is a versatile framework(Easily it can be integerated with other frameworks).
+
+
+==================================
+🔷 Work Flow of Spring Framework
+==================================
+➤ Developer will write the code using POJO classes, Bean classes and Component classes.
+➤ Spring Container will create the objects of POJO classes, Bean classes and Component classes.
+
+🔄 In a project multiple classes will be dependent on each other.
+✅ For Example:
+➤ Controller class is dependent on Service class.
+➤ Service class is dependent on DAO class.
+➤ DAO class is dependent on Database.
+
+🔄 In Java one class can communicate with another class in 2 ways:
+1. Inheritance(Is-A Relationship)
+2. Composition or Object Reference(Has-A Relationship)
+
+
 =============================================
 🔷 SpringBBoot Application Folder Structure
 =============================================
@@ -487,6 +596,345 @@ public class Student {
 ✅ Generates all boilerplate automatically (getters, setters, constructors, toString, equals, hashCode).
 
 
+=========
+🔷 Bean 
+=========
+➤ A Bean is an object that is created, managed, initialized, and destroyed by the Spring IoC Container.
+➤ In Spring Boot, most beans are created automatically using auto-configuration.
+
+🔄 Management of Bean
+Spring IoC Container
+➤ ApplicationContext (most commonly used)
+➤ Responsible for:
+    ✔️ Object creation
+    ✔️ Dependency Injection
+    ✔️ Lifecycle management
+    ✔️ Scope handling
+
+
+🔄 Ways to Create Beans
+1️⃣ Using @Component (Most Common)
+@Component
+public class UserService {}
+
+2️⃣ Stereotype Annotations
+| Annotation        | Use            |
+| ----------------- | -------------- |
+| `@Component`      | Generic        |
+| `@Service`        | Business logic |
+| `@Repository`     | DAO layer      |
+| `@Controller`     | MVC Controller |
+| `@RestController` | REST APIs      |
+
+
+3️⃣ Using @Bean (Java Config)
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public EmailService emailService() {
+        return new EmailService();
+    }
+}
+👉 Used when:
+➤ Third-party class
+➤ Need control over object creation
+
+─────────▶ When same object Bean is made through component and through Bean annotation inside the configuration class, Bean annotated object will be used.
+
+
+==================
+🔷 Bean Lifecycle
+==================
+🔄 Bean Lifecycle Flow
+1️⃣ Bean Definition Loaded
+2️⃣ Bean Instantiation
+3️⃣ Dependency Injection
+4️⃣ Aware Interfaces
+5️⃣ BeanPostProcessor (Before Init)
+6️⃣ Initialization (@PostConstruct)
+7️⃣ BeanPostProcessor (After Init)
+8️⃣ Bean Ready for Use
+9️⃣ Container Shutdown
+1️⃣0️⃣ Destruction (@PreDestroy)
+
+🔄 Step-by-Step Lifecycle
+1️⃣ Bean Definition
+✔️ Spring scans classes
+✔️ Creates BeanDefinition
+✔️ Stores metadata (scope, class, dependencies)
+👉 Happens during context startup
+
+2️⃣ Bean Instantiation
+Spring creates object using:
+✔️ Default constructor OR
+✔️ Parameterized constructor (DI)
+
+@Component
+public class OrderService {
+    public OrderService() {
+        System.out.println("Constructor called");
+    }
+}
+
+
+3️⃣ Dependency Injection
+Dependencies injected via:
+✔️ Constructor Injection (BEST)
+✔️ Setter Injection
+✔️ Field Injection (NOT recommended)
+
+@Component
+public class PaymentService {
+
+    private final OrderService orderService;
+
+    public PaymentService(OrderService orderService) {
+        this.orderService = orderService;
+    }
+}
+
+4️⃣ Aware Interfaces
+Spring injects internal objects:
+| Interface                 | Injected Object    |
+| ------------------------- | ------------------ |
+| `BeanNameAware`           | Bean name          |
+| `BeanFactoryAware`        | BeanFactory        |
+| `ApplicationContextAware` | ApplicationContext |
+@Component
+public class DemoBean implements BeanNameAware {
+
+    @Override
+    public void setBeanName(String name) {
+        System.out.println("Bean Name: " + name);
+    }
+}
+👉 Used rarely, but interview favorite.
+
+
+5️⃣ BeanPostProcessor (Before Init)
+postProcessBeforeInitialization()
+
+👉 Used by Spring internally:
+    ✔️ @Autowired
+    ✔️ @Value
+    ✔️ @PostConstruct
+AOP proxy creation
+
+
+6️⃣ Initialization Phase (3 Ways)
+1️⃣ @PostConstruct (Recommended)
+@PostConstruct
+public void init() {
+    System.out.println("Bean Initialized");
+}
+
+2️⃣ InitializingBean
+@Component
+public class DemoBean implements InitializingBean {
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("afterPropertiesSet()");
+    }
+}
+
+3️⃣ initMethod in @Bean
+@Bean(initMethod = "start")
+public Server server() {
+    return new Server();
+}
+
+👉 Priority Order: @PostConstruct → InitializingBean → initMethod
+
+
+7️⃣ BeanPostProcessor (After Init)
+postProcessAfterInitialization()
+👉 Used for:
+    ✔️ AOP proxies
+    ✔️ Security
+    ✔️ Transaction management
+
+8️⃣ Bean Ready to Use 
+Bean is:
+    ✔️ Fully initialized
+    ✔️ Injected
+    ✔️ Proxied (if required)
+
+9️⃣ Application Shutdown
+Triggered by:
+    ✔️ JVM shutdown
+    ✔️ context.close()
+    ✔️ SIGTERM
+
+
+1️⃣0️⃣ Destruction Phase (3 ways )
+1️⃣ @PreDestroy (Recommended)
+@PreDestroy
+public void cleanup() {
+    System.out.println("Bean Destroyed");
+}
+
+2️⃣ DisposableBean
+@Override
+public void destroy() {}
+
+3️⃣ destroyMethod
+@Bean(destroyMethod = "stop")
+👉 Order: @PreDestroy → DisposableBean → destroyMethod
+
+
+🔄 Bean Scopes
+| Scope         | Description                          |
+| ------------- | ------------------------------------ |
+| `singleton`   | One instance per container (DEFAULT) |
+| `prototype`   | New instance every time              |
+| `request`     | One per HTTP request                 |
+| `session`     | One per HTTP session                 |
+| `application` | One per ServletContext               |
+
+@Scope("prototype")
+@Component
+public class MyBean {
+}
+👉 Prototype beans are NOT destroyed by Spring
+
+
+🔄 Lazy vs Eager Initialization
+1️⃣ Eager (Default)
+Created at startup
+Beans with singleton scope are eager by default
+
+2️⃣ Lazy
+@Lazy
+@Component
+public class LazyBean {}
+👉 Improves startup time
+
+
+🔄 Bean Lifecycle Diagram
+Constructor
+ ↓
+Dependency Injection
+ ↓
+@PostConstruct
+ ↓
+BeanPostProcessor
+ ↓
+Business Logic
+ ↓
+@PreDestroy
+
+
+========================================================================
+🔷 Two @Bean Methods Returning the Same Type in a @Configuration Class
+========================================================================
+Case 1️⃣: Two @Bean Methods, SAME Return Type, DIFFERENT NAMES
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public UserService userService1() {
+        return new UserService();
+    }
+
+    @Bean
+    public UserService userService2() {
+        return new UserService();
+    }
+}
+
+✅ What happens?
+➤ Spring creates TWO different beans
+➤ Both are of type UserService
+➤ Bean names:
+    ✔️ userService1
+    ✔️ userService2
+👉 No conflict at creation time
+
+❌ Where conflict happens?
+@Autowired
+private UserService userService;
+
+❌ Spring throws: NoUniqueBeanDefinitionException
+👉 Because Spring finds 2 beans of same type and doesn't know which one to inject.
+
+
+🔄 Fixing
+1️⃣ Use @Qualifier
+@Autowired
+@Qualifier("userService1")
+private UserService userService;
+
+2️⃣ Use @Primary
+@Bean
+@Primary
+public UserService userService1() {
+    return new UserService();
+}
+
+
+Case 2️⃣: Same Object Instance Returned by Two @Bean Methods
+@Bean
+public UserService userService1() {
+    return new UserService();
+}
+
+@Bean
+public UserService userService2() {
+    return userService1();
+}
+
+❓ Does Spring create two objects?
+❌ NO
+
+
+❓ Why?
+➤ @Configuration class is CGLIB proxied
+➤ Spring intercepts method calls
+➤ Ensures singleton behavior
+✔️ Only ONE object is created
+✔️ Both bean names point to same instance
+👉 This happens ONLY if class is annotated with @Configuration
+
+
+Case 3️⃣: Using @Component instead of @Configuration
+@Component
+public class AppConfig {
+
+    @Bean
+    public UserService userService1() {
+        return new UserService();
+    }
+
+    @Bean
+    public UserService userService2() {
+        return userService1();
+    }
+}
+
+❌ What happens?
+➤ Spring does NOT proxy the class
+➤ userService1() is a normal method call
+➤ TWO different objects are created
+⚠️ This is a huge trap
+
+
+Case 4️⃣: Same Bean Name (Hard Conflict)
+@Bean("userService")
+public UserService userService1() {
+    return new UserService();
+}
+
+@Bean("userService")
+public UserService userService2() {
+    return new UserService();
+}
+
+❌ Result: BeanDefinitionOverrideException
+🚫 Application fails at startup
+
+
 =========================================================================
 🔷 Which Dependency Injection is Better — Field, Setter, or Constructor?
 =========================================================================
@@ -583,6 +1031,348 @@ public class UserService {
 
 ➤ Adding all 3 types of DI in one class is not a good practice. It creates confusion and makes the code hard to maintain.
 ➤ Choose one type of DI per class, preferably constructor injection for better maintainability and testability.
+
+
+==================================
+🔷 Scope vs Bean Scope in Spring
+==================================
+Scope defines the lifetime and visibility of an object.
+
+In Spring:
+❓ Scope answers HOW MANY objects?
+❓ Scope answers HOW LONG does the object live?
+❓ Scope answers WHO can access it?
+
+🔄 Bean Scope
+Bean Scope defines the lifecycle and visibility of a Spring Bean inside the IoC container.
+👉 It tells Spring:
+    ✔️ Whether to create one instance or multiple
+    ✔️ When to create it
+    ✔️ When to destroy it
+
+
+🔄 Default Bean Scope
+✅ singleton (DEFAULT)
+@Component
+public class UserService {}
+
+✔️ Only ONE instance per Spring container
+✔️ Shared across the entire application
+⚠️ Not JVM-wide, only container-wide
+
+🔄 Types of Bean Scopes in Spring Boot
+1️⃣ Singleton Scope
+@Scope("singleton")
+@Component
+public class SingletonBean {
+}
+
+🔁 Characteristics
+➤ One object per container
+➤ Created at startup (eager)
+➤ Thread-safe design required
+
+🔁 Use Cases
+➤ Services
+➤ Repositories
+➤ Controllers
+
+
+2️⃣ Prototype Scope
+@Scope("prototype")
+@Component
+public class PrototypeBean {}
+
+🔁 Characteristics
+➤ New object for every request
+➤ Spring manages creation only
+❌ No destruction callback
+
+🔁 Use Cases
+➤ Stateful beans
+➤ Temporary objects
+⚠️ Trap: @PreDestroy will NOT be called
+
+
+3️⃣ Request Scope (Web)
+@Scope(value = WebApplicationContext.SCOPE_REQUEST)
+@Component
+public class RequestBean {}
+
+🔁 Characteristics
+➤ One object per HTTP request
+➤ Destroyed after request ends
+
+🔁 Use Cases
+➤ Request metadata
+➤ Correlation ID
+➤ Request logging
+
+ProxyMode allows a request-scoped bean to be safely injected into a singleton bean by using a proxy object.
+
+🔄 Why is ProxyMode Needed?
+➤ @RequestScope beans live per HTTP request
+➤ @Service / @Component beans are singleton
+➤ Singleton beans are created at startup
+➤ Request beans exist only during a request
+❌ Direct injection causes lifecycle mismatch
+
+
+🔄 Solution: proxyMode
+@Scope(
+  value = WebApplicationContext.SCOPE_REQUEST,
+  proxyMode = ScopedProxyMode.TARGET_CLASS
+)
+@Component
+public class RequestData {
+}
+
+
+🔄 How It Works (Internally)
+Singleton Bean
+     ↓
+Injected Proxy (fake object)
+     ↓
+Actual Request Bean (created per request)
+
+➤ Spring injects a proxy
+➤ Proxy finds the correct request object at runtime
+
+🔄 Types of ProxyMode
+| Mode           | Used When                       |
+| -------------- | ------------------------------- |
+| `TARGET_CLASS` | Class-based beans (most common) |
+| `INTERFACES`   | Interface-based beans           |
+
+
+4️⃣ Session Scope (Web)
+@Scope(value = WebApplicationContext.SCOPE_SESSION)
+@Component
+public class SessionBean {}
+
+🔁 Characteristics
+➤ One object per HTTP session
+➤ Destroyed when session expires
+
+🔁 Use Cases
+➤ User preferences
+➤ Login state
+
+
+5️⃣ Application Scope
+@Scope(value = WebApplicationContext.SCOPE_APPLICATION)
+@Component
+public class AppBean {}
+
+🔁 Characteristics
+➤ One object per ServletContext
+➤ Shared across sessions
+
+🔁 Use Cases
+➤ Application-level caches
+➤ Configuration holders
+
+6️⃣ WebSocket Scope (Advanced)
+@Scope("websocket")
+👉 Used in real-time apps
+
+
+======================================
+🔷 @ConditionalOnProperty Annotation
+======================================
+➤ A Spring Boot conditional annotation
+➤ Controls bean creation based on the presence and value of a configuration property
+➤ Bean will be registered only if the condition evaluates to TRUE
+
+👉 It is evaluated at startup time, during bean definition phase
+
+🔄 Why does this annotation exist?
+Problem it solves:
+    ✔️ Enable / disable features without code changes
+    ✔️ Environment-based behavior (dev / test / prod)
+    ✔️ Feature toggles (turn functionality ON/OFF)
+
+Without it:
+    ✔️ You’d need if-else logic inside beans
+    ✔️ Beans would still be created → wasted memory
+    ✔️ Hard to maintain
+
+
+🔄 Where is it used?
+➤ @Configuration classes
+➤ @Bean methods
+➤ @Component classes
+
+Mainly used in:
+    ✔️ Auto-configuration
+    ✔️ Feature flags
+    ✔️ Third-party integrations (Kafka, Redis, Mail, etc.)
+
+
+🔄 Package & Declaration
+org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+
+🔄 Basic Syntax
+@ConditionalOnProperty(
+    name = "feature.enabled",
+    havingValue = "true"
+)
+👉 Bean is created only if: feature.enabled=true
+
+
+🔄 Attributes
+1️⃣ name (or value)
+➤ Property key to check
+➤ Mandatory
+name = "app.cache.enabled"
+
+
+2️⃣ havingValue
+➤ Required value for the condition to pass
+➤ Compared as String
+➤ Optional
+havingValue = "true"
+
+✔️ Case-sensitive
+✔️ "true" ≠ "TRUE"
+
+
+3️⃣ matchIfMissing
+➤ Default: false
+➤ If true → condition passes even if property is not present
+matchIfMissing = true
+👉 Useful for default ON behavior
+
+
+4️⃣ prefix
+➤ Common prefix for property keys
+➤ Cleaner configuration
+
+prefix = "app.feature",
+name = "enabled"
+
+Matches: app.feature.enabled=true
+
+🔄 All Variants of Usage
+✅ Case 1️⃣: Property exists and matches value
+@ConditionalOnProperty(name = "payment.enabled", havingValue = "true")
+✔️ Created when: payment.enabled=true
+
+
+❌ Case 2️⃣: Property exists but value mismatch
+payment.enabled=false
+➡️ Bean NOT created
+
+
+❌ Case 3️⃣: Property missing (default behavior)
+matchIfMissing = false
+➡️ Bean NOT created
+
+
+✅ Case 4️⃣: Property missing but allowed
+@ConditionalOnProperty(
+    name = "payment.enabled",
+    havingValue = "true",
+    matchIfMissing = true
+)
+➡️ Bean created even if property missing
+
+
+🔄 Applying on @Bean Method
+@Bean
+@ConditionalOnProperty(name = "cache.enabled", havingValue = "true")
+public CacheService cacheService() {
+    return new CacheService();
+}
+👉 Only this bean is conditional
+👉 Other beans in config are unaffected
+
+
+🔄 Applying on @Configuration Class
+@Configuration
+@ConditionalOnProperty(name = "kafka.enabled", havingValue = "true")
+public class KafkaConfig {
+}
+📌 ALL beans inside this class become conditional
+
+
+🔄 Multiple Properties Condition
+@ConditionalOnProperty(
+    name = {"feature.a", "feature.b"},
+    havingValue = "true"
+)
+✔️ BOTH must be:
+feature.a=true
+feature.b=true
+➡️ Logical AND
+
+
+🔄 What happens internally?
+@ConditionalOnProperty uses: OnPropertyCondition
+
+🌟 Evaluation Steps:
+1️⃣ Reads Environment
+2️⃣ Checks property existence
+3️⃣ Compares string value
+4️⃣ Applies matchIfMissing
+5️⃣ Returns TRUE / FALSE
+6️⃣ BeanDefinition registered or skipped
+👉 Happens before bean instantiation
+
+
+🔄 Property Sources Checked
+Spring checks properties in this order:
+1️⃣ Command-line arguments
+2️⃣ application.properties
+3️⃣ application.yml
+4️⃣ OS environment variables
+5️⃣ JVM system properties
+
+
+🔄 Difference: @Value vs @ConditionalOnProperty
+| Aspect        | `@Value`     | `@ConditionalOnProperty` |
+| ------------- | ------------ | ------------------------ |
+| Purpose       | Inject value | Control bean creation    |
+| Bean created? | Always       | Conditional              |
+| Runtime logic | Yes          | No                       |
+| Memory usage  | More         | Optimized                |
+
+
+🔄 Real-World Use Cases
+1️⃣ Enable Kafka only in prod
+kafka.enabled=true
+
+2️⃣ Toggle new feature rollout
+feature.new-dashboard=true
+
+3️⃣ Conditional Email Service
+mail.enabled=false
+
+
+🔄 Common Traps ⚠️
+❌ Trap 1️⃣: Case sensitivity
+feature.enabled=TRUE ❌
+
+❌ Trap 2️⃣: Property missing unexpectedly
+Forgot matchIfMissing=true
+
+❌ Trap 3️⃣: Using with @ComponentScan
+Condition applies after scanning, not during scanning
+
+
+🔄 When NOT to use it
+➤ Runtime decision making
+➤ Per-request logic
+➤ User-based conditions
+👉 It’s startup-time only
+
+
+🔄 Best Practices ✅
+➤ Use clear property names
+➤ Combine with @Configuration
+➤ Avoid complex conditions
+➤ Document default behavior
+➤ Prefer matchIfMissing carefully
 
 
 ==========================================
@@ -951,6 +1741,296 @@ public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
 ❌ Logic tightly coupled to business flow
 
 
+=============================================
+🔷 Convert Request Data Into Custom Objects
+=============================================
+Spring MVC can automatically bind simple types:
+    ✔️ String
+    ✔️ int
+    ✔️ long
+    ✔️ boolean
+❌ But it cannot directly convert request data into custom objects.
+
+❌ Example (Without PropertyEditor)
+@GetMapping("/user")
+public String getUser(User user) {  // ❌ how will Spring create User?
+    return "ok";
+}
+
+Spring does not know: How to convert request data → User object
+➡️ Solution: PropertyEditor
+
+
+🔄 PropertyEditor
+PropertyEditor is a Spring mechanism used to convert String-based request values into custom Java objects.
+👉 It works during data binding phase.
+
+
+🔄 Real World Scenario
+Request: GET /order?product=101
+
+👉 Goal:
+Convert "101" into Product object
+
+
+🔄 Step-by-Step Implementation
+
+1️⃣ Custom Domain Object
+public class Product {
+    private int id;
+    private String name;
+
+    // getters & setters
+}
+
+
+2️⃣ Create Custom PropertyEditor
+import java.beans.PropertyEditorSupport;
+
+public class ProductEditor extends PropertyEditorSupport {
+
+    @Override
+    public void setAsText(String text) throws IllegalArgumentException {
+        int productId = Integer.parseInt(text);
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setName("Sample Product");
+
+        setValue(product);
+    }
+}
+👉 Key method: setAsText(String text) → conversion logic lives here
+
+3️⃣ Register PropertyEditor using @InitBinder
+@RestController
+public class OrderController {
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Product.class, new ProductEditor());
+    }
+
+    @GetMapping("/order")
+    public String placeOrder(Product product) {
+        return "Product ID: " + product.getId();
+    }
+}
+
+
+🔄 How Binding Happens (Internals)
+Request Parameter (String)
+        ↓
+PropertyEditor
+        ↓
+Custom Object
+        ↓
+Controller Parameter
+
+Spring:
+1️⃣ Reads request param
+2️⃣ Finds registered PropertyEditor
+3️⃣ Calls setAsText()
+4️⃣ Injects converted object
+
+✅ Example Request: GET /order?product=101
+─────────▶ Controller Receives: Product{id=101, name="Sample Product"}
+
+
+🔄 Passing Custom Object using @RequestParam
+@GetMapping("/order")
+public String placeOrder(@RequestParam Product product) {
+    return "success";
+}
+👉 Works because PropertyEditor handles conversion
+
+
+🔄 Important Rules & Traps ⚠️
+❌ PropertyEditor is:
+    ✔️ NOT thread-safe
+    ✔️ Old mechanism
+➤ Scope:
+    ✔️ Controller-level (via @InitBinder)
+    ✔️ Global (via ControllerAdvice)
+
+
+🔄 Global PropertyEditor (Best Practice)
+@ControllerAdvice
+public class GlobalBinder {
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Product.class, new ProductEditor());
+    }
+}
+👉 Applies to all controllers
+
+🔄 When to Use PropertyEditor?
+✅ Legacy Spring MVC apps
+❌ New applications (use Converter)
+
+
+=============
+🔷 Converter
+=============
+➤ A Converter is a type-safe, thread-safe mechanism in Spring used to convert one object type into another.
+➤ It is part of Spring’s Conversion Service, and it replaces PropertyEditor in modern applications.
+
+
+🔄 Converter (Problem with PropertyEditor)
+| Problem in PropertyEditor | How Converter Solves     |
+| ------------------------- | ---------------------    |
+| ❌ Not thread-safe         | ✅ Thread-safe         |
+| ❌ Controller-scoped       | ✅ Global              |
+| ❌ String → Object only    | ✅ Any type → Any type |
+| ❌ Old Java Beans API      | ✅ Spring-native       |
+| ❌ Hard to test            | ✅ Easy to test        |
+👉 Converter is the industry standard now.
+
+
+🔄 Where Converter Is Used Internally
+Spring uses Converter in:
+    ✔️ Controller request binding
+    ✔️ @RequestParam
+    ✔️ @PathVariable
+    ✔️ @ModelAttribute
+    ✔️ Spring Data JPA
+    ✔️ Spring Security
+    ✔️ WebFlux
+
+
+🔄 Core Interface
+public interface Converter<S, T> {
+    T convert(S source);
+}
+✔️ S → Source type
+✔️ T → Target type
+
+
+🔄 Real-World Problem (Same as PropertyEditor Example)
+Request: GET /order?product=101
+Goal: String "101" → Product object
+
+
+🔄 Step-by-Step Implementation
+1️⃣ Domain Object
+public class Product {
+    private int id;
+    private String name;
+
+    // getters & setters
+}
+
+
+2️⃣ Create Custom Converter
+@Component
+public class StringToProductConverter implements Converter<String, Product> {
+
+    @Override
+    public Product convert(String source) {
+
+        int id = Integer.parseInt(source);
+
+        Product product = new Product();
+        product.setId(id);
+        product.setName("Sample Product");
+
+        return product;
+    }
+}
+✔️ Thread-safe
+✔️ No shared state
+✔️ Reusable everywhere
+
+
+🔄 3️⃣ Use in Controller (Nothing Special Required)
+@GetMapping("/order")
+public String placeOrder(Product product) {
+    return "Product ID: " + product.getId();
+}
+✔️ Spring auto-detects the converter
+✔️ Automatically converts request parameter
+
+
+🔄 How Conversion Happens Internally 
+HTTP Request (String)
+        ↓
+ConversionService
+        ↓
+Matching Converter
+        ↓
+Target Object
+        ↓
+Controller Parameter
+✔️ Spring Boot auto-configures: FormattingConversionService
+
+
+🔄 Converter vs Formatter
+| Feature        | Converter          | Formatter                 |
+| -------------- | ------------------ | ------------------------- |
+| Direction      | Object → Object    | Object ↔ String           |
+| Use case       | General conversion | Formatting (Date, Number) |
+| Locale support | ❌                 | ✅                         |
+| Example        | String → User      | Date → String             |
+✔️ Formatter is built on top of Converter
+
+
+🔄 Registering Converter (When @Component Is Not Enough)
+1️⃣ Using WebMvcConfigurer
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToProductConverter());
+    }
+}
+
+2️⃣ Global Registration
+✔️ Applies to all controllers
+✔️ Clean architecture
+
+🔄 Converter for @PathVariable
+@GetMapping("/order/{product}")
+public String getOrder(@PathVariable Product product) {
+    return product.getName();
+}
+✔️ Works automatically
+
+
+🔄 Converter in Spring Data JPA
+Used for:
+    ✔️ Enum mapping
+    ✔️ ID mapping
+    ✔️ Custom types
+
+@Converter
+public class StatusConverter implements AttributeConverter<Status, String> {}
+👉 Different Converter interface (JPA)
+
+
+🔄 Common Traps ⚠️
+❌ Thinking Converter works only for Controller
+❌ Confusing JPA Converter with Spring Converter
+❌ Forgetting thread-safety benefit
+
+
+🔄 PropertyEditor vs Converter
+| Feature     | PropertyEditor | Converter |
+| ----------- | -------------- | --------- |
+| Thread-safe | ❌             | ✅       |
+| Scope       | Controller     | Global    |
+| Modern      | ❌             | ✅       |
+| Recommended | ❌             | ✅       |
+
+
+🔄 When Should You Use Converter?
+✔️ Custom object binding
+✔️ ID → Entity mapping
+✔️ Clean REST APIs
+✔️ Modern Spring Boot apps
+
+
 ======================
 🔷 @Value Annotation
 ======================
@@ -1033,7 +2113,7 @@ public class AppConfig {
 
 
 ==============================
-🔷 @Transactional Annotation
+🔷 @Transactional Annotation 
 ===============================
 ➤ @Transactional in Spring marks a method (or class) so that database operations inside it run within a single transaction.
 ➤ Either all succeed (commit) or all fail (rollback).
@@ -1072,20 +2152,120 @@ It can be applied at:
 @Transactional(rollbackFor = Exception.class)
 public void doWork() { ... }
 
-2️⃣ Isolation Levels (how transactions interact with each other)
-✔️ READ_COMMITTED (default in most DBs)
+
+🔄 Classic Read Problem
+1️⃣ Dirty Read
+➤ A transaction reads data written by another transaction that has NOT yet committed
+➤ If the other transaction rolls back, the read data becomes invalid (dirty)
+
+✅ Example
+➤ T1 updates balance from 100 → 200 (not committed)
+➤ T2 reads balance = 200
+➤ T1 rolls back
+➤ T2 used wrong data
+
+❗ Why dangerous?
+➤ Reading uncommitted data
+➤ Breaks consistency badly
+
+
+2️⃣ Non-Repeatable Read
+➤ Same row is read twice in the same transaction
+➤ Value changes because another transaction commits an update in between
+
+✅ Example
+➤ T1 reads salary = 50k
+➤ T2 updates salary to 60k and commits
+➤ T1 reads salary again → 60k
+
+❗ Why dangerous?
+➤ Same query returns different results
+➤ Violates consistency within a transaction
+
+
+3️⃣ Phantom Read
+➤ A transaction re-executes a range query
+➤ Another transaction inserts or deletes rows
+➤ New rows appear or disappear (phantoms)
+
+✅ Example
+➤ T1 reads employees with salary > 50k → 5 rows
+➤ T2 inserts new employee with salary 70k
+➤ T1 runs same query again → 6 rows
+
+❗ Why dangerous?
+➤ Row count changes
+➤ Happens with range queries, not single rows
+
+2️⃣ Isolation Levels ─────────▶ It tells, how the changes made by one transaction are visible to another transaction running in parallel
+✔️ READ_COMMITTED (default in most DBs, but depends on DB we are using).
 ✔️ READ_UNCOMMITTED
-✔️ REPEATABLE_READ
+✔️ REPEATABLE_COMMITTED
 ✔️ SERIALIZABLE
 
 ✅ Example:
 @Transactional(isolation = Isolation.SERIALIZABLE)
 
-3️⃣ Propagation (what happens if a method with a transaction calls another transactional method)
+
+🔄 Isolation Levels vs Problems
+| Isolation Level      | Dirty Read    | Non-Repeatable Read  | Phantom Read   |
+| -------------------- | -----------   | -------------------  | ------------   |
+| **READ UNCOMMITTED** | ❌ Possible  | ❌ Possible          | ❌ Possible   |
+| **READ COMMITTED**   | ✅ Prevented | ❌ Possible          | ❌ Possible   |
+| **REPEATABLE READ**  | ✅ Prevented | ✅ Prevented         | ❌ Possible   |
+| **SERIALIZABLE**     | ✅ Prevented | ✅ Prevented         | ✅ Prevented  |
+
+
+🔄 How Each Isolation Level Works
+1️⃣ READ UNCOMMITTED
+➤ Lowest isolation
+➤ No locks
+➤ Reads uncommitted data
+✔️ Read: No Lock acquired
+✔️ Write: No Lock acquired
+👉 Rarely used:
+    ✔️ Only in Read Applications
+👉 High concurrency but unsafe
+
+
+2️⃣ READ COMMITTED
+➤ Reads only committed data put read shared lock
+➤ Prevents dirty reads
+➤ Allows data to change between reads
+✔️ Read: Shared lock acquired and released as soon as read is done
+✔️ Write: Exclusive lock acquired and keep till the end of the transaction
+👉 Default in:
+    ✔️ PostgreSQL
+    ✔️ Oracle
+    ✔️ SQL Server
+
+
+3️⃣ REPEATABLE READ
+➤ Same row read multiple times → same value
+➤ Uses row-level locks
+➤ New rows can still appear
+✔️ Read: Shared lock acquired and released only at the end of the transaction
+✔️ Write: Exclusive lock acquired and keep till the end of the transaction
+👉 Default in:
+    ✔️ MySQL (InnoDB)
+
+
+4️⃣ SERIALIZABLE
+➤ Highest isolation
+➤ Transactions behave as if executed one by one
+➤ Range locks + strict locking
+✔️ Same as Repeatable Read Locking Stragegy + apply Range Lock and lock is released only at the end of the transaction
+👉 Safest
+👉 Slowest
+
+
+🔄 Propagation (what happens if a method with a transaction calls another transactional method)
 ✔️ REQUIRED (default) → joins existing transaction or creates new one if none.
 ✔️ REQUIRES_NEW → always starts a new transaction.
-✔️ MANDATORY → must run inside an existing transaction.
-✔️ SUPPORTS, NOT_SUPPORTED, NEVER, NESTED.
+✔️ MANDATORY → must run inside an existing  parent transaction if present else throw exception.
+✔️ SUPPORTS → if parent transaction exists, joins it or execute the method without any transaction.
+✔️ NOT_SUPPORTED → if parent transaction is present suspend the parent transaction and execute the method without any transaction. and resume the parent transaction or if not parent transaction is present execute the method without any transaction.
+✔️ NEVER → if parent transaction is present throw exception, if not present execute the method without any transaction.
 
 ✅ Example:
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -1158,9 +2338,9 @@ emails:
 | Popularity         | Legacy style    | Modern Spring Boot style    |
 
 
-=======================
-🔷 Spring Profiles 
-=======================
+==========================================
+🔷 Spring Profiles (@Profile Annotation)
+==========================================
 ➤ Spring Profiles allow you to activate or deactivate beans/configurations based on the current environment (like dev, test, prod).
 ➤ You can control which beans load depending on the active profile.
 ➤ You can create multiple versions of the same bean/class and Spring will only load the one matching the active profile.
@@ -2185,7 +3365,7 @@ public void placeOrder() {
 ➤ Reusable
 ➤ No duplicate code
 
-⚠️ Common  Traps ⚠️
+⚠️ Common  Traps
 ❌ Forgetting @Retention(RUNTIME)
 ❌ Expecting annotation to execute logic
 ❌ Using annotation without processor (AOP / reflection)
@@ -2198,6 +3378,184 @@ public void placeOrder() {
 ➤ @NotNull
 ➤ @RestController
 👉 All are custom annotations internally.
+
+
+====================
+🔷 Async Annotation
+====================
+@Async allows a method to run in a separate thread, so the caller does not wait for its completion.
+
+✔️ Improves performance
+✔️ Frees up request threads
+✔️ Enables background processing
+
+🔄 Why Do We Need @Async?
+❌ Synchronous Execution (Problem)
+sendEmail();   // takes 5 seconds
+processOrder(); // blocked
+
+✔️ Request thread is blocked
+✔️ Poor scalability
+
+✅ Asynchronous Execution (Solution)
+sendEmailAsync(); // runs in background
+processOrder();  // continues immediately
+
+
+🔄 How @Async Works Internally
+➤ Spring creates a proxy for the bean
+➤ Method call intercepted
+➤ Task submitted to Executor (thread pool)
+➤ Method executes in different thread
+👉 Uses AOP + Proxying
+
+
+🔄 Enabling @Async
+@EnableAsync
+@SpringBootApplication
+public class MyApp {
+}
+⚠️ Without this, @Async will NOT work
+
+
+🔄 Basic Usage
+@Service
+public class EmailService {
+
+    @Async
+    public void sendEmail() {
+        System.out.println(Thread.currentThread().getName());
+    }
+}
+✔️ Runs in background thread
+✔️ Caller does not wait
+
+
+🔄 Return Types of @Async Methods
+1️⃣ void (Fire-and-Forget)
+@Async
+public void logActivity() {
+}
+✔️ No result
+✔️ Exceptions are not propagated
+
+2️⃣ Future<T> (Old)
+@Async
+public Future<String> task() {
+    return new AsyncResult<>("done");
+}
+
+3️⃣ CompletableFuture<T> (BEST PRACTICE)
+@Async
+public CompletableFuture<String> task() {
+    return CompletableFuture.completedFuture("done");
+}
+✔️ Non-blocking
+✔️ Modern
+✔️ Chainable
+
+
+🔄 Exception Handling in @Async
+❌ Problem
+@Async
+public void asyncMethod() {
+    throw new RuntimeException();
+}
+
+➡️ Exception is lost
+
+✅ Solution: AsyncUncaughtExceptionHandler
+@Configuration
+@EnableAsync
+public class AsyncConfig implements AsyncConfigurer {
+
+    @Override
+    public Executor getAsyncExecutor() {
+        return Executors.newFixedThreadPool(5);
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (ex, method, params) ->
+            System.out.println("Exception in " + method.getName());
+    }
+}
+
+
+🔄 Custom Thread Pool
+❌ Default Executor
+➤ SimpleAsyncTaskExecutor
+➤ Unlimited threads
+➤ NOT production safe
+
+✅ Custom Executor (Recommended)
+@Bean("taskExecutor")
+public Executor taskExecutor() {
+
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(5);
+    executor.setMaxPoolSize(10);
+    executor.setQueueCapacity(100);
+    executor.setThreadNamePrefix("Async-");
+    executor.initialize();
+
+    return executor;
+}
+
+Use Executor in @Async
+@Async("taskExecutor")
+public void asyncTask() {
+}
+
+
+🔄 @Async at Class Level
+@Async
+@Service
+public class NotificationService {
+}
+✔️ All public methods become async
+
+
+🔄 Important Rules & Limitations
+🚫 Self Invocation
+this.asyncMethod(); // ❌ DOES NOT WORK
+
+❓ Why?
+✔️ Proxy is bypassed
+✔️ Must be called from another bean
+
+🚫 Private Methods
+@Async
+private void method() { } // ❌
+✔️ Only public methods work
+
+🚫 Final Methods
+Cannot be proxied
+
+
+🔄 @Async vs @Transactional
+⚠️ Order matters
+@Async
+@Transactional
+public void process() { }
+✔️ Transaction exists inside async thread
+
+
+🔄 Real-World Use Cases
+| Use Case               | Why Async    |
+| ---------------------- | ------------ |
+| Email sending          | Slow IO      |
+| SMS/Push notifications | Background   |
+| Audit logging          | Non-critical |
+| Report generation      | Long-running |
+| External API calls     | Latency      |
+
+🔄 @Async vs CompletableFuture vs WebFlux
+| Feature         | @Async | CompletableFuture | WebFlux |
+| --------------- | ------ | ----------------- | ------- |
+| Thread-based    | ✅     | ✅               | ❌      |
+| Non-blocking IO | ❌     | ❌               | ✅      |
+| Simplicity      | High   | Medium            | Low     |
 
 
 ======================================
@@ -2608,3 +3966,4 @@ Flux<Repository> repos = webClient.get()
 ➤ Reactive microservices communicating via WebFlux + Kafka
 ➤ IoT sensor data streaming
 ➤ Notification systems
+ 
