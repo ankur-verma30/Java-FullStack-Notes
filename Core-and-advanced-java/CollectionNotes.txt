@@ -6,12 +6,12 @@
 
 
 🔄 Why use Generics
-| **Purpose**                 | **Explanation**                                                        |
-| --------------------------- | ---------------------------------------------------------------------- |
-| **Type Safety**             | Detects invalid data types at compile time                             |
-| **Code Reusability**        | Allows writing one class or method that works with multiple data types |
-| **Eliminates Type Casting** | Removes the need for explicit `(Type)` casting while retrieving data   |
-| **Compile-Time Checking**   | Prevents runtime errors such as `ClassCastException`                   |
+| Purpose                 | Explanation                                                            |
+| ------------------------| ---------------------------------------------------------------------- |
+| Type Safety             | Detects invalid data types at compile time                             |
+| Code Reusability        | Allows writing one class or method that works with multiple data types |
+| Eliminates Type Casting | Removes the need for explicit `(Type)` casting while retrieving data   |
+| Compile-Time Checking   | Prevents runtime errors such as `ClassCastException`                   |
 
 
 ✅ Example:
@@ -169,8 +169,8 @@ Because Java doesn't know: This list can hold Dogs, but I don't know what it act
 
 
 🔄 Why not use both read and write?
-| **Type**                 | **Can Read**              | **Can Write** |
-| ------------------------ | ----------------------    | ------------- |
+| Type                     | Can Read                 | Can Write      |
+| ------------------------ | ----------------------   | -------------  |
 | `extends`                | ✅ Yes (as parent type) | ❌ No          |
 | `super`                  | ❌ No (only `Object`)   | ✅ Yes         |
 | Exact type (`List<Dog>`) | ✅ Yes                  | ✅ Yes         |
@@ -178,15 +178,15 @@ Because Java doesn't know: This list can hold Dogs, but I don't know what it act
 
 
 🔄 PECS(Producer Extends, Consumer Super) rule
-| **Situation**                      | **Wildcard to Use** | **Reason**                           |
+| Situation                      | Wildcard to Use | Reason                           |
 | ---------------------------------- | ------------------- | ------------------------------------ |
-| You only **read / produce** items  | `<? extends T>`     | Guarantees type safety while reading |
-| You only **write / consume** items | `<? super T>`       | Guarantees type safety while adding  |
+| You only read / produce items  | `<? extends T>`     | Guarantees type safety while reading |
+| You only write / consume items | `<? super T>`       | Guarantees type safety while adding  |
 
 
 🔄 Trap Questions
-| **Trap**                                                 | **Explanation**                                                     |
-| -------------------------------------------------------  | ------------------------------------------------------------------- |
+| Trap                                                      | Explanation                                                         |
+| -------------------------------------------------------   | ------------------------------------------------------------------- |
 | ❌ You can’t use primitive types with generics           | `List<int>` is invalid; use wrapper types like `List<Integer>`      |
 | ❌ Generic type info is erased at runtime (Type Erasure) | JVM removes generic type information after compilation              |
 | ❌ Cannot create instances of type parameter             | `T obj = new T();` ❌ not allowed due to type erasure               |
@@ -475,9 +475,9 @@ public interface Iterable<T> {
 
 
 🔄 Key Methods of Iterable
-| **Method**                                         | **Description**                                                          | **Since** |
+| Method                                             | Description                                                              | Since     |
 | -------------------------------------------------- | ------------------------------------------------------------------------ | --------- |
-| `Iterator<T> iterator()`                           | Returns an **Iterator** over elements of type `T`.                       | Java 5    |
+| `Iterator<T> iterator()`                           | Returns an Iterator over elements of type `T`.                           | Java 5    |
 | `default void forEach(Consumer<? super T> action)` | Performs the given action for each element (commonly used with lambdas). | Java 8    |
 
 
@@ -574,432 +574,678 @@ public class MyIterable implements Iterable<Integer> {
 
 
 🔄 Relationship with Iterator
-| **Feature** | **Iterable**                               | **Iterator**                         |
-| ----------- | ------------------------------------------ | ------------------------------------ |
-| **Type**    | Interface that provides `iterator()`       | Interface used to traverse elements  |
-| **Purpose** | Supplies an `Iterator` object              | Performs the actual iteration        |
-| **Methods** | `iterator()`, `forEach()`, `spliterator()` | `hasNext()`, `next()`, `remove()`    |
-| **Usage**   | Implemented by collection classes          | Used by `for-each` and `while` loops |
+| Feature | Iterable                                   | Iterator                             |
+| --------| ------------------------------------------ | ------------------------------------ |
+| Type    | Interface that provides `iterator()`       | Interface used to traverse elements  |
+| Purpose | Supplies an `Iterator` object              | Performs the actual iteration        |
+| Methods | `iterator()`, `forEach()`, `spliterator()` | `hasNext()`, `next()`, `remove()`    |
+| Usage   | Implemented by collection classes          | Used by `for-each` and `while` loops |
 
 
-
-📚 2. Collection<E> (Interface)
+=============================
+🔷 Collection<E> (Interface)
+=============================
+The Collection interface in Java is the root interface of the Java Collections Framework. It resides in the java.util package and represents a group of objects known as its elements. It defines the basic operations that all collection classes must implement or support.
 ➤ Root interface for all collection types (except maps).
 ➤ Extends: Iterable<E>
 ➤ Common Subinterfaces: List, Set, Queue, etc.
 
-➤ Key Methods:
-add(E e), remove(Object o), clear(), size(), contains(Object o), etc.
 
-➤ Does not maintain order or index-based access (depends on implementation).
+🔄 Details of Collection Interface
+➤ Hierarchy Root: It is at the top of the collection interface hierarchy. Subinterfaces like List, Set, and Queue extend it.
+➤ Purpose: Allows manipulation of groups of objects independently of their representation or implementation.
+➤ Common Methods:
+    ✔️ add(E e) ─────────▶ Add an element.
+    ✔️ remove(Object o) ─────────▶ Remove an element.
+    ✔️ contains(Object o) ─────────▶ Check if an element exists.
+    ✔️ size() ─────────▶ Returns number of elements.
+    ✔️ isEmpty() ─────────▶ Checks if empty.
+    ✔️ clear() ─────────▶ Removes all elements.
+    ✔️ iterator() ─────────▶ Returns an iterator over the elements.
+    ✔️ Bulk operations like addAll(), removeAll(), retainAll().
 
-🔄 3. SequencedCollection<E> (Interface – ✅ New in Java 21 / Finalized in Java 24)
-➤ Extends: Collection<E>
+➤  No Direct Instantiation: As an interface, it cannot be instantiated directly. Instead, you use concrete classes (e.g. ArrayList, HashSet) that implement Collection and assign them to a Collection reference.
+➤  Common Subinterfaces:
+    ✔️ List: Ordered collections allowing duplicates, accessible by index (e.g., ArrayList).
+    ✔️ Set: Collections with unique elements, no duplicates allowed (e.g., HashSet).
+    ✔️ Queue: Collection models a FIFO (First-In-First-Out) structure (e.g., PriorityQueue).
+
+
+🔄 Advantages of Collection Interface
+➤ Provides a uniform API to handle different types of collections.
+➤ Enables interchangeable use of collection types adhering to the same interface.
+➤ Defines the contract for collections to support iteration, adding, removing, and searching.
+
+
+✅ Example:
+Collection<String> fruits = new ArrayList<>();
+fruits.add("Apple");
+fruits.add("Banana");
+fruits.add("Mango");
+Here, an ArrayList implementing Collection interface is used, enabling manipulation of the elements via Collection methods.
+
+
+❓ Collection is root or Iterable?
+➤ The Collection interface is often called the root interface of the Java Collections Framework because it defines the fundamental operations common to all collections. However, it itself extends the Iterable interface, which means:
+    ✔️ Iterable interface is a more general contract that provides the ability to obtain an iterator over elements, enabling iteration. It declares the `iterator()` method.
+    ✔️ The Collection interface extends Iterable, meaning it inherits the ability to be iterated, but adds more specific methods for adding, removing, querying, and bulk operations on groups of elements.
+
+➤ So, calling Collection the "root" interface refers to it being the root of most collection types in the framework (like List, Set, Queue), defining the core behaviors of collections beyond basic iteration.
+
+➤ The Iterable interface is a more basic iteration capability interface, while Collection builds on it to provide a richer API for manipulating collections of objects.
+
+
+========================================
+🔷 SequencedCollection<E> (Interface)
+========================================
+The SequencedCollection interface is a new interface introduced in Java 21 that extends the Collection interface to represent collections with a well-defined encounter (iteration) order. It models collections whose elements have a linear sequence from a first element to a last element, supporting operations at both ends and reversible iteration.
 ➤ Purpose: Provides a standardized way to handle ordered collections (like first and last elements).
 
-➤ Key Methods Introduced:
-getFirst(), getLast()
-addFirst(E e), addLast(E e)
-removeFirst(), removeLast()
-reversed()
 
-🔸 Applies to: List-like or deque-like structures where order matters.
-🔹 This brings better symmetry and consistency in ordered collections.
-
-🔷 List Interface
-➤ Extends: SequencedCollection<E>
-➤ Represents an ordered collection with index-based access.
-➤ Duplicates allowed, insertion order preserved.
-➤ Common Implementations: ArrayList, LinkedList, Vector, Stack
-
-➤ Key Methods:
-get(int index), set(int index, E e), add(E e), remove(int index),indexOf(Object o), subList(), listIterator()
-
-✅ Key Features of the List Interface:
-➤ Ordered
-➤ Index-Based access
-➤ Allows duplicates
-
-🌟 ArrayList
-An ArrayList is a resizable array implementation of the List interface. 
-Unlike arrays in Java, which have a fixed size, ArrayList can change its size dynamically as elements are added or removed.
-This flexibility makes it a popular choice when the number of elements in a list isn't known in advance.
-
-➤ Implements: List<E>, hence also a SequencedCollection, Collection, and Iterable.
-
-✔️ Ways to Create ArrayList
-🔄Default constructor
-ArrayList<Integer> list = new ArrayList<>();
-System.out.println(list.getClass().getName());
-✅Output: java.util.ArrayList
-👉 Creates an empty list with default capacity 10.
-
-🔄With Initial Capacity
-ArrayList<String> list = new ArrayList<>(20);
-👉Useful when you know approx. number of elements.
-
-🔄 From Another Collection
-List<Integer> numbers = new ArrayList<>(List.of(1, 2, 3, 4));
-👉Copies elements from existing collection.
-
-🔄 Using Arrays.asList (Fixed-size list backed by array)
-List<String> names = new ArrayList<>(Arrays.asList("A", "B", "C"));
-System.out.println(names.getClass().getName());
-✅Output: java.util.ArrayList
-
-➤ This is NOT java.util.ArrayList
-➤ It is an inner static class of java.util.Arrays called Arrays$ArrayList.
-➤ Characteristics:
-    1. Fixed-size list (backed by the given array).
-    2. You can modify elements (set()), but cannot add() or remove().
-    3. Trying list.add("D") will throw UnsupportedOperationException.
-
-🔄 Using Arrays.asList() on an existing array
-String[] array = {"Apple", "Banana", "Cherry"};
-List<String> list2 = Arrays.asList(array);
-System.out.println(list2.getClass().getName());
-✅ Output: java.util.Arrays$ArrayList
-
-➤ Same as above: backed by the array itself.
-➤ Any changes in list2 are reflected in the original array (because they share memory).
-
-list2.set(0, "Mango"); 
-System.out.println(array[0]); // Output: Mango (array updated too!)
-0
-🔄Immutable List Using List.of() (Java 9+) // Unmodifiable list can't even replace the elements unlike list made from Arrays.asList()
-List<Integer> list3 = List.of(1, 2, 3);
-System.out.println(list3.getClass().getName());
-
-✅ Output: java.util.ImmutableCollections$ListN
-
-✅ Key Points
-➤ new ArrayList<>() ─────────▶ java.util.ArrayList (fully dynamic, resizable).
-➤ Arrays.asList() ─────────▶ java.util.Arrays$ArrayList (fixed-size, backed by array).
-➤ With an existing array, modifications affect both list and array.
-➤ Arrays$ArrayList is an inner class only meant as a lightweight adapter.
-
-✔️ Common Operations on ArrayList
-1️⃣ Add Elements
-list.add(10);          // add at end
-list.add(1, 20);       // add at specific index
-list.addAll(otherList); // add all elements
-
-2️⃣ Access Elements
-int x = list.get(0);   // get element at index
-
-3️⃣ Update Elements
-list.set(1, 50);       // update index 1 to value 50
-
-4️⃣ Remove Elements
-list.remove(2);        // remove by index
-list.remove(Integer.valueOf(10)); // remove by value if element is not present it will do nothing or else remove the element from the list
-list.clear();          // remove all elements
-
-5️⃣ Search Operations
-boolean present = list.contains(30); // check existence
-int idx = list.indexOf(50);          // first index
-int lastIdx = list.lastIndexOf(50);  // last index
-
-6️⃣ Iteration
-// for-each loop
-for(Integer val : list) { System.out.println(val); }
-
-// using Iterator
-Iterator<Integer> it = list.iterator();
-while(it.hasNext()) System.out.println(it.next());
-
-// using ListIterator (forward & backward)
-ListIterator<Integer> itr = list.listIterator();
-while(itr.hasNext()) System.out.println(itr.next());
-while(itr.hasPrevious()) System.out.println(itr.previous());
-
-// using forEach + lambda
-list.forEach(System.out::println);
-
-7️⃣ Size & Capacity
-int size = list.size();
-boolean empty = list.isEmpty();
-
-8️⃣ Conversion
-// ArrayList -> Array
-Integer[] arr = list.toArray(new Integer[0]);
-
-// Array -> ArrayList
-ArrayList<Integer> list2 = new ArrayList<>(Arrays.asList(arr));
-
-🔷 Internal Working of ArrayList
-➤ Unlike a regular array, which has a fixed size, an ArrayList can grow and shrink as elements are added or removed. 
-➤ This dynamic resizing is achieved by creating a new array when the current array is full and copying the elements to the new array.
-➤ Internally the ArrayList is implemented as an array of Object references. 
-➤ When you add elements to an ArrayList, you're essentially storing these elements in this internal array.
-➤ When you create an ArrayList, it has an initial capacity(default is 10). The capacity refers to the size of the internal array that holds the elements before needing to resize.
-
-🔷 Adding elements
-When we add an element to an ArrayList, the following steps occur:
-
-1. Checking Capacity: Before adding the new element, ArrayList checks if there is enough space in the internal array(elementData). IF the array is full, it needs to be resized.
-2. Resize if necessary: If the internal array is full, the ArrayList will create a new array with a larger capacity (usually 1.5 times the current capacity) and copy the existing elements from the old array to the new array.
-3. Add the Element: The new element is added to the internal array at the appropriate index, and the size is incremented.
-
-🔷 Resizing the Array
-1. Initial Capacity: By default, the initial capacityis 10. This means the internal array can hold 10 elements before it needs to grow.
-2. Growth Factor: When the internal array is full, a new array is created with a size 1.5 times the old array. This growth factor balances memory efficiency and resizing cost.
-3. Copying Elements: When resizing occurs, all elements from the old array are copied to the new array, which is an O(n) operation, where n is the number of elements in the ArrayList.
-
-🔷 Removing Elements
-1. Check Bounds: The ArrayList  checks if the index is within the valid range (0 to size - 1).
-2. Remove the Element: The element is removed, and all elements to the right of the removed element are shifted to the left to fill the gap.
-3. Reduce Size: The size is decremented by 1.
-
-🔷 Converting List to Array
-String [] array = arr.toArray(new String[0]);
-👉 This creates a new array of the same type as the list and copies the elements into it.        
-👉 We pass new String[0] to tell the compiler the type of the array we are passing as a argument (Convention).
-
-🔷 Sorting the List
-✅Method 1: Collections.sort(arr);
-👉 This sorts the list in ascending order using the natural ordering of the elements.
-
-✅Method 2: arr.sort(null);
-👉 This sorts the list in ascending order using the natural ordering of 
-the elements.
-👉 null is defined here because no custom comparator is used
-
-Collections.sort(list);                   // ascending
-list.sort(Collections.reverseOrder());    // descending
-
-🔟 Retain / Remove All
-list.removeAll(otherList);   // remove all common elements
-list.retainAll(otherList);   // keep only common elements
-
-🔷 Time Complexity of Operations in List
-➤ Accessing by index (get) is O(1).
-➤ Adding an element is O(n) in the worst case when resizing occurs.
-➤ Removing elements can be O(n) because it may involve shifting elements.
-➤ Iteration is O(n).
-
-🔷 Comparator
-It is an interface that defines a method for comparing two objects of the same type.
-It is used to sort objects in a custom order.
-
-🔷 How to use Comparator
-public class ArrayListIntro {
-
-	public static void main(String[] args) {
-		List<Integer>arr=new ArrayList<>();
-		arr.add(1);
-		arr.add(2);
-		arr.add(3);
-		
-		List<Integer>list1=List.of(4,5,6,7,8,9);
-		//adding all the elements
-		arr.addAll(2,list1);
-		
-		arr.sort(new CustomComparator());
-		System.out.println(arr); // Output: [9, 8, 7, 6, 5, 4, 3, 2, 1]
-	}
-}
-class CustomComparator implements Comparator<Integer>{
-
-	@Override
-	public int compare(Integer o1, Integer o2) {
-		return o2-o1;
-	}
-}
-👉 If we do o1-o2, it will sort in ascending order
-
-🔷 Using lambda expression
-✅ Example 1: Sorting Lexicographically
-		List<String>str=Arrays.asList("Apple", "Mango","Banana");
-		str.sort((a,b)-> a.compareTo(b));
-		//if gives negative then first will come
-		System.out.println(str); // Output: [Apple, Banana, Mango]
-
-✅ Example 2: Sorting by Length		
-		List<String>str2=Arrays.asList("Apple", "Plum","Banana");
-		str2.sort((a,b)-> a.length()-b.length());
-		System.out.println(str2);// Output: [Plum, Apple, Banana]
+🔄 Key Characteristics of SequencedCollection
+➤ Defines a strict encounter order of elements conceptually arranged in sequence.
+➤ Supports operations at both the front and back ends of the collection, such as:
+    ✔️ addFirst(E e) ─────────▶  add element at the beginning.
+    ✔️ addLast(E e) ─────────▶  add element at the end.
+    ✔️ getFirst() ─────────▶  get the first element.
+    ✔️ getLast() ─────────▶  get the last element.
+    ✔️ removeFirst() ─────────▶  remove and return the first element.
+    ✔️ removeLast() ─────────▶  remove and return the last element.
+➤ Provides a method reversed() which returns a view of the collection in reverse order.
+➤ Extends the Collection interface, thus inherits all standard collection operations.
+➤ Enables efficient manipulation and traversal of ordered elements from both ends.
+➤ Conceptually similar to a Deque but generalized for collections beyond just double-ended queues.
 
 
-###############
-🌟 LinkedList
-###############
-A LinkedList is a doubly-linked list implementation of the List and Deque interfaces.
-It allows for efficient insertion and removal of elements at both ends of the list.
+🔄 Use and Significance
+➤ It formalizes collections with order and two-ended operations.
+➤ Supports processing the elements both forward and in reverse.
+➤ Enables uniform APIs for ordered collections in the Java Collections Framework.
+➤ Forms the base for new related interfaces like SequencedSet and SequencedMap.
 
-✅Custom Made LinkedList Implementation
-package collections;
 
-public class LinkedListIntro {
+✅ Example
+SequencedCollection<String> seqCollection = ...;
+seqCollection.addFirst("start");
+seqCollection.addLast("end");
+String first = seqCollection.getFirst();
+String last = seqCollection.getLast();
+SequencedCollection<String> reversedView = seqCollection.reversed();
 
-	public static void main(String[] args) {
-		Node node1=new Node();
-		node1.value=10;
-		node1.next=null;
-		
-		Node node2=new Node();
-		node2.value=2;
-		node2.next=null;
-		node1.next=node2;
-		
-		Node temp=node1;
-		while(temp!=null) {
-			System.out.println(temp.value);
-			temp=temp.next;
-		}
-	}
-}
 
-class Node{
-	public int value;
-	public Node next;
-}
-
-👉 A LinkedList is a linear data structure where each element is a seperate object called a node. Each node contains two parts:
-1. Data: The value stored in the node.
-2. Pointer/Reference: Two Pointers, one points to the next node(next) and the other pointing to the previous node(previous).
-
-⚡ Performance Considerations
-➤ LinkedList has different performance characteristics compared to ArrayList:
-
-🔄Insertion and Deletion: LinkedList is better for frequent insertions and deletions in the middle of the list because it does not require shifting elements, as in ArrayList.
-
-🔄 Random Access: LinkedList has slower random access(get(int index)) compared to ArrayList because it has to traverse the list from the beginning to reach the desired index.
-
-🔄 Memory Overhead: LinkedList requires more memory than ArrayList because each node in a LinkedList requires extra memory to store references to the next and the previous node.
-
-✅ Using LinkedList Collection Framework
-
-package collections;
-
+✅ Example demonstrating how to implement and use the SequencedCollection interface in Java 21
+import java.util.SequencedCollection;
 import java.util.LinkedList;
 
-public class LinkedListIntro {
+public class SequencedCollectionExample {
+    public static void main(String[] args) {
+        *// LinkedList implements SequencedCollection as of Java 21*
+        SequencedCollection<String> seqCollection = new LinkedList<>();
 
-	public static void main(String[] args) {
-		LinkedList<Integer>linkedlist=new LinkedList<>();
-		✅Adding elements and getting elements
-		linkedlist.add(1);//O(1)
-		linkedlist.add(2);
-		linkedlist.add(3);
-		
-		System.out.println(linkedlist);
-		
-		//getting the value at 0th index
-		System.out.println(linkedlist.get(0)); //O(n)
-		
-		//adding the value at specific index
-		linkedlist.add(2, 5); // O(1)
-		
-		//adding at the first of the linkedlist
-		linkedlist.addFirst(0); // O(1)
-		
-		//adding at the last of the linkedlist
-		linkedlist.addLast(10); // O(1)
-		
-		System.out.println(linkedlist);
-		
-		//getting the first element
-		System.out.println(linkedlist.getFirst());
-		//getting the last element
-		System.out.println(linkedlist.getLast());
+        *// Add elements at the front and end*
+        seqCollection.addFirst("First");
+        seqCollection.addLast("Second");
+        seqCollection.addLast("Third");
 
-		✅Removing elements
-		//removing element on specific index
-		int removedElement=linkedlist.remove(0);
-		System.out.println(removedElement);
-		
-		System.out.println(linkedlist);
-		
-		//removing the first element
-		int removed=linkedlist.removeFirst();
-		System.out.println(removed);
-		
-		System.out.println(linkedlist);
-		
-		//removing first and last element
-		int val1=linkedlist.removeFirst();
-		int val2=linkedlist.removeLast();
-		
-		System.out.println(val1+" "+val2);
-		System.out.println(linkedlist);
-		
-		//Java 8 feature
-		boolean flag=linkedlist.removeIf(x->x%2!=0);// 5 is removed
-		System.out.println(flag); //tells that removal has taken place or not
-		
-		System.out.println(linkedlist);
-		
-		LinkedList<String> animals=new LinkedList<>(Arrays.asList("Cat","Dog","Elephant"));
-		LinkedList<String> animalsToRemove=new LinkedList<>(Arrays.asList("Dog")); //works if there is ArrayList also
-		
-		boolean removedAnimals=animals.removeAll(animalsToRemove);
-		System.out.println(removedAnimals);
-		System.out.println(animals);// Dog is removed
-	}
+        *// Access first and last elements*
+        String first = seqCollection.getFirst();
+        String last = seqCollection.getLast();
+        System.out.println("First Element: " + first);
+        System.out.println("Last Element: " + last);
+
+        *// Remove first and last elements*
+        String removedFirst = seqCollection.removeFirst();
+        String removedLast = seqCollection.removeLast();
+        System.out.println("Removed First Element: " + removedFirst);
+        System.out.println("Removed Last Element: " + removedLast);
+
+        *// Add one more element at the end*
+        seqCollection.addLast("Fourth");
+
+        *// Iterate in normal order*
+        System.out.println("Normal iteration:");
+        for (String s : seqCollection) {
+            System.out.println(s);
+        }
+
+        *// Get and iterate using reversed view*
+        SequencedCollection<String> reversed = seqCollection.reversed();
+        System.out.println("Reversed iteration:");
+        for (String s : reversed) {
+            System.out.println(s);
+        }
+    }
+}
+👉 This example shows:
+➤ Adding elements at both ends of the collection using addFirst and addLast.
+ Accessing and removing elements from the front and back.
+ Iterating elements in both forward and reverse order with reversed().
+
+⚡ Note: To run this code, you need Java 21 or later, as the SequencedCollection interface and related methods are introduced in Java 21. The LinkedList class is enhanced to implement this interface supporting dualended operations and reversed views.
+
+
+===================
+🔷 List Interface
+===================
+The List interface is part of the Java Collections Framework and represents an ordered collection (also known as a sequence). It extends the Collection interface and provides additional methods to manipulate elements based on their integer index.
+
+🔄 Key Features of List Interface:
+➤ Maintains the order of insertion; elements can be accessed by their position (index).
+➤ Allows duplicate elements.
+➤ Supports positional access and insertion of elements.
+➤ Provides methods to search for elements and manipulate elements by their position.
+➤ Allows null elements.
+
+
+🔄 Common Methods Defined in List
+➤ add(E e) ─────────▶ Adds element at the end.
+➤ add(int index, E element) ─────────▶ Inserts element at specific index.
+➤ get(int index) ─────────▶ Retrieves element at given index.
+➤ set(int index, E element) ─────────▶ Replaces element at index.
+➤ remove(int index) ─────────▶ Removes element at specific index.
+➤ indexOf(Object o) ─────────▶ Returns first occurrence index of element.
+➤ lastIndexOf(Object o) ─────────▶ Returns last occurrence index.
+➤ listIterator() ─────────▶ Returns a List Iterator for bidirectional traversal.
+
+
+🔄 Common Implementations
+ArrayList ─────────▶ Resizable array implementation, fast random access but slower insertions/removals in the middle.
+LinkedList ─────────▶ Doubly-linked list implementation, good for frequent insertions/removals.
+Vector ─────────▶ Synchronized resizable array (legacy).
+Stack ─────────▶ Last-In-First-Out stack built on Vector.
+
+
+✅ Example Code:
+import java.util.List;
+import java.util.ArrayList;
+
+public class ListExample {
+    public static void main(String[] args) {
+        List<String> fruits = new ArrayList<>();
+        fruits.add("Apple");
+        fruits.add("Banana");
+        fruits.add("Cherry");
+        fruits.add(1, "Mango"); // Insert at index 1
+
+        System.out.println("Fruits List: " + fruits); // [Apple, Mango, Banana, Cherry]
+
+        String fruit = fruits.get(2);
+        System.out.println("Element at index 2: " + fruit); // Banana
+
+        fruits.set(2, "Grapes");
+        System.out.println("After setting index 2: " + fruits); // [Apple, Mango, Grapes, Cherry]
+
+        fruits.remove(3);
+        System.out.println("After removing index 3: " + fruits); // [Apple, Mango, Grapes]
+
+        int index = fruits.indexOf("Mango");
+        System.out.println("Index of Mango: " + index); // 1
+    }
 }
 
-#############
-🌟 Vectors
-#############
-➤ A Vector in Java is a part of the java.util package and is one of the legacy classes in Java that implements the List interface.
-➤ It was introduced in JDK 1.0 before collection framework and is synchronized, making it thread-safe.
-➤ Now it is a part of the collection framework.
-➤ Howeever, due to its synchronization overhead, it's generally recommended to use other modern alternatives like ArrayList in single-threaded scenarios.
-➤ Despite this, vectors is still useful in certain situations, particularly when thread safety is a concern.
 
-🔷 Key Features of Vectors
-🔄 Dynamic Array: Like ArrayList, vector is a dynamic array that grows automatically when more elements are added than its current capacity.
+==============
+🔷 ArrayList
+==============
+➤ ArrayList is a resizablearray implementation of the List interface in Java.
+➤ It allows dynamic arrays that can grow as needed, unlike plain arrays with fixed size.
+➤ This flexibility makes it a popular choice when the number of elements in a list isn't known in advance.
+➤ Part of the Java Collections Framework and located in java.util package.
 
-🔄Synchronized: All the methods in Vector are synchronized, which make it thread-safe. This means multiple thread can work on a Vector without the risk of corrupting the data. However, this can introduce performance overhead in single-threaded environments.
 
-🔄 Legacy Class: Vector was part of Java's original release and is considered a legacy class. It's generally recommended to use ArrayList in single-threaded environments due to performance Considerations.
+🔄 Key Features
+➤ Resizable: Internally uses a dynamic array that doubles its size when capacity is exceeded.
+➤ Indexed Access: Supports fast random access by index with O(1) time complexity for get()` and set()`.
+➤ Allows Duplicates & Nulls: Can store duplicate elements and null values.
+➤ Insertion Order: Maintains the order in which elements are inserted.
+➤ Nonsynchronized: Not threadsafe by default; use Collections.synchronizedList() for thread safety.
 
-🔄 Resizing Mechanisms: When the current capacity of the vector is excedded, it doubles its size by default(or increases by a specific capacity increment if provided).
 
-🔄 Random Access: Similary to arrays and ArrayList, Vector allows random access to elements, making it efficient for accessing elements using index.
+🔄 Internal Working
+➤ Internally maintains an array called elementData.
+➤ When adding elements exceeds capacity, the array grows by approximately 50%.
+➤ Copying of the old array to new array happens during resizing, which is costly (O(n)).
+➤ Adding elements at the end is generally O(1) amortized; inserting or removing at middle involves shifting elements O(n).
 
-🔷 Constructor of Vectors
-👉 Vector(): Creates a vector with an initial capacity of 10.
-👉 Vector(int initialCapacity): Creates a vector with specified initial capacity.
-👉 Vector(int initialCapacity, int capacityIncrement): Creates a vector with an initial capacity and capacity increment(how much the vector should grow when its capacity is exceeded).
-👉Vector(<Collections<? extends E>c): Creates a vector containing the elements of the specified collection.
 
-✅Code Implementation of Vector
-package collections;
+🔄 Important Methods
+➤ add(E e)  ─────────▶ Adds element at the end.
+➤ add(int index, E element)  ─────────▶ Inserts at specified position, shifting elements.
+➤ get(int index)  ─────────▶ Retrieves element at index quickly.
+➤ set(int index, E element)  ─────────▶ Replaces element at index.
+➤ remove(int index)  ─────────▶ Removes element at index, shifts subsequent elements.
+➤ size()  ─────────▶ Returns number of elements.
+➤ contains(Object o)  ─────────▶ Checks if an element is present.
+➤ clear()  ─────────▶ Removes all elements.
 
-import java.util.Vector;
 
-public class VectorDemo {
-	public static void main(String[] args) {
-		Vector<Integer> vector = new Vector<>(3);
+🔄 Time Complexity
+| Operation                 | Time Complexity        |
+| --------------------------| -----------------------|
+| Access by index           | O(1)                   |
+| Add at end                | O(1) amortized         |
+| Insert / remove at middle | O(n) (due to shifting) |
+| Search (contains)         | O(n)                   |
+| Resize (occasional)       | O(n)                   |
 
-		// can check the initial capacity
-		System.out.println(vector.capacity());
 
-		vector.add(1);
-		vector.add(1);
-		vector.add(1);
-		vector.add(1);
+🔄 When to Use ArrayList
+➤ When frequent random access is needed.
+➤ When insertions and deletions mainly occur at the end.
+➤ When you want a dynamically resizable array.
 
-		// New capacity=initialCapacity+capacityIncrement;
-		// By default capacityIncrement is initalValue it doubles the capacity
-		System.out.println(vector.capacity());
 
-	}
+🔄 When Not to Use ArrayList
+➤ When thread safety is needed (use Vector or Collections.synchronizedList).
+➤ When frequent insertions/deletions at start or middle of the list are expected (LinkedList preferred).
+
+
+🔄 Differences from Array
+➤ Arrays have fixed size, ArrayList grows dynamically.
+➤ ArrayList provides methods for easy manipulation (add, remove, search).
+➤ Arrays can store primitives directly; ArrayList stores objects (use wrapper classes for primitives).
+
+
+🔁 Understand internal resizing mechanics and performance costs.
+🔄 Internal Resizing Mechanics of ArrayList
+
+1️⃣ Initial Capacity: When an ArrayList is created without specifying capacity, it typically starts with a default capacity (commonly 10). Internally, it maintains an array called `elementData` to store elements.
+    
+2️⃣ Adding Elements:When elements are added, they are placed sequentially in the internal array.
+    
+3️⃣ Resizing Trigger: When the number of elements exceeds the current capacity, ArrayList must resize its internal array to accommodate new elements.
+
+4️⃣ Resize Operation:
+    Resizing involves:
+    ✔️ Creating a new, larger array (usually 1.5 times the original capacity).
+    ✔️ Copying existing elements from the old array to the new array.
+    ✔️ Assigning the new array as the backing storage.
+
+5️⃣ Capacity Growth Strategy: The capacity generally increases by about 50% over the old capacity (not doubling exactly, unlike some other systems). For example, if the capacity is 10, after resizing it might become 15.
+    
+6️⃣ Amortized Cost: Although resizing is an expensive operation (O(n) due to array copy), it does not occur with every insertion. Most `add()` operations run in O(1) time. The occasional cost of resizing is spread out over many insertions, leading to an amortized time complexity of O(1) for additions at the end.
+    
+
+🔄 Performance Costs Explained
+| Operation                    | Time Complexity Details                                                                                  |
+| -----------------------------| ---------------------------------------------------------------------------------------------------------|
+| Adding element at end        | O(1) amortized — most insertions are constant time; occasional resizing costs O(n) but is infrequent     |
+| Adding element in middle     | O(n) — elements to the right of the index must be shifted                                                |
+| Removing element from middle | O(n) — elements to the left must shift to fill the gap                                                   |
+| Access by index              | O(1) — direct access using the internal array                                                            |
+| Contains / Search            | O(n) — requires linear traversal of elements                                                             |
+
+
+🔄 Important Points
+➤ Resizing can cause temporary performance hiccups due to:
+    ✔️ Memory allocation for larger array.
+    ✔️ Copying all elements from old array to new array.
+➤ Over-allocating capacity initially when the expected size is known can reduce resizing costs.
+➤ Frequent insertions/removals in the middle make ArrayList inefficient compared to linked structures.
+
+
+✅ Example of Resizing (Conceptual)
+➤ Initially: capacity = 10
+➤ Add elements 1 to 10 → No resize needed
+➤ Add 11th element → Resize: Make new array with capacity ~15, copy 10 elements to new array, add 11th element
+
+
+🔄 Ways to create ArrayList
+Here are the main ways to create an ArrayList in Java, important for placements:
+
+1️⃣ Default Constructor (Empty ArrayList)
+ArrayList<String> list = new ArrayList<>();
+👉 Creates an empty ArrayList with an initial capacity of 10 by default.
+
+
+2️⃣ Constructor with Initial Capacity
+ArrayList<String> list = new ArrayList<>(50);
+👉 Creates an empty ArrayList but with specified initial capacity to optimize resizing if size is known.
+
+
+3️⃣ Constructor with Collection
+List<String> collection = Arrays.asList("A", "B", "C");
+ArrayList<String> list = new ArrayList<>(collection);
+👉 Creates an ArrayList initialized with elements from the specified collection.
+
+
+4️⃣ Using `Arrays.asList()` and Constructor
+ArrayList<String> list = new ArrayList<>(Arrays.asList("One", "Two", "Three"));
+👉 Initialize ArrayList from existing array elements conveniently.
+
+
+5️⃣ Using Java 9+ `List.of()` Factory Method
+ArrayList<String> list = new ArrayList<>(List.of("Alpha", "Beta", "Gamma"));
+👉 Creates an unmodifiable list, wrapped by ArrayList for modifiable access; requires Java 9+.
+
+
+6️⃣ Collecting from Stream
+List<String> list = Stream.of("x", "y", "z").collect(Collectors.toCollection(ArrayList::new));
+👉 Creates and collects elements from a Stream into a new ArrayList.
+
+
+🔄 Common Operations on ArrayList
+Here is a comprehensive overview of common operations on ArrayList in Java, covering typical usage you'll need for placements:
+
+1️⃣ Add Elements
+➤ list.add(10); ─────────▶ add element at the end
+➤ list.add(1, 20); ─────────▶ insert element at index 1
+➤ list.addAll(otherList); ─────────▶ add all elements from another collection
+
+2️⃣ Access Elements
+➤ int x = list.get(0); ─────────▶ get element at index 0
+
+3️⃣ Update Elements
+➤ list.set(1, 50); ─────────▶ update element at index 1
+
+4️⃣ Remove Elements
+➤ list.remove(2); ─────────▶ remove element at index 2
+➤ list.remove(Integer.valueOf(10)); ─────────▶ remove first occurrence of value 10
+➤ list.clear(); ─────────▶ remove all elements
+
+5️⃣ Search Operations
+➤ boolean present = list.contains(30); ─────────▶ check if element exists
+➤ int idx = list.indexOf(50); ─────────▶ get first occurrence index of element 50
+➤ int lastIdx = list.lastIndexOf(50); ─────────▶ get last occurrence index
+
+6️⃣ Iteration
+    1️⃣ For-each loop 
+    for(Integer val : list) { System.out.println(val); }
+
+    2️⃣ Using Iterator  
+    Iterator<Integer> it = list.iterator();
+    while(it.hasNext()) System.out.println(it.next());
+
+    
+    3️⃣ Using ListIterator (forward & backward)
+    ListIterator<Integer> itr = list.listIterator();
+    while(itr.hasNext()) System.out.println(itr.next());
+    while(itr.hasPrevious()) System.out.println(itr.previous());
+
+    
+    4️⃣ Using forEach + Lambda
+    list.forEach(System.out::println);
+
+    
+7️⃣ Size & Capacity
+➤ int size = list.size(); ─────────▶ get current size
+➤ boolean empty = list.isEmpty(); ─────────▶ check if empty
+
+
+8️⃣ Conversion
+    1️⃣ rrayList to Array:
+    Integer[] arr = list.toArray(new Integer[0]);
+
+    2️⃣ Array to ArrayList:
+    ArrayList<Integer> list = new ArrayList<>(Arrays.asList(arr));
+
+
+===============
+🔷 Comparator
+===============
+A comparator in Java is a functional interface used to define custom ordering logic for objects. It belongs to the java.util package and provides a way to compare two objects to determine their relative ordering, which is essential for sorting collections of objects by criteria different from their natural ordering.
+
+
+🔄 What is Comparator?
+➤ Interface: Comparator<T> is a generic interface that compares two objects of type T.
+➤ Purpose: Used to create custom sort orders for collections (like List, TreeSet, or arrays) separate from the object's natural order defined by Comparable.
+➤ Functional Method: Must implement the method:
+        int compare(T o1, T o2);
+    ✔️ Returns a negative integer if o1 should come before o2.
+    ✔️ Returns zero if they are considered equal in ordering.
+    ✔️ Returns a positive integer if o1 should come after o2.
+
+
+🔄 Why Use Comparator?➤
+➤ When you want to sort objects by multiple or dynamic fields.
+➤ When the class of the objects does not implement Comparable, or you want to provide an alternative ordering.
+➤ Helpful for sorting on fields other than the natural ordering, for example, by age, name, or salary.
+
+
+🔄 How to Implement Comparator?
+1️⃣ Separate class implementation:
+    class StudentAgeComparator implements Comparator<Student> {
+        public int compare(Student s1, Student s2) {
+            return s1.getAge()  s2.getAge(); *// Ascending order by age*
+        }
+    }
+   
+ 
+2️⃣ Anonymous class instance:
+    Comparator<Student> comp = new Comparator<>() {
+        public int compare(Student s1, Student s2) {
+            return s1.getName().compareTo(s2.getName());
+        }
+    };
+   
+    
+3️⃣ Lambda expression (Java 8+):
+    Comparator<Student> comp = (s1, s2) > s1.getId()  s2.getId();
+   
+    
+4️⃣ Using method references and Comparator utility methods:
+    list.sort(Comparator.comparing(Student::getName).thenComparing(Student::getAge));
+   
+    
+🔄 Methods in Comparator Interface
+✔️ compare(T o1, T o2): Core comparison method.
+✔️ thenComparing: Compose comparators for multilevel sorting.
+✔️ reversed(): Returns a comparator that imposes the reverse ordering.
+✔️ equals(Object obj): Checks equality of comparators.
+
+
+🔄 Usage Examples
+List<Student> students = new ArrayList<>();
+students.add(new Student("Ajay", 27));
+students.add(new Student("Sneha", 23));
+students.add(new Student("Simran", 37));
+
+ Sort by age ascending
+students.sort(Comparator.comparing(Student::getAge));
+
+ Sort by name ascending, then age
+students.sort(Comparator.comparing(Student::getName).thenComparing(Student::getAge));
+
+
+⚡ Important Points
+➤ Comparator enables flexible, powerful sorting beyond an object's natural order.
+➤ Commonly combined with Collections.sort(), Arrays.sort(), or stream operations.
+➤ Understanding Comparator is crucial for solving complex ordering problems and writing clean, maintainable code.
+
+
+###############
+🔷 LinkedList
+###############
+➤ LinkedList is an implementation of the List and Deque interfaces using a doubly linked list data structure.
+➤ It stores elements in nodes where each node contains the data and references to the previous and next nodes.
+➤ Located in the java.util package.
+
+
+🔄 Key Characteristics
+➤ Doubly Linked List: Each element points to both the next and previous nodes.
+➤ Non-contiguous memory allocation: Nodes can be anywhere in memory, linked by pointers.
+➤ Maintains insertion order.
+➤ Allows duplicate and null elements.
+➤ Implements `List`, `Deque`, and `Queue` interfaces, so it supports stack, queue, and deque operations
+
+
+🔄 LinkedList Constructors in Java
+The LinkedList class provides multiple constructors to create instances of linked lists:
+
+1️⃣ Default Constructor
+    LinkedList<E> list = new LinkedList<>();
+➤ Creates an empty linked list.
+➤ Internally initializes the list with no elements.
+
+
+2️⃣ Constructor with Collection
+    Collection<? extends E> c;
+    LinkedList<E> list = new LinkedList<>(c);
+
+➤ Creates a linked list containing the elements of the specified collection, in the order they are returned by the collection's iterator.
+➤ Useful for copying or converting collections into a LinkedList.
+
+
+🔄 Core Advantages
+➤ Efficient insertions and deletions anywhere in the list, especially at the beginning or middle (O(1) if node is known).
+➤ No need to resize like ArrayList.
+➤ Useful when frequent add/remove operations at ends or middle are needed.
+
+
+🔄 Disadvantages
+➤ Slower random access (O(n)) since it requires traversal from the start or end.
+➤ More memory overhead than ArrayList due to storing node pointers.
+
+
+🔄 Important Methods
+➤ add(E e) ─────────▶ Append element at end.
+➤ add(int index, E element) ─────────▶ Insert at specific position.
+➤ addFirst(E e) ─────────▶ Add at the beginning.
+➤ addLast(E e) ─────────▶ Add at the end.
+➤ get(int index) ─────────▶ Get element by index (O(n)).
+➤ getFirst(), getLast() ─────────▶ Get first and last elements.
+➤ remove(), removeFirst(), removeLast() ─────────▶ Remove elements.
+➤ contains(Object o) ─────────▶ Check existence.
+➤ size() ─────────▶ Get total elements.
+➤ clear() ─────────▶ Clear all elements.
+➤ iterator(), listIterator() ─────────▶ For traversal.
+➤ offer(), poll(), peek() ─────────▶ Queue operations.
+
+
+🔄 Performance Complexity
+| **Operation**              | **LinkedList Complexity**                 | **ArrayList Complexity**    |
+| -------------------------- | ----------------------------------------- | --------------------------- |
+| **Access by index**        | **O(n)**                                  | **O(1)**                    |
+| **Add at end**             | **O(1)**                                  | **O(1) amortized**          |
+| **Add at beginning**       | **O(1)**                                  | **O(n)**                    |
+| **Add / remove in middle** | **O(n)** to traverse + **O(1)** to modify | **O(n)** (element shifting) |
+| **Remove by value**        | **O(n)**                                  | **O(n)**                    |
+| **Search (contains)**      | **O(n)**                                  | **O(n)**                    |
+
+
+🔄 Use Cases
+➤ When you require frequent insertions/deletions not just at the end of the list.
+➤ Implementing stacks, queues, or deques where add/remove at both ends are common.
+➤ When random access is not a priority.
+
+
+✅ Example Code
+LinkedList<String> list = new LinkedList<>();
+
+// Adding elements
+list.add("Apple");
+list.addFirst("Mango");  // Add at start
+list.addLast("Banana");  // Add at end// Accessing elements
+String first = list.getFirst(); // Mango
+String last = list.getLast();   // Banana
+String second = list.get(1);    // Apple// Removing elements
+list.removeFirst();
+list.removeLast();
+list.remove("Apple");
+
+// Iterating
+for(String fruit : list) {
+    System.out.println(fruit);
 }
 
-✅Methods of Vector
-➤ add(E e): Add an element to the end of the vector.
-➤ add(int index, E element): Insert an element at a specific index.
-➤ get(int index): Retrieve an element at a specific index.
-➤ set(int index, E element): Replace an element at a specific index.
-➤ remove(int index): Remove an element at a specific index.		
-➤ remove(Object o): Remove the first occurrence of the specified element.
-➤ size(): Return the number of elements in the vector.
-➤ isEmpty(): Check if the vector is empty.
-➤ contains(Object o): Check if the vector contains a specific element.
-➤ clear(): Remove all elements from the vector.
+
+## Difference Between ArrayList and LinkedList
+| **Feature**                  | **ArrayList**                      | **LinkedList**                      |
+| ---------------------------- | ---------------------------------- | ----------------------------------- |
+| **Data structure**           | Resizable dynamic array            | Doubly linked list                  |
+| **Access time**              | **O(1)** random access             | **O(n)** sequential access          |
+| **Memory overhead**          | Less (contiguous memory)           | More (stores node pointers)         |
+| **Insert / delete (middle)** | **O(n)** due to shifting           | **O(1)** if node reference is known |
+| **Insert / delete (ends)**   | **O(1)** amortized at end          | **O(1)** at both ends               |
+| **Cache locality**           | Good (contiguous memory)           | Poor                                |
+| **Use case**                 | Frequent reads, rare modifications | Frequent insertions/deletions       |
+
+
+
+#############
+🔷 Vectors
+#############
+➤ Vector is a class in the Java Collections Framework that implements a dynamic array similar to ArrayList but is synchronized (thread-safe).
+➤ It is present in the `java.util` package.
+➤ Grows automatically as elements are added.
+
+🔄 Key Features
+➤ Resizable array: Like ArrayList, Vector can grow dynamically.
+➤ Thread-safe: All methods of Vector are synchronized, making it safe for concurrent access by multiple threads.
+➤ Maintains insertion order.
+➤ Allows duplicate and null elements.
+➤ Implements List, RandomAccess, Cloneable, and Serializable interfaces.
+
+
+🔄 Internal Working
+➤ Uses an internal array (elementData) to store elements.
+➤ Initial capacity is typically 10 elements by default.
+➤ When capacity is exceeded, Vector doubles its size (unlike ArrayList which grows by 50%).
+➤ Due to synchronization, Vector has overhead compared to ArrayList.
+
+
+🔄 Vector Constructors in Java
+Vector class includes constructors to initialize vectors:
+1️⃣ Default Constructor
+    Vector<E> vector = new Vector<>();
+➤ Creates an empty vector with an initial capacity of 10.
+
+2️⃣ Constructor with Initial Capacity   
+    Vector<E> vector = new Vector<>(int initialCapacity);
+➤ Creates an empty vector with specified initial capacity.
+
+3️⃣ Constructor with Initial Capacity and Capacity Increment   
+    Vector<E> vector = new Vector<>(int initialCapacity, int capacityIncrement);
+➤ Capacity increment specifies by how much capacity is increased when the vector overflows.
+➤ If capacityIncrement is 0, it doubles the size (default behavior).
+
+4️⃣ Constructor with Collection    
+    Collection<? extends E> c;
+    Vector<E> vector = new Vector<>(c);
+➤ Constructs a vector containing the elements of the specified collection, in the order they are returned by the collection's iterator.
+
+
+🔄 Important Methods
+➤ add(E e) ─────────▶ Add element at the end.
+➤ add(int index, E element) ─────────▶ Add element at a given position.
+➤ get(int index) ─────────▶ Access element by index.
+➤ set(int index, E element) ─────────▶ Update element at index.
+➤ remove(int index) ─────────▶ Remove element at index.
+➤ size() ─────────▶ Returns number of elements.
+➤ capacity() ─────────▶ Returns current capacity of the vector.
+➤ clear() ─────────▶ Removes all elements.
+➤ elementAt(int index) ─────────▶ Similar to get().
+➤ firstElement(), lastElement() ─────────▶ Access first and last elements.
+
+
+🔄 Performance and Usage
+| **Operation**                 | **Vector Time Complexity** | **Notes**                                     |
+| ----------------------------- | -------------------------- | --------------------------------------------- |
+| **Access by index**           | **O(1)**                   | Fast random access via internal array         |
+| **Insert at end**             | **O(1) amortized**         | Occasional resize creates a new array         |
+| **Insert / remove in middle** | **O(n)**                   | Elements must be shifted                      |
+| **Thread safety**             | **Synchronized**           | All public  methods are thread-safe but slower |
+
+
+🔄 Synchronization and Performance
+👉 Since vector methods are synchronized, it ensures that only one thread can access the vector at a time. This makes it thread-safe but cna introduce performance overhead in single-threaded environments because synchronization adds locking and unlocking costs.
+
+👉 In moder Java applications, ArrayList is generally preferred over Vector when synchronization isn't required. For thread-safe collections, the CopyOnWriteArrayList or ConcurrentHashMap from the java.util.concurrent package are often recommended.
+
+
+🔄 Difference between Vector and ArrayList
+| **Feature**         | **Vector**                               | **ArrayList**                                     |
+| ------------------- | ---------------------------------------- | ------------------------------------------------- |
+| **Synchronization** | Synchronized (thread-safe by default)    | Not synchronized                                  |
+| **Growth factor**   | Capacity typically **doubles** on resize | Capacity grows by **~50%**                        |
+| **Performance**     | Slower due to synchronization overhead   | Faster in single-threaded or read-heavy scenarios |
+
+
+🔄 When to Use Vector
+➤ When thread safety is required without external synchronization.
+➤ Legacy applications that already use Vector.
+➤ Replace with modern alternatives like CollectionssynchronizedList or CopyOnWriteArrayList if concurrency is required with better performance.
+
 
 ✅Code Implementation of Vector Methods
 import java.util.Vector;
@@ -1065,19 +1311,32 @@ Contains 'Apple'? false
 After clear: []
 Is vector empty after clear? true
 
-🔷 Synchronization and Performance
-👉 Since vector methods are synchronized, it ensures that only one thread can access the vector at a time. This makes it thread-safe but cna introduce performance overhead in single-threaded environments because synchronization adds locking and unlocking costs.
 
-👉 In moder Java applications, ArrayList is generally preferred over Vector when synchronization isn't required. For thread-safe collections, the CopyOnWriteArrayList or ConcurrentHashMap from the java.util.concurrent package are often recommended.
-
-🌟 Stack
-👉 Stack extends Vector, it is synchronized making it thread-safe.
-👉 LIFO structure: Stack follows the Last-In-First-Out(LIFO) principle, where the last element added is the first one to be removed.
-👉 Inheritance: Stack is a subclass of Vector, which means it inherits all the features of a dynamic array but is constrained by the stack's LIFO nature.
+==========
+🔷 Stack
+==========
+The Stack class in Java represents a last-in-first-out (LIFO) stack of objects. It extends the Vector class and provides five primary operations:
 
 
-✅Code Implementation
-📝Method 1
+🔄 Key Concepts of Java Stack
+➤ LIFO principle ─────────▶ Last element added is the first to be removed.
+➤ Synchronized ─────────▶ Thread-safe due to Vector inheritance.
+➤ Generic ─────────▶ Can hold any type of objects with generics.
+
+
+🔄 Constructors of Stack
+➤ Stack() ─────────▶ Creates an empty stack.
+
+
+🔄 Main Stack Methods
+➤ push(E item) ─────────▶ Adds an item to the top of the stack.
+➤ pop() ─────────▶ Removes and returns the top item; throws EmptyStackException if empty.
+➤ peek() ─────────▶ Returns the top item without removing it; throws EmptyStackException if empty.
+➤ empty() ─────────▶ Checks if the stack is empty.
+➤ search(Object o) ─────────▶ Returns 1-based position from the top; returns -1 if not found.
+
+
+✅Code Implementation 1️⃣
 package collections;
 
 import java.util.Stack;
@@ -1116,7 +1375,8 @@ public class StackDemo {
 	}
 }
 
-📝Method 2:
+
+✅Code Implementation 2️⃣: LinkedList as Stack
 package collections;
 
 import java.util.LinkedList;
@@ -1145,13 +1405,31 @@ public class StackDemo {
 	}
 }
 
-🌟 CopyOnWriteArrayList
-👉 Copy on Write means that whenever an element is added or removed from the ArrayList, a new copy is created. This ensures that the ArrayList remains thread-safe even if multiple threads are accessing it concurrently.
 
-👉 Read Operations: Fast and direct, since they happen on a stable list without interference from modifications.
-👉 Write Operations: A new copy of the list is created for every modification. 
-👉 The reference to the list is then updated so that subsequent reads use this new list.
-👉 Useful when read operations are more in comparison to write operations because on writing each time a new copy is created hence memory consumption take place.
+🔄 Performance
+➤ Inherits Vector's synchronized methods, being thread-safe but slower than ArrayDeque or LinkedList when used as stack.
+➤ Recommended to use Deque implementations (like ArrayDeque) for better performance and flexibility in modern applications.
+
+
+=========================
+🔷 CopyOnWriteArrayList
+=========================
+CopyOnWriteArrayList in Java is a thread-safe variant of ArrayList where all mutative operations (like add, set, remove) are implemented by making a fresh copy of the underlying array. It resides in the java.util.concurrent package and is designed for concurrent environments where reads heavily outnumber writes.
+
+
+🔄 Key Features
+➤ Thread safety ─────────▶ Safe to use concurrently without external synchronization.
+➤ Copy-on-write mechanism ─────────▶ Every update clones the internal array, so read operations are not blocked and can be performed without locking.
+➤ Iterator Snapshot ─────────▶ The iterator obtained from CopyOnWriteArrayList reflects the state of the list at the time it was created and will not see changes made after the iterator is created.
+➤ No ConcurrentModificationException ─────────▶ Modifications during iteration are safe and don't throw exceptions.
+➤ Costs ─────────▶ Copy-on-write comes with overhead on updates due to array copying. Therefore, it's best when reads dominate writes.
+
+
+🔄 Constructors:
+➤ CopyOnWriteArrayList() ─────────▶ Creates an empty list.
+➤ CopyOnWriteArrayList(Collection<? extends E> c) ─────────▶ Creates a list containing the elements of the specified collection, in order.
+➤ CopyOnWriteArrayList(E[] array) ─────────▶ Creates a list holding a copy of the given array.
+
 
 ❌ Problem with List and ArrayList
 package collections;
@@ -1203,7 +1481,20 @@ Meat
 The new udpated Array List
 [Milk, Eggs, Bread, Meat, Butter]
 
-🔷 Maps in Java
+
+🔄 Advantages
+➤ Ideal for cases with frequent reads and infrequent writes.
+➤ Avoids synchronization overhead during reads.
+➤ Simplifies concurrent programming by managing its own synchronization internally.
+
+🔄 Limitations
+➤ Not suitable for scenarios with frequent writes as copying arrays on each update is costly.
+➤ Iterator does not reflect latest changes made after iterator creation.
+
+
+=========
+🔷 Maps
+=========
 In Java, a Map is an object that maps keys to values. It cannot contain duplicate keys, and each key can map to at most one value. Thik of it as a dictionary where you look up a word(key ) to find its defintion(value).
 
 Map does not extends collection interface. It extends Map interface.
@@ -1314,7 +1605,7 @@ The key is passed through a hash function to generate a unique hash code(an inte
 The hash code is then used to calculate an index in the array(bucket location) using
 int index= hashCode % array.length;
 The index decides which bucket will hold the key-value pair.
-✅ For example: If the array size is 16, the key's hash code will be divided by `16, and the remainder will be the index.
+✅ For example: If the array size is 16, the key's hash code will be divided by 16, and the remainder will be the index.
 
 ⚡ Step 3: Storing in the Bucket:
 The key-value pair is stored in the bucket at the calculated index.
@@ -1831,8 +2122,8 @@ class NameComparator implements Comparator<Student> {
 | ------------------- | --------------------------------------- | --------------------------------------------------- |
 | Package             | `java.lang`                             | `java.util`                                         |
 | Method              | `compareTo(Object o)`                   | `compare(Object o1, Object o2)`                     |
-| Sorting logic       | Defined **inside the class**            | Defined **outside the class**                       |
-| Natural Order       | Provides **default (natural)** ordering | Provides **custom/multiple** orderings              |
+| Sorting logic       | Defined inside the class            | Defined outside the class                       |
+| Natural Order       | Provides default (natural) ordering | Provides custom/multiple orderings              |
 | Modifies class code | Yes (must implement inside class)       | No (separate comparator class or lambda)            |
 | One vs Many         | One natural order only                  | Many possible comparators                           |
 | Java 8 support      | No enhancements                         | Added `comparing()`, `thenComparing()` for chaining |
@@ -3795,7 +4086,7 @@ What is Mutable and Immutable class
 🧠 Mutable vs Immutable Classes
 | Property        | Immutable Class                             | Mutable Class                             |
 | --------------- | ------------------------------------------- | ----------------------------------------- |
-| Definition      | Object **cannot be changed** after creation | Object **can be modified** after creation |
+| Definition      | Object cannot be changed after creation | Object can be modified after creation |
 | Example         | `String`                                    | `StringBuilder`, `StringBuffer`           |
 | Thread-safe?    | Yes (`String`)                              | Only `StringBuffer` is thread-safe        |
 | Performance     | Slower (new object on change)               | Faster for frequent modifications         |
@@ -3803,19 +4094,19 @@ What is Mutable and Immutable class
 
 
 🔷 StringBuilder and StringBuffer
-| Feature                 | **StringBuilder**                             | **StringBuffer**                       |
+| Feature                 | StringBuilder                             | StringBuffer                       |
 | ----------------------- | --------------------------------------------- | -------------------------------------- |
-| **Mutability**          | Mutable                                       | Mutable                                |
-| **Thread Safety**       | ❌ Not thread-safe                            | ✔️ Thread-safe (synchronized)         |
-| **Performance**         | Faster                                        | Slower (sync overhead)                 |
-| **Use Case**            | Single-thread environment                     | Multi-thread environment               |
-| **Synchronization**     | No                                            | Yes (all methods synchronized)         |
-| **Introduced In**       | Java 5 (JDK 1.5)                              | Java 1.0                               |
-| **Default Capacity**    | 16 chars                                      | 16 chars                               |
-| **Expansion Mechanism** | `(oldCapacity * 2) + 2`                       | Same                                   |
-| **Efficiency in Loops** | More efficient                                | Less efficient due to locking          |
-| **toString() Behavior** | Returns string of internal buffer             | Same                                   |
-| **Suitable For**        | Heavy modifications in single-thread programs | Modifications in multi-thread programs |
+| Mutability          | Mutable                                       | Mutable                                |
+| Thread Safety       | ❌ Not thread-safe                            | ✔️ Thread-safe (synchronized)         |
+| Performance         | Faster                                        | Slower (sync overhead)                 |
+| Use Case            | Single-thread environment                     | Multi-thread environment               |
+| Synchronization     | No                                            | Yes (all methods synchronized)         |
+| Introduced In       | Java 5 (JDK 1.5)                              | Java 1.0                               |
+| Default Capacity    | 16 chars                                      | 16 chars                               |
+| Expansion Mechanism | `(oldCapacity * 2) + 2`                       | Same                                   |
+| Efficiency in Loops | More efficient                                | Less efficient due to locking          |
+| toString() Behavior | Returns string of internal buffer             | Same                                   |
+| Suitable For        | Heavy modifications in single-thread programs | Modifications in multi-thread programs |
 
 
 ✅ Code Example Showing StringBuilder Functioning (Fast, Non-Synchronized)
