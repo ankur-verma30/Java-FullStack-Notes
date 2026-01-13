@@ -2785,85 +2785,241 @@ public class ImmutableMapDemo3 {
 Map.ofEntries: {A=1, B=2, C=3, D=4}
 
  
-
+========
  🔷 Set
-➤ Set is a collection of unique elements (no duplicates).
-➤ Unordered by default (HashSet).
-➤ Extends Collection interface.
-➤ Not thread-safe by default.
-
-🔄 Common Implementations:
-➤ HashSet ─────────▶ backed by HashMap, no order guarantee.
-➤ LinkedHashSet ─────────▶ maintains insertion order.
-➤ TreeSet ─────────▶ maintains sorted order (uses Red-Black Tree).
-➤ EnumSet ─────────▶ optimized for enum constants.
-
-👉 For thread-safety, we have special implementations:
-➤ Collections.synchronizedSet(set) ─────────▶ synchronized wrapper (rarely used).
-➤ ConcurrentSkipListSet ─────────▶ concurrent + sorted.
-➤ CopyOnWriteArraySet ─────────▶ concurrent + copy-on-write
+========
+In the Java Collections Framework, the Set interface (java.util.Set) represents a collection that cannot contain duplicate elements. It models the mathematical set abstraction.
 
 
+🔄 Key Characteristics
+1️⃣ No Duplicates ─────────▶ The primary feature. If you try to add an element that is already present, the add() method returns false and the set remains unchanged.
+
+2️⃣ Mathematical Operations ─────────▶ It provides methods for standard set operations like Union, Intersection, and Difference.
+
+3️⃣ Order ─────────▶ The Set interface itself does not guarantee any specific order of elements (though some implementations like LinkedHashSet or TreeSet do).
+
+4️⃣ Implementation ─────────▶ Like Map, Set is an interface, so you cannot instantiate it directly. You must use a concrete class.
+
+
+🔄 How Set Prevents Duplicates
+Internally, almost all Set implementations in Java are backed by a corresponding Map.
+1️⃣ When you add an element to a HashSet, it actually adds that element as a Key in an internal HashMap.
+
+2️⃣Since Map keys must be unique, the Set inherits this behavior. A "dummy" object is used as the constant Value for every key.
+
+
+🔄 Core Methods
+Since Set extends the Collection interface, it contains all the standard collection methods, but their behavior is strictly governed by the "no-duplicate" rule.
+
+🔄 Basic Operations
+🔗 boolean add(E e) ─────────▶ Adds the element if it is not already present.
+
+🔗 boolean remove(Object o) ─────────▶ Removes the specified element.
+
+🔗 boolean contains(Object o) ─────────▶ Returns true if the set contains the element.
+
+🔗 int size() ─────────▶ Returns the number of elements.
+
+
+🔄 Bulk Operations (Set Theory)
+1️⃣ Union ─────────▶ s1.addAll(s2) — Transforms s1 into the union of s1 and s2.
+
+2️⃣ Intersection ─────────▶ s1.retainAll(s2) — Transforms s1 into the intersection (only elements present in both).
+
+3️⃣ Difference ─────────▶ s1.removeAll(s2) — Removes from s1 all elements found in s2.
+
+
+🔁 The SortedSet and NavigableSet Interfaces
+While Set is the base, there are two important sub-interfaces
+1️⃣ SortedSet ─────────▶ Guarantees that elements are maintained in ascending order (either natural or via a Comparator).
+
+2️⃣ NavigableSet ─────────▶ Extends SortedSet with navigation methods like lower(), higher(), floor(), and ceiling() to find matches based on proximity.
+
+
+✅ Code Example: Basic Set Operations
+import java.util.*;
+
+public class SetInterfaceDemo {
+    public static void main(String[] args) {
+        // Using HashSet as the concrete implementation
+        Set<String> set = new HashSet<>();
+
+        // 1. Adding elements
+        set.add("Java");
+        set.add("Python");
+        set.add("C++");
+        
+        // 2. Attempting a duplicate
+        boolean isAdded = set.add("Java"); 
+        System.out.println("Was 'Java' added again? " + isAdded); // false
+
+        // 3. Mathematical Operations example
+        Set<Integer> a = new HashSet<>(Arrays.asList(1, 2, 3, 4));
+        Set<Integer> b = new HashSet<>(Arrays.asList(3, 4, 5, 6));
+
+        // Intersection
+        Set<Integer> intersection = new HashSet<>(a);
+        intersection.retainAll(b);
+        System.out.println("Intersection: " + intersection); // [3, 4]
+    }
+}
+
+
+🔄 Constraints and Considerations
+1️⃣ hashCode and equals ─────────▶ To work correctly in a Set, the objects you store must properly override hashCode() and equals(). If two objects are "equal" but have different hash codes, the Set will mistakenly allow both.
+
+2️⃣ Mutability ─────────▶ You must be very careful if you modify an object that is already inside a Set. If the modification changes the result of equals() or hashCode(), the Set may become "corrupted" (you won't be able to find or remove the element).
+
+
+====================
 🔷 LinkedHashSet
-➤ Hash table + doubly linked list implementation.
-➤ Maintains insertion order.
-➤ Slightly slower than HashSet due to maintaining linked list.
+====================
+LinkedHashSet is a specific implementation of the Set interface that provides a predictable iteration order while maintaining the unique property of a Set. It is the "ordered" version of HashSet.
 
-✅ Code Implementation:
+
+🔄 The Core Concept
+LinkedHashSet is physically a combination of a Hash Table and a Doubly-Linked List.
+1️⃣ Hash Table ─────────▶ Used for high-performance storage and $O(1)$ lookups.
+2️⃣ Doubly-Linked List ─────────▶ Used to maintain the insertion order of the elements.
+
+
+🔄 Internal Working
+The internal working of LinkedHashSet is very similar to HashSet, but with one key difference in how it uses the underlying Map
+1️⃣ Backed by LinkedHashMap ─────────▶ While HashSet uses a HashMap internally, LinkedHashSet uses a LinkedHashMap.
+2️⃣ Order Preservation ─────────▶ When you add an element, the LinkedHashMap creates an entry and links it to the previous element added. This creates a chain through all elements in the order they were inserted.
+3️⃣ Efficiency ─────────▶ Because it uses a hash table, it still provides O(1) time complexity for add, remove, and contains operations.
+
+
+🔄 Key Characteristics
+| Feature       | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| Duplicates    | ❌ Not allowed (inherits `Set` behavior)                          |
+| Null Elements | ✅ Allows one `null` element                                      |
+| Ordering      | Maintains **insertion order** during iteration                   |
+| Performance   | Slightly slower than `HashSet`, faster than `TreeSet`            |
+| Memory Usage  | Higher than `HashSet` due to linked list `before/after` pointers |
+
+
+✅ Code Implementation: HashSet vs. LinkedHashSet
+This example highlights the difference in iteration behavior.
+
 import java.util.*;
 
 public class LinkedHashSetDemo {
     public static void main(String[] args) {
-        LinkedHashSet<String> lhs = new LinkedHashSet<>();
+        // HashSet - Random Order
+        Set<String> hs = new HashSet<>();
+        hs.add("India");
+        hs.add("USA");
+        hs.add("Japan");
+        hs.add("Brazil");
+        System.out.println("HashSet (Random): " + hs);
 
-        lhs.add("Apple");
-        lhs.add("Banana");
-        lhs.add("Mango");
-        lhs.add("Banana"); // duplicate ignored
-
-        System.out.println("LinkedHashSet: " + lhs);
+        // LinkedHashSet - Insertion Order
+        Set<String> lhs = new LinkedHashSet<>();
+        lhs.add("India");
+        lhs.add("USA");
+        lhs.add("Japan");
+        lhs.add("Brazil");
+        System.out.println("LinkedHashSet (Ordered): " + lhs);
     }
 }
+✅ Output
+HashSet (Random): [USA, Japan, Brazil, India] 
+LinkedHashSet (Ordered): [India, USA, Japan, Brazil]
 
-✅ Output:
-LinkedHashSet: [Apple, Banana, Mango]
 
+🔄 When to Use LinkedHashSet
+You should choose LinkedHashSet when
+1️⃣ You need a collection of unique elements.
+2️⃣ The order in which you add elements must be preserved (e.g., a "Recently Viewed Products" list where you don't want duplicates).
+3️⃣ You are willing to trade a small amount of memory/performance for that ordering.
+
+
+🔄 Compared to Other Set Implementations
+| Feature                 | HashSet                      | LinkedHashSet                  | TreeSet                 |
+| ----------------------- | ---------------------------- | ------------------------------ | ----------------------- |
+| Ordering                | No ordering                  | Insertion order                | Natural / Sorted order  |
+| Internal Data Structure | Hash table                   | Hash table + linked list       | Red-Black Tree          |
+| Search Time             | **O(1)** (average)           | **O(1)** (average)             | **O(log n)**            |
+| Null Elements           | Allows one `null`            | Allows one `null`              | ❌ Does not allow `null` |
+| Performance             | Fastest                      | Slightly slower than `HashSet` | Slowest among three     |
+| Use Case                | Fast lookup, no order needed | Order matters                  | Sorted data required    |
+
+
+============
 🔷 TreeSet
-➤ Backed by a Red-Black Tree (self-balancing BST).
-➤ Maintains sorted order (ascending by default).
-➤ Can accept a Comparator for custom order.
+============
+TreeSet is a concrete implementation of the NavigableSet interface, which in turn extends SortedSet. Unlike HashSet, it guarantees that the elements will be in a specific, sorted order.
 
-✅ Code Implementation:
+🔄 The Core Concept
+TreeSet stores its elements in a Red-Black Tree (a type of self-balancing binary search tree).
+    ✔️ Sorted Order ─────────▶ Elements are stored in their "natural" ascending order (like 1, 2, 3 or A, B, C) or according to a custom Comparator provided at creation time.
+    ✔️ Internal Map ─────────▶ Similar to HashSet being backed by HashMap, TreeSet is internally backed by a TreeMap.
+
+
+🔄 Key Characteristics
+| Feature            | Description                                                               |
+| ------------------ | ------------------------------------------------------------------------- |
+| Duplicates         | ❌ Not allowed                                                             |
+| Null Elements      | ❌ Does not allow `null` (throws `NullPointerException` due to comparison) |
+| Performance        | **O(log n)** for `add`, `remove`, and `contains`                          |
+| Ordering           | Always sorted (natural order or custom `Comparator`)                      |
+| Thread Safety      | ❌ Not synchronized / not thread-safe                                      |
+| Internal Structure | Red-Black Tree                                                            |
+
+
+🔄 Navigation Methods
+Because TreeSet implements NavigableSet, it provides powerful methods to find elements relative to a target:
+🔗 first() / last() ─────────▶ Returns the smallest and largest elements.
+
+🔗 lower(e) / higher(e) ─────────▶ Returns the greatest element strictly less than e, or the least element strictly greater than e.
+
+🔗 floor(e) / ceiling(e) ─────────▶ Same as lower/higher, but includes equality (returns e if it exists in the set).
+
+🔗 pollFirst() / pollLast() ─────────▶ Retrieves and removes the first or last element.
+
+
+🔄 How TreeSet Determines Equality
+Crucial Distinction ─────────▶ HashSet uses .equals() and .hashCode() to identify duplicates. TreeSet does not.
+    ✔️ TreeSet uses the compareTo() (or compare()) method.
+    ✔️ If a.compareTo(b) == 0, TreeSet considers them duplicates and will not add the second one, even if a.equals(b) is false.
+
+❌ Warning ─────────▶ To ensure your TreeSet behaves correctly, your compareTo logic should be consistent with your equals logic.
+
+
+✅ Code Example: Natural vs. Custom Sorting
 import java.util.*;
 
 public class TreeSetDemo {
     public static void main(String[] args) {
-        TreeSet<Integer> ts = new TreeSet<>();
+        // 1. Natural Sorting (Integers)
+        TreeSet<Integer> numbers = new TreeSet<>();
+        numbers.add(50);
+        numbers.add(10);
+        numbers.add(30);
+        numbers.add(30); // Duplicate, ignored
+        
+        System.out.println("Sorted Numbers: " + numbers); // [10, 30, 50]
 
-        ts.add(30);
-        ts.add(10);
-        ts.add(20);
-        ts.add(40);
+        // 2. Navigation
+        System.out.println("Closest below 35: " + numbers.floor(35)); // 30
+        System.out.println("Higher than 10: " + numbers.higher(10)); // 30
 
-        System.out.println("TreeSet: " + ts); // Sorted order
-        System.out.println("First: " + ts.first());
-        System.out.println("Last: " + ts.last());
-        System.out.println("HeadSet(<30): " + ts.headSet(30));
-        System.out.println("TailSet(>=20): " + ts.tailSet(20));
-        System.out.println("SubSet(10 to 30): " + ts.subSet(10, 30));
+        // 3. Custom Sorting (Descending Order)
+        TreeSet<String> names = new TreeSet<>(Comparator.reverseOrder());
+        names.add("Alice");
+        names.add("Charlie");
+        names.add("Bob");
+        
+        System.out.println("Reverse Names: " + names); // [Charlie, Bob, Alice]
     }
 }
 
-✅ Output:
-TreeSet: [10, 20, 30, 40]
-First: 10
-Last: 40
-HeadSet(<30): [10, 20]
-TailSet(>=20): [20, 30, 40]
-SubSet(10 to 30): [10, 20]
 
-
+===========================
 🔷 ConcurrentSkipListSet
+===========================
 ➤ A concurrent, sorted, thread-safe set.
 ➤ Backed by ConcurrentSkipListMap internally.
 ➤ Maintains ascending sorted order.
@@ -2895,7 +3051,10 @@ HeadSet(<40): [10, 20]
 TailSet(>=20): [20, 40, 50]
 SubSet(10 to 40): [10, 20]
 
+
+========================
 🔷 CopyOnWriteArraySet
+========================
 ➤ Backed by CopyOnWriteArrayList.
 ➤ Thread-safe set.
 ➤ On every write operation (add/remove) ─────────▶ creates a new copy of the underlying array.
@@ -2935,8 +3094,6 @@ public class CopyOnWriteArraySetDemo {
         System.out.println("After modification: " + cowSet); // "Go" appears in actual set
     }
 }
-
-
 ✅ Output:
 CopyOnWriteArraySet: [Java, Python, C++]
 Iterator Snapshot:
@@ -2946,101 +3103,114 @@ C++
 After modification: [Java, Python, C++, Go]
 
 
+=======================
 🔷 Queue Interface
-➤ A linear data structure that works on FIFO (First In First Out) principle.
-➤ Elements are added at the end (rear) and removed from the front (head).
-➤ Declared in java.util package.
-➤ Common implementations:
-	✔️ LinkedList
-	✔️ PriorityQueue
-	✔️ ArrayDeque
-	✔️ Concurrent Queues (ConcurrentLinkedQueue, BlockingQueue, etc.)
+=======================
+The Queue interface (java.util.Queue) is a collection designed for holding elements prior to processing. It typically (but not necessarily) orders elements in a FIFO (First-In-First-Out) manner.
 
-✅ Common Queue Methods
-| Method      | Description     | Behavior when queue is empty / full      |
-| ----------- | --------------- | ---------------------------------------- |
-| `add(e)`    | Inserts element | Throws exception if full                 |
-| `offer(e)`  | Inserts element | Returns `false` if full (no exception)   |
-| `remove()`  | Removes head    | Throws `NoSuchElementException` if empty |
-| `poll()`    | Removes head    | Returns `null` if empty                  |
-| `element()` | Retrieves head  | Throws `NoSuchElementException` if empty |
-| `peek()`    | Retrieves head  | Returns `null` if empty                  |
+🔄 Key Characteristics
+1️⃣ Ordering ─────────▶ Most queues are FIFO, where the element added first is the one removed first. Exceptions include PriorityQueue (ordered by priority) and LIFO stacks (if used via a Deque implementation).
+
+2️⃣ Insert/Remove/Inspect ─────────▶ The interface provides two methods for each of these three operations—one that throws an exception if the operation fails, and one that returns a special value (null or false).
+
+3️⃣ Null Elements ─────────▶ Most implementations (like LinkedList or PriorityQueue) discourage or forbid null elements because null is used as a special return value by the poll() and peek() methods.
 
 
-✅Code Implementation:
+🔄 Core Methods
+The Queue interface is unique because it offers two forms for every operation to allow for different error-handling styles.
+| Operation Type     | Throws Exception                                       | Returns Special Value                |
+| ------------------ | ------------------------------------------------------ | ------------------------------------ |
+| Insert (at tail)   | `add(e)` → throws `IllegalStateException` if full      | `offer(e)` → returns `false` if full |
+| Remove (from head) | `remove()` → throws `NoSuchElementException` if empty  | `poll()` → returns `null` if empty   |
+| Examine (head)     | `element()` → throws `NoSuchElementException` if empty | `peek()` → returns `null` if empty   |
+
+
+🔄 Queue Hierarchy
+The Queue interface is the root for several specialized sub-interfaces and implementations:
+1️⃣ Deque (Double Ended Queue): Extends Queue to allow insertion and removal from both ends.
+
+2️⃣ BlockingQueue: Used in concurrent programming; methods wait for the queue to become non-empty when retrieving or wait for space to become available when storing.
+
+3️⃣ PriorityQueue: An implementation where elements are ordered according to their natural ordering or a custom Comparator.
+
+
+✅ Code Example: Basic Queue Operations
 import java.util.*;
 
 public class QueueDemo {
     public static void main(String[] args) {
-        Queue<Integer> q = new LinkedList<>();
+        // Using LinkedList as a Queue
+        Queue<String> queue = new LinkedList<>();
 
-        // Enqueue (add/offer)
-        q.add(10);       // throws exception if fails
-        q.offer(20);     // returns false if fails
-        q.add(30);
+        // 1. Enqueue (Add elements)
+        queue.add("Patient 1");
+        queue.offer("Patient 2");
+        queue.offer("Patient 3");
 
-        System.out.println("Queue: " + q);
+        System.out.println("Queue: " + queue);
 
-        // Peek operations
-        System.out.println("Peek: " + q.peek());     // returns 10, does not remove
-        System.out.println("Element: " + q.element()); // returns 10, throws exception if empty
+        // 2. Peek (Look at the head without removing)
+        System.out.println("Head of queue: " + queue.peek()); 
 
-        // Dequeue (remove/poll)
-        System.out.println("Removed using poll: " + q.poll());   // removes 10
-        System.out.println("Removed using remove: " + q.remove()); // removes 20
+        // 3. Dequeue (Remove elements from the head)
+        System.out.println("Removed: " + queue.poll()); // Removes Patient 1
+        
+        System.out.println("Queue after poll: " + queue);
 
-        System.out.println("Queue after removals: " + q);
-
-        // Edge cases
-        q.clear(); // empty queue
-        System.out.println("Poll on empty: " + q.poll());   // null
-        try {
-            System.out.println("Remove on empty: " + q.remove()); // exception
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
+        // 4. Iterating
+        System.out.println("Remaining Patients:");
+        for (String patient : queue) {
+            System.out.println("- " + patient);
         }
     }
 }
 
-✅ Output:
-Queue: [10, 20, 30]
-Peek: 10
-Element: 10
-Removed using poll: 10
-Removed using remove: 20
-Queue after removals: [30]
-Poll on empty: null
-Remove on empty: java.util.NoSuchElementException
+
+🔄 When to use a Queue?
+    ✔️ Messaging Systems ─────────▶ To handle tasks in the order they were received.
+    ✔️ Breadth-First Search (BFS) ─────────▶ In graph algorithms to track nodes to visit.
+    ✔️ Buffer Management ─────────▶ For IO operations or printer spooling where data is produced faster than it is consumed.
 
 
-🔷 PriorityQueue in Java
-A Queue implementation that orders elements by priority instead of FIFO.
-Located in java.util package.
-By default:
-	✔️ Uses natural ordering (ascending for numbers, alphabetical for strings).
-	✔️ Internally implemented as a Min-Heap (binary heap).
-Key Features:
-	✔️ Does not allow null elements.
-	✔️ Duplicate elements are allowed.
-	✔️ Can use a custom Comparator to define ordering (e.g., Max-Heap).
+🔄 Common Implementations
+| Class           | Internal Structure          | Ordering       |
+| --------------- | --------------------------- | -------------- |
+| `LinkedList`    | Doubly linked list          | FIFO           |
+| `PriorityQueue` | Priority heap (binary heap) | Priority-based |
+| `ArrayDeque`    | Resizable array             | FIFO / LIFO    |
 
 
-🌟 Internal Working
-➤ Implemented using a binary heap stored in an array.
-➤ For natural ordering ─────────▶ acts as a Min-Heap.
-➤ For reverse order (Comparator.reverseOrder()) ─────────▶ acts as a Max-Heap.
-➤ Operations like insertion and deletion work in O(log n).
-➤ The head element of the queue is always the smallest (min-heap) or largest (max-heap) based on comparator.
+===================
+🔷 PriorityQueue
+===================
+PriorityQueue is a specialized implementation of the Queue interface. Unlike a standard queue that follows FIFO (First-In-First-Out), a PriorityQueue processes elements based on their priority.
 
 
-🌟Common Methods
-| Method                | Description                                       |
-| --------------------- | ------------------------------------------------- |
-| `add(e)` / `offer(e)` | Insert element                                    |
-| `peek()`              | Returns highest-priority element without removing |
-| `poll()`              | Removes and returns highest-priority element      |
-| `remove()`            | Removes head, throws exception if empty           |
-| `size()`              | Returns number of elements                        |
+🔄 The Core Concept
+In a PriorityQueue, every element has an associated priority.
+➤ Elements with higher priority are served before elements with lower priority.
+➤ By default (Natural Ordering), the smallest element is considered the highest priority (e.g., the number 1 comes out before 10).
+➤ You can provide a custom Comparator to define your own priority logic (e.g., the largest number first).
+
+
+🔄 Internal Working: The Binary Heap
+Internally, PriorityQueue is not a sorted list. It is implemented using a Priority Heap (specifically a Min-Heap by default).
+➤ Structure ─────────▶ It is a balanced binary tree stored in an array.
+➤ The Heap Property ─────────▶ In a Min-Heap, for any given node, the value of that node is less than or equal to the values of its children. This ensures that the root (index 0) is always the smallest element.
+➤ Efficiency ─────────▶ * Insert (offer) ─────────▶ O(log n) (requires "bubbling up" the element).
+    ✔️ Remove Head (poll) ─────────▶ O(log n) (requires "sifting down" to restore heap property).
+    ✔️ Peek ─────────▶ O(1) (the smallest element is always at the root).
+
+
+🔄 Key Characteristics
+| Feature            | Description                                                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Duplicates         | ✅ Allowed                                                                                                                  |
+| Null Elements      | ❌ Not allowed (`NullPointerException` due to comparison requirement)                                                       |
+| Ordering           | Not globally sorted; only the **head** is guaranteed to be the minimum (or highest priority). Iteration order is undefined |
+| Thread Safety      | ❌ Not thread-safe (`PriorityBlockingQueue` for concurrent use)                                                             |
+| Internal Structure | Binary heap                                                                                                                |
+
 
 ✅Code Implementation 1:Natural Ordering (Min-Heap)
 import java.util.*;
@@ -3129,13 +3299,28 @@ public class PriorityQueueCustom {
     }
 }
 
-✅ Insights
-👉 PriorityQueue is not thread-safe ─────────▶ use PriorityBlockingQueue for concurrent cases.
-👉 Backed by a binary heap, not a balanced tree.
-👉 The iterator of PriorityQueue does not guarantee sorted order ─────────▶ only the head follows priority.
-👉 If ordering is important when iterating, use poll() repeatedly or move to a TreeSet/TreeMap.
 
+🔄 Why is the Iterator Not Sorted?
+➤ A common point of confusion is that if you print a PriorityQueue directly, the output looks unsorted: [10, 50, 30].
+➤ This is because the heap only guarantees the top element is the smallest.
+➤ The internal array arrangement satisfies the heap property but is not a fully sorted sequence.
+➤ To get elements in order, you must use poll() until the queue is empty.
+
+
+🔄 Queue vs PriorityQueue
+| Feature                       | LinkedList (as Queue)   | PriorityQueue             |
+| ----------------------------- | ----------------------- | ------------------------- |
+| Order                         | FIFO (insertion order)  | Priority-based            |
+| Internal Data Structure       | Doubly linked list      | Binary heap (array-based) |
+| Time Complexity (Head access) | **O(1)**                | **O(1)**                  |
+| Time Complexity (Insert)      | **O(1)**                | **O(log n)**              |
+| Null Elements                 | Allows `null`           | ❌ Does not allow `null`   |
+| Use Case                      | Simple queue processing | Priority-based scheduling |
+
+
+==============================
 🔷 Deque (Double Ended Queue)
+==============================
 ➤ A linear data structure that allows insertion & deletion at both ends (front & rear).
 ➤ More versatile than Queue and Stack:
     ✔️ Queue ─────────▶ Insert at rear, delete at front
@@ -3182,7 +3367,7 @@ Interface: Deque<E> (extends Queue<E> from java.util).
 🔗 iterator() ─────────▶ Iterates from front ─────────▶ end
 🔗 descendingIterator() ─────────▶ Iterates from end ─────────▶ front
 
-4. Example (Using ArrayDeque)
+✅ Example (Using ArrayDeque)
 import java.util.*;
 
 public class DequeExample {
@@ -3240,7 +3425,9 @@ System.out.println(stack.pop()); // removeFirst() ─────────▶
     ✔️ descendingIterator() ─────────▶ tail ─────────▶ head
 
 
-🔷 BlockingQueue in Java
+=================
+🔷 BlockingQueue
+=================
 ➤ Interface in java.util.concurrent package.
 ➤ A thread-safe queue designed for concurrent programming.
 ➤ Unlike normal queues:
@@ -3320,8 +3507,7 @@ public class BlockingQueueExample {
         consumer.join();
     }
 }
-
-🔹 Sample Output (Producer–Consumer)
+✅ Sample Output (Producer–Consumer)
 Producing: 1
 Consuming: 1
 Producing: 2
@@ -3343,7 +3529,9 @@ Consuming: 3  // Consumer frees space ─────────▶ Producer re
     ✔️ LinkedBlockingQueue
 
 
-🌟 LinkedBlockingQueue
+========================
+🔷 LinkedBlockingQueue
+========================
 ➤ A thread-safe blocking queue based on a linked list.
 ➤ Optionally bounded:
     ✔️ Default = unbounded (capacity = Integer.MAX_VALUE)
@@ -3419,7 +3607,9 @@ Null Allowed?            No                                       No
 ➤ ArrayBlockingQueue is preferred for predictable, bounded workloads with better memory efficiency.
 
 
-🌟 PriorityBlockingQueue
+=========================
+🔷 PriorityBlockingQueue
+=========================
 ➤,A thread-safe, unbounded blocking queue that orders elements based on:
     ✔️ Natural ordering (Comparable) at head OR
     ✔️ Custom Comparator provided at construction.
@@ -3500,7 +3690,10 @@ Consuming: 50
     ✔️ Task scheduling (e.g., priority-based job execution).
     ✔️ Message prioritization systems.
 
-🌟 SynchronousQueue
+
+====================
+🔷 SynchronousQueue
+====================
 ➤ A special type of BlockingQueue in java.util.concurrent.
 ➤ Capacity = 0 (or conceptually 1) ─────────▶ it cannot hold elements.
 ➤ Each put() must wait for a take() by another thread (and vice versa).
@@ -3578,13 +3771,15 @@ Producer: put B successfully
 ➤ Constructor: new SynchronousQueue<>(true) ─────────▶ fair mode (FIFO order).
 
 
-🌟 DelayQueue
+===============
+🔷 DelayQueue
+===============
 ➤ A thread-safe, unbounded blocking queue in java.util.concurrent.
 ➤ Stores elements that implement the Delayed interface.
 ➤ Elements can be retrieved only when their delay has expired.
 ➤ Internally backed by a priority queue (ordered by remaining delay).
 
-Characteristics
+🔄 Characteristics
 ➤ Unbounded ─────────▶ grows dynamically (bounded by memory).
 ➤ Ordering ─────────▶ element with the least remaining delay is at the head.
 ➤ Blocking behavior:
@@ -3664,7 +3859,10 @@ Executed: Task-3 at 3003
     ✔️ Implementing retry mechanisms.
     ✔️ Session timeouts / cache eviction.
 
-🌟 ConcurrentLinkedQueue
+
+===========================
+🔷 ConcurrentLinkedQueue
+===========================
 ➤ A lock-free, thread-safe implementation of Queue interface.
 ➤ Located in java.util.concurrent.
 ➤ Based on non-blocking algorithms (uses CAS – Compare-And-Swap) instead of locks.
@@ -3763,7 +3961,10 @@ Thread-2 executing Task-P2-2
 ➤ Best for message passing systems, task submission, event queues where blocking is not needed.
 ➤ size() is not constant time ─────────▶ avoid in performance-critical code.
 
-🌟 ConcurrentLinkedDeque
+
+===========================
+🔷 ConcurrentLinkedDeque
+===========================
 ➤ A non-blocking, thread-safe, double-ended queue (Deque).
 ➤ Located in java.util.concurrent.
 ➤ Backed by lock-free, linked nodes with CAS (Compare-And-Swap) operations.
@@ -3848,7 +4049,9 @@ Consumed Task-5
 ➤ Provides lock-free scalability for multiple threads.
 
 
-🔷 Enums in Java 
+==========
+🔷 Enums 
+==========
 Enum (short for enumeration) is a special data type in Java used to represent a fixed set of named constants.
 
 Introduced in Java 5.
@@ -4042,7 +4245,9 @@ HIGH -> 2
 CRITICAL -> 3
 
 
-🔹 What is a String in Java?
+============
+🔷 Strings
+============
 A String in Java is an object that represents a sequence of characters.
 Strings are immutable, meaning their value cannot be changed once created.
 
@@ -4322,7 +4527,9 @@ What is Mutable and Immutable class
 | Common Use Case | Constant values, keys in Map                | Dynamic strings in loops or editors       |
 
 
+==================================
 🔷 StringBuilder and StringBuffer
+==================================
 | Feature                 | StringBuilder                             | StringBuffer                       |
 | ----------------------- | --------------------------------------------- | -------------------------------------- |
 | Mutability          | Mutable                                       | Mutable                                |
