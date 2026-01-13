@@ -1592,94 +1592,120 @@ The new udpated Array List
 =========
 🔷 Maps
 =========
-In Java, a Map is an object that maps keys to values. It cannot contain duplicate keys, and each key can map to at most one value. Thik of it as a dictionary where you look up a word(key ) to find its defintion(value).
+The Map interface (java.util.Map) is a core part of the Java Collections Framework, but unlike List or Set, it does not extend the Collection interface.
 
-Map does not extends collection interface. It extends Map interface.
+It is designed to store data in Key-Value pairs.
+    ✔️ Key ─────────▶ A unique identifier used to retrieve data.
+    ✔️ Value ─────────▶ The actual data associated with the key.
 
-🌟 Key Characteristics of the Map Interface
-➤ Key-Value Pair: Each entry in a Map consists of a key and a value.
-➤ Unique Keys: No two entries can have the same key.
-➤ One Value per key: Each key maps to a single value.
-➤ Order: Some implementations maintain insertion order(LinkedHashMap), nature order(TreeMap), or no order(HashMap).
 
-🌟 HashMap
-✅ Code Snippet:
-package collections;
+🔄 Key Characteristics
+1️⃣ Unique Keys ─────────▶ A Map cannot contain duplicate keys. If you try to insert a key that already exists, the old value is overwritten.
+2️⃣ One-to-One Mapping ─────────▶ Each key maps to exactly one value.
+3️⃣ Value Duplication ─────────▶ Duplicate values are allowed (different keys can point to the same value).
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Set;
 
-public class HashMapDemo {
+🔄 The Map.Entry Interface
+The Map interface contains a nested inner interface called Map.Entry<K, V>.
+    ✔️ It represents a single Key-Value pair stored inside the map.
+    ✔️ When you iterate over a map, you are essentially iterating over these Entry objects.
 
-	public static void main(String[] args) {
-		HashMap<Integer, String> hs = new HashMap<>();
-		hs.put(1, "Ankur");
-		hs.put(2, "Deepak");
-		hs.put(3, "Suraj");
-		hs.put(4, "Harsh");
-		System.out.println(hs);
 
-		System.out.println(hs.get(3));
-		// if not present gives null
-		System.out.println(hs.get(5));
+🔄 Core Methods of Map.Entry
+🔗 K getKey() ─────────▶ Returns the key corresponding to this entry.
+🔗 V getValue() ─────────▶ Returns the value corresponding to this entry.
+🔗 V setValue(V value) ─────────▶ Replaces the value corresponding to this entry with the specified value.
 
-		if (hs.containsKey(2)) {
-			System.out.println("Key is present in the map");
-		} else {
-			System.out.println("Key is not present in the map");
-		}
 
-		if (hs.containsValue("Ankur")) {
-			System.out.println("Value is present");
-		} else {
-			System.out.println("Value is not present");
-		}
+🔄 Core Map Methods
+These are the fundamental methods available in the interface before Java 8.
 
-		// iterating the map Method 1
-		System.out.println("Iterating on the map by keySet Method");
-		// Set<Integer> keys=hs.keySet();
-		for (int i : hs.keySet()) {
-			System.out.println(i + " -> " + hs.get(i));
-		}
+🔁 Basic Operations
+🔗 V put(K key, V value) ─────────▶ Associates the specified value with the specified key. If the map previously contained a mapping for the key, the old value is returned.
+🔗 V get(Object key) ─────────▶ Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
+🔗 V remove(Object key) ─────────▶ Removes the mapping for a key from this map if it is present. Returns the value that was associated with the key.
+🔗 boolean containsKey(Object key) ─────────▶ Returns true if this map contains a mapping for the specified key.
+🔗 boolean containsValue(Object value) ─────────▶ Returns true if this map maps one or more keys to the specified value.
+🔗 int size() ─────────▶ Returns the number of key-value mappings.
+🔗 void clear() ─────────▶ Removes all mappings from the map.
 
-		// Method 2
-		System.out.println("Iterating on the map using entrySet Method");
-		Set<Entry<Integer, String>> entrySet = hs.entrySet();
-		for (Entry<Integer, String> entry : entrySet) {
-			System.out.println(entry.getKey() + " -> " + entry.getValue().toUpperCase());
-		}
 
-		//hs.remove(1); //removing element based on key
-		boolean isRemoved=hs.remove(1, "Deepak"); //removing based on key and value
-		System.out.println(isRemoved); //because no entry exist of that type
+🔁 Collection Views
+The Map interface provides three methods to view the data as a Collection. These views are backed by the map, meaning if you remove an element from the view, it is removed from the map.
 
-	}
+1️⃣ Set<K> keySet() ─────────▶ Returns a Set view of the keys contained in this map.
+2️⃣ Collection<V> values() ─────────▶ Returns a Collection view of the values contained in this map.
+3️⃣ Set<Map.Entry<K, V>> entrySet() ─────────▶ Returns a Set view of the mappings (entries) contained in this map. This is the most efficient way to iterate through a map.
+
+
+🔁 Modern Map Methods (Java 8+)
+Java 8 introduced "Default Methods" to the Map interface, significantly simplifying common coding tasks.
+
+🔗 V getOrDefault(Object key, V defaultValue) ─────────▶ Returns the value to which the specified key is mapped, or defaultValue if this map contains no mapping for the key.
+
+🔗 V putIfAbsent(K key, V value) ─────────▶ If the specified key is not already associated with a value (or is mapped to null), associates it with the given value.
+
+🔗 void forEach(BiConsumer action) ─────────▶ Performs the given action for each entry in this map.
+
+🔗 boolean replace(K key, V oldValue, V newValue) ─────────▶ Replaces the entry for the specified key only if currently mapped to the specified value.
+
+🔗 V computeIfAbsent(K key, Function mappingFunction) ─────────▶ If the specified key is not already associated with a value, attempts to compute its value using the given mapping function and enters it into this map.
+
+🔗 V merge(K key, V value, BiFunction remappingFunction) ─────────▶ If the specified key is not already associated with a value or is associated with null, associates it with the given non-null value. Otherwise, replaces the associated value with the results of the given remapping function.
+
+
+✅ Conceptual Code Example
+This example demonstrates the usage of the Interface methods specifically. Note that we use HashMap only to instantiate the object, but the reference type is Map.
+
+
+import java.util.*;
+
+public class MapInterfaceDemo {
+    public static void main(String[] args) {
+        // Polymorphism: Using Map interface reference
+        Map<String, Integer> scores = new HashMap<>();
+
+        // ─────────▶ Basic Insertion
+        scores.put("Alice", 90);
+        scores.put("Bob", 85);
+        
+        // returns 90 (the old value) and updates Alice to 95
+        System.out.println("Old Alice Score: " + scores.put("Alice", 95)); 
+
+        // ─────────▶ Java 8 features
+        scores.putIfAbsent("Charlie", 88); // Adds Charlie
+        scores.putIfAbsent("Alice", 100);  // Does nothing, Alice exists
+
+        // ─────────▶ Iterating using entrySet (Best Practice)
+        System.out.println("\n--- Student Scores ---");
+        for (Map.Entry<String, Integer> entry : scores.entrySet()) {
+            System.out.println("Key: " + entry.getKey() + " | Value: " + entry.getValue());
+        }
+
+        // ─────────▶ Using Views
+        Set<String> keys = scores.keySet();
+        // Removing from KeySet removes from Map!
+        keys.remove("Bob"); 
+        System.out.println("\nDoes map contain Bob? " + scores.containsKey("Bob")); // False
+        
+        // ─────────▶ Using forEach (Java 8)
+        scores.forEach((k, v) -> System.out.println("Student: " + k + " has " + v));
+    }
 }
 
-❌Output:
-{1=Ankur, 2=Deepak, 3=Suraj, 4=Harsh}
-Deepak
-null
-Key is not present in the map
-Value is present
-Iterating on the map by keySet Method
-1 -> Ankur
-2 -> Deepak
-3 -> Suraj
-4 -> Harsh
-Iterating on the map using entrySet Method
-1 -> ANKUR
-2 -> DEEPAK
-3 -> SURAJ	
-4 -> HARSH
-false
 
-🌟 Key Characteristics of HashMap
-➤ Unordered: Does not maintain any order of its elements.
-➤ Allows null keys and Values: Can have one null key and multiple null values.
-➤ Not Synchhronized: Not thread-safe, requires external synchronization if used in a multi-threaded context.
-➤ Performance: Offers constant time performance(O(1)) for basic operations like get and put, assuming the hash function disperses elements properly.
+==============
+🔷 HashMap
+==============
+HashMap is the most commonly used implementation of the Map interface. It stores data in (Key, Value) pairs and is based on the hashing principle.
+
+
+🔄 Key Characteristics
+➤ Unordered ─────────▶ Does not maintain any order of its elements.
+➤ Allows null keys and Values ─────────▶ Can have one null key and multiple null values.
+➤ Not Synchhronized ─────────▶ Not thread-safe, requires external synchronization if used in a multi-threaded context.
+➤ Performance ─────────▶ Offers constant time performance(O(1)) for basic operations like get and put, assuming the hash function disperses elements properly.
+
 
 🔄 Internal Structure of HashMap
 Basic components:
@@ -1689,33 +1715,39 @@ Basic components:
 ✔️ Hash function: Converts a key into an index(bucket location) for storage.
 ➤ A hash function is an algorithm that takes an input(or key) and returns a fixed-size string of bytes, typically a numerical value. The output is known as the hash code, hash value or simply hash. The primary purpose of a hash function is to map data of arbitrary size to a fixed-size value.
 
-Characteristics of Hash Function:
+
+🔄 Characteristics of Hash Function:
 ✔️ Deterministic: Given the same input, the hash function always produces the same output.
 ✔️ Fixed Output size: The output of the hash function is a fixed-size string of bytes.
 ✔️ Efficient Computation: The hash function is fast to compute.
 
-🧠 How Data is Stored in HashMap
-⚡ Step 1: Hashing the Key: 
-The key is passed through a hash function to generate a unique hash code(an integer number). This hash code helps determine where the key-value pair will be stored in the array(called a "bucket array").
 
-⚡ Step 2: Calculating the Index:
-The hash code is then used to calculate an index in the array(bucket location) using
+🔁 How Data is Stored in HashMap
+1️⃣ Hashing the Key
+➤ The key is passed through a hash function to generate a unique hash code(an integer number). This hash code helps determine where the key-value pair will be stored in the array(called a "bucket array").
+
+
+2️⃣ Calculating the Index
+➤ The hash code is then used to calculate an index in the array(bucket location) using
 int index= hashCode % array.length;
-The index decides which bucket will hold the key-value pair.
+➤ The index decides which bucket will hold the key-value pair.
 ✅ For example: If the array size is 16, the key's hash code will be divided by 16, and the remainder will be the index.
 
-⚡ Step 3: Storing in the Bucket:
-The key-value pair is stored in the bucket at the calculated index.
-Each bucket can hold multiple key-value pairs.
+
+3️⃣ Storing in the Bucket
+➤ The key-value pair is stored in the bucket at the calculated index.
+➤ Each bucket can hold multiple key-value pairs.
 (this is called a collision handling mechanism).
 
-🧠 How HashMap Retrieves Data
-When we call get(Key), the HashMap follows the following steps:
-⚡ Hashing the key: Similar to insertion, the key is hashed using the same hash function to calculate its hash code.
-⚡ Finding the index: The hash code is used to find the index of the bucket where the key-value pair is stored.
-⚡ Searching in the Bucket: Once the correct bucket is found, it checks for the key in that bucket. If found, it returns the value associated with the key.	
 
-🆚Handling Collisions
+🔁 Data Reterival in Hashmap
+When we call get(Key), the HashMap follows the following steps
+1️⃣ Hashing the key ─────────▶ Similar to insertion, the key is hashed using the same hash function to calculate its hash code.
+2️⃣ Finding the index ─────────▶ The hash code is used to find the index of the bucket where the key-value pair is stored.
+3️⃣ Searching in the Bucket ─────────▶ Once the correct bucket is found, it checks for the key in that bucket. If found, it returns the value associated with the key.	
+
+
+🔄 Handling Collisions
 ➤ Since different keys can generate the same index(called a collision)
 HashMap uses a technique to handle this situation. Java's HashMap uses Linked List(or balanced Red-Black Tree(self balancing binary search tree) after Java 8) to resolve collisions.
 
@@ -1723,6 +1755,7 @@ HashMap uses a technique to handle this situation. Java's HashMap uses Linked Li
 ➤ This is called Separate Chaining.
 
 ➤ When a key-value pair is retrieved, the HashMap traverse the linked list to find the value associated with the key.
+
 
 🔄 HashMap Resizing(Rehashing)
 ➤ HashMap has an internal array size, which is by default is 16.
@@ -1736,18 +1769,21 @@ When the number of elements(key-value pairs) grows and exceeds a certain load fa
 and placed in the new array.
 ➤ This ensures the HashMap continues to work efficiently even after more data is added.
 
-⚡Time Compplexity
+
+🔄 Time Compplexity
 ➤ Average: O(1) for insertion, deletion, search.
 ➤ Worst case (all collisions in same bucket): O(logn) (but rare in practice).
 But after Java 8, if there are too many elements in the bucket, HashMap switches to a balanced tree instead of a linked list to ensure better performance.
 TREEFY_THRESHOLD = 8 for converting linked list to balanced tree.
 
+
+✅ Example: Custom Class as Key in HashMap
 ❗Problem:
 ➤ When you create a custom class Person with fields like id and name, and put it into a HashMap, then:
 ➤ By default, Object's implementation of hashCode() and equals() is used.
 ➤ That implementation uses memory address ─────────▶ so two objects with the same values (id=1, name="Ankur") are considered different keys.
 
-Example (Problem Case):
+
 import java.util.*;
 
 class Person {
@@ -1776,8 +1812,8 @@ public class Main {
 }
 👉 Output:
 Map size: 2
-
 ➤ Even though both objects have the same id and name, they are treated as different keys.
+
 
 ✅ Fix:
 To fix this, override hashCode() and equals() in the Person class.
@@ -1836,13 +1872,15 @@ Map size: 1
 ➤ Now both objects are considered the same key because hashCode() is same and equals() says they are equal.
 ➤ The second put() overwrites the value (Manager replaces Developer).
 
-✔️ Key Notes 
+
+🔄 Key Notes 
 ➤ Always override both equals() and hashCode() together (not just one).
 ➤ If you only override equals() but not hashCode(), HashMap may still treat them as different keys.
 ➤ Use Objects.hash() and Objects.equals() (Java 7+) to simplify.
 ➤ Consistency rule: if a.equals(b) == true, then a.hashCode() == b.hashCode() must also hold.
 
-✅ Working of getOrDefault() Method:
+
+🔁 Working of getOrDefault() Method
 package collections;
 
 import java.util.HashMap;
@@ -1871,13 +1909,12 @@ public class HashMapDemo {
 
 	}
 }
-
 ✅Output:
 Ankur is present in the map
 Sam Not present
 
-✅Method: putIfAbsent()
-Example:
+
+🔁 putIfAbsent() Method
 package collections;
 
 import java.util.HashMap;
@@ -1895,31 +1932,47 @@ public class HashMapDemo {
 		System.out.println(hashMap);
 	}
 }
+✅Output: {Ankur=200, Alice=99, Bob=101, Sam=201}
 
-✅Output:
-{Ankur=200, Alice=99, Bob=101, Sam=201}
 
+=================
 🔷 LinkedHashMap
-package collections;
+=================
+A LinkedHashMap is a specialized implementation of the Map interface that combines the speed of a HashMap with the ordering capabilities of a LinkedList.
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-public class LinkedHashMapDemo {
+🔄 Core Concept
+Think of a LinkedHashMap as a HashMap with a hidden thread running through it.
+✔️ HashMap Component ─────────▶ It uses a hash table to store data, ensuring $O(1)$ performance for basic operations.
+✔️ LinkedList Component ─────────▶ It maintains a doubly-linked list running through all its entries. This list defines the iteration order.
 
-	public static void main(String[] args) {
-		LinkedHashMap<String, Integer> linkedHashMap = new LinkedHashMap<>();
-		linkedHashMap.put("Orange", 10);
-		linkedHashMap.put("Apple", 20);
-		linkedHashMap.put("Mango", 30);
-		
-		for(Map.Entry<String, Integer>entry:linkedHashMap.entrySet()) {
-			System.out.println(entry.getKey()+" -> "+ entry.getValue());
-		}
-	}
+
+🔄 Internal Structure: The Entry Node
+In a standard HashMap, a node contains: hash, key, value, and next. In a LinkedHashMap, the internal class (static inner class) extends HashMap.Node to add two more pointers:
+
+1️⃣ before: Points to the entry that was inserted before this one.
+2️⃣ after: Points to the entry that was inserted after this one.
+
+🔗 Code:
+static class Entry<K,V> extends HashMap.Node<K,V> {
+    Entry<K,V> before, after; // Pointers for the doubly linked list
+    Entry(int hash, K key, V value, Node<K,V> next) {
+        super(hash, key, value, next);
+    }
 }
 
-📌 Constructor
+
+🔄 Two Types of Ordering
+Unlike HashMap (random order) or TreeMap (sorted order), LinkedHashMap offers two specific ordering modes based on a boolean flag in its constructor:
+
+1️⃣ Insertion-Order (Default)
+➤ The map remembers the order in which keys were inserted. 
+➤ If you re-insert a key (put a new value for an existing key), the order is not affected.
+
+2️⃣ Access-Order
+➤ The map keeps track of which entries were recently accessed. When you call get() or put(), that entry moves to the end of the list. 
+➤ This makes LinkedHashMap perfect for building LRU (Least Recently Used) Caches.
+🔗 Constructor:
 LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)
 
 ➤ initialCapacity ─────────▶ number of buckets initially.
@@ -1928,64 +1981,63 @@ LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)
 	✔️ false ─────────▶ maintains insertion order.
 	✔️ true ─────────▶ maintains access order (order changes when an entry is accessed with get() or put()).
 
-✅ Example 1: accessOrder = false (Insertion Order)
+
+✅ Example: Insertion-Order vs Access-Order
+
 import java.util.*;
 
-public class Main {
+public class LinkedHashMapDemo {
     public static void main(String[] args) {
-        // Insertion order
-        Map<Integer, String> map = new LinkedHashMap<>(16, 0.75f, false);
+        // 1. DEFAULT: Insertion Order
+        Map<String, Integer> lhm = new LinkedHashMap<>();
+        lhm.put("Zebra", 10);
+        lhm.put("Apple", 50);
+        lhm.put("Mango", 20);
+        
+        System.out.println("Insertion Order: " + lhm.keySet());
+        // Output: [Zebra, Apple, Mango]
 
-        map.put(1, "A");
-        map.put(2, "B");
-        map.put(3, "C");
+        // 2. Access Order (For LRU Cache behavior)
+        // (Initial Capacity, Load Factor, accessOrder=true)
+        LinkedHashMap<String, Integer> cache = new LinkedHashMap<>(16, 0.75f, true);
+        cache.put("A", 1);
+        cache.put("B", 2);
+        cache.put("C", 3);
 
-        // Access element
-        map.get(2); // does NOT change order
-
-        System.out.println("Insertion Order: " + map);
+        cache.get("A"); // Accessing "A" moves it to the end
+        
+        System.out.println("Access Order: " + cache.keySet());
+        // Output: [B, C, A]
     }
 }
-👉 Output:
-Insertion Order: {1=A, 2=B, 3=C}
-Even though we accessed key 2, the order remains insertion order.
 
-✅ Example 2: accessOrder = true (Access Order)
-import java.util.*;
 
-public class Main {
-    public static void main(String[] args) {
-        // Access order
-        Map<Integer, String> map = new LinkedHashMap<>(16, 0.75f, true);
+🔄 Key Differences: HashMap vs. LinkedHashMap
+| Feature                 | HashMap                                                               | LinkedHashMap                                  |
+| ----------------------- | --------------------------------------------------------------------- | ---------------------------------------------- |
+| Iteration Order         | Undefined / Unpredictable                                             | Predictable (Insertion order or Access order)  |
+| Internal Data Structure | Hash table + Red-Black Tree (after Java 8 for high-collision buckets) | Hash table + Doubly-linked list                |
+| Memory Usage            | Lower                                                                 | Higher (extra `before` / `after` pointers)     |
+| Performance             | Slightly faster for put/get                                           | Slightly slower due to maintaining linked list |
+| Use Case                | Fast access, no order needed                                          | When iteration order matters (e.g., LRU cache) |
 
-        map.put(1, "A");
-        map.put(2, "B");
-        map.put(3, "C");
 
-        // Access element
-        map.get(2); // moves 2 to end
-        map.get(1); // moves 1 to end
+🔄 Special Feature: removeEldestEntry()
+➤ This is a protected method in LinkedHashMap that you can override to create a fixed-size cache.
+➤ When put() or putAll() is called, the map checks this method to see if it should delete the oldest entry.
 
-        System.out.println("Access Order: " + map);
+✅ Example of a simple LRU Cache:
+LinkedHashMap<Integer, String> lru = new LinkedHashMap<Integer, String>(5, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<Integer, String> eldest) {
+        return size() > 5; // Automatically remove oldest if size exceeds 5
     }
-}
-👉 Output:
-Access Order: {3=C, 2=B, 1=A}
+};
 
-First inserted order: {1=A, 2=B, 3=C}
-After map.get(2) ─────────▶ 2 moves to end ─────────▶ {1=A, 3=C, 2=B}
-After map.get(1) ─────────▶ 1 moves to end ─────────▶ {3=C, 2=B, 1=A}
 
-⚡Tip
-✔️ accessOrder = true is often used to implement LRU Cache (Least Recently Used).
-✔️ removeEldestEntry() method can be overridden to auto-remove the oldest entry.
-
-LinkedHashMap is a combination of HashMap + Doubly Linked List.
-
-✅ Constructor Method:
-LinkedHashMap linkedHashMap= new LinkedHashMap(hashMap);
-
+==============
 🔷WeakHashMap
+==============
 ➤ WeakHashMap<K,V> is a special implementation of Map where keys are stored as weak references.
 ➤ If a key is not strongly referenced elsewhere in the program, the GC (Garbage Collector) can reclaim it.
 ➤ Once GC collects the key, the corresponding entry is automatically removed from the map.
@@ -2093,7 +2145,10 @@ Therefore, inside the map it will use the key1.equals(key2) and it will return t
 
 If we want output like {key=1, key=2} then we can use IdentityHashMap.
 
+
+====================
 🔷IdentityHashMap
+====================
 ➤ IdentityHashMap is a special implementation of Map in Java where keys are compared using reference equality (==) instead of equals().
 ➤ It is part of java.util package.
 
@@ -2160,7 +2215,10 @@ public class IdentityHashMapDemo {
 }
 ✅Output : {Key=2}
 
+
+===============
 🔷 Comparable
+===============
 ➤ Belongs to java.lang package.
 ➤ Used to define the natural/default ordering of objects.
 ➤ A class implements Comparable to provide its own comparison logic.
@@ -2270,7 +2328,10 @@ public class Main {
 ➤ Comparator ─────────▶ "I allow multiple sorting logics, outside the class."
 ➤ Common trick: “Can a class implement both?” ─────────▶ ✅ Yes, a class can have a natural order (Comparable) and also be sorted by different comparators when needed.
 
+
+=============
 🔷 SortedMap
+=============
 An interface in Java that extends Map and guarantees ordering of keys in ascending order (natural ordering or custom Comparator).
 
 🌟 Key Features:
@@ -2329,7 +2390,10 @@ TailMap(>=3): {3=Banana, 4=Grapes, 5=Mango}
 SubMap(2 to 5): {2=Orange, 3=Banana, 4=Grapes}
 Comparator Used: null
 
+
+================
 🔷 NavigableMap
+================
 An interface that extends SortedMap, providing navigation methods for key search and traversal.
 
 🌟 Key Features:
@@ -2396,7 +2460,10 @@ Poll First Entry: 1=Apple
 Poll Last Entry: 5=Mango
 Remaining Map: {2=Orange, 3=Banana, 4=Grapes}
 
+
+==============
 🔷 Hashtable
+==============
 A legacy class (from JDK 1.0) that implements Map, storing key-value pairs in hash table form.
 
 🔄 Key Features:
@@ -2468,51 +2535,110 @@ Iterating with Enumeration:
 102 -> Python
 101 -> Java
 
+
+======================
 🔷 ConcurrentHashMap
-✅ Java 7
+======================
+ConcurrentHashMap is a highly efficient, thread-safe implementation of the Map interface. It was introduced in Java 5 as a replacement for Hashtable and Collections.synchronizedMap(), which have poor performance in multi-threaded environments.
+
+
+🔄 The Problem with Synchronized Maps
+➤ Before ConcurrentHashMap, if you wanted thread safety, you had to lock the entire map for every operation.
+➤ Hashtable / SynchronizedMap: They use a single "Global Lock." If Thread A is reading, Thread B must wait to write (and vice versa). This creates a massive bottleneck.
+
+
+🔄 Java 7
 ➤ Used segment-based locking (default: 16 segments ─────────▶ 16 smaller hash tables).
 ➤ Only the segment being modified/read is locked.
 ➤ Read: doesn’t require locking unless concurrent write is happening.
 ➤ Write: locks only that segment (better concurrency than Hashtable).
 
-✅ Java 8
-➤ Removed segmentation ─────────▶ now uses bucket-level locks.
-➤ Uses CAS (Compare-And-Swap) for updates (almost lock-free).
-➤ Locking only occurs during resizing or treeification (when collision chains convert to balanced trees).
-➤ Much faster than Java 7 implementation.
 
-✅Code Implementation:
-import java.util.concurrent.*;
+🔄 Java 8 and Beyond
+In Java 8, the internal structure was redesigned to be even faster, moving away from "Segmented Locking" to a more granular Node-level locking strategy.
 
-public class ConcurrentHashMapDemo {
+1️⃣ Data Structure
+Like HashMap, it uses an array of buckets (Nodes). When a collision occurs, it uses a Linked List or a Red-Black Tree.
+
+2️⃣ CAS (Compare-And-Swap) Operations
+For inserting a node into an empty bucket, ConcurrentHashMap does not use locks. Instead, it uses CAS (an atomic CPU instruction). This is extremely fast because it avoids the overhead of blocking threads.
+
+3️⃣ Synchronized Buckets (Fine-Grained Locking)
+If a bucket is not empty (a collision occurs), the map synchronizes only on the first node of that specific bucket.
+    ✔️ Impact: Thread A can update Bucket 1 while Thread B updates Bucket 2 simultaneously. They do not block each other.
+
+
+🔄 Key Characteristics
+| Key Characteristic | Behavior                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| Locking            | Fine-grained locking (bucket-level / CAS-based after Java 8)                        |
+| Null Keys / Values | ❌ Not allowed; throws `NullPointerException`                                        |
+| Read Operations    | Lock-free; return the most recently available value                                 |
+| Iterators          | Fail-safe and weakly consistent; do **not** throw `ConcurrentModificationException` |
+
+
+🔄 Important Methods
+Because multiple threads access the map, standard get and put aren't always enough to avoid "race conditions." ConcurrentHashMap provides atomic "Check-then-Act" methods:
+
+🔗 putIfAbsent(K key, V value) ─────────▶ Only inserts if the key is missing.
+
+🔗 remove(Object key, Object value) ─────────▶ Only removes if the key is mapped to that specific value.
+
+🔗 replace(K key, V oldValue, V newValue) ─────────▶ Only replaces if the current value matches oldValue.
+
+
+✅ Code Example: Concurrent Access
+This example demonstrates how multiple threads can safely modify the map without explicit synchronized blocks.
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+
+public class ConcurrentMapDemo {
     public static void main(String[] args) {
-        ConcurrentHashMap<Integer, String> chm = new ConcurrentHashMap<>();
+        // 1. Initialize Map
+        Map<String, Integer> inventory = new ConcurrentHashMap<>();
+        inventory.put("Apples", 10);
 
-        // Adding elements
-        chm.put(1, "Apple");
-        chm.put(2, "Banana");
-        chm.put(3, "Mango");
+        // 2. Atomic update (Safe from race conditions)
+        // computeIfPresent ensures the logic is atomic
+        inventory.computeIfPresent("Apples", (key, val) -> val + 50);
 
-        // Retrieving
-        System.out.println("ConcurrentHashMap: " + chm);
+        // 3. Thread-safe iteration
+        inventory.put("Oranges", 20);
+        inventory.put("Bananas", 30);
 
-        // Key already exists ─────────▶ old value replaced
-        chm.put(2, "Orange");
-        System.out.println("After update: " + chm);
+        System.out.println("Inventory before iteration: " + inventory);
 
-        // Safe iteration during modification
-        chm.forEach((k, v) -> System.out.println(k + " -> " + v));
+        // Fail-safe iterator: We can modify the map WHILE iterating!
+        for (String key : inventory.keySet()) {
+            if (key.equals("Oranges")) {
+                inventory.put("Grapes", 40); // This won't throw Exception
+            }
+        }
+
+        System.out.println("Final Inventory: " + inventory);
     }
 }
 
-✅Output:
-ConcurrentHashMap: {1=Apple, 2=Banana, 3=Mango}
-After update: {1=Apple, 2=Orange, 3=Mango}
-1 -> Apple
-2 -> Orange
-3 -> Mango
 
+🔄 HashMap vs. SynchronizedMap vs. ConcurrentHashMap
+| Feature           | HashMap                            | SynchronizedMap                    | ConcurrentHashMap                               |
+| ----------------- | ---------------------------------- | ---------------------------------- | ----------------------------------------------- |
+| Thread Safety     | ❌ No                               | ✅ Yes (single global lock)         | ✅ Yes (fine-grained / bucket-level locking)     |
+| Performance       | Fastest in single-threaded use     | Slow under high contention         | High performance in multi-threaded environments |
+| Iterator Behavior | Fail-fast                          | Fail-fast                          | Fail-safe (weakly consistent)                   |
+| Null Support      | One null key, multiple null values | One null key, multiple null values | ❌ No null keys or values                        |
+
+
+🔄 Why are Nulls not allowed?
+The creator of ConcurrentHashMap (Doug Lea) famously excluded nulls to avoid ambiguity in multi-threaded environments.
+    ✔️ In a normal HashMap, get(key) == null could mean the key isn't there, OR the value is actually null. You'd check containsKey(key) to be sure.
+    ✔️ In a concurrent environment, the map could change between your call to get() and containsKey(). By forbidding nulls, if get() returns null, you are 100% certain the key does not exist.
+
+
+=========================
 🔷 ConcurrentSkipListMap
+=========================
 ➤ Thread-safe, Sorted Map implementation.
 ➤ Backed by a SkipList, which is a probabilistic data structure with multiple layers (like “express lanes” in a linked list).
 ➤ Allows logarithmic time search, insert, delete.
@@ -2554,7 +2680,9 @@ HeadMap (<4): {1=Orange, 2=Apple}
 TailMap (>=2): {2=Apple, 4=Banana, 5=Mango}
 
 
+===========
 🔷 EnumMap
+===========
 ➤ A specialized Map implementation where keys must be enum constants.
 ➤ Internally uses an array of values, indexed by enum’s ordinal().
 ➤ Very fast (no hashing) and memory-efficient.
@@ -2586,7 +2714,10 @@ public class EnumMapDemo {
 EnumMap: {MON=Start of week, FRI=Weekend is near, SUN=Holiday}
 Message for FRI: Weekend is near
 
+
+=================
 🔷 ImmutableMap
+=================
 ➤ Map that cannot be modified once created.
 ➤ Any attempt to add/remove/update will throw UnsupportedOperationException.
 
@@ -2654,6 +2785,7 @@ public class ImmutableMapDemo3 {
 Map.ofEntries: {A=1, B=2, C=3, D=4}
 
  
+
  🔷 Set
 ➤ Set is a collection of unique elements (no duplicates).
 ➤ Unordered by default (HashSet).
