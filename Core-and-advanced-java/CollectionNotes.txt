@@ -1980,13 +1980,12 @@ A LinkedHashMap is a specialized implementation of the Map interface that combin
 
 🔄 Core Concept
 Think of a LinkedHashMap as a HashMap with a hidden thread running through it.
-✔️ HashMap Component ─────────▶ It uses a hash table to store data, ensuring $O(1)$ performance for basic operations.
+✔️ HashMap Component ─────────▶ It uses a hash table to store data, ensuring O(1) performance for basic operations.
 ✔️ LinkedList Component ─────────▶ It maintains a doubly-linked list running through all its entries. This list defines the iteration order.
 
 
 🔄 Internal Structure: The Entry Node
 In a standard HashMap, a node contains: hash, key, value, and next. In a LinkedHashMap, the internal class (static inner class) extends HashMap.Node to add two more pointers:
-
 1️⃣ before: Points to the entry that was inserted before this one.
 2️⃣ after: Points to the entry that was inserted after this one.
 
@@ -2014,7 +2013,7 @@ LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)
 
 ➤ initialCapacity ─────────▶ number of buckets initially.
 ➤ loadFactor ─────────▶ controls resizing.
-➤ accessOrder ─────────▶
+➤ accessOrder
 	✔️ false ─────────▶ maintains insertion order.
 	✔️ true ─────────▶ maintains access order (order changes when an entry is accessed with get() or put()).
 

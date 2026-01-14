@@ -3402,12 +3402,32 @@ sendEmailAsync(); // runs in background
 processOrder();  // continues immediately
 
 
-🔄 How @Async Works Internally
+🔄 How @Async Works Internally 
 ➤ Spring creates a proxy for the bean
 ➤ Method call intercepted
 ➤ Task submitted to Executor (thread pool)
 ➤ Method executes in different thread
 👉 Uses AOP + Proxying
+
+
+🔄 Condition for @Async Annotation to work properly?
+1️⃣ Different Class ─────────▶ If @Async annotation is applied to the method within the same class, from which it is being called, then Proxy mechanism is skipped because internal methods are not intercepted
+🚫 Self Invocation
+this.asyncMethod(); // ❌ DOES NOT WORK
+
+❓ Why?
+✔️ Proxy is bypassed
+✔️ Must be called from another bean
+
+
+2️⃣ Public Method ─────────▶ Method annotated with @Async must be public. And again, AOP interception works only on public methods.
+🚫 Private Methods
+@Async
+private void method() { } // ❌
+✔️ Only public methods work
+
+🚫 Final Methods
+Cannot be proxied
 
 
 🔄 Enabling @Async
@@ -3456,30 +3476,113 @@ public CompletableFuture<String> task() {
 
 
 🔄 Exception Handling in @Async
-❌ Problem
-@Async
-public void asyncMethod() {
-    throw new RuntimeException();
-}
-
-➡️ Exception is lost
-
+1️⃣ in void Methods
+➤ Exceptions thrown in void @Async methods are lost.
 ✅ Solution: AsyncUncaughtExceptionHandler
+1️⃣ Async Configuration (Exception Handler Wiring)
+package com.example.asyncdemo.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Configuration
-@EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
 
-    @Override
-    public Executor getAsyncExecutor() {
-        return Executors.newFixedThreadPool(5);
-    }
+    @Autowired
+    private CustomAsyncExceptionHandler customAsyncExceptionHandler;
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (ex, method, params) ->
-            System.out.println("Exception in " + method.getName());
+        return customAsyncExceptionHandler;
     }
 }
+
+
+3️⃣ Custom Async Exception Handler
+package com.example.asyncdemo.config;
+
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Method;
+
+@Component
+public class CustomAsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
+
+    @Override
+    public void handleUncaughtException(
+            Throwable ex,
+            Method method,
+            Object... params) {
+
+        System.out.println("❌ Exception in @Async void method");
+        System.out.println("Method Name: " + method.getName());
+        System.out.println("Exception Message: " + ex.getMessage());
+    }
+}
+
+4️⃣ Async Service (VOID METHOD THROWING EXCEPTION)
+package com.example.asyncdemo.service;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AsyncService {
+
+    @Async
+    public void processAsyncTask() {
+        System.out.println("Async task started by thread: "
+                + Thread.currentThread().getName());
+
+        // ❌ Exception thrown
+        throw new RuntimeException("Something went wrong in async void method");
+    }
+}
+
+5️⃣ Controller to Trigger Async Method
+package com.example.asyncdemo.controller;
+
+import com.example.asyncdemo.service.AsyncService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class AsyncController {
+
+    private final AsyncService asyncService;
+
+    public AsyncController(AsyncService asyncService) {
+        this.asyncService = asyncService;
+    }
+
+    @GetMapping("/start")
+    public String startAsync() {
+        asyncService.processAsyncTask();
+        return "Async task triggered";
+    }
+}
+
+6️⃣ Expected Output
+🔗 When you hit: GET http://localhost:8080/start
+
+Console Output:
+Async task started by thread: SimpleAsyncTaskExecutor-1
+❌ Exception in @Async void method
+Method Name: processAsyncTask
+Exception Message: Something went wrong in async void method
+
+
+✔️ Exception is NOT lost
+✔️ Handled by AsyncUncaughtExceptionHandler
+✔️ Application does NOT crash
+
+2️⃣ in Future/CompletableFuture Methods
+➤ Exceptions are captured in the Future.
+✅ Solution: Use CompletableFuture.exceptionally()
+
 
 
 🔄 Custom Thread Pool
@@ -3487,6 +3590,8 @@ public class AsyncConfig implements AsyncConfigurer {
 ➤ SimpleAsyncTaskExecutor
 ➤ Unlimited threads
 ➤ NOT production safe
+➤ Always create a custom thread pool for real apps.
+
 
 ✅ Custom Executor (Recommended)
 @Bean("taskExecutor")
@@ -3516,31 +3621,18 @@ public class NotificationService {
 ✔️ All public methods become async
 
 
-🔄 Important Rules & Limitations
-🚫 Self Invocation
-this.asyncMethod(); // ❌ DOES NOT WORK
-
-❓ Why?
-✔️ Proxy is bypassed
-✔️ Must be called from another bean
-
-🚫 Private Methods
-@Async
-private void method() { } // ❌
-✔️ Only public methods work
-
-🚫 Final Methods
-Cannot be proxied
-
 
 🔄 @Async vs @Transactional
 ⚠️ Order matters
-@Async
-@Transactional
+1️⃣ @Async
+2️⃣ @Transactional
 public void process() { }
 ✔️ Transaction exists inside async thread
+❌ Transaction Context do not transfer from caller thread to new thread which got created by @Async. So if any error happens in async method transaction will not be rolled back for that caller thread.
 
+➤ Use Transaction inside @Async method for creating a single transactional thread.
 
+ 
 🔄 Real-World Use Cases
 | Use Case               | Why Async    |
 | ---------------------- | ------------ |
@@ -3549,6 +3641,7 @@ public void process() { }
 | Audit logging          | Non-critical |
 | Report generation      | Long-running |
 | External API calls     | Latency      |
+
 
 🔄 @Async vs CompletableFuture vs WebFlux
 | Feature         | @Async | CompletableFuture | WebFlux |

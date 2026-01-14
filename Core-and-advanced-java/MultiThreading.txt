@@ -2144,7 +2144,233 @@ scheduler.shutdown();
 ⚡ Use submit() for tasks needing results.
 ⚡ Handle InterruptedException properly inside tasks.
 
+#######################
+🔷 ThreadPoolExecutor
+#######################
+ThreadPoolExecutor is a core Java concurrency framework class used to manage and execute a pool of threads efficiently instead of creating a new thread for every task.
 
+🔄 It belongs to:
+java.util.concurrent.ThreadPoolExecutor
+
+
+🔄 Why Do We Need ThreadPoolExecutor?
+Creating a new thread for every task:
+❌ Is expensive
+❌ Causes performance degradation
+❌ Can lead to OutOfMemoryError (too many threads)
+
+ThreadPoolExecutor solves this by:
+♻️ Reusing threads
+🎯 Controlling concurrency
+⚖️ Managing task queues
+🚦 Handling overload gracefully
+
+🔄 High-Level Working
+Tasks are submitted (as Runnable or Callable)
+Executor:
+    ✔️ Uses existing threads, or
+    ✔️ Creates new threads (up to a limit), or
+    ✔️ Queues tasks, or
+    ✔️ Rejects tasks (based on configuration)
+
+
+🔄 Core Components
+1️⃣ Core Pool Size
+✔️ Minimum number of threads to keep alive
+✔️ Created eagerly when tasks arrive
+
+2️⃣ Maximum Pool Size
+✔️ Maximum number of threads allowed
+
+3️⃣ Work Queue
+✔️ Holds tasks waiting for execution
+✔️ Examples:
+    ➡ LinkedBlockingQueue
+    ➡ ArrayBlockingQueue
+        ➡ SynchronousQueue
+
+4️⃣ Keep Alive Time
+✔️ Time for which extra threads (beyond core size) stay alive when idle
+
+5️⃣ Tread Factory
+✔️ Creates new threads
+✔️ Useful for:
+    ➡ Naming threads
+    ➡ Setting priority
+        ➡ Custom behavior
+
+6️⃣ Rejected Execution Handler
+✔️ Decides what happens when:
+    ➡ Queue is full AND
+    ➡ Max threads reached
+
+
+🔄 Constructor
+ThreadPoolExecutor(
+    int corePoolSize,
+    int maximumPoolSize,
+    long keepAliveTime,
+    TimeUnit unit,
+    BlockingQueue<Runnable> workQueue,
+    ThreadFactory threadFactory,
+    RejectedExecutionHandler handler
+)
+
+
+🔄 Task Handling Algorithm (Step-by-Step)
+When a task is submitted:
+
+1️⃣ If current threads < corePoolSize
+→ Create a new thread
+
+2️⃣ Else if queue is NOT full
+→ Put task into queue
+
+3️⃣ Else if current threads < maximumPoolSize
+→ Create a new thread
+
+4️⃣ Else
+→ Reject the task
+
+
+🔄 Rejection Policies
+| Policy                  | Behavior                            |
+| ----------------------- | ----------------------------------- |
+| `AbortPolicy` (default) | Throws `RejectedExecutionException` |
+| `CallerRunsPolicy`      | Caller thread runs the task         |
+| `DiscardPolicy`         | Silently drops task                 |
+| `DiscardOldestPolicy`   | Drops oldest task in queue          |
+
+
+🔄 Commonly Used Factory Methods
+(Internally use ThreadPoolExecutor)
+
+Executors.newFixedThreadPool(n)
+Executors.newCachedThreadPool()
+Executors.newSingleThreadExecutor()
+Executors.newScheduledThreadPool(n)
+
+
+🔄 Advantages
+✅ Better performance
+✅ Controlled resource usage
+✅ Thread reuse
+✅ Configurable behavior
+✅ Safer than manual thread management
+
+
+🔄 Real-World Use Cases
+➤ Handling HTTP requests in servers
+➤ Background job processing
+➤ Asynchronous event handling
+➤ Parallel CPU / I/O tasks
+
+
+✅ Code implementation
+import java.util.concurrent.*;
+
+public class ThreadPoolExecutorDemo {
+
+    public static void main(String[] args) {
+
+        // 1️⃣ Create ThreadPoolExecutor
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                2,                          // corePoolSize
+                4,                          // maximumPoolSize
+                10,                         // keepAliveTime
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(2),// workQueue
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.AbortPolicy() // rejection policy
+        );
+
+        // 2️⃣ Submit tasks
+        for (int i = 1; i <= 6; i++) {
+            final int taskId = i;
+
+            executor.execute(() -> {
+                System.out.println(
+                        "Task " + taskId +
+                        " executed by " +
+                        Thread.currentThread().getName()
+                );
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+
+        // 3️⃣ Shutdown executor
+        executor.shutdown();
+    }
+}
+How This Code Works
+ThreadPool Configuration
+corePoolSize      = 2
+maximumPoolSize   = 4
+queue capacity    = 2
+
+🔄 Task Flow
+1️⃣ First 2 tasks → new threads created
+2️⃣ Next 2 tasks → placed in queue
+3️⃣ Next 2 tasks → new threads (up to max = 4)
+4️⃣ Any further tasks → RejectedExecutionException
+
+
+################################
+ThreadPoolExecutor 🆚 Executor
+################################
+| Aspect             | Executor               | ThreadPoolExecutor          |
+| ------------------ | ---------------------- | --------------------------- |
+| Type               | Interface              | Concrete Class              |
+| Level              | High-level abstraction | Low-level, detailed control |
+| Thread Management  | ❌ No                   | ✅ Yes                       |
+| Pool Configuration | ❌ No                   | ✅ Yes                       |
+| Queue Control      | ❌ No                   | ✅ Yes                       |
+| Rejection Policy   | ❌ No                   | ✅ Yes                       |
+| Lifecycle Methods  | ❌ No                   | ✅ Yes                       |
+| Production Usage   | ❌ Rare                 | ✅ Common                    |
+
+
+✅ Relationship Between Them
+Executor (interface)
+        ↑
+ExecutorService (interface)
+        ↑
+AbstractExecutorService (abstract class)
+        ↑
+ThreadPoolExecutor (class)
+
+👉 ThreadPoolExecutor IS AN Executor, but with much more power
+
+
+🔄 Real-World Analogy
+1️⃣ Executor
+"I don't care how you do it — just run this task."
+
+2️⃣ ThreadPoolExecutor
+"Run this task using:
+➤ 5 core threads
+➤ Max 10 threads
+➤ A bounded queue
+➤ Reject if overloaded
+➤ Shut down gracefully"
+
+
+🔄 When to Use What?
+✔️ Use Executor
+➤ When you want abstraction
+➤ When you don’t care about implementation
+➤ For simple frameworks / libraries
+
+✔️ Use ThreadPoolExecutor
+➤ Production systems
+➤ Performance-critical apps
+➤ High-load servers
+➤ When resource control matters
 
 ######################
 🔷 Future Interface
