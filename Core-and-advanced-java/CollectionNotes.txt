@@ -1687,7 +1687,6 @@ public class MapInterfaceDemo {
 ==============
 HashMap is the most commonly used implementation of the Map interface. It stores data in (Key, Value) pairs and is based on the hashing principle.
 
-
 🔄 Key Characteristics
 ➤ Unordered ─────────▶ Does not maintain any order of its elements.
 ➤ Allows null keys and Values ─────────▶ Can have one null key and multiple null values.
@@ -1738,7 +1737,7 @@ Index = 35 % 16 = 3
 3️⃣ Storing in the Bucket
 ➤ The key-value pair is stored at the calculated index.
 ➤ Each bucket can store multiple entries
-(This happens when multiple keys map to the same index → collision).
+(This happens when multiple keys map to the same index ─────────▶ collision).
 
 
 🔄 Handling Collisions
@@ -1755,7 +1754,6 @@ Bucket[3] → (K1,V1) → (K2,V2) → (K3,V3)
 ➤ If collisions increase, HashMap converts the LinkedList into a Red-Black Tree
 to improve performance.
 🌳 LinkedList ↔ Red-Black Tree Conversion (TREEIFY)
-This is the missing and most important part of your notes.
 
 
 🔁 When LinkedList is converted to Red-Black Tree?
@@ -1795,9 +1793,9 @@ When get(key) is called, HashMap performs:
 
 3️⃣ Searching in the Bucket
 ➤ If bucket contains:
-    ✔️ Single entry → return value
-    ✔️ LinkedList → traverse using equals()
-    ✔️ Red-Black Tree → search using tree logic (O(log n))
+    ✔️ Single entry ─────────▶ return value
+    ✔️ LinkedList ─────────▶ traverse using equals()
+    ✔️ Red-Black Tree ─────────▶ search using tree logic (O(log n))
 
 
 🔄 HashMap Resizing (Rehashing)
@@ -1947,19 +1945,10 @@ public class HashMapDemo {
 		} else {
 			System.out.println("Ankur Not present");
 		}
-
-		Integer res2 = hashMap.getOrDefault("Sam", -1);
-		if (res2 != -1) {
-			System.out.println("Sam is present in the map");
-		} else {
-			System.out.println("Sam Not present");
-		}
-
 	}
 }
 ✅Output:
 Ankur is present in the map
-Sam Not present
 
 
 🔁 putIfAbsent() Method
@@ -1975,12 +1964,12 @@ public class HashMapDemo {
 		hashMap.put("Alice", 99);
 		hashMap.put("Bob", 101);
 
-		hashMap.putIfAbsent("Ankur", 200);
+		hashMap.putIfAbsent("Ankur", 200); // Will not update as Ankur is already present
 		hashMap.putIfAbsent("Sam", 201);
 		System.out.println(hashMap);
 	}
 }
-✅Output: {Ankur=200, Alice=99, Bob=101, Sam=201}
+✅Output: {Ankur=100, Alice=99, Bob=101, Sam=201}
 
 
 =================
