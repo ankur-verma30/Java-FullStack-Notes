@@ -465,7 +465,7 @@ public interface Iterable<T> {
     Iterator<T> iterator();
 }
 👉 Here:
-    ✔️ T → Generic type parameter (the type of elements to iterate).
+    ✔️ T ─────────▶ Generic type parameter (the type of elements to iterate).
     ✔️ Any class implementing Iterable must provide an implementation for the iterator() method.
 
 
@@ -521,7 +521,7 @@ while(itr.hasNext()){
 ➤ It is specifically designed for use with List implementations like ArrayList, LinkedList, and Vector.
 
 🔄 Key Features of ListIterator
-The ListIterator offers several advantages over the basic Iterator:
+The ListIterator offers several advantages over the basic Iterator
     ✔️ Bidirectional ─────────▶ You can move both forward and backward.
     ✔️ Index-Aware ─────────▶ You can retrieve the current index of the cursor.
     ✔️ Modification ─────────▶ You can add, remove, or replace elements during iteration.
@@ -554,13 +554,13 @@ The ListIterator maintains a cursor position between elements. When you call nex
 
 
 🔄 Comparison between ListIterator and Iterator
-| **Feature**       | **Iterator**                        | **ListIterator**                         |
-| ----------------- | ----------------------------------- | ---------------------------------------- |
-| **Direction**     | Forward only                        | Forward and backward                     |
-| **Applicability** | Any `Collection` (Set, List, Queue) | `List` only                              |
-| **Add elements**  | ❌ No                                | ✅ Yes                                    |
-| **Get index**     | ❌ No                                | ✅ Yes (`nextIndex()`, `previousIndex()`) |
-| **Set / replace** | ❌ No                                | ✅ Yes (`set()`)                          |
+| Feature       | Iterator                              | ListIterator                             |
+| --------------| -----------------------------------   | ---------------------------------------- |
+| Direction     | Forward only                          | Forward and backward                     |
+| Applicability | Any `Collection` (Set, List, Queue)   | `List` only                              |
+| Add elements  | ❌ No                                | ✅ Yes                                   |
+| Get index     | ❌ No                                | ✅ Yes (`nextIndex()`, `previousIndex()`)|
+| Set / replace | ❌ No                                | ✅ Yes (`set()`)                         |
 
 
 ✅Example:
@@ -589,7 +589,7 @@ public class ListIteratorExample {
 
 🔄 Important Constraints
 1️⃣ IllegalStateException: Methods like remove() and set() can only be called after a call to next() or previous().
-2️⃣ Concurrent Modification: If the list is structurally modified (e.g., using list.add()) while using the iterator, it will throw a ConcurrentModificationException. Always use litr.add() instead.
+2️⃣ Concurrent Modification: If the list is structurally modified (e.g., using list.add()) while using the iterator, it will throw a ConcurrentModificationException. ─────────▶ Always use litr.add() instead.
 
 
 🔄 Method2: forEach()
@@ -655,13 +655,13 @@ public class MyIterable implements Iterable<Integer> {
 =============================
 The Collection interface in Java is the root interface of the Java Collections Framework. It resides in the java.util package and represents a group of objects known as its elements. It defines the basic operations that all collection classes must implement or support.
 ➤ Root interface for all collection types (except maps).
-➤ Extends: Iterable<E>
+➤ Extends ─────────▶ Iterable<E>
 ➤ Common Subinterfaces: List, Set, Queue, etc.
 
 
 🔄 Details of Collection Interface
-➤ Hierarchy Root: It is at the top of the collection interface hierarchy. Subinterfaces like List, Set, and Queue extend it.
-➤ Purpose: Allows manipulation of groups of objects independently of their representation or implementation.
+➤ Hierarchy Root ─────────▶ It is at the top of the collection interface hierarchy. Subinterfaces like List, Set, and Queue extend it.
+➤ Purpose ─────────▶ Allows manipulation of groups of objects independently of their representation or implementation.
 ➤ Common Methods
     ✔️ add(E e) ─────────▶ Add an element.
     ✔️ remove(Object o) ─────────▶ Remove an element.
@@ -785,8 +785,8 @@ public class SequencedCollectionExample {
 }
 👉 This example shows:
 ➤ Adding elements at both ends of the collection using addFirst and addLast.
- Accessing and removing elements from the front and back.
- Iterating elements in both forward and reverse order with reversed().
+➤ Accessing and removing elements from the front and back.
+➤ Iterating elements in both forward and reverse order with reversed().
 
 ⚡ Note: To run this code, you need Java 21 or later, as the SequencedCollection interface and related methods are introduced in Java 21. The LinkedList class is enhanced to implement this interface supporting dual-ended operations and reversed views.
 
@@ -884,16 +884,6 @@ public class ListExample {
 ➤ size()  ─────────▶ Returns number of elements.
 ➤ contains(Object o)  ─────────▶ Checks if an element is present.
 ➤ clear()  ─────────▶ Removes all elements.
-
-
-🔄 Time Complexity
-| Operation                 | Time Complexity        |
-| --------------------------| -----------------------|
-| Access by index           | O(1)                   |
-| Add at end                | O(1) amortized         |
-| Insert / remove at middle | O(n) (due to shifting) |
-| Search (contains)         | O(n)                   |
-| Resize (occasional)       | O(n)                   |
 
 
 🔄 When to Use ArrayList
@@ -1081,7 +1071,7 @@ A comparator in Java is a functional interface used to define custom ordering lo
    
     
 3️⃣ Lambda expression (Java 8+)
-    Comparator<Student> comp = (s1, s2) > s1.getId() - s2.getId();
+    Comparator<Student> comp = (s1, s2) -> s1.getId() - s2.getId();
    
     
 4️⃣ Using method references and Comparator utility methods
@@ -1304,7 +1294,7 @@ Vector class includes constructors to initialize vectors:
 🔄 When to Use Vector
 ➤ When thread safety is required without external synchronization.
 ➤ Legacy applications that already use Vector.
-➤ Replace with modern alternatives like CollectionssynchronizedList or CopyOnWriteArrayList if concurrency is required with better performance.
+➤ Replace with modern alternatives like Collections synchronizedList or CopyOnWriteArrayList if concurrency is required with better performance.
 
 
 ✅Code Implementation of Vector Methods
@@ -1620,7 +1610,6 @@ The Map interface contains a nested inner interface called Map.Entry<K, V>.
 🔄 Core Map Methods
 These are the fundamental methods available in the interface before Java 8.
 
-🔁 Basic Operations
 🔗 V put(K key, V value) ─────────▶ Associates the specified value with the specified key. If the map previously contained a mapping for the key, the old value is returned.
 🔗 V get(Object key) ─────────▶ Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
 🔗 V remove(Object key) ─────────▶ Removes the mapping for a key from this map if it is present. Returns the value that was associated with the key.
@@ -1656,7 +1645,6 @@ Java 8 introduced "Default Methods" to the Map interface, significantly simplify
 
 ✅ Conceptual Code Example
 This example demonstrates the usage of the Interface methods specifically. Note that we use HashMap only to instantiate the object, but the reference type is Map.
-
 
 import java.util.*;
 
@@ -1709,65 +1697,125 @@ HashMap is the most commonly used implementation of the Map interface. It stores
 
 🔄 Internal Structure of HashMap
 Basic components:
-✔️ Key: The identifer used to retrieve a value.
-✔️ Value:The data associated with the key.
-✔️ Bucket: A place where key-value paris are stored. Think of buckets as cells in a list(array).
-✔️ Hash function: Converts a key into an index(bucket location) for storage.
+✔️ Key ─────────▶ The identifer used to retrieve a value.
+✔️ Value ─────────▶The data associated with the key.
+✔️ Bucket ─────────▶ A place where key-value paris are stored. Think of buckets as cells in a list(array).
+✔️ Hash function ─────────▶ Converts a key into an index(bucket location) for storage.
 ➤ A hash function is an algorithm that takes an input(or key) and returns a fixed-size string of bytes, typically a numerical value. The output is known as the hash code, hash value or simply hash. The primary purpose of a hash function is to map data of arbitrary size to a fixed-size value.
 
 
-🔄 Characteristics of Hash Function:
-✔️ Deterministic: Given the same input, the hash function always produces the same output.
-✔️ Fixed Output size: The output of the hash function is a fixed-size string of bytes.
-✔️ Efficient Computation: The hash function is fast to compute.
-
+🔄 Characteristics of Hash Function
+✔️ Deterministic ─────────▶  Given the same input, the hash function always produces the same output.
+✔️ Fixed Output size ─────────▶  The output of the hash function is a fixed-size string of bytes.
+✔️ Efficient Computation ─────────▶  The hash function is fast to compute.
 
 🔁 How Data is Stored in HashMap
 1️⃣ Hashing the Key
-➤ The key is passed through a hash function to generate a unique hash code(an integer number). This hash code helps determine where the key-value pair will be stored in the array(called a "bucket array").
+➤ When we insert a key-value pair using put(key, value),
+the key is passed to the hash function to generate a hash code (an integer).
+
+➤ This hash code helps decide where the entry will be stored inside the internal array
+(called bucket array or table).
+
+⚡ Important Points
+➤ hashCode() is not the index
+➤ It is only used to calculate the index
 
 
 2️⃣ Calculating the Index
-➤ The hash code is then used to calculate an index in the array(bucket location) using
-int index= hashCode % array.length;
-➤ The index decides which bucket will hold the key-value pair.
-✅ For example: If the array size is 16, the key's hash code will be divided by 16, and the remainder will be the index.
+➤ HashMap converts the hash code into a valid array index.
+Internally: index = (n - 1) & hash
 
+📌 (Earlier Java explanation equivalent to)
+index = hashCode % array.length
+➤ The index determines which bucket will store the entry.
+
+✅ Example
+Array size = 16
+Hash code = 35
+Index = 35 % 16 = 3
 
 3️⃣ Storing in the Bucket
-➤ The key-value pair is stored in the bucket at the calculated index.
-➤ Each bucket can hold multiple key-value pairs.
-(this is called a collision handling mechanism).
-
-
-🔁 Data Reterival in Hashmap
-When we call get(Key), the HashMap follows the following steps
-1️⃣ Hashing the key ─────────▶ Similar to insertion, the key is hashed using the same hash function to calculate its hash code.
-2️⃣ Finding the index ─────────▶ The hash code is used to find the index of the bucket where the key-value pair is stored.
-3️⃣ Searching in the Bucket ─────────▶ Once the correct bucket is found, it checks for the key in that bucket. If found, it returns the value associated with the key.	
+➤ The key-value pair is stored at the calculated index.
+➤ Each bucket can store multiple entries
+(This happens when multiple keys map to the same index → collision).
 
 
 🔄 Handling Collisions
-➤ Since different keys can generate the same index(called a collision)
-HashMap uses a technique to handle this situation. Java's HashMap uses Linked List(or balanced Red-Black Tree(self balancing binary search tree) after Java 8) to resolve collisions.
+➤ A collision occurs when multiple keys produce the same index.
+➤ HashMap uses Separate Chaining to handle collisions.
 
-➤ If multiple key-value paris map to the same bucket, they are stored i a linked list inside the bucket.
-➤ This is called Separate Chaining.
+🔄 Before Java 8
+➤ Each bucket stored entries using a LinkedList.
+Bucket[3] → (K1,V1) → (K2,V2) → (K3,V3)
+➤ Time Complexity in worst case: O(n)
 
-➤ When a key-value pair is retrieved, the HashMap traverse the linked list to find the value associated with the key.
+
+🔄 Java 8 Onwards
+➤ If collisions increase, HashMap converts the LinkedList into a Red-Black Tree
+to improve performance.
+🌳 LinkedList ↔ Red-Black Tree Conversion (TREEIFY)
+This is the missing and most important part of your notes.
 
 
-🔄 HashMap Resizing(Rehashing)
-➤ HashMap has an internal array size, which is by default is 16.
-When the number of elements(key-value pairs) grows and exceeds a certain load factor(default is 0.75), HashMap automatically resizes the array to hold more data. This process is called rehashing.
+🔁 When LinkedList is converted to Red-Black Tree?
+🔸 TREEIFY_THRESHOLD
+static final int TREEIFY_THRESHOLD = 8;
+➤ If number of nodes in a bucket > 8,
+➤ AND the HashMap capacity is at least 64,
+➤ Then LinkedList is converted to Red-Black Tree
+📌 Both conditions must be satisfied
 
-➤ The default size of the array is 16, so when more than 12 elements(16*0.75) are inserted, the HashMap will resize.
 
-❗During rehashing
-➤ The array size is doubled
-➤ All existing entries are rehashed(i.e., their positions are recalculated)
-and placed in the new array.
-➤ This ensures the HashMap continues to work efficiently even after more data is added.
+🔁 When Red-Black Tree is converted back to LinkedList?
+🔸 UNTREEIFY_THRESHOLD
+static final int UNTREEIFY_THRESHOLD = 6;
+➤ If number of nodes in a tree bucket drops below 6,
+➤ Tree is converted back to LinkedList
+
+🔸 MIN_TREEIFY_CAPACITY
+static final int MIN_TREEIFY_CAPACITY = 64;
+➤ If capacity < 64 and collisions exceed threshold,
+➤ HashMap prefers resizing instead of treeification
+| Condition                       | Action                      |
+| ------------------------------- | --------------------------- |
+| Bucket size > 8 & capacity ≥ 64 | LinkedList → Red-Black Tree |
+| Bucket size < 6                 | Red-Black Tree → LinkedList |
+| Capacity < 64                   | Resize instead of treeify   |
+
+
+🔁 Data Retrieval in HashMap (get(key))
+When get(key) is called, HashMap performs:
+
+1️⃣ Hashing the Key
+➤ Same hash function is used to generate hash code.
+
+2️⃣ Finding the Index
+➤ Index is calculated using the hash and array size.
+
+3️⃣ Searching in the Bucket
+➤ If bucket contains:
+    ✔️ Single entry → return value
+    ✔️ LinkedList → traverse using equals()
+    ✔️ Red-Black Tree → search using tree logic (O(log n))
+
+
+🔄 HashMap Resizing (Rehashing)
+➤ Default capacity = 16
+➤ Default load factor = 0.75
+➤ Resize happens when: size > capacity × loadFactor
+
+
+✅ Example
+16 × 0.75 = 12
+➤ On inserting 13th entry → resize
+
+
+❗ During Rehashing
+➤ Capacity is doubled
+➤ New array is created
+➤ All existing entries are rehashed and redistributed
+📌 Rehashing is expensive (O(n)), but happens rarely.
 
 
 🔄 Time Compplexity
@@ -4279,7 +4327,8 @@ System.out.println(s1 == s3); // false (different memory locations)
 Operations like == compare references, not values.
 Use .equals() to compare values of strings.
 
-🔎 Code Example: Comparing References vs Values
+
+✅ Code Example: Comparing References vs Values
 String x1 = "mike";
 String x2 = "mike";
 String x3 = new String("mike");
@@ -4294,7 +4343,8 @@ String str2 = new String("Ankur");
 System.out.println(str1 == str2);    // false
 System.out.println(str1.equals(str2)); // true
 
-💡 intern() Method
+
+🔗 intern() Method
 Syntax:
 String interned = new String("mike").intern();
 
@@ -4317,13 +4367,14 @@ String str5 = "";
 System.out.println(str5.length()); // 0
 System.out.println(str4.length()); // ❌ NullPointerException
 
+
 ⚖️ Difference: Null vs Empty String
-| Property         | `null`                | `""` (Empty String)     |
-| ---------------- | --------------------- | ----------------------- |
+| Property         | null                    |  (Empty String)          |
+| ---------------- | ---------------------   | -----------------------  |
 | Memory allocated | ❌ No                  | ✅ Yes                   |
 | Object created   | ❌ No                  | ✅ Yes                   |
 | `.length()`      | ❌ Throws Exception    | ✅ Returns 0             |
-| Usability        | Can't call any method | Can call String methods |
+| Usability        | Can't call any method   | Can call String methods   |
 
 
 🔍 How to Check if a String is Empty
@@ -4449,6 +4500,7 @@ System.out.println(s2 instanceof String); // true
 System.out.println(s3 instanceof String); // true
 🔸 String.valueOf() works for all primitives: int, float, char, boolean, double, long, etc.
 
+
 🔍 Search in a String
 🔎 contains() Method
 ➤ Checks whether a string contains a specific sequence of characters.
@@ -4515,12 +4567,12 @@ String result = s1.concat(s2); // HelloWorld
 
 ➕ Add whitespace between
 String result = s1.concat(" ").concat(s2); // Hello World
-What is Mutable and Immutable class
 
-🧠 Mutable vs Immutable Classes
+
+🔁 What is Mutable and Immutable class
 | Property        | Immutable Class                             | Mutable Class                             |
 | --------------- | ------------------------------------------- | ----------------------------------------- |
-| Definition      | Object cannot be changed after creation | Object can be modified after creation |
+| Definition      | Object cannot be changed after creation     | Object can be modified after creation     |
 | Example         | `String`                                    | `StringBuilder`, `StringBuffer`           |
 | Thread-safe?    | Yes (`String`)                              | Only `StringBuffer` is thread-safe        |
 | Performance     | Slower (new object on change)               | Faster for frequent modifications         |
@@ -4530,8 +4582,8 @@ What is Mutable and Immutable class
 ==================================
 🔷 StringBuilder and StringBuffer
 ==================================
-| Feature                 | StringBuilder                             | StringBuffer                       |
-| ----------------------- | --------------------------------------------- | -------------------------------------- |
+| Feature             | StringBuilder                                 | StringBuffer                           |
+| --------------------| --------------------------------------------- | -----------------------------------    |
 | Mutability          | Mutable                                       | Mutable                                |
 | Thread Safety       | ❌ Not thread-safe                            | ✔️ Thread-safe (synchronized)         |
 | Performance         | Faster                                        | Slower (sync overhead)                 |
