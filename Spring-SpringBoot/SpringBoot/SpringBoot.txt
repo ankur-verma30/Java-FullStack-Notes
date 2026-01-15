@@ -1820,7 +1820,7 @@ public class AppConfig {
 
 
 ==============================
-🔷 @Transactional Annotation 
+🔷 @Transactional Annotation
 ===============================
 ➤ @Transactional in Spring marks a method (or class) so that database operations inside it run within a single transaction.
 ➤ Either all succeed (commit) or all fail (rollback).
@@ -2058,7 +2058,19 @@ emails:
 spring.profiles.active=dev
 
 ➤ This tells 
-pring Boot to load all settings from application-dev.properties in addition to the default application.properties.
+Spring Boot to load all settings from application-dev.properties in addition to the default application.properties.
+
+
+🔄 Where Spring Looks for Active Profile
+Spring uses Environment abstraction and checks multiple sources in priority order.
+| Priority | Source                                           |
+| -------- | ------------------------------------------------ |
+| 1️⃣      | JVM argument `-Dspring.profiles.active=prod`     |
+| 2️⃣      | OS environment variable `SPRING_PROFILES_ACTIVE` |
+| 3️⃣      | `application.properties / application.yml`       |
+| 4️⃣      | `spring.profiles.default`                        |
+| 5️⃣      | No profile (default behavior)                    |
+
 
 🔄 Create Profile-Specific Property Files
 Each profile has its own file following this naming convention:
@@ -2214,9 +2226,9 @@ System.out.println(context.getEnvironment().getActiveProfiles()[0]);
 Spring MVC (Model-View-Controller) is a web framework within the Spring Framework used to build web applications (both traditional and RESTful).
 
 It follows the MVC design pattern, which separates the application into:
-➤ Model → Data & Business logic
-➤ View → User Interface
-➤ Controller → Request handling
+➤ Model ────────  Data & Business logic
+➤ View ────────  User Interface
+➤ Controller ────────  Request handling
 
 🧠 Goal of Spring MVC
 To separate concerns and make the application flexible, maintainable, and testable.
@@ -2892,11 +2904,11 @@ Client
 | Layer                     | Servlet container                | Spring MVC        |
 | API                       | Servlet API                      | Spring Framework  |
 | Executes                  | Before DispatcherServlet         | Before Controller |
-| Aware of Spring Beans     | ❌                                | ✅                 |
-| Access to Controller info | ❌                                | ✅                 |
-| Can modify ModelAndView   | ❌                                | ✅                 |
+| Aware of Spring Beans     | ❌                               | ✅               |
+| Access to Controller info | ❌                               | ✅               |
+| Can modify ModelAndView   | ❌                               | ✅               |
 | Configuration             | web.xml / FilterRegistrationBean | WebMvcConfigurer  |
-| Framework dependent       | ❌                                | ✅                 |
+| Framework dependent       | ❌                               | ✅              |
 
 
 🔄 Filter vs Interceptor vs AOP
@@ -2904,7 +2916,7 @@ Client
 | --------------------- | -------------- | ----------- | ---------------------- |
 | Level                 | Request        | Controller  | Method                 |
 | Scope                 | Global         | MVC         | Business logic         |
-| Access to method args | ❌              | ❌           | ✅                      |
+| Access to method args | ❌             | ❌         | ✅                     |
 | Best for              | Security, CORS | MVC logic   | Cross-cutting concerns |
 
 
@@ -3183,7 +3195,7 @@ public CompletableFuture<String> task() {
 
 
 🔄 Exception Handling in @Async
-1️⃣ in void Methods
+1️⃣ void Methods
 ➤ Exceptions thrown in void @Async methods are lost.
 ✅ Solution: AsyncUncaughtExceptionHandler
 1️⃣ Async Configuration (Exception Handler Wiring)
@@ -3291,7 +3303,6 @@ Exception Message: Something went wrong in async void method
 ✅ Solution: Use CompletableFuture.exceptionally()
 
 
-
 🔄 Custom Thread Pool
 ❌ Default Executor
 ➤ SimpleAsyncTaskExecutor
@@ -3326,7 +3337,6 @@ public void asyncTask() {
 public class NotificationService {
 }
 ✔️ All public methods become async
-
 
 
 🔄 @Async vs @Transactional
@@ -3465,13 +3475,13 @@ If multiple exception handlers match:
 🔄 Why We Use Spring Batch
 | Purpose                    | Explanation                                                             |
 | -------------------------- | ----------------------------------------------------------------------- |
-| Automation             | Run repetitive jobs (e.g., daily report generation, data cleanup).      |
-| Bulk Processing        | Process millions of records efficiently.                                |
-| Transaction Management | Each chunk is processed transactionally — rollback if any failure.      |
-| Restart Capability     | Resume job from where it failed.                                        |
-| Scalability            | Supports multi-threaded and parallel processing.                        |
-| Integration            | Works easily with Spring Boot, Spring Data, JPA, JDBC, etc.             |
-| Monitoring             | Tracks job metadata (start time, end time, status, etc.) automatically. |
+| Automation                 | Run repetitive jobs (e.g., daily report generation, data cleanup).      |
+| Bulk Processing            | Process millions of records efficiently.                                |
+| Transaction Management     | Each chunk is processed transactionally — rollback if any failure.      |
+| Restart Capability         | Resume job from where it failed.                                        |
+| Scalability                | Supports multi-threaded and parallel processing.                        |
+| Integration                | Works easily with Spring Boot, Spring Data, JPA, JDBC, etc.             |
+| Monitoring                 | Tracks job metadata (start time, end time, status, etc.) automatically. |
 
 
 🔄 Real-World Use Cases

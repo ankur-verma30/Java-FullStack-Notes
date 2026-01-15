@@ -649,11 +649,13 @@ import org.springframework.http.ResponseEntity;
 
 ➤ Think of it as your Java-based Postman — but used inside your application code.
 
+
 2️⃣ When to Use It
 ➤ You use RestTemplate when:
     ✔️ Your Spring app wants to call another REST API (either external or internal).
     ✔️ You need to integrate multiple microservices.
     ✔️ You want to send or receive JSON data programmatically
+
 
 3️⃣ How It Works Internally
 Here’s the internal flow:
@@ -661,12 +663,14 @@ Here’s the internal flow:
 [Your Spring App] → (RestTemplate) → [HTTP Request] → [Target REST API] 
 → [Response] → (RestTemplate parses it) → [Java Object or String]
 
+
 ✅ Example Flow:
 You call:
 restTemplate.getForObject("https://jsonplaceholder.typicode.com/posts/1", Post.class);
 → It makes a GET request to that URL
 → Gets the JSON response
 → Converts it automatically into a Post Java object using Jackson JSON Mapper
+
 
 ✅ Example:
 Let's say we have StudentService and a client Service that calls it.
@@ -695,6 +699,30 @@ class Student {
     private String department;
 }
 
+
+@Configuration
+public class RestTemplateConfig {
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+
+🔄 If we want to set timeouts
+@Configuration
+public class RestTemplateConfig {
+
+@Bean
+public RestTemplate restTemplate() {
+    SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    factory.setConnectTimeout(5000); // 5 seconds
+    factory.setReadTimeout(5000);    // 5 seconds
+    return new RestTemplate(factory);
+    }
+}
+
+
 🔗 StudentClient.java (Consumer using RestTemplate)
 package com.example.demo.client;
 
@@ -722,6 +750,7 @@ public class StudentClient {
     }
 }
 
+
 // Student model (same structure as in API)
 @Data
 class Student {
@@ -729,6 +758,7 @@ class Student {
     private String name;
     private String department;
 }
+
 
 🔄 Running the Example
 ➤ Run the StudentController application (port 8080).
@@ -738,6 +768,7 @@ GET http://localhost:8080/api/students/1
 ➤ Run StudentClient class (it can be in another app or in same app).
 → It makes a GET call using RestTemplate.
 
+
 ✅ You’ll see output like:
 Status Code: 200 OK
 Student Details:
@@ -746,7 +777,7 @@ Name: Ankur Verma
 Department: IT
 
 
-Commonly Used RestTemplate Methods
+🔄 Commonly Used RestTemplate Methods
 | Method                            | Purpose                                                  | Example                                                   |
 | --------------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
 | `getForObject(url, class)`        | GET request and returns object directly                  | `restTemplate.getForObject(url, Student.class)`           |
@@ -757,18 +788,253 @@ Commonly Used RestTemplate Methods
 | `delete(url)`                     | DELETE request                                           | `restTemplate.delete(url)`                                |
 
 
+🔄 Limitations of RestTemplate 
+1️⃣ There are so many overloaed methods which create confusion and so its hard to remember and maintain.
+2️⃣ It was build before cocepts like Retry, circuit breaker etc. so adding support means more overloaded methods and not user friendly.
+3️⃣ It is a blocking client which means each request will block the thread until response is received. This can lead to thread exhaustion under high load.
+
+
+===============
+🔷 RestClient
+===============
+➤ RestClient is a modern, synchronous (blocking) HTTP client
+➤ Introduced in Spring Framework 6
+➤ Designed as a replacement for RestTemplate
+➤ Provides a fluent(chaining of methods), readable, and type-safe API
+➤ Built on top of Spring’s HTTP infrastructure
+
+
+🔄 Why Spring Introduced RestClient
+Problems with RestTemplate
+    ✔️ Old, imperative API
+    ✔️ Verbose
+    ✔️ Hard to customize
+    ✔️ No future enhancements planned
+
+Problems with WebClient
+    ✔️ Reactive programming overhead
+    ✔️ Mono / Flux learning curve
+    ✔️ Overkill for simple MVC apps
+
+Solution → RestClient
+    ✔️ Blocking (simple mental model)
+    ✔️ Fluent API
+    ✔️ Future-proof
+    ✔️ Clean error handling
+
+
+🔄 Positioning in Spring REST Clients
+RestTemplate   ❌ (legacy, blocking)
+RestClient     ✅ (modern, blocking)
+WebClient      ⚡ (reactive, non-blocking)
+Feign          🧩 (declarative abstraction)
+
+
+🔄 Core Characteristics
+➤ Blocking I/O
+➤ Synchronous request-response
+➤ Fluent builder pattern
+➤ Strong typing
+➤ Integrated with Spring ecosystem
+➤ Supports interceptors, error handlers, timeouts
+
+
+🔄 Creating a RestClient
+1️⃣ Simple Creation
+@Bean
+public RestClient restClient() {
+        return RestClient.create();
+}
+
+2️⃣ Recommended (Bean Configuration)
+@Bean
+public RestClient restClient() {
+    return RestClient.builder()
+            .baseUrl("https://api.example.com")
+            .defaultHeader("Content-Type", "application/json")
+            .build();
+}
+👉 Best practice: Define as a singleton bean
+
+
+🔄 Basic HTTP Operations
+✅ GET Request
+User user = restClient
+        .get()
+        .uri("/users/{id}", 1)
+        .retrieve()
+        .body(User.class);
+
+
+✅ POST Request
+UserResponse response = restClient
+        .post()
+        .uri("/users")
+        .body(userRequest)
+        .retrieve()
+        .body(UserResponse.class);
+
+
+✅ PUT Request
+restClient.put()
+        .uri("/users/{id}", 1)
+        .body(updateRequest)
+        .retrieve()
+        .toBodilessEntity();
+
+
+✅ DELETE Request
+restClient.delete()
+        .uri("/users/{id}", 1)
+        .retrieve()
+        .toBodilessEntity();
+
+
+🔄 Response Handling
+─────────▶ Read Full Response
+ResponseEntity<User> response =
+        restClient.get()
+        .uri("/users/{id}", 1)
+        .retrieve()
+        .toEntity(User.class);
+
+─────────▶ No Response Body
+restClient.post()
+        .uri("/users")
+        .body(request)
+        .retrieve()
+        .toBodilessEntity();
+
+
+🔄 Error Handling
+restClient.get()
+    .uri("/users/{id}", 1)
+    .retrieve()
+    .onStatus(HttpStatusCode::is4xxClientError,
+        (req, res) -> {
+            throw new RuntimeException("Client error");
+        })
+    .onStatus(HttpStatusCode::is5xxServerError,
+        (req, res) -> {
+            throw new RuntimeException("Server error");
+        })
+    .body(User.class);
+
+✅ Cleaner than RestTemplate exception handling
+
+
+🔄 Headers & Authentication
+Custom Headers
+restClient.get()
+    .uri("/users")
+    .header("Authorization", "Bearer token")
+    .retrieve()
+    .body(List.class);
+
+Default Headers (Global)
+RestClient.builder()
+    .defaultHeader("Authorization", "Bearer token")
+    .build();
+
+
+🔄 Path Variables & Query Params
+1️⃣ Path Variables
+.uri("/users/{id}", id)
+
+2️⃣ Query Parameters
+.uri(uriBuilder ->
+    uriBuilder
+        .path("/users")
+        .queryParam("active", true)
+        .build()
+)
+
+
+🔄 Interceptors (Cross-Cutting Concerns)
+1️⃣ Inside the Builder  
+RestClient.builder()
+    .requestInterceptor((request, body, execution) -> {
+        System.out.println("Request URL: " + request.getURI());
+        return execution.execute(request, body);
+    })
+    .build();
+Use cases:
+    ✔️ Logging
+    ✔️ Authentication
+    ✔️ Tracing
+    ✔️ Metrics
+
+
+2️⃣ Can create seperate Interceptor class
+public class LoggingInterceptor implements ClientHttpRequestInterceptor {
+    @Override
+    public ClientHttpResponse intercept(
+            HttpRequest request,
+            byte[] body,
+            ClientHttpRequestExecution execution) throws IOException {
+        System.out.println("Request URL: " + request.getURI());
+        return execution.execute(request, body);
+    }
+}
+
+Then register it:
+@Configuration
+public class RestClientConfig {
+    @Bean
+    public RestClient restClientInstance() {
+        return RestClient.builder()
+                .interceptor(new LoggingInterceptor())
+                .build();
+    }
+}
+
+
+🔄 Timeouts & HTTP Client
+RestClient uses:
+➤ ClientHttpRequestFactory
+➤ Backed by:
+    ✔️ JDK HttpClient
+    ✔️ Apache HttpClient
+    ✔️ OkHttp
+
+✅ Example:
+HttpComponentsClientHttpRequestFactory factory =
+        new HttpComponentsClientHttpRequestFactory();
+
+factory.setConnectTimeout(5000);
+factory.setReadTimeout(5000);
+
+RestClient.builder()
+    .requestFactory(factory)
+    .build();
+
+
+🔄 RestClient vs RestTemplate
+| Feature        | RestTemplate | RestClient |
+| -------------- | ------------ | ---------- |
+| API Style      | Imperative   | Fluent     |
+| Future Support | ❌            | ✅          |
+| Error Handling | Weak         | Strong     |
+| Configuration  | Hard         | Easy       |
+| Spring Boot 3  | ❌            | ✅          |
+
+
+==============
 🔷 WebClient
+==============
 ➤ WebClient is part of Spring WebFlux, a reactive web framework introduced in Spring 5.
 ➤ It is used to make asynchronous, non-blocking HTTP requests to REST APIs.
 
 👉 Think of it as:
 A reactive, lightweight, and flexible version of RestTemplate
 
+
 🔄 Why WebClient Was Introduced
 ➤ RestTemplate (older client) works in a blocking manner —
 that means each thread waits for the response before continuing.
 ➤ In contrast, WebClient is non-blocking —
 it can handle many requests concurrently with fewer threads, improving performance and scalability.
+
 
 🔄 Key Features of WebClient
 | Feature                      | Description                                                               |
@@ -785,6 +1051,7 @@ it can handle many requests concurrently with fewer threads, improving performan
 ✔️ When handling multiple concurrent API calls.
 ✔️ When you need to stream data (e.g., continuous updates).
 ✔️ When you’re using Spring WebFlux or microservices.
+
 
 🔄 Basic Syntax
 WebClient webClient = WebClient.create("http://localhost:8080");
@@ -807,7 +1074,7 @@ Mono<Student> is a reactive type that represents one asynchronous result (like a
 | Recommended By Spring | Deprecated (for new apps)       | ✅ Official Replacement      |
 
 
-Maven dependency for WebClient:
+🔄 Maven dependency for WebClient:
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-webflux</artifactId>
@@ -815,6 +1082,7 @@ Maven dependency for WebClient:
 
 ➤ spring-boot-starter-web --> class
 ➤ spring-boot-starter-webflux --> interface
+
 
 🔄 Reactive Concepts Used
 1️⃣ Mono<T> → represents 0 or 1 asynchronous result (like one Student).
