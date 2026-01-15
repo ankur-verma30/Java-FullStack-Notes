@@ -41,7 +41,7 @@ In project we will develop serveral classes. All those classes we can catergoriz
         👉 It is a special type of bean class.
         👉 It is used to define various layers of an application like Controller, Service, Repository etc..
         👉 Controller classes will have logic to deal with request and response.
-        👉 Service classes will have business logic of out project.
+        👉 Service classes will have business logic of our project.
         👉 DAO classes will contain the logic to communicate with database.
 
 
@@ -438,8 +438,8 @@ public class ResourceManager {
 @PreDestroy 🆚 @PostConstruct
 | Annotation       | Purpose                          |
 | ---------------- | -------------------------------- |
-| `@PostConstruct` | Runs **after bean creation**     |
-| `@PreDestroy`    | Runs **before bean destruction** |
+| `@PostConstruct` | Runs after bean creation         |
+| `@PreDestroy`    | Runs before bean destruction     |
 
 🔄 @PreDestroy vs DisposableBean
 Using DisposableBean
@@ -530,11 +530,11 @@ Here:
 4️⃣ Accessing Values Inside Code
 You can fetch values in your beans with @Value or @ConfigurationProperties.
 
-Using @Value:
+🔄 Using @Value:
 @Value("${server.port}")
 private int port;
 
-Using @ConfigurationProperties:
+🔄 Using @ConfigurationProperties:
 @Component
 @ConfigurationProperties(prefix = "spring.datasource")
 public class DBConfig {
@@ -597,7 +597,7 @@ public class Student {
 
 
 =========
-🔷 Bean 
+🔷 Bean
 =========
 ➤ A Bean is an object that is created, managed, initialized, and destroyed by the Spring IoC Container.
 ➤ In Spring Boot, most beans are created automatically using auto-configuration.
@@ -646,7 +646,6 @@ public class AppConfig {
 ==================
 🔷 Bean Lifecycle
 ==================
-🔄 Bean Lifecycle Flow
 1️⃣ Bean Definition Loaded
 2️⃣ Bean Instantiation
 3️⃣ Dependency Injection
@@ -709,7 +708,6 @@ public class DemoBean implements BeanNameAware {
         System.out.println("Bean Name: " + name);
     }
 }
-👉 Used rarely, but interview favorite.
 
 
 5️⃣ BeanPostProcessor (Before Init)
@@ -745,7 +743,7 @@ public Server server() {
     return new Server();
 }
 
-👉 Priority Order: @PostConstruct → InitializingBean → initMethod
+👉 Priority Order: @PostConstruct ─────────▶ InitializingBean ─────────▶ initMethod
 
 
 7️⃣ BeanPostProcessor (After Init)
@@ -781,7 +779,7 @@ public void destroy() {}
 
 3️⃣ destroyMethod
 @Bean(destroyMethod = "stop")
-👉 Order: @PreDestroy → DisposableBean → destroyMethod
+👉 Order: @PreDestroy ─────────▶ DisposableBean ─────────▶ destroyMethod
 
 
 🔄 Bean Scopes
@@ -1064,8 +1062,7 @@ public class UserService {}
 1️⃣ Singleton Scope
 @Scope("singleton")
 @Component
-public class SingletonBean {
-}
+public class SingletonBean {}
 
 🔁 Characteristics
 ➤ One object per container
@@ -1124,8 +1121,7 @@ ProxyMode allows a request-scoped bean to be safely injected into a singleton be
   proxyMode = ScopedProxyMode.TARGET_CLASS
 )
 @Component
-public class RequestData {
-}
+public class RequestData {}
 
 
 🔄 How It Works (Internally)
@@ -1448,6 +1444,7 @@ Examples of cross-cutting concerns
 ➤ Caching
 ⚡ Without AOP, this code gets repeated everywhere, making the application hard to maintain.
 
+
 🔄 Why AOP is Needed (Problem Without AOP)
 ❌ Without AOP
 public void transferMoney() {
@@ -1492,7 +1489,7 @@ public class LoggingAspect {
 A point during program execution where advice can be applied.
 👉 In Spring AOP: Method execution only
 
-Example:
+✅ Example:
 @Around("execution(* com.app.service.*.*(..))")
 public void logAround(ProceedingJoinPoint joinPoint) throws Throwable {
     System.out.println("Method started");
@@ -1597,7 +1594,7 @@ bean(userService)
 
 🔄 Named Pointcut
 @Pointcut("execution(* com.app.service.*.*(..))")
-public void allServiceMethods() {} ─────────▶ should not have a method body 
+public void allServiceMethods() {} ─────────▶ should not have a method body
 
 @Before("allServiceMethods()")
 public void logBefore() {
@@ -1718,7 +1715,7 @@ public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
 | Business logic separation | ✅ Best         | ❌             | ❌                |
 
 
-🔄 Benefits of AOP 
+🔄 Benefits of AOP
 ✔️️ No code duplication
 ✔️️ Clean business logic
 ✔️️ Centralized cross-cutting concerns
@@ -1739,296 +1736,6 @@ public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
 ❌ Simple applications
 ❌ Overuse leads to debugging complexity
 ❌ Logic tightly coupled to business flow
-
-
-=============================================
-🔷 Convert Request Data Into Custom Objects
-=============================================
-Spring MVC can automatically bind simple types:
-    ✔️ String
-    ✔️ int
-    ✔️ long
-    ✔️ boolean
-❌ But it cannot directly convert request data into custom objects.
-
-❌ Example (Without PropertyEditor)
-@GetMapping("/user")
-public String getUser(User user) {  // ❌ how will Spring create User?
-    return "ok";
-}
-
-Spring does not know: How to convert request data → User object
-➡️ Solution: PropertyEditor
-
-
-🔄 PropertyEditor
-PropertyEditor is a Spring mechanism used to convert String-based request values into custom Java objects.
-👉 It works during data binding phase.
-
-
-🔄 Real World Scenario
-Request: GET /order?product=101
-
-👉 Goal:
-Convert "101" into Product object
-
-
-🔄 Step-by-Step Implementation
-
-1️⃣ Custom Domain Object
-public class Product {
-    private int id;
-    private String name;
-
-    // getters & setters
-}
-
-
-2️⃣ Create Custom PropertyEditor
-import java.beans.PropertyEditorSupport;
-
-public class ProductEditor extends PropertyEditorSupport {
-
-    @Override
-    public void setAsText(String text) throws IllegalArgumentException {
-        int productId = Integer.parseInt(text);
-
-        Product product = new Product();
-        product.setId(productId);
-        product.setName("Sample Product");
-
-        setValue(product);
-    }
-}
-👉 Key method: setAsText(String text) → conversion logic lives here
-
-3️⃣ Register PropertyEditor using @InitBinder
-@RestController
-public class OrderController {
-
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(Product.class, new ProductEditor());
-    }
-
-    @GetMapping("/order")
-    public String placeOrder(Product product) {
-        return "Product ID: " + product.getId();
-    }
-}
-
-
-🔄 How Binding Happens (Internals)
-Request Parameter (String)
-        ↓
-PropertyEditor
-        ↓
-Custom Object
-        ↓
-Controller Parameter
-
-Spring:
-1️⃣ Reads request param
-2️⃣ Finds registered PropertyEditor
-3️⃣ Calls setAsText()
-4️⃣ Injects converted object
-
-✅ Example Request: GET /order?product=101
-─────────▶ Controller Receives: Product{id=101, name="Sample Product"}
-
-
-🔄 Passing Custom Object using @RequestParam
-@GetMapping("/order")
-public String placeOrder(@RequestParam Product product) {
-    return "success";
-}
-👉 Works because PropertyEditor handles conversion
-
-
-🔄 Important Rules & Traps ⚠️
-❌ PropertyEditor is:
-    ✔️ NOT thread-safe
-    ✔️ Old mechanism
-➤ Scope:
-    ✔️ Controller-level (via @InitBinder)
-    ✔️ Global (via ControllerAdvice)
-
-
-🔄 Global PropertyEditor (Best Practice)
-@ControllerAdvice
-public class GlobalBinder {
-
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(Product.class, new ProductEditor());
-    }
-}
-👉 Applies to all controllers
-
-🔄 When to Use PropertyEditor?
-✅ Legacy Spring MVC apps
-❌ New applications (use Converter)
-
-
-=============
-🔷 Converter
-=============
-➤ A Converter is a type-safe, thread-safe mechanism in Spring used to convert one object type into another.
-➤ It is part of Spring’s Conversion Service, and it replaces PropertyEditor in modern applications.
-
-
-🔄 Converter (Problem with PropertyEditor)
-| Problem in PropertyEditor | How Converter Solves     |
-| ------------------------- | ---------------------    |
-| ❌ Not thread-safe         | ✅ Thread-safe         |
-| ❌ Controller-scoped       | ✅ Global              |
-| ❌ String → Object only    | ✅ Any type → Any type |
-| ❌ Old Java Beans API      | ✅ Spring-native       |
-| ❌ Hard to test            | ✅ Easy to test        |
-👉 Converter is the industry standard now.
-
-
-🔄 Where Converter Is Used Internally
-Spring uses Converter in:
-    ✔️ Controller request binding
-    ✔️ @RequestParam
-    ✔️ @PathVariable
-    ✔️ @ModelAttribute
-    ✔️ Spring Data JPA
-    ✔️ Spring Security
-    ✔️ WebFlux
-
-
-🔄 Core Interface
-public interface Converter<S, T> {
-    T convert(S source);
-}
-✔️ S → Source type
-✔️ T → Target type
-
-
-🔄 Real-World Problem (Same as PropertyEditor Example)
-Request: GET /order?product=101
-Goal: String "101" → Product object
-
-
-🔄 Step-by-Step Implementation
-1️⃣ Domain Object
-public class Product {
-    private int id;
-    private String name;
-
-    // getters & setters
-}
-
-
-2️⃣ Create Custom Converter
-@Component
-public class StringToProductConverter implements Converter<String, Product> {
-
-    @Override
-    public Product convert(String source) {
-
-        int id = Integer.parseInt(source);
-
-        Product product = new Product();
-        product.setId(id);
-        product.setName("Sample Product");
-
-        return product;
-    }
-}
-✔️ Thread-safe
-✔️ No shared state
-✔️ Reusable everywhere
-
-
-🔄 3️⃣ Use in Controller (Nothing Special Required)
-@GetMapping("/order")
-public String placeOrder(Product product) {
-    return "Product ID: " + product.getId();
-}
-✔️ Spring auto-detects the converter
-✔️ Automatically converts request parameter
-
-
-🔄 How Conversion Happens Internally 
-HTTP Request (String)
-        ↓
-ConversionService
-        ↓
-Matching Converter
-        ↓
-Target Object
-        ↓
-Controller Parameter
-✔️ Spring Boot auto-configures: FormattingConversionService
-
-
-🔄 Converter vs Formatter
-| Feature        | Converter          | Formatter                 |
-| -------------- | ------------------ | ------------------------- |
-| Direction      | Object → Object    | Object ↔ String           |
-| Use case       | General conversion | Formatting (Date, Number) |
-| Locale support | ❌                 | ✅                         |
-| Example        | String → User      | Date → String             |
-✔️ Formatter is built on top of Converter
-
-
-🔄 Registering Converter (When @Component Is Not Enough)
-1️⃣ Using WebMvcConfigurer
-@Configuration
-public class WebConfig implements WebMvcConfigurer {
-
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new StringToProductConverter());
-    }
-}
-
-2️⃣ Global Registration
-✔️ Applies to all controllers
-✔️ Clean architecture
-
-🔄 Converter for @PathVariable
-@GetMapping("/order/{product}")
-public String getOrder(@PathVariable Product product) {
-    return product.getName();
-}
-✔️ Works automatically
-
-
-🔄 Converter in Spring Data JPA
-Used for:
-    ✔️ Enum mapping
-    ✔️ ID mapping
-    ✔️ Custom types
-
-@Converter
-public class StatusConverter implements AttributeConverter<Status, String> {}
-👉 Different Converter interface (JPA)
-
-
-🔄 Common Traps ⚠️
-❌ Thinking Converter works only for Controller
-❌ Confusing JPA Converter with Spring Converter
-❌ Forgetting thread-safety benefit
-
-
-🔄 PropertyEditor vs Converter
-| Feature     | PropertyEditor | Converter |
-| ----------- | -------------- | --------- |
-| Thread-safe | ❌             | ✅       |
-| Scope       | Controller     | Global    |
-| Modern      | ❌             | ✅       |
-| Recommended | ❌             | ✅       |
-
-
-🔄 When Should You Use Converter?
-✔️ Custom object binding
-✔️ ID → Entity mapping
-✔️ Clean REST APIs
-✔️ Modern Spring Boot apps
 
 
 ======================
@@ -2210,10 +1917,10 @@ public void doWork() { ... }
 🔄 Isolation Levels vs Problems
 | Isolation Level      | Dirty Read    | Non-Repeatable Read  | Phantom Read   |
 | -------------------- | -----------   | -------------------  | ------------   |
-| **READ UNCOMMITTED** | ❌ Possible  | ❌ Possible          | ❌ Possible   |
-| **READ COMMITTED**   | ✅ Prevented | ❌ Possible          | ❌ Possible   |
-| **REPEATABLE READ**  | ✅ Prevented | ✅ Prevented         | ❌ Possible   |
-| **SERIALIZABLE**     | ✅ Prevented | ✅ Prevented         | ✅ Prevented  |
+| READ UNCOMMITTED | ❌ Possible  | ❌ Possible          | ❌ Possible   |
+| READ COMMITTED   | ✅ Prevented | ❌ Possible          | ❌ Possible   |
+| REPEATABLE READ  | ✅ Prevented | ✅ Prevented         | ❌ Possible   |
+| SERIALIZABLE     | ✅ Prevented | ✅ Prevented         | ✅ Prevented  |
 
 
 🔄 How Each Isolation Level Works
@@ -2999,13 +2706,13 @@ public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loggingInterceptor1)
-        .addPathPatterns("/**") ─────────▶ Apply to these URL Patterns
-        .excludePathPatterns("/static/**"); ─────────▶ Exclude these URL Patterns
+        .addPathPatterns("/") ─────────▶ Apply to these URL Patterns
+        .excludePathPatterns("/static/"); ─────────▶ Exclude these URL Patterns
     }
 
     registry.addInterceptor(loggingInterceptor2)
-    .addPathPatterns("/**")
-    .excludePathPatterns("/static/**");   
+    .addPathPatterns("/")
+    .excludePathPatterns("/static/");   
 }
 ─────────▶ same sequence will be followed by all interceptors as it was added in the code 
 
@@ -3758,13 +3465,13 @@ If multiple exception handlers match:
 🔄 Why We Use Spring Batch
 | Purpose                    | Explanation                                                             |
 | -------------------------- | ----------------------------------------------------------------------- |
-| **Automation**             | Run repetitive jobs (e.g., daily report generation, data cleanup).      |
-| **Bulk Processing**        | Process millions of records efficiently.                                |
-| **Transaction Management** | Each chunk is processed transactionally — rollback if any failure.      |
-| **Restart Capability**     | Resume job from where it failed.                                        |
-| **Scalability**            | Supports multi-threaded and parallel processing.                        |
-| **Integration**            | Works easily with Spring Boot, Spring Data, JPA, JDBC, etc.             |
-| **Monitoring**             | Tracks job metadata (start time, end time, status, etc.) automatically. |
+| Automation             | Run repetitive jobs (e.g., daily report generation, data cleanup).      |
+| Bulk Processing        | Process millions of records efficiently.                                |
+| Transaction Management | Each chunk is processed transactionally — rollback if any failure.      |
+| Restart Capability     | Resume job from where it failed.                                        |
+| Scalability            | Supports multi-threaded and parallel processing.                        |
+| Integration            | Works easily with Spring Boot, Spring Data, JPA, JDBC, etc.             |
+| Monitoring             | Tracks job metadata (start time, end time, status, etc.) automatically. |
 
 
 🔄 Real-World Use Cases
@@ -3780,14 +3487,14 @@ If multiple exception handlers match:
 🔄 Key Concepts in Spring Batch
 | Concept           | Description                                                         |
 | ----------------- | ------------------------------------------------------------------- |
-| **Job**           | Represents the entire batch process (contains one or more steps).   |
-| **Step**          | A single phase of the job — e.g., read → process → write.           |
-| **ItemReader**    | Reads data (from file, DB, API, etc.).                              |
-| **ItemProcessor** | Processes/transforms the data (e.g., filtering, mapping).           |
-| **ItemWriter**    | Writes data to a destination (DB, file, etc.).                      |
-| **JobRepository** | Stores metadata about job execution (status, start/end time, etc.). |
-| **JobLauncher**   | Used to start the batch job.                                        |
-| **JobParameters** | External inputs to a batch job (e.g., file path, date).             |
+| Job           | Represents the entire batch process (contains one or more steps).   |
+| Step          | A single phase of the job — e.g., read → process → write.           |
+| ItemReader    | Reads data (from file, DB, API, etc.).                              |
+| ItemProcessor | Processes/transforms the data (e.g., filtering, mapping).           |
+| ItemWriter    | Writes data to a destination (DB, file, etc.).                      |
+| JobRepository | Stores metadata about job execution (status, start/end time, etc.). |
+| JobLauncher   | Used to start the batch job.                                        |
+| JobParameters | External inputs to a batch job (e.g., file path, date).             |
 
 
 🔄 How Spring Batch Works (Flow Diagram)
@@ -3915,13 +3622,13 @@ public void runJob() throws Exception {
 🔄 Advanced Features
 | Feature                      | Description                                                  |
 | ---------------------------- | ------------------------------------------------------------ |
-| **Job Restartability**       | Resume job from last successful step using job metadata.     |
-| **Job Scheduling**           | Combine with Spring Scheduler / Quartz to run periodically.  |
-| **Parallel Steps**           | Run multiple steps in parallel threads.                      |
-| **Partitioning**             | Split data into multiple partitions for parallel processing. |
-| **Skip and Retry Logic**     | Skip or retry items that fail processing.                    |
-| **Listeners**                | Hook into lifecycle events (before/after job or step).       |
-| **Database-backed Metadata** | Stores job execution data in DB via `JobRepository`.         |
+| Job Restartability       | Resume job from last successful step using job metadata.     |
+| Job Scheduling           | Combine with Spring Scheduler / Quartz to run periodically.  |
+| Parallel Steps           | Run multiple steps in parallel threads.                      |
+| Partitioning             | Split data into multiple partitions for parallel processing. |
+| Skip and Retry Logic     | Skip or retry items that fail processing.                    |
+| Listeners                | Hook into lifecycle events (before/after job or step).       |
+| Database-backed Metadata | Stores job execution data in DB via `JobRepository`.         |
 
 
 =========================
@@ -3933,10 +3640,10 @@ Instead of executing tasks sequentially and blocking threads (like traditional S
 🔄 Traditional vs Reactive Thinking
 | Type             | Traditional (Imperative)       | Reactive (Declarative)                 |
 | ---------------- | ------------------------------ | -------------------------------------- |
-| **Thread Model** | One thread per request         | Few threads handle many requests       |
-| **I/O Calls**    | Blocking (waits for response)  | Non-blocking (reacts when ready)       |
-| **Processing**   | Sequential                     | Event-driven & Stream-based            |
-| **Example**      | Waiting for DB query to finish | Subscribes to DB result when available |
+| Thread Model | One thread per request         | Few threads handle many requests       |
+| I/O Calls    | Blocking (waits for response)  | Non-blocking (reacts when ready)       |
+| Processing   | Sequential                     | Event-driven & Stream-based            |
+| Example      | Waiting for DB query to finish | Subscribes to DB result when available |
 
 🔄 Why Reactive Programming?
 Reactive programming helps when your system:
@@ -3949,10 +3656,10 @@ Reactive programming helps when your system:
 🔄 Core Concepts of Reactive Programming 
 | Concept          | Description                                    | Analogy                         |
 | ---------------- | ---------------------------------------------- | ------------------------------- |
-| **Publisher**    | Emits data asynchronously (like a data source) | “Person who speaks”             |
-| **Subscriber**   | Listens to data from Publisher                 | “Person who listens”            |
-| **Subscription** | Connection between Publisher & Subscriber      | “Phone call between two people” |
-| **Backpressure** | Mechanism to control data flow rate            | “Listener says – speak slower!” |
+| Publisher    | Emits data asynchronously (like a data source) | “Person who speaks”             |
+| Subscriber   | Listens to data from Publisher                 | “Person who listens”            |
+| Subscription | Connection between Publisher & Subscriber      | “Phone call between two people” |
+| Backpressure | Mechanism to control data flow rate            | “Listener says – speak slower!” |
 
 🔄 Reactive Streams Specification (4 Interfaces)
 Spring implements Reactive Streams, which has four interfaces:
@@ -3966,8 +3673,8 @@ Spring Boot provides Spring WebFlux — a reactive alternative to Spring MVC.
 
 | Framework          | Type         | I/O Model    |
 | ------------------ | ------------ | ------------ |
-| **Spring MVC**     | Synchronous  | Blocking     |
-| **Spring WebFlux** | Asynchronous | Non-Blocking |
+| Spring MVC     | Synchronous  | Blocking     |
+| Spring WebFlux | Asynchronous | Non-Blocking |
 
 👉 WebFlux is built on:
 ➤ Project Reactor → core reactive library used internally.
@@ -3976,8 +3683,8 @@ Spring Boot provides Spring WebFlux — a reactive alternative to Spring MVC.
 Core Types in Project Reactor
 | Type        | Description                                   | Example      |
 | ----------- | --------------------------------------------- | ------------ |
-| **Mono<T>** | Emits **0 or 1** item (for single responses)  | `Mono<User>` |
-| **Flux<T>** | Emits **0 or many** items (for streams/lists) | `Flux<User>` |
+| Mono<T> | Emits 0 or 1 item (for single responses)  | `Mono<User>` |
+| Flux<T> | Emits 0 or many items (for streams/lists) | `Flux<User>` |
 These replace the traditional User or List<User> in reactive code.
 
 ✅ Example: Reactive Controller
@@ -4021,11 +3728,11 @@ Client → Reactive Controller → Reactive Service → Reactive Repository → 
 🔄 Advantages
 | Advantage                         | Explanation                                                  |
 | --------------------------------- | ------------------------------------------------------------ |
-| 🚀 **High Scalability**           | Handles thousands of concurrent connections with few threads |
-| ⚡ **Better Resource Utilization** | No blocking → less thread overhead                           |
-| 🔄 **Asynchronous**               | Data flows as streams, not as fixed responses                |
-| 📡 **Streaming Data Support**     | Perfect for real-time dashboards, notifications, etc.        |
-| ⚙️ **Resilient Systems**          | Built-in error handling and backpressure support             |
+| 🚀 High Scalability           | Handles thousands of concurrent connections with few threads |
+| ⚡ Better Resource Utilization | No blocking → less thread overhead                           |
+| 🔄 Asynchronous               | Data flows as streams, not as fixed responses                |
+| 📡 Streaming Data Support     | Perfect for real-time dashboards, notifications, etc.        |
+| ⚙️ Resilient Systems          | Built-in error handling and backpressure support             |
 
 🔄Limitations / When Not to Use
 ➤ When application is CPU-bound (heavy computation, not I/O waiting)
@@ -4037,10 +3744,10 @@ Client → Reactive Controller → Reactive Service → Reactive Repository → 
 🔄 Integration with Other Modules
 | Integration                      | Example                                                 |
 | -------------------------------- | ------------------------------------------------------- |
-| **Spring Data R2DBC**            | Reactive DB access (MySQL, PostgreSQL)                  |
-| **Spring Data MongoDB Reactive** | Non-blocking Mongo queries                              |
-| **Reactive Kafka**               | Consuming Kafka streams reactively                      |
-| **WebClient**                    | Non-blocking HTTP client (replacement for RestTemplate) |
+| Spring Data R2DBC            | Reactive DB access (MySQL, PostgreSQL)                  |
+| Spring Data MongoDB Reactive | Non-blocking Mongo queries                              |
+| Reactive Kafka               | Consuming Kafka streams reactively                      |
+| WebClient                    | Non-blocking HTTP client (replacement for RestTemplate) |
 
 ✅ Example with WebClient (Reactive REST Calls)
 WebClient webClient = WebClient.create("https://api.github.com");

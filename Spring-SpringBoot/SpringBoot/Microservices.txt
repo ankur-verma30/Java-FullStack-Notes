@@ -121,10 +121,10 @@ In a microservices architecture:
 🔄 Popular Service Registry
 | Registry                 | Description                                  | Features                                                 |
 | ------------------------ | -------------------------------------------- | -------------------------------------------------------- |
-| **Eureka (Netflix OSS)** | Popular in Spring Cloud ecosystem            | Auto-registration, client-side load balancing, dashboard |
-| **Consul (HashiCorp)**   | Service discovery + health checks + KV store | Multi-datacenter, DNS-based discovery, health checks     |
-| **Zookeeper (Apache)**   | Distributed coordination + service discovery | High availability, consistency, hierarchical namespace   |
-| **etcd**                 | Distributed key-value store                  | Lightweight, used in Kubernetes for service discovery    |
+| Eureka (Netflix OSS) | Popular in Spring Cloud ecosystem            | Auto-registration, client-side load balancing, dashboard |
+| Consul (HashiCorp)   | Service discovery + health checks + KV store | Multi-datacenter, DNS-based discovery, health checks     |
+| Zookeeper (Apache)   | Distributed coordination + service discovery | High availability, consistency, hierarchical namespace   |
+| etcd                 | Distributed key-value store                  | Lightweight, used in Kubernetes for service discovery    |
 
 🔄 Project Starter dependency
 spring-web
@@ -213,14 +213,14 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 🔄 Key Responsibilities of an API Gateway
 | Responsibility                     | Description                                                                            |
 | ---------------------------------- | -------------------------------------------------------------------------------------- |
-| **Request Routing**                | Routes incoming requests to the appropriate microservice based on the URL or headers.  |
-| **Request Aggregation**            | Aggregates results from multiple services and returns a single response to the client. |
-| **Authentication & Authorization** | Validates tokens (e.g., JWT, OAuth2) before forwarding requests.                       |
-| **Rate Limiting / Throttling**     | Limits the number of requests from clients to prevent overload.                        |
-| **Caching**                        | Stores responses for frequently accessed data to reduce backend calls.                 |
-| **Load Balancing**                 | Distributes requests among multiple instances of a microservice.                       |
-| **Logging & Monitoring**           | Tracks incoming requests, response times, errors, etc.                                 |
-| **Protocol Translation**           | Can convert protocols (e.g., HTTP to WebSocket or gRPC).                               |
+| Request Routing                | Routes incoming requests to the appropriate microservice based on the URL or headers.  |
+| Request Aggregation            | Aggregates results from multiple services and returns a single response to the client. |
+| Authentication & Authorization | Validates tokens (e.g., JWT, OAuth2) before forwarding requests.                       |
+| Rate Limiting / Throttling     | Limits the number of requests from clients to prevent overload.                        |
+| Caching                        | Stores responses for frequently accessed data to reduce backend calls.                 |
+| Load Balancing                 | Distributes requests among multiple instances of a microservice.                       |
+| Logging & Monitoring           | Tracks incoming requests, response times, errors, etc.                                 |
+| Protocol Translation           | Can convert protocols (e.g., HTTP to WebSocket or gRPC).                               |
 
 
 🔄 How it Works
@@ -286,7 +286,7 @@ You allow Gateway to automatically detect all services registered in Eureka.
 
 4️⃣: How Automatic Routing Works
 Once you enable discovery, the Gateway automatically exposes endpoints in the format:
-http://localhost:8080/{service-name}/** 
+http://localhost:8080/{service-name}/ 
 
 ✅ For example:
 | Service       | Call through Gateway                                                                     |
@@ -298,20 +298,20 @@ http://localhost:8080/{service-name}/**
 applies Spring Cloud LoadBalancer,and routes the request accordingly.
 
 5️⃣(Optional): Define Manual Routes
-If you want custom paths instead of /service-name/**,
+If you want custom paths instead of /service-name/,
 you can define them manually:
 
 spring.cloud.gateway.routes[0].id=greet-service
 spring.cloud.gateway.routes[0].uri=lb://greet-service
-spring.cloud.gateway.routes[0].predicates[0]=Path=/api/greet/**
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/greet/
 
 spring.cloud.gateway.routes[1].id=user-service
 spring.cloud.gateway.routes[1].uri=lb://user-service ---> lb stands for load balancer
-spring.cloud.gateway.routes[1].predicates[0]=Path=/api/user/**
+spring.cloud.gateway.routes[1].predicates[0]=Path=/api/user/
 
 👉 Here:
 🔗 lb:// prefix = use LoadBalancer (Eureka + Feign-like resolution)
-🔗 /api/greet/** = any request starting with /api/greet/ will go to greet-service
+🔗 /api/greet/ = any request starting with /api/greet/ will go to greet-service
 
 Step 6️⃣: Service-Level Configurations
 In each microservice (for example, greet-service):
@@ -434,7 +434,7 @@ public class GlobalRequestFilter implements GlobalFilter, Ordered {
 | `filter()`                      | Executes logic before and after request processing           |
 | `exchange.getRequest()`         | Accesses request object                                      |
 | `chain.filter(exchange)`        | Passes control to the next filter                            |
-| `.then(Mono.fromRunnable(...))` | Executes logic **after** the response is sent                |
+| `.then(Mono.fromRunnable(...))` | Executes logic after the response is sent                |
 | `getOrder()`                    | Defines order; use `-1` for high priority, or `0` for normal |
 
 ✅ Logs Output
@@ -526,12 +526,12 @@ management.endpoints.web.exposure.include=*
 🔄 Features in Admin Dashboard
 | Feature              | Description                                                        |
 | -------------------- | ------------------------------------------------------------------ |
-| **Application List** | Shows all registered client applications.                          |
-| **Health Status**    | UP, DOWN, or OFFLINE status of each app.                           |
-| **Metrics**          | CPU, memory, HTTP requests, DB stats, etc.                         |
-| **Logs**             | View and download logs from services.                              |
-| **Custom Endpoints** | Trigger actuator endpoints like `/shutdown` or `/restart`.         |
-| **Notifications**    | Can integrate with Slack or email alerts when a service goes DOWN. |
+| Application List | Shows all registered client applications.                          |
+| Health Status    | UP, DOWN, or OFFLINE status of each app.                           |
+| Metrics          | CPU, memory, HTTP requests, DB stats, etc.                         |
+| Logs             | View and download logs from services.                              |
+| Custom Endpoints | Trigger actuator endpoints like `/shutdown` or `/restart`.         |
+| Notifications    | Can integrate with Slack or email alerts when a service goes DOWN. |
 
 
 🔄 Benefits of Admin Server
@@ -572,10 +572,10 @@ Think of Zipkin as a flight tracker for requests across your microservices
 🔄 Zipkin Terminology
 | Concept          | Description                                                                           |
 | ---------------- | ------------------------------------------------------------------------------------- |
-| **Trace**        | Represents the **entire journey** of a single request through all services.           |
-| **Span**         | A **single unit of work** within a trace, e.g., an HTTP request to a service.         |
-| **Annotation**   | Marks an **event** or **timestamp** in a span (like request received, response sent). |
-| **Service Name** | Name of the microservice generating the span.                                         |
+| Trace        | Represents the entire journey of a single request through all services.           |
+| Span         | A single unit of work within a trace, e.g., an HTTP request to a service.         |
+| Annotation   | Marks an event or timestamp in a span (like request received, response sent). |
+| Service Name | Name of the microservice generating the span.                                         |
 
 
 🔄 How Zipkin Works
@@ -649,11 +649,11 @@ Then automatically all services will access Zipkin Server at http://localhost:94
 🔄 Key Features
 | Benefit                    | Description                                            |
 | -------------------------- | ------------------------------------------------------ |
-| **Distributed Tracing**    | See request flow across multiple services.             |
-| **Latency Analysis**       | Identify slow services or bottlenecks.                 |
-| **Error Detection**        | Pinpoint which service caused failure.                 |
-| **Visualization**          | Trace timelines, duration, and dependencies.           |
-| **Supports Microservices** | Works with Spring Cloud, Sleuth, and other frameworks. |
+| Distributed Tracing    | See request flow across multiple services.             |
+| Latency Analysis       | Identify slow services or bottlenecks.                 |
+| Error Detection        | Pinpoint which service caused failure.                 |
+| Visualization          | Trace timelines, duration, and dependencies.           |
+| Supports Microservices | Works with Spring Cloud, Sleuth, and other frameworks. |
 
 
 🔄 Placement in Architecture
@@ -818,19 +818,19 @@ feign.client.config.default.loggerLevel=full
 🔄 Advantages of Feign Client
 | Benefit                     | Explanation                                                  |
 | --------------------------- | ------------------------------------------------------------ |
-| **Declarative & Clean**     | Define REST calls via interfaces; no boilerplate code.       |
-| **Integration with Eureka** | Resolves service names dynamically without hardcoding URLs.  |
-| **Load Balancing (Ribbon)** | Automatically distributes requests across service instances. |
-| **Error Handling & Retry**  | Built-in retry mechanisms and error decoders.                |
-| **Easy Testing**            | Mock interfaces easily for unit tests.
+| Declarative & Clean     | Define REST calls via interfaces; no boilerplate code.       |
+| Integration with Eureka | Resolves service names dynamically without hardcoding URLs.  |
+| Load Balancing (Ribbon) | Automatically distributes requests across service instances. |
+| Error Handling & Retry  | Built-in retry mechanisms and error decoders.                |
+| Easy Testing            | Mock interfaces easily for unit tests.
                        |
 
 🔄 Limitations
 | Limitation              | Description                                               |
 | ----------------------- |  --------------------------------------------------------- |
-| **Overhead**            | Slightly higher latency than lightweight HTTP clients.    |
-| **Less Control**        | Less granular control than `RestTemplate` or `WebClient`. |
-| **Needs Configuration** | Must be properly integrated with Eureka for full power.   |
+| Overhead            | Slightly higher latency than lightweight HTTP clients.    |
+| Less Control        | Less granular control than `RestTemplate` or `WebClient`. |
+| Needs Configuration | Must be properly integrated with Eureka for full power.   |
 
 
 
@@ -1078,7 +1078,7 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | Each service has its own configuration file scattered everywhere | Store all configurations centrally                                                     |
 | Changing config means rebuilding and redeploying each service    | Update one config file in Git, and all services can auto-refresh                       |
-| Hard to manage environment configs (dev, test, prod)             | Config Server supports **profiles** like `application-dev.yml`, `application-prod.yml` |
+| Hard to manage environment configs (dev, test, prod)             | Config Server supports profiles like `application-dev.yml`, `application-prod.yml` |
 | Security issues from keeping credentials in services             | Keep them centralized, possibly encrypted                                              |
 
 
@@ -1112,9 +1112,9 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
 🔄 Architecture Components
 | Component          | Role                                                                                    |
 | ------------------ | --------------------------------------------------------------------------------------- |
-| **Config Server**  | A Spring Boot application that provides configuration files to all services.            |
-| **Config Client**  | Any microservice that fetches its configuration from the Config Server.                 |
-| **Git Repository** | The storage location for configuration files (could also be filesystem, SVN, or Vault). |
+| Config Server  | A Spring Boot application that provides configuration files to all services.            |
+| Config Client  | Any microservice that fetches its configuration from the Config Server.                 |
+| Git Repository | The storage location for configuration files (could also be filesystem, SVN, or Vault). |
 
 
 🔄 Setting Up Config Server
@@ -1235,12 +1235,12 @@ spring.cloud.config.server.encrypt.enabled=true
 🔄 Advantages of Using Spring Cloud Config Server
 | Benefit                                  | Description                                                   |
 | ---------------------------------------- | ------------------------------------------------------------- |
-| **Centralized Configuration Management** | All configs are managed from one repository.                  |
-| **Environment-Specific Configs**         | Supports multiple profiles like dev, test, prod.              |
-| **Dynamic Refresh**                      | Configs can be reloaded at runtime using `/actuator/refresh`. |
-| **Version Control Integration**          | Git provides version history, rollback, and collaboration.    |
-| **Consistency Across Microservices**     | Ensures uniform configuration across all services.            |
-| **Secure & Scalable**                    | Supports encryption, Vault, and multiple environments.        |
+| Centralized Configuration Management | All configs are managed from one repository.                  |
+| Environment-Specific Configs         | Supports multiple profiles like dev, test, prod.              |
+| Dynamic Refresh                      | Configs can be reloaded at runtime using `/actuator/refresh`. |
+| Version Control Integration          | Git provides version history, rollback, and collaboration.    |
+| Consistency Across Microservices     | Ensures uniform configuration across all services.            |
+| Secure & Scalable                    | Supports encryption, Vault, and multiple environments.        |
 
 🔄 Where Config Server Fits in Microservice Architecture
                       ┌─────────────────────────────┐
@@ -1285,9 +1285,9 @@ A circuit breaker detects this repeated failure and “opens” the circuit:
 🔄 Circuit Breaker States
 | State            | Meaning                                                            | Behavior                                           |
 | ---------------- | ------------------------------------------------------------------ | -------------------------------------------------- |
-| 🔴  **Closed**    | Everything is normal                                               | All requests pass through                          |
-| 🟢 **Open**      | Service is failing repeatedly                                      | Requests are stopped immediately (fail fast)       |
-| 🟡 **Half-Open** | After a cooldown, circuit allows limited requests to test recovery | If successful → go to Closed; if fails → stay Open |
+| 🔴  Closed    | Everything is normal                                               | All requests pass through                          |
+| 🟢 Open      | Service is failing repeatedly                                      | Requests are stopped immediately (fail fast)       |
+| 🟡 Half-Open | After a cooldown, circuit allows limited requests to test recovery | If successful → go to Closed; if fails → stay Open |
 
 🔄 Implementation in Spring Boot
 
@@ -1571,12 +1571,12 @@ It’s fast, lightweight, and supports caching, session storage, pub/sub messagi
 2️⃣ Why Redis is used for Caching in Spring Boot
 | Reason                          | Explanation                                                    |
 | ------------------------------- | -------------------------------------------------------------- |
-| 🚀 **In-memory storage**        | Redis stores data in RAM, giving nanosecond-level access times |
-| 🧠 **Persistent option**        | Can optionally persist data to disk                            |
-| ⚖️ **Scalable**                 | Works well in distributed/microservices systems                |
-| 🧩 **Supports data structures** | Strings, Hashes, Lists, Sets, Sorted Sets                      |
-| 🕒 **TTL (Time To Live)**       | Keys can expire automatically after a time                     |
-| 🧱 **Stateless Microservices**  | Perfect for caching results shared across instances            |
+| 🚀 In-memory storage        | Redis stores data in RAM, giving nanosecond-level access times |
+| 🧠 Persistent option        | Can optionally persist data to disk                            |
+| ⚖️ Scalable                 | Works well in distributed/microservices systems                |
+| 🧩 Supports data structures | Strings, Hashes, Lists, Sets, Sorted Sets                      |
+| 🕒 TTL (Time To Live)       | Keys can expire automatically after a time                     |
+| 🧱 Stateless Microservices  | Perfect for caching results shared across instances            |
 
 
 3️⃣ Redis Architecture (Simple Flow)
@@ -1951,15 +1951,15 @@ public class StudentAnnotationController {
 🔄 Redis Cache Operations (Conceptually)
 | Operation           | Description             | Example            |
 | ------------------- | ----------------------- | ------------------ |
-| **SET key value**   | Adds/updates value      | `SET user:1 Ankur` |
-| **GET key**         | Fetch value             | `GET user:1`       |
-| **DEL key**         | Delete key              | `DEL user:1`       |
-| **EXPIRE key time** | Set TTL in seconds      | `EXPIRE user:1 60` |
-| **TTL key**         | Time left before expiry | `TTL user:1`       |
+| SET key value   | Adds/updates value      | `SET user:1 Ankur` |
+| GET key         | Fetch value             | `GET user:1`       |
+| DEL key         | Delete key              | `DEL user:1`       |
+| EXPIRE key time | Set TTL in seconds      | `EXPIRE user:1 60` |
+| TTL key         | Time left before expiry | `TTL user:1`       |
 
 
 🔄 Comparison
-| Feature          | **Method 1: RedisTemplate (Manual)** | **Method 2: @Cacheable (Annotation)**                 |
+| Feature          | Method 1: RedisTemplate (Manual) | Method 2: @Cacheable (Annotation)                 |
 | ---------------- | ------------------------------------ | ----------------------------------------------------- |
 | Control over TTL | Per-entry using `Duration`           | Global TTL via `CacheManager`                         |
 | Logging          | Manual (you define hit/miss logs)    | Implicit (you can log inside method to detect misses) |
@@ -1978,15 +1978,15 @@ It allows different applications or microservices to communicate asynchronously 
 🔄 Core Kafka Concepts
 | Concept                | Description                                                                                                    |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **Producer**           | Publishes messages (events) to a Kafka topic.                                                                  |
-| **Subscriber**           | Subscribes to a topic and processes messages.                                                                | 
-| **Topic**              | A named **category or channel** where records (messages) are stored and published.                             |
-| **Partition**          | Each topic is divided into partitions for scalability and parallel processing.                                 |
-| **Offset**             | A unique ID for each message in a partition — helps track consumer progress.                                   |
-| **Broker**             | A Kafka server that stores messages and handles client requests.                                               |
-| **Cluster**            | A group of brokers working together for scalability and fault tolerance.                                       |
-| **Consumer Group**     | A group of consumers that share the workload — each message is processed by only one consumer in the group.    |
-| **ZooKeeper (Legacy)** | Used for managing Kafka cluster provides runtime environment  (replaced by Kafka’s internal Raft quorum ). |
+| Producer           | Publishes messages (events) to a Kafka topic.                                                                  |
+| Subscriber           | Subscribes to a topic and processes messages.                                                                | 
+| Topic              | A named category or channel where records (messages) are stored and published.                             |
+| Partition          | Each topic is divided into partitions for scalability and parallel processing.                                 |
+| Offset             | A unique ID for each message in a partition — helps track consumer progress.                                   |
+| Broker             | A Kafka server that stores messages and handles client requests.                                               |
+| Cluster            | A group of brokers working together for scalability and fault tolerance.                                       |
+| Consumer Group     | A group of consumers that share the workload — each message is processed by only one consumer in the group.    |
+| ZooKeeper (Legacy) | Used for managing Kafka cluster provides runtime environment  (replaced by Kafka’s internal Raft quorum ). |
 
 
 🔄 How Kafka Works (Flow)
@@ -2002,12 +2002,12 @@ It allows different applications or microservices to communicate asynchronously 
 🔄 Why Kafka is Used in Microservices / Spring Boot
 | Reason                         | Explanation                                                                                |
 | ------------------------------ | ------------------------------------------------------------------------------------------ |
-| **Decoupling Services**        | Producers and consumers don’t need to know each other — they communicate via topics.       |
-| **Asynchronous Communication** | Services don’t block each other; producers send messages without waiting for consumers.    |
-| **Scalability**                | Kafka can handle millions of messages per second using partitioning.                       |
-| **Fault Tolerance**            | Kafka replicates data across brokers — no message loss if a node fails.                    |
-| **Replay Capability**          | Consumers can reprocess data from any offset — useful for debugging or rebuilding systems. |
-| **Event-Driven Architecture**  | Microservices communicate through events instead of direct REST calls.                     |
+| Decoupling Services        | Producers and consumers don’t need to know each other — they communicate via topics.       |
+| Asynchronous Communication | Services don’t block each other; producers send messages without waiting for consumers.    |
+| Scalability                | Kafka can handle millions of messages per second using partitioning.                       |
+| Fault Tolerance            | Kafka replicates data across brokers — no message loss if a node fails.                    |
+| Replay Capability          | Consumers can reprocess data from any offset — useful for debugging or rebuilding systems. |
+| Event-Driven Architecture  | Microservices communicate through events instead of direct REST calls.                     |
 
 🔄 Kafka Architecture Diagram (Conceptually)
  ┌───────────────┐      ┌───────────────┐
@@ -2112,22 +2112,22 @@ Here, both connect to the same broker but serve different purposes.
 🔄 Advanced Kafka Concepts
 | Concept                          | Description                                                                         |
 | -------------------------------- | ----------------------------------------------------------------------------------- |
-| **Retention Policy**             | Kafka keeps messages for a configurable time (e.g., 7 days) even after consumption. |
-| **Replication Factor**           | Ensures high availability — each partition’s data is replicated across brokers.     |
-| **Acks (Acknowledgments)**       | Controls reliability — `acks=0`, `acks=1`, or `acks=all`.                           |
-| **Idempotent Producer**          | Ensures no duplicate messages when retries happen.                                  |
-| **Transactional Messaging**      | Ensures atomicity across multiple Kafka operations.                                 |
-| **Exactly-Once Semantics (EOS)** | Prevents duplicate processing in consumers.                                         |
-| **Kafka Streams API**            | For stream processing — transform, aggregate, and process messages in real-time.    |
-| **Schema Registry (Avro/JSON)**  | Manages schemas for structured messages.                                            |
-| **Offset Management**            | Consumer offset can be auto-committed or manually managed.                          |
+| Retention Policy             | Kafka keeps messages for a configurable time (e.g., 7 days) even after consumption. |
+| Replication Factor           | Ensures high availability — each partition’s data is replicated across brokers.     |
+| Acks (Acknowledgments)       | Controls reliability — `acks=0`, `acks=1`, or `acks=all`.                           |
+| Idempotent Producer          | Ensures no duplicate messages when retries happen.                                  |
+| Transactional Messaging      | Ensures atomicity across multiple Kafka operations.                                 |
+| Exactly-Once Semantics (EOS) | Prevents duplicate processing in consumers.                                         |
+| Kafka Streams API            | For stream processing — transform, aggregate, and process messages in real-time.    |
+| Schema Registry (Avro/JSON)  | Manages schemas for structured messages.                                            |
+| Offset Management            | Consumer offset can be auto-committed or manually managed.                          |
 
 🔄 Real-World Use Cases
 | Use Case                       | Example                                           |
 | ------------------------------ | ------------------------------------------------- |
-| **Log aggregation**            | Collecting logs from multiple servers.            |
-| **Event sourcing**             | Tracking all state changes in microservices.      |
-| **Stream processing**          | Fraud detection, metrics monitoring.              |
-| **Asynchronous communication** | Between order, payment, and inventory services.   |
-| **Analytics pipelines**        | Real-time data ingestion into Spark/Flink/Hadoop. |
+| Log aggregation            | Collecting logs from multiple servers.            |
+| Event sourcing             | Tracking all state changes in microservices.      |
+| Stream processing          | Fraud detection, metrics monitoring.              |
+| Asynchronous communication | Between order, payment, and inventory services.   |
+| Analytics pipelines        | Real-time data ingestion into Spark/Flink/Hadoop. |
 

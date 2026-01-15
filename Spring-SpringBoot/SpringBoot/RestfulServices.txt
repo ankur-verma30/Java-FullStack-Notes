@@ -294,12 +294,12 @@ Content-Length: 1234
 🔄 Common HTTP Methods
 | Method     | Description                                       |
 | ---------- | ------------------------------------------------- |
-| **GET**    | Retrieve data from the server (no body).          |
-| **POST**   | Send data to the server (used for creating data). |
-| **PUT**    | Update existing resource completely.              |
-| **PATCH**  | Update part of a resource.                        |
-| **DELETE** | Delete a resource.                                |
-| **HEAD**   | Same as GET but returns only headers.             |
+| GET    | Retrieve data from the server (no body).          |
+| POST   | Send data to the server (used for creating data). |
+| PUT    | Update existing resource completely.              |
+| PATCH  | Update part of a resource.                        |
+| DELETE | Delete a resource.                                |
+| HEAD   | Same as GET but returns only headers.             |
 
 =====================
 🔹 HTTP Status Codes
@@ -334,11 +334,11 @@ These are typically used for informational purposes and are not commonly seen in
 
 | Code Range | Meaning       | Example                        |
 | ---------- | ------------- | ------------------------------ |
-| **1xx**    | Informational | 100 Continue                   |
-| **2xx**    | Success       | 200 OK, 201 Created            |
-| **3xx**    | Redirection   | 301 Moved Permanently          |
-| **4xx**    | Client Error  | 400 Bad Request, 404 Not Found |
-| **5xx**    | Server Error  | 500 Internal Server Error      |
+| 1xx    | Informational | 100 Continue                   |
+| 2xx    | Success       | 200 OK, 201 Created            |
+| 3xx    | Redirection   | 301 Moved Permanently          |
+| 4xx    | Client Error  | 400 Bad Request, 404 Not Found |
+| 5xx    | Server Error  | 500 Internal Server Error      |
 
 🔄 Features
 ➤ Stateless: Each request is independent; no session info is stored by default.
@@ -773,11 +773,11 @@ it can handle many requests concurrently with fewer threads, improving performan
 🔄 Key Features of WebClient
 | Feature                      | Description                                                               |
 | ---------------------------- | ------------------------------------------------------------------------- |
-| **Reactive (Non-blocking)**  | Uses Project Reactor (`Mono` and `Flux`) for async programming.           |
-| **Lightweight**              | Doesn’t depend on Servlet API. Works in both Spring MVC and WebFlux apps. |
-| **Supports Streaming**       | Can handle continuous data streams (e.g., SSE, WebSockets).               |
-| **Functional API**           | Fluent builder-style syntax for constructing requests.                    |
-| **Can Replace RestTemplate** | Fully supports GET, POST, PUT, DELETE, etc.                               |
+| Reactive (Non-blocking)  | Uses Project Reactor (`Mono` and `Flux`) for async programming.           |
+| Lightweight              | Doesn’t depend on Servlet API. Works in both Spring MVC and WebFlux apps. |
+| Supports Streaming       | Can handle continuous data streams (e.g., SSE, WebSockets).               |
+| Functional API           | Fluent builder-style syntax for constructing requests.                    |
+| Can Replace RestTemplate | Fully supports GET, POST, PUT, DELETE, etc.                               |
 
 
 🔄 When to Use WebClient
@@ -799,12 +799,12 @@ Mono<Student> is a reactive type that represents one asynchronous result (like a
 🔄 WebClient vs RestTemplate
 | Feature                   | `RestTemplate`                  | `WebClient`                 |
 | ------------------------- | ------------------------------- | --------------------------- |
-| **Introduced In**         | Spring 3                        | Spring 5 (WebFlux)          |
-| **Type**                  | Synchronous (Blocking)          | Asynchronous (Non-blocking) |
-| **Performance**           | Slower (one thread per request) | Faster (reactive model)     |
-| **Reactive Support**      | ❌ No                            | ✅ Yes                       |
-| **Streaming Support**     | ❌ No                            | ✅ Yes                       |
-| **Recommended By Spring** | Deprecated (for new apps)       | ✅ Official Replacement      |
+| Introduced In         | Spring 3                        | Spring 5 (WebFlux)          |
+| Type                  | Synchronous (Blocking)          | Asynchronous (Non-blocking) |
+| Performance           | Slower (one thread per request) | Faster (reactive model)     |
+| Reactive Support      | ❌ No                            | ✅ Yes                       |
+| Streaming Support     | ❌ No                            | ✅ Yes                       |
+| Recommended By Spring | Deprecated (for new apps)       | ✅ Official Replacement      |
 
 
 Maven dependency for WebClient:
@@ -902,11 +902,11 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 When you start your Spring Boot app, Spring Data REST automatically generates endpoints like:
 | HTTP Method | Endpoint         | Description                        |
 | ----------- | ---------------- | ---------------------------------- |
-| **GET**     | `/students`      | Get all students (with pagination) |
-| **GET**     | `/students/{id}` | Get student by ID                  |
-| **POST**    | `/students`      | Create a new student               |
-| **PUT**     | `/students/{id}` | Update an existing student         |
-| **DELETE**  | `/students/{id}` | Delete student by ID               |
+| GET     | `/students`      | Get all students (with pagination) |
+| GET     | `/students/{id}` | Get student by ID                  |
+| POST    | `/students`      | Create a new student               |
+| PUT     | `/students/{id}` | Update an existing student         |
+| DELETE  | `/students/{id}` | Delete student by ID               |
 
 ✅ Example Request & Response
 👉 POST Request:
@@ -1078,8 +1078,8 @@ List<User> users = mongoTemplate.find(query, User.class);
 In springboot we can handle exception in 2 ways:
 | Type                         | Description                                                                 | Scope               |
 | ---------------------------- | --------------------------------------------------------------------------- | ------------------- |
-| **Global Exception Handler** | Handles exceptions **across all controllers** using `@RestControllerAdvice` | Application-wide    |
-| **Local Exception Handler**  | Handles exceptions **within a single controller** using `@ExceptionHandler` | Controller-specific |
+| Global Exception Handler | Handles exceptions across all controllers using `@RestControllerAdvice` | Application-wide    |
+| Local Exception Handler  | Handles exceptions within a single controller using `@ExceptionHandler` | Controller-specific |
 
 🔄 Steps:
 ➤ Create User Defined Exception class
