@@ -235,7 +235,7 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 
 
 🔄 How it Works
-1️⃣ Client sends request → always goes to API Gateway.
+1️⃣ Client sends request ─────────▶ always goes to API Gateway.
 2️⃣ Gateway authenticates the request (if required).
 3️⃣ Gateway routes request to one or more backend services.
 4️⃣ Backend service processes request and returns response.
@@ -268,7 +268,7 @@ In the Spring ecosystem, you can use:
 ➤ devtools
 
 🔄 Step-by-Step Configuration
-1️⃣: Add Dependencies
+1️⃣ Add Dependencies
 In the Gateway project’s pom.xml:
 
 <dependencies>
@@ -283,7 +283,7 @@ In the Gateway project’s pom.xml:
 </dependencies>
 
 
-2️⃣: Register Gateway with Eureka
+2️⃣ Register Gateway with Eureka
 🔗 application.properties
 
 spring.application.name=api-gateway
@@ -297,7 +297,7 @@ spring.cloud.gateway.discovery.locator.enabled=true
 spring.cloud.gateway.discovery.locator.lower-case-service-id=true
 
 
-3️⃣: Enable Gateway Discovery Routing
+3️⃣ Enable Gateway Discovery Routing
 🔗 By setting
 spring.cloud.gateway.discovery.locator.enabled=true
 You allow Gateway to automatically detect all services registered in Eureka.
@@ -308,11 +308,11 @@ Once you enable discovery, the Gateway automatically exposes endpoints in the fo
 http://localhost:8080/{service-name}/ 
 
 ✅ For example:
-| Service       | Call through Gateway                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------- |
-| greet-service | [http://localhost:8080/greet-service/greet](http://localhost:8080/greet-service/greet)   |
-| user-service  | [http://localhost:8080/user-service/users](http://localhost:8080/user-service/users)     |
-| order-service | [http://localhost:8080/order-service/orders](http://localhost:8080/order-service/orders) |
+| Service       | Call through Gateway                          |
+| ------------- | ----------------------------------------------|
+| greet-service | (http://localhost:8080/greet-service/greet)   |
+| user-service  | (http://localhost:8080/user-service/users)    |
+| order-service | (http://localhost:8080/order-service/orders)  |
 👉 Gateway internally fetches service instances from Eureka,
 applies Spring Cloud LoadBalancer,and routes the request accordingly.
 
@@ -325,14 +325,14 @@ spring.cloud.gateway.routes[0].uri=lb://greet-service
 spring.cloud.gateway.routes[0].predicates[0]=Path=/api/greet/
 
 spring.cloud.gateway.routes[1].id=user-service
-spring.cloud.gateway.routes[1].uri=lb://user-service ---> lb stands for load balancer
+spring.cloud.gateway.routes[1].uri=lb://user-service ─────────▶ lb stands for load balancer
 spring.cloud.gateway.routes[1].predicates[0]=Path=/api/user/
 
 👉 Here:
 🔗 lb:// prefix = use LoadBalancer (Eureka + Feign-like resolution)
 🔗 /api/greet/ = any request starting with /api/greet/ will go to greet-service
 
-Step 6️⃣: Service-Level Configurations
+6️⃣ Service-Level Configurations
 In each microservice (for example, greet-service):
 
 spring.application.name=greet-service
@@ -341,7 +341,7 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 Similarly for user-service, order-service, etc.
 
 
-7️⃣: Run Services
+7️⃣ Run Services
 Run in this order:
 ➤ Eureka Server
 ➤ All microservices (greet, user, order)
@@ -355,11 +355,11 @@ http://localhost:8080/api/greet/hello
 
 
 🔄 Benefits of Using API Gateway
-✔️ Single Entry Point — clients only need one endpoint.
-✔️ Security — central place to implement auth & SSL.
-✔️ Simplified Client Logic — clients don’t need to call multiple services.
-✔️ Cross-Cutting Features — caching, logging, metrics, rate limiting applied centrally.
-✔️ Service Decoupling — microservices can evolve independently.
+✔️ Single Entry Point ─────────▶ clients only need one endpoint.
+✔️ Security ─────────▶ central place to implement auth & SSL.
+✔️ Simplified Client Logic ─────────▶ clients don’t need to call multiple services.
+✔️ Cross-Cutting Features ─────────▶ caching, logging, metrics, rate limiting applied centrally.
+✔️ Service Decoupling ─────────▶ microservices can evolve independently.
 
 
 🔄 API Gateway vs Service Registry
@@ -368,8 +368,7 @@ http://localhost:8080/api/greet/hello
 | Purpose             | Routes, secures, and aggregates requests | Tracks available services & instances  |
 | Client Interaction  | Client talks to gateway                  | Client talks to registry for discovery |
 | Added Functionality | Auth, rate limiting, logging, caching    | Service discovery, health checks       |
-| Focus               | Request management                       | Service availability 
-                  |
+| Focus               | Request management                       | Service availability                   |
 
 
 🔷 Global Filter in Spring Cloud Gateway?
@@ -385,8 +384,8 @@ A Global Filter is a filter that:
 It implements the GlobalFilter and Ordered interfaces.
 
 🔄 Key Concepts
-1️⃣ GlobalFilter Interface:
-🔗 Defines a single method:
+1️⃣ GlobalFilter Interface
+🔗 Defines a single method
 Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain);
 
 👉 Here:
@@ -453,7 +452,7 @@ public class GlobalRequestFilter implements GlobalFilter, Ordered {
 | `filter()`                      | Executes logic before and after request processing           |
 | `exchange.getRequest()`         | Accesses request object                                      |
 | `chain.filter(exchange)`        | Passes control to the next filter                            |
-| `.then(Mono.fromRunnable(...))` | Executes logic after the response is sent                |
+| `.then(Mono.fromRunnable(...))` | Executes logic after the response is sent                    |
 | `getOrder()`                    | Defines order; use `-1` for high priority, or `0` for normal |
 
 ✅ Logs Output
@@ -472,7 +471,10 @@ if (!exchange.getRequest().getHeaders().containsKey("Authorization")) {
 }
 👉 This will short-circuit and stop the filter chain if the header is missing.
 
+
+=================
 🔷 Admin Server
+=================
 An Admin Server is a centralized management and monitoring tool for multiple Spring Boot applications (or microservices).
 ➤ It collects information from client applications (services) and displays it in a web dashboard.
 ➤ Essentially, it’s like a control panel for all your microservices.
@@ -488,7 +490,7 @@ An Admin Server is a centralized management and monitoring tool for multiple Spr
     ✔️ Logs
     ✔️ Custom info
 Admin Server presents this in a web UI dashboard.
-[Microservices] --> [Actuator Endpoints] --> [Admin Server Dashboard] --> [Admin User]
+[Microservices] ─────────▶ [Actuator Endpoints] ─────────▶ [Admin Server Dashboard] ─────────▶ [Admin User]
 
 🔄Add to configure Admin Server Project
 spring-web
@@ -543,8 +545,8 @@ management.endpoints.web.exposure.include=*
 
 
 🔄 Features in Admin Dashboard
-| Feature              | Description                                                        |
-| -------------------- | ------------------------------------------------------------------ |
+| Feature          | Description                                                        |
+| -----------------| ------------------------------------------------------------------ |
 | Application List | Shows all registered client applications.                          |
 | Health Status    | UP, DOWN, or OFFLINE status of each app.                           |
 | Metrics          | CPU, memory, HTTP requests, DB stats, etc.                         |
@@ -554,21 +556,23 @@ management.endpoints.web.exposure.include=*
 
 
 🔄 Benefits of Admin Server
-✔️ Centralized Monitoring – Monitor multiple services in one place.
-✔️ Quick Health Checks – Identify failing services instantly.
-✔️ Improved Maintenance – Restart, shutdown, or trigger custom endpoints from dashboard.
-✔️ Integration with Actuators – Leverages existing Spring Boot actuator endpoints.
-✔️ Alerting – Notifies admins about critical failures or unhealthy services.
+✔️ Centralized Monitoring ─────────▶ Monitor multiple services in one place.
+✔️ Quick Health Checks ─────────▶ Identify failing services instantly.
+✔️ Improved Maintenance ─────────▶ Restart, shutdown, or trigger custom endpoints from dashboard.
+✔️ Integration with Actuators ─────────▶ Leverages existing Spring Boot actuator endpoints.
+✔️ Alerting ─────────▶ Notifies admins about critical failures or unhealthy services.
 
 
 🔄 Order of Startup / Dependency
-➤ Eureka Server – must start first (so microservices can register).
-➤ Microservices – register themselves with Eureka.
-➤ API Gateway – queries Eureka for routing information.
-➤ Admin Server – collects metrics and health info from microservices (can also use Eureka to find them).
+➤ Eureka Server ─────────▶ must start first (so microservices can register).
+➤ Microservices ─────────▶ register themselves with Eureka.
+➤ API Gateway ─────────▶ queries Eureka for routing information.
+➤ Admin Server ─────────▶ collects metrics and health info from microservices (can also use Eureka to find them).
 
  
+=================
 🔷 Zipkin Server
+=================
 Zipkin is a distributed tracing system used to monitor and troubleshoot latency problems in microservices.
     ✔️ It helps track requests as they flow through multiple microservices.
     ✔️ Zipkin collects timing data for each request (called a span) and organizes it into traces.
@@ -578,7 +582,7 @@ Think of Zipkin as a flight tracker for requests across your microservices
 
 🔄 Why Zipkin is Needed
 ➤ In microservices architectures:
-1️⃣ Requests often pass through multiple services (e.g., Gateway → UserService → OrderService → PaymentService).
+1️⃣ Requests often pass through multiple services (e.g., Gateway ─────────▶ UserService ─────────▶ OrderService ─────────▶ PaymentService).
 2️⃣ Latency issues or errors can occur at any microservice.
 3️⃣ Hard to know which service caused the delay or failure.
 
@@ -589,11 +593,11 @@ Think of Zipkin as a flight tracker for requests across your microservices
 
 
 🔄 Zipkin Terminology
-| Concept          | Description                                                                           |
-| ---------------- | ------------------------------------------------------------------------------------- |
-| Trace        | Represents the entire journey of a single request through all services.           |
-| Span         | A single unit of work within a trace, e.g., an HTTP request to a service.         |
-| Annotation   | Marks an event or timestamp in a span (like request received, response sent). |
+| Concept      | Description                                                                           |
+| -------------| ------------------------------------------------------------------------------------- |
+| Trace        | Represents the entire journey of a single request through all services.               |
+| Span         | A single unit of work within a trace, e.g., an HTTP request to a service.             |
+| Annotation   | Marks an event or timestamp in a span (like request received, response sent).         |
 | Service Name | Name of the microservice generating the span.                                         |
 
 
@@ -662,12 +666,12 @@ Then automatically all services will access Zipkin Server at http://localhost:94
 ➤ UserService receives request: Sleuth generates trace ID & span ID.
 ➤ OrderService receives forwarded request: Sleuth continues same trace ID.
 ➤ PaymentService does the same.
-➤ All spans are sent to Zipkin Server → Zipkin shows end-to-end trace with duration and dependencies.
+➤ All spans are sent to Zipkin Server ─────────▶ Zipkin shows end-to-end trace with duration and dependencies.
 
 
 🔄 Key Features
-| Benefit                    | Description                                            |
-| -------------------------- | ------------------------------------------------------ |
+| Benefit                | Description                                            |
+| -----------------------| ------------------------------------------------------ |
 | Distributed Tracing    | See request flow across multiple services.             |
 | Latency Analysis       | Identify slow services or bottlenecks.                 |
 | Error Detection        | Pinpoint which service caused failure.                 |
@@ -676,12 +680,12 @@ Then automatically all services will access Zipkin Server at http://localhost:94
 
 
 🔄 Placement in Architecture
-➤ Zipkin Server → Centralized, independent service.
-➤ Microservices → Each instrumented with Sleuth, sends data to Zipkin.
-➤ API Gateway → Also optionally instrumented.
-➤ Admin Server / Eureka → Can be used alongside Zipkin but serve different purposes:
-    ✔️ Admin Server → monitoring, health, logs
-    ✔️ Zipkin → request tracing
+➤ Zipkin Server ─────────▶ Centralized, independent service.
+➤ Microservices ─────────▶ Each instrumented with Sleuth, sends data to Zipkin.
+➤ API Gateway ─────────▶ Also optionally instrumented.
+➤ Admin Server / Eureka ─────────▶ Can be used alongside Zipkin but serve different purposes:
+    ✔️ Admin Server ─────────▶ monitoring, health, logs
+    ✔️ Zipkin ─────────▶ request tracing
 
 Client --> API Gateway --> Microservices
          \-> Zipkin Server (collects traces)
@@ -726,11 +730,11 @@ public interface StudentClient {
 
 
 🔄 How Feign Works Internally
-1️⃣ Interface Declaration – You define an interface annotated with @FeignClient.
-2️⃣ Dynamic Proxy – Spring Cloud creates a runtime proxy implementation of that interface.
-3️⃣ Service Discovery – If Eureka is used, Feign automatically resolves the service name to the actual URL.
-4️⃣ Request Handling – The proxy makes HTTP calls (using OpenFeign under the hood).
-5️⃣ Response Mapping – Feign automatically converts the JSON response to the Java object type declared in your interface.
+1️⃣ Interface Declaration ─────────▶ You define an interface annotated with @FeignClient.
+2️⃣ Dynamic Proxy ─────────▶ Spring Cloud creates a runtime proxy implementation of that interface.
+3️⃣ Service Discovery ─────────▶ If Eureka is used, Feign automatically resolves the service name to the actual URL.
+4️⃣ Request Handling ─────────▶ The proxy makes HTTP calls (using OpenFeign under the hood).
+5️⃣ Response Mapping ─────────▶ Feign automatically converts the JSON response to the Java object type declared in your interface.
 
 
 🔄 How to Setup Feign Client in Spring Boot
@@ -831,31 +835,32 @@ feign.client.config.default.loggerLevel=full
   ┌──────────────┐
   │ Eureka Server│  (Service Registry)
   └──────────────┘
-➤ Feign Client simplifies API calls between OrderService → StudentService.
+➤ Feign Client simplifies API calls between OrderService ─────────▶ StudentService.
 ➤ Eureka resolves service names dynamically.
 ➤ API Gateway routes external requests.
 
 
 🔄 Advantages of Feign Client
-| Benefit                     | Explanation                                                  |
-| --------------------------- | ------------------------------------------------------------ |
+| Benefit                 | Explanation                                                  |
+| ------------------------| ------------------------------------------------------------ |
 | Declarative & Clean     | Define REST calls via interfaces; no boilerplate code.       |
 | Integration with Eureka | Resolves service names dynamically without hardcoding URLs.  |
 | Load Balancing (Ribbon) | Automatically distributes requests across service instances. |
 | Error Handling & Retry  | Built-in retry mechanisms and error decoders.                |
-| Easy Testing            | Mock interfaces easily for unit tests.
-                       |
+| Easy Testing            | Mock interfaces easily for unit tests.                       |
+
 
 🔄 Limitations
-| Limitation              | Description                                               |
-| ----------------------- |  --------------------------------------------------------- |
+| Limitation          | Description                                               |
+| --------------------|  ---------------------------------------------------------|
 | Overhead            | Slightly higher latency than lightweight HTTP clients.    |
 | Less Control        | Less granular control than `RestTemplate` or `WebClient`. |
 | Needs Configuration | Must be properly integrated with Eureka for full power.   |
 
 
-
+=================
 🔷 Load Balancer
+=================
 A Load Balancer is a mechanism that distributes incoming requests across multiple instances of a service to:
     ✔️ Prevent overloading a single instance
     ✔️ Achieve fault tolerance and high availability
@@ -863,7 +868,6 @@ A Load Balancer is a mechanism that distributes incoming requests across multipl
 
 In microservices, multiple instances of the same service often run (e.g., multiple “Greet” services).
 A load balancer ensures requests are distributed evenly among them.
-
 
 In Spring Boot, the Environment object represents the current runtime environment — including:
     ✔️ Active profiles (dev, test, prod)
@@ -914,15 +918,15 @@ Each microservice instance:
 🔄 How to Do It (in IntelliJ or Eclipse)
 Option 1️⃣: Using Run Configurations
 ➤ Open your project (e.g., GreetApiApplication).
-➤ Go to Run → Edit Configurations.
-➤ Click “+” → Application.
-➤ Name it → Greet-Instance-1.
-➤ Select your main class → com.example.GreetApiApplication.
+➤ Go to Run ─────────▶ Edit Configurations.
+➤ Click “+” ─────────▶ Application.
+➤ Name it ─────────▶ Greet-Instance-1.
+➤ Select your main class ─────────▶ com.example.GreetApiApplication.
 ➤ In VM options or Program arguments, add:
 --server.port=8081
 
 
-➤ Copy that configuration → name it Greet-Instance-2.
+➤ Copy that configuration ─────────▶ name it Greet-Instance-2.
 Add argument:
 --server.port=8082
 
@@ -943,13 +947,15 @@ java -jar target/greet-api.jar --server.port=8083
 👉 Each command starts a new instance with a different port.
 
 
+===================================================
 🔷 How Feign Client Does Load Balancing Internally
+===================================================
 1️⃣ Historical Context — Ribbon + Feign (Old Stack)
 Earlier, in Spring Cloud Netflix (pre-2021):
 Feign used Ribbon under the hood for client-side load balancing.
 
 👉 Architecture looked like this:
-Feign Client → Ribbon → Eureka → Target Service
+Feign Client ─────────▶ Ribbon ─────────▶ Eureka ─────────▶ Target Service
 
 ✅ Example flow:
 ➤ You make a Feign call to a service name, say @FeignClient("user-service").
@@ -974,7 +980,7 @@ Since Spring Cloud 2020+, Ribbon was removed and replaced by:
 Now Feign integrates with Spring Cloud LoadBalancer instead of Ribbon.
 
 👉 Architecture now:
-Feign Client → Spring Cloud LoadBalancer → Eureka → Target Service
+Feign Client ─────────▶ Spring Cloud LoadBalancer ─────────▶ Eureka ─────────▶ Target Service
 
 🔄 So What Changed Internally between Ribbons and Spring Cloud LoadBalancer?
 | Feature        | Ribbon (Old)                      | Spring Cloud LoadBalancer (New) |
@@ -983,7 +989,7 @@ Feign Client → Spring Cloud LoadBalancer → Eureka → Target Service
 | Integration    | Tight Netflix coupling            | Spring-native                   |
 | Algorithm      | Round Robin / Random              | Pluggable, customizable         |
 | Configuration  | Complex YAML                      | Simple Spring config            |
-| Future Support | ❌ Removed after Spring Cloud 2020 | ✅ Actively evolving             |
+| Future Support | ❌ Removed after Spring Cloud 2020| ✅ Actively evolving           |
 
 When Feign client is used with Spring Cloud Eureka and Spring Cloud LoadBalancer, this happens under the hood:
 Step 1️⃣ — You make a Feign call:
@@ -1004,15 +1010,14 @@ Step 4️⃣ — LoadBalancer queries Eureka Server
 Eureka keeps a registry of all service instances.
 
 ✅ Example registry response:
-
-greet-api → [http://localhost:8081, http://localhost:8082, http://localhost:8083]
+greet-api ─────────▶ [http://localhost:8081, http://localhost:8082, http://localhost:8083]
 
 Step 5️⃣ — LoadBalancer applies a strategy
 Spring Cloud LoadBalancer applies its algorithm (default: Round Robin):
-1st request → 8081
-2nd request → 8082
-3rd request → 8083
-4th → back to 8081
+1st request ─────────▶ 8081
+2nd request ─────────▶ 8082
+3rd request ─────────▶ 8083
+4th ─────────▶ back to 8081
 
 🔄 Dependency Configuration of LoadBalancer 
 ⚡ Dependencies Required
@@ -1085,8 +1090,9 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
          |---> Makes HTTP call to selected service instance
 
 
- 
+========================
 🔷 Cloud Config Server
+========================
 ➤ Spring Cloud Config Server is a centralized configuration management system for microservices.
 
 ➤ It allows you to store all configuration files (application.properties / application.yml) for multiple services in one place — typically a Git repository — and lets each microservice fetch its configuration dynamically from the Config Server.
@@ -1099,7 +1105,7 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | Each service has its own configuration file scattered everywhere | Store all configurations centrally                                                     |
 | Changing config means rebuilding and redeploying each service    | Update one config file in Git, and all services can auto-refresh                       |
-| Hard to manage environment configs (dev, test, prod)             | Config Server supports profiles like `application-dev.yml`, `application-prod.yml` |
+| Hard to manage environment configs (dev, test, prod)             | Config Server supports profiles like `application-dev.yml`, `application-prod.yml`     |
 | Security issues from keeping credentials in services             | Keep them centralized, possibly encrypted                                              |
 
 
@@ -1114,8 +1120,8 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
                      (reads configuration)
                               │
              ┌────────────────┴─────────────────┐
-             │        Config Server              │
-             │ (centralized configuration center)│
+             │        Config Server             │
+             │(centralized configuration center)│
              └────────────────┬─────────────────┘
                               │
                  (serves configuration via HTTP)
@@ -1131,8 +1137,8 @@ Feign gets the HTTP response and maps it back to the Java return type (String, D
 
 
 🔄 Architecture Components
-| Component          | Role                                                                                    |
-| ------------------ | --------------------------------------------------------------------------------------- |
+| Component      | Role                                                                                    |
+| ---------------| --------------------------------------------------------------------------------------- |
 | Config Server  | A Spring Boot application that provides configuration files to all services.            |
 | Config Client  | Any microservice that fetches its configuration from the Config Server.                 |
 | Git Repository | The storage location for configuration files (could also be filesystem, SVN, or Vault). |
@@ -1238,11 +1244,8 @@ If you also add Spring Boot Actuator, you can refresh configs at runtime without
     <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
 
-👉 Add in application.properties:
-management.endpoints.web.exposure.include=refresh
-
-👉 Send POST request:
-POST http://localhost:8081/actuator/refresh
+👉 Add in application.properties: management.endpoints.web.exposure.include=refresh
+👉 Send POST request: POST http://localhost:8081/actuator/refresh
 
 ➡️ The URL POST http://localhost:8081/actuator/refresh
 is the URL of the microservice (Config Client) — NOT the Config Server.
@@ -1253,15 +1256,17 @@ is the URL of the microservice (Config Client) — NOT the Config Server.
 ➤ Encrypt sensitive data using:
 spring.cloud.config.server.encrypt.enabled=true
 
+
 🔄 Advantages of Using Spring Cloud Config Server
-| Benefit                                  | Description                                                   |
-| ---------------------------------------- | ------------------------------------------------------------- |
+| Benefit                              | Description                                                   |
+| -------------------------------------| ------------------------------------------------------------- |
 | Centralized Configuration Management | All configs are managed from one repository.                  |
 | Environment-Specific Configs         | Supports multiple profiles like dev, test, prod.              |
 | Dynamic Refresh                      | Configs can be reloaded at runtime using `/actuator/refresh`. |
 | Version Control Integration          | Git provides version history, rollback, and collaboration.    |
 | Consistency Across Microservices     | Ensures uniform configuration across all services.            |
 | Secure & Scalable                    | Supports encryption, Vault, and multiple environments.        |
+
 
 🔄 Where Config Server Fits in Microservice Architecture
                       ┌─────────────────────────────┐
@@ -1281,15 +1286,16 @@ spring.cloud.config.server.encrypt.enabled=true
 Every microservice (client) fetches its configuration from the Config Server instead of a local file.
 
 
+===================
 🔷 Circuit Breaker
+===================
 ➤ A Circuit Breaker is a resilience pattern used to prevent one failing microservice from crashing or slowing down the entire system.
 
 👉 Think of it as an electric circuit fuse —
 ➤ when there’s a fault in one part, it “breaks” the connection temporarily to protect the rest.
  
 🔄 Goal
-To stop making repeated calls to a service that is already failing,
-and allow it to recover gracefully while maintaining system stability.
+To stop making repeated calls to a service that is already failing, and allow it to recover gracefully while maintaining system stability.
 
 🔄 Real-World Analogy
 👉 Imagine:
@@ -1304,14 +1310,14 @@ A circuit breaker detects this repeated failure and “opens” the circuit:
 ✔️ Optionally returns a fallback response (like “Service Temporarily Unavailable”).
 
 🔄 Circuit Breaker States
-| State            | Meaning                                                            | Behavior                                           |
-| ---------------- | ------------------------------------------------------------------ | -------------------------------------------------- |
-| 🔴  Closed    | Everything is normal                                               | All requests pass through                          |
+| State         | Meaning                                                            | Behavior                                           |
+| --------------| ------------------------------------------------------------------ | -------------------------------------------------- |
+| 🔴  Closed   | Everything is normal                                               | All requests pass through                          |
 | 🟢 Open      | Service is failing repeatedly                                      | Requests are stopped immediately (fail fast)       |
-| 🟡 Half-Open | After a cooldown, circuit allows limited requests to test recovery | If successful → go to Closed; if fails → stay Open |
+| 🟡 Half-Open | After a cooldown, circuit allows limited requests to test recovery | If successful ─ go to Closed; if fails ─ stay Open |
+
 
 🔄 Implementation in Spring Boot
-
 Spring Boot uses Resilience4j for Circuit Breaker support
 (previously Netflix Hystrix was popular but is now deprecated).
 
@@ -1371,9 +1377,9 @@ public class StudentController {
 
 🔄 How it Works
 1️⃣ Normal flow: Calls pass through normally (Circuit Closed).
-2️⃣ If the target service fails repeatedly (e.g., 3 out of 5 requests fail): Circuit opens → blocks further calls for 10 seconds.
-3️⃣ After 10 seconds: Circuit enters Half-Open state → allows a few test calls.
-4️⃣ If those calls succeed → Closed again (normal). If they fail → stays Open (still blocking).
+2️⃣ If the target service fails repeatedly (e.g., 3 out of 5 requests fail): Circuit opens ─────────▶ blocks further calls for 10 seconds.
+3️⃣ After 10 seconds: Circuit enters Half-Open state ─────────▶ allows a few test calls.
+4️⃣ If those calls succeed ─────────▶ Closed again (normal). If they fail ─────────▶ stays Open (still blocking).
 
 
 🔄 Benefits of Circuit Breaker
@@ -1583,15 +1589,16 @@ public class ReportScheduler {
 ➤ Running batch processes
 
 
+=============================================
 🔷 Spring Boot With Redis Cache Integration
-1️⃣ Redis
-Redis (Remote Dictionary Server) is an in-memory key–value data store.
-It’s fast, lightweight, and supports caching, session storage, pub/sub messaging, leaderboard data, etc.
+=============================================
+➤ Redis (Remote Dictionary Server) is an in-memory key–value data store.
+➤ It’s fast, lightweight, and supports caching, session storage, pub/sub messaging, leaderboard data, etc.
 
 
 2️⃣ Why Redis is used for Caching in Spring Boot
-| Reason                          | Explanation                                                    |
-| ------------------------------- | -------------------------------------------------------------- |
+| Reason                       | Explanation                                                    |
+| -----------------------------| -------------------------------------------------------------- |
 | 🚀 In-memory storage        | Redis stores data in RAM, giving nanosecond-level access times |
 | 🧠 Persistent option        | Can optionally persist data to disk                            |
 | ⚖️ Scalable                 | Works well in distributed/microservices systems                |
@@ -1610,8 +1617,8 @@ Client (Spring Boot App)
         |   if not found (cache miss)
         v
    Database (MySQL, etc)
-✅ Cache Hit → value found in Redis → fast response
-❌ Cache Miss → fetch from DB → store result in Redis → serve response
+✅ Cache Hit ─────────▶ value found in Redis ─────────▶ fast response
+❌ Cache Miss ─────────▶ fetch from DB ─────────▶ store result in Redis ─────────▶ serve response
 
 
 4️⃣ Spring Boot Caching Abstraction (Important)
@@ -1628,8 +1635,8 @@ Spring provides a simple caching abstraction via annotations.
 5️⃣ How Caching Works Internally
 1️⃣ When a method annotated with @Cacheable is called:
     ➤ Spring first checks the cache (Redis)
-    ➤ If result is found → return cached value
-    ➤ If not found → execute method → save result to cache → return result
+    ➤ If result is found ─────────▶ return cached value
+    ➤ If not found ─────────▶ execute method ─────────▶ save result to cache ─────────▶ return result
 
 🔄 Integrate Redis Cache in Spring Boot
 1️⃣ Add Dependencies
@@ -1759,17 +1766,17 @@ public class StudentServiceManual {
         // 🔹 1. Try fetching from Redis cache
         Object cachedData = redisTemplate.opsForValue().get(key);
         if (cachedData != null) {
-            System.out.println("✅ [CACHE-HIT] Data fetched from Redis → " + cachedData);
+            System.out.println("✅ [CACHE-HIT] Data fetched from Redis ─────────▶ " + cachedData);
             return (Student) cachedData;
         }
 
-        // 🔹 2. Cache miss → fetch from database
+        // 🔹 2. Cache miss ─────────▶ fetch from database
         System.out.println("🚀 [CACHE-MISS] Fetching from database for ID: " + id);
         Student student = fetchFromDatabase(id);
 
         // 🔹 3. Store in cache with 5-minute expiry
         redisTemplate.opsForValue().set(key, student, Duration.ofMinutes(5));
-        System.out.println("🧠 [CACHE-STORE] Data cached in Redis for 5 minutes → " + student);
+        System.out.println("🧠 [CACHE-STORE] Data cached in Redis for 5 minutes ─────────▶ " + student);
 
         return student;
     }
@@ -1816,10 +1823,10 @@ public class StudentManualController {
 👉 Console Logs
 First Request:
 🚀 [CACHE-MISS] Fetching from database for ID: 1
-🧠 [CACHE-STORE] Data cached in Redis for 5 minutes → Student{id=1, name='Ankur Verma', branch='IT'}
+🧠 [CACHE-STORE] Data cached in Redis for 5 minutes ─────────▶ Student{id=1, name='Ankur Verma', branch='IT'}
 
 👉 Second Request:
-✅ [CACHE-HIT] Data fetched from Redis → Student{id=1, name='Ankur Verma', branch='IT'}
+✅ [CACHE-HIT] Data fetched from Redis ─────────▶ Student{id=1, name='Ankur Verma', branch='IT'}
 
 🔄 Pros and Cons
 | Pros                                                | Cons                                   |
@@ -1909,7 +1916,7 @@ public class StudentServiceAnnotation {
 
     @CachePut(value = "students", key = "#student.id")
     public Student updateStudent(Student student) {
-        System.out.println("♻️ [CACHE-UPDATE] Updated student in cache → " + student);
+        System.out.println("♻️ [CACHE-UPDATE] Updated student in cache ─────────▶ " + student);
         return student;
     }
 
@@ -1963,15 +1970,15 @@ public class StudentAnnotationController {
 ✅ [CACHE-HIT] Student fetched from Redis automatically (no DB log)
 
 👉 On update:
-♻️ [CACHE-UPDATE] Updated student in cache → Student{id=1, name='Ankur Updated', branch='IT'}
+♻️ [CACHE-UPDATE] Updated student in cache ─────────▶ Student{id=1, name='Ankur Updated', branch='IT'}
 
 👉 On delete:
 🗑️ [CACHE-EVICT] Deleted student from cache ID: 1
 
 
 🔄 Redis Cache Operations (Conceptually)
-| Operation           | Description             | Example            |
-| ------------------- | ----------------------- | ------------------ |
+| Operation       | Description             | Example            |
+| --------------- | ----------------------- | ------------------ |
 | SET key value   | Adds/updates value      | `SET user:1 Ankur` |
 | GET key         | Fetch value             | `GET user:1`       |
 | DEL key         | Delete key              | `DEL user:1`       |
@@ -1980,7 +1987,7 @@ public class StudentAnnotationController {
 
 
 🔄 Comparison
-| Feature          | Method 1: RedisTemplate (Manual) | Method 2: @Cacheable (Annotation)                 |
+| Feature          | Method 1: RedisTemplate (Manual)     | Method 2: @Cacheable (Annotation)                     |
 | ---------------- | ------------------------------------ | ----------------------------------------------------- |
 | Control over TTL | Per-entry using `Duration`           | Global TTL via `CacheManager`                         |
 | Logging          | Manual (you define hit/miss logs)    | Implicit (you can log inside method to detect misses) |
@@ -1990,18 +1997,19 @@ public class StudentAnnotationController {
 | Best Used When   | Complex cache management needed      | Standard read/update/delete caching                   |
 
 
-
-🔷 Apache Kafka - Message Broker 
+=================================
+🔷 Apache Kafka - Message Broker
+=================================
 Apache Kafka is a distributed event streaming platform designed to handle high-throughput, real-time data feeds.
 It allows different applications or microservices to communicate asynchronously using messages (events).
 
 
 🔄 Core Kafka Concepts
-| Concept                | Description                                                                                                    |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Concept            | Description                                                                                                    |
+| -------------------| -------------------------------------------------------------------------------------------------------------- |
 | Producer           | Publishes messages (events) to a Kafka topic.                                                                  |
-| Subscriber           | Subscribes to a topic and processes messages.                                                                | 
-| Topic              | A named category or channel where records (messages) are stored and published.                             |
+| Subscriber         | Subscribes to a topic and processes messages.                                                                  |
+| Topic              | A named category or channel where records (messages) are stored and published.                                 |
 | Partition          | Each topic is divided into partitions for scalability and parallel processing.                                 |
 | Offset             | A unique ID for each message in a partition — helps track consumer progress.                                   |
 | Broker             | A Kafka server that stores messages and handles client requests.                                               |
@@ -2131,8 +2139,8 @@ Here, both connect to the same broker but serve different purposes.
         
 
 🔄 Advanced Kafka Concepts
-| Concept                          | Description                                                                         |
-| -------------------------------- | ----------------------------------------------------------------------------------- |
+| Concept                      | Description                                                                         |
+| -----------------------------| ----------------------------------------------------------------------------------- |
 | Retention Policy             | Kafka keeps messages for a configurable time (e.g., 7 days) even after consumption. |
 | Replication Factor           | Ensures high availability — each partition’s data is replicated across brokers.     |
 | Acks (Acknowledgments)       | Controls reliability — `acks=0`, `acks=1`, or `acks=all`.                           |
@@ -2144,8 +2152,8 @@ Here, both connect to the same broker but serve different purposes.
 | Offset Management            | Consumer offset can be auto-committed or manually managed.                          |
 
 🔄 Real-World Use Cases
-| Use Case                       | Example                                           |
-| ------------------------------ | ------------------------------------------------- |
+| Use Case                   | Example                                           |
+| ---------------------------| ------------------------------------------------- |
 | Log aggregation            | Collecting logs from multiple servers.            |
 | Event sourcing             | Tracking all state changes in microservices.      |
 | Stream processing          | Fraud detection, metrics monitoring.              |
