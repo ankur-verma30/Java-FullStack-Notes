@@ -25,7 +25,7 @@ A thread is a light-weight process that can be created and destroyed at runtime.
 ###################
 Multitasking is the ability of a computer to run multiple tasks or programs at the same time. On single-core CPUs, this is done through time-sharing, rapdily switching between tasks. On multi-core CPUs, this is done through parallelism, where multiple cores, true paralled execution occurs, with tasks distributed across the cores. The OS scheduler balances the load, ensuring efficient and resposive system performance.
 
-It utilizes the capabilities of a CPU and its cores. When an OS performs multitasking, it can assign different tasks to different cores. This is mroe efficient than assigning all tasks to a single core.
+It utilizes the capabilities of a CPU and its cores. When an OS performs multitasking, it can assign different tasks to different cores. This is more efficient than assigning all tasks to a single core.
 ✅For Example: We are browsing the internet while listening to music and dowloading files at the same time.
 
 
@@ -35,30 +35,28 @@ It utilizes the capabilities of a CPU and its cores. When an OS performs multita
 Multithreading is a technique in which multiple threads of execution are created within a single process. Each thread is a separate execution path within the process.
 Multithreading is used to improve the performance of a program by allowing it to execute multiple tasks concurrently.
 
-✅For Example: A web browser can use mutlithreading by having seperate threads for rendering the page, running JavaScript, and handling user input. This makes the browser more resposive and efficient.
+✅For Example: A web browser can use multithreading by having seperate threads for rendering the page, running JavaScript, and handling user input. This makes the browser more resposive and efficient.
 
 It enhances the efficiency of multitasking by breaking down individual tasks into smaller sub-tasks or threads. These threads can be processed simultaneously, making better use of the CPU's capabilities and resources.
 
-📝In Single-Core System:
-Both threads and processes are managed by the OS scheduler through time slicing ad context switching to create the illusion of simultaneous execution.
-📝In Multi-Core System:
-Both threads and processes can run in true parallelism, with tasks distributed across the cores to optimize performance.
+📝In Single-Core System: Both threads and processes are managed by the OS scheduler through time slicing ad context switching to create the illusion of simultaneous execution.
+📝In Multi-Core System: Both threads and processes can run in true parallelism, with tasks distributed across the cores to optimize performance.
 
 
 ##################################
 🔷 Advantages of Multithreading
 ##################################
 1️⃣ Improved Performance / Better CPU Utilization
-➤ Threads run concurrently → utilize multiple cores.
+➤ Threads run concurrently ─────────▶ utilize multiple cores.
 ➤ Reduces CPU idle time.
 ➤ Great for computational + IO workloads.
 
 2️⃣ Responsiveness
 ➤ One thread can handle heavy tasks while UI/API stays responsive.
-E.g., Web server spins separate threads for each request.
+✅ Example: Web server spins separate threads for each request.
 
 3️⃣ Resource Sharing
-➤ Threads share memory space → low overhead compared to processes.
+➤ Threads share memory space ─────────▶ low overhead compared to processes.
 ➤ Faster context switching.
 
 4️⃣ Scalability in Server Applications
@@ -76,9 +74,8 @@ E.g., Web server spins separate threads for each request.
 ############################################################
 ❌ Disadvantages of Multithreading & How to Overcome Them
 ############################################################
-
 1️⃣ Race Conditions
-❗ Problem: Two threads access and modify shared data simultaneously → inconsistent data.
+❗ Problem: Two threads access and modify shared data simultaneously ─────────▶ inconsistent data.
 ✅ Fix:
 ➤ Use synchronization (synchronized, locks)
 ➤ Use Atomic classes (AtomicInteger, AtomicReference)
@@ -88,13 +85,12 @@ E.g., Web server spins separate threads for each request.
 
 
 2️⃣ Deadlocks
-❗ Problem: Two threads wait forever for each other’s lock → system hangs.
+❗ Problem: Two threads wait forever for each other’s lock ─────────▶ system hangs.
 ✅ Fix:
 ➤ Acquire locks in consistent global order
 ➤ Use tryLock() with timeout (ReentrantLock)
 ➤ Reduce lock scope (lock only necessary code)
 ➤ Avoid nested locking
-
 ✅ Better solution: Use lock-free algorithms if possible.
 
 
@@ -108,7 +104,6 @@ E.g., Web server spins separate threads for each request.
 
 4️⃣ Thread Interference
 ❗ Problem: Threads overwrite each other’s computation.
-
 ✅ Fix:
 ➤ Wrap shared logic with:
 ➤ synchronized
@@ -125,7 +120,7 @@ E.g., Web server spins separate threads for each request.
 
 
 6️⃣ Context Switching Overhead
-❗ Problem: Too many threads → CPU wastes time switching instead of executing.
+❗ Problem: Too many threads ─────────▶ CPU wastes time switching instead of executing.
 ✅ Fix:
 ➤ Use thread pools (fixed-size) to limit thread count.
 ➤ Use virtual threads (Project Loom) in modern Java.
@@ -133,7 +128,7 @@ E.g., Web server spins separate threads for each request.
 
 
 7️⃣ Memory Overhead
-❗ Problem: Each thread has its own stack → high memory usage.
+❗ Problem: Each thread has its own stack ─────────▶ high memory usage.
 ✅ Fix:
 ➤ Avoid creating unnecessary threads.
 ➤ Use cached or fixed thread pools.
@@ -160,16 +155,14 @@ Especially when:
 ➤ Use non-blocking algorithms (CAS operations).
 ➤ Use parallelization only when beneficial.
 ➤ Tune thread pool size based on:
-    ✔️ CPU-bound → cores + 1
-    ✔️ IO-bound → (cores * 2) or more
+    ✔️ CPU-bound ─────────▶ cores + 1
+    ✔️ IO-bound ─────────▶ (cores * 2) or more
 
 
 ###############################
 🔷 Thread Creation Techniques
 ###############################
 1️⃣ Using Thread Class
-
-package p1;
 
 public class World extends Thread {
 	@Override
@@ -180,10 +173,7 @@ public class World extends Thread {
 	}
 }
 
-package p1;
-
 public class intro {
-
 	public static void main(String[] args) {
 		World w = new World();
 		w.start();
@@ -191,7 +181,6 @@ public class intro {
 			System.out.println(Thread.currentThread().getName());
 		}
 	}
-
 }
 🔗 Steps:
 ➤ A new class World is created that extends Thread.
@@ -200,8 +189,6 @@ public class intro {
 
 
 2️⃣ Using Runnable Interface
-package p1;
-
 public class World implements Runnable {
     @Override
     public void run() {
@@ -211,10 +198,7 @@ public class World implements Runnable {
     }
 }
 
-package p1;
-
 public class intro {
-
     public static void main(String[] args) {
         Thread t = new Thread(new World());
         t.start();
@@ -223,7 +207,6 @@ public class intro {
         }
     }
 }
-
 🔄 Steps:
 ➤ A new class World is created that implements Runnable.
 ➤ The run method is overridden to define the code constitutes the new thread.
@@ -236,16 +219,15 @@ public class intro {
 ➤ Callable must be wrapped inside a FutureTask.
 
 🔄 Execution flow:
-1️⃣ Define Callable → work to be done
-2️⃣ Wrap in FutureTask → manages result
-3️⃣ Pass FutureTask to Thread → runs asynchronously
-4️⃣ Call future.get() → retrieve output
+1️⃣ Define Callable ─────────▶ work to be done
+2️⃣ Wrap in FutureTask ─────────▶ manages result
+3️⃣ Pass FutureTask to Thread ─────────▶ runs asynchronously
+4️⃣ Call future.get() ─────────▶ retrieve output
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 public class CallableThreadExample {
-
     public static void main(String[] args) throws Exception {
 
         // Step 1: Define Callable
@@ -272,14 +254,13 @@ public class CallableThreadExample {
 #####################
 🔷 Thread Lifecycle
 #####################
-The lifecycle of a thread is Java consist of several states, which a thread can move through during its execution.
+The lifecycle of a thread in Java consist of several states, which a thread can move through during its execution.
 The lifecycle of a thread is as follows:
-
-1️⃣ New: A new thread is created but not yet started.
-2️⃣ Runnable: After the start method is called, the thread becomes runnable. It's ready to run and is waiting for CPU time.
-3️⃣ Running: The thread is in this state when it is executing.
-4️⃣ Blocked/Waiting: A thread is in this state when it is  waiting for a resource or for another thread to perform an action.
-5️⃣ Terminated: The thread has completed its execution.
+1️⃣ New ─────────▶ A new thread is created but not yet started.
+2️⃣ Runnable ─────────▶ After the start method is called, the thread becomes runnable. It's ready to run and is waiting for CPU time.
+3️⃣ Running ─────────▶ The thread is in this state when it is executing.
+4️⃣ Blocked/Waiting ─────────▶ A thread is in this state when it is waiting for a resource or for another thread to perform an action.
+5️⃣ Terminated ─────────▶ The thread has completed its execution.
 
 
 ###################
@@ -288,13 +269,12 @@ The lifecycle of a thread is as follows:
 🔄 start()
 ➤ Used to start a new thread of execution.
 ➤ Internally calls the run() method in a new call stack.
-➤ Cannot call start() on the same thread object more than once → throws IllegalThreadStateException.
-
+➤ Cannot call start() on the same thread object more than once ─────────▶ throws IllegalThreadStateException.
 t1.start();  // starts execution of thread
 
 🔄 run()
 ➤ Contains the code that will be executed by the thread.
-➤ If run() is called directly (without start()), it will behave like a normal method → no new thread is created.
+➤ If run() is called directly (without start()), it will behave like a normal method ─────────▶ no new thread is created.
 
 @Override
 public void run() {
@@ -304,44 +284,42 @@ public void run() {
 🔄 sleep(milliseconds)
 ➤ Causes the currently executing thread to pause temporarily for a given time.
 ➤ Throws InterruptedException if another thread interrupts the sleeping one.
-➤ Static method → belongs to the class, not an object.
+➤ Static method ─────────▶ belongs to the class, not an object.
+
 
 #############################################
 🔷 Difference between sleep and wait method
 #############################################
-| Feature                     | `sleep()`                        | `wait()`                               |
+| Feature                     | sleep()                          | wait()                                 |
 | --------------------------- | -------------------------------- | -------------------------------------- |
-| Method belongs to           | `Thread` class                   | `Object` class                         |
+| Method belongs to           | Thread class                     | Object class                           |
 | Purpose                     | Pause execution for a fixed time | Release lock and wait for notification |
-| Lock release                | ❌ Does **not** release lock     | ✅ **Releases** lock                  |
+| Lock release                | ❌ Does not release lock         | ✅ Releases lock                      |
 | Requires synchronized block | ❌ No                            | ✅ Yes                                |
-| How it resumes              | Automatically after time expires | Via `notify()` / `notifyAll()`         |
-| Time-bound                  | Yes (mandatory or optional)      | Optional (`wait()` or `wait(time)`)    |
+| How it resumes              | Automatically after time expires | via notify() / notifyAll()             |
+| Time-bound                  | Yes (mandatory or optional)      | Optional (wait() or wait(time))        |
 | Thread state                | TIMED_WAITING                    | WAITING / TIMED_WAITING                |
 | Can be interrupted          | Yes                              | Yes                                    |
-| Throws exception            | `InterruptedException`           | `InterruptedException`                 |
+| Throws exception            | InterruptedException             | InterruptedException                   |
 | Used for                    | Delays, polling, retry logic     | Inter-thread communication             |
 | Who controls wake-up        | JVM (timer-based)                | Another thread                         |
 | Common misuse               | Used instead of wait/notify      | Used without synchronization           |
 | Typical use case            | Pause execution                  | Producer–Consumer                      |
 
 
-Thread.sleep(1000);  // pauses current thread for 1 second
-
 🔄 join()
 ➤ Allows one thread to wait for another thread to finish execution before continuing.
 ➤ Ensures sequential execution when required.
 ➤ Overloads:
-    ✔️ join() → waits until thread finishes.
-    ✔️ join(long millis) → waits for max specified time.
-
+    ✔️ join() ─────────▶ waits until thread finishes.
+    ✔️ join(long millis) ─────────▶ waits for max specified time.
 t1.join();  // main thread waits until t1 finishes
+
 
 🔄 setPriority(int priority)
 ➤ Used to set priority of a thread.
-➤ Range: 1 (MIN_PRIORITY) → 10 (MAX_PRIORITY), default = 5 (NORM_PRIORITY).
+➤ Range: 1 (MIN_PRIORITY) ─────────▶ 10 (MAX_PRIORITY), default = 5 (NORM_PRIORITY).
 ➤ Just a hint to the scheduler (not guaranteed).
-
 t1.setPriority(Thread.MAX_PRIORITY);
 
 👉 Naming Threads
@@ -351,8 +329,6 @@ ThreadMethodDemo t1 = new ThreadMethodDemo("FirstThread");
 System.out.println(t1.getName());  // prints: FirstThread
 
 ✅ Example with Priority + Name
-package p1;
-
 public class ThreadMethodDemo extends Thread {
     public ThreadMethodDemo(String name) {
         super(name);  // assigning thread name
@@ -378,12 +354,9 @@ public class ThreadMethodDemo extends Thread {
 ➤ Used to interrupt a thread that is sleeping, waiting, or blocked.
 ➤ Sets the interrupt status flag of the thread.
 ➤ If the thread is in sleep() or join(), it will throw InterruptedException.
-
 🔗 Method: t1.interrupt();
 
 ✅ Code Example:
-package p1;
-
 public class ThreadMethodDemo extends Thread {
     @Override
     public void run() {
@@ -397,28 +370,28 @@ public class ThreadMethodDemo extends Thread {
 
     public static void main(String[] args) {
         ThreadMethodDemo t1 = new ThreadMethodDemo();
-        t1.start();       // starts the thread → calls run() in separate stack
+        t1.start();       // starts the thread ─────────▶ calls run() in separate stack
         t1.interrupt();   // interrupts t1 immediately
     }
 }
 
 🔷 What Happens at Runtime?
-➤ t1.start() → new thread is created, run() starts execution.
-➤ Inside run(), thread executes → Thread.sleep(1000).
+➤ t1.start() ─────────▶ new thread is created, run() starts execution.
+➤ Inside run(), thread executes ─────────▶ Thread.sleep(1000).
     ✔️ This puts the thread into TIMED_WAITING state.
 ➤ Meanwhile, the main thread calls t1.interrupt().
     ✔️ This sets the interrupt flag for t1.
     ✔️ Since t1 is currently sleeping, it immediately throws an InterruptedException.
-➤ The exception is caught in the catch block →
+➤ The exception is caught in the catch block ─────────▶
 Thread interrupted: java.lang.InterruptedException: sleep interrupted
 
-🔷 Key Notes for Interview
+👉 Key Notes
 ➤ interrupt()
-    ✔️ If a thread is sleeping, waiting, or blocked → InterruptedException is thrown.
-    ✔️ If a thread is running normally (not in sleep/wait) → just sets interrupt flag, no exception.
+    ✔️ If a thread is sleeping, waiting, or blocked ─────────▶ InterruptedException is thrown.
+    ✔️ If a thread is running normally (not in sleep/wait) ─────────▶ just sets interrupt flag, no exception.
 ➤ sleep() always needs to be inside a try-catch because it throws InterruptedException.
 ➤ Execution flow here:
-start() → run() → sleep() → interrupt() → exception thrown → handled in catch.
+start() ─────────▶ run() ─────────▶ sleep() ─────────▶ interrupt() ─────────▶ exception thrown ─────────▶ handled in catch.
 
 🔄 Yield Method
 A hint to the scheduler that the current thread is willing to yield its current use of a processor.
@@ -429,7 +402,7 @@ public class MyThread extends Thread {
         super(name);
     }
     public static void main(String[] args) throws InterruptedException {
-        MyThread  t1=new MyThread("First Thead");
+        MyThread t1=new MyThread("First Thead");
         MyThread t2=new MyThread("Second Thread");
         t1.start();
         t2.start();
@@ -459,7 +432,7 @@ public class MyThread extends Thread {
 
     public static void main(String[] args) throws InterruptedException {
         MyThread t1 = new MyThread("First Thead"); //user thread for the business logic
-        t1.setDaemon(true);//daemon thread 
+        t1.setDaemon(true);//daemon thread
         t1.start();
         System.out.println("Main method execution completed");
     }
@@ -487,20 +460,16 @@ Hello World
 ➤ It is used to prevent concurrent access to a shared resource, such as a variable or object.
 ➤ It is implemented using the synchronized keyword.
 ➤ The synchronized keyword is used to define a block of code that is synchronized.
-➤ Only one thread can access the synchronized block at a time.
 ➤ If multiple threads try to access the synchronized block at the same time, they will block until the first thread releases the lock.
 ➤ This prevents concurrent access to the shared resource and prevent race conditions and ensures that only one thread can access it at a time and attain mutual exclusion.
 ➤ synchronized method accquire the lock on the object for instance methods and on the class for static methods.
 
 ✅Example:
-Counter.java
-package com.corejava;
-
 public class Counter {
     private int count = 0;
 
     public synchronized void increment() { //critical section
-        Thread.yield(); 
+        Thread.yield();
         count++;
     }
 
@@ -508,9 +477,6 @@ public class Counter {
         return count;
     }
 }
-
-MyThread.java
-package com.corejava;
 
 public class MyThread extends Thread {
     private Counter counter;
@@ -526,9 +492,6 @@ public class MyThread extends Thread {
         }
     }
 }
-
-Test.java
-package com.corejava;
 
 public class Test {
     public static void main(String[] args) {
@@ -548,6 +511,7 @@ public class Test {
     }
 }
 
+
 ➤ When you want to synchronized some part of the method not the whole method then use synchronized block instead of synchronized keyword on the method.
 ✅Example:
  public void increment() { 
@@ -566,8 +530,8 @@ public class Test {
 
 🔁 Common Problems
 🔄 Deadlock
-Thread 1 → Lock A → Lock B
-Thread 2 → Lock B → Lock A
+Thread 1 ─────────▶ Lock A ─────────▶ Lock B
+Thread 2 ─────────▶ Lock B ─────────▶ Lock A
 
 🔄 Performance Overhead
 ➤ Thread blocking
@@ -629,8 +593,8 @@ synchronized (MyClass.class) {
 | Feature            | Object Lock                            | Class Lock            |
 | ------------------ | -------------------------------------- | --------------------- |
 | Lock applies to    | Single object                          | Entire class          |
-| Created by         | `synchronized` instance method / block | `static synchronized` |
-| Lock owner         | Object instance                        | `Class` object        |
+| Created by         | synchronized instance method / block | static synchronized |
+| Lock owner         | Object instance                        | Class object        |
 | Threads blocked    | Only for same object                   | Across all objects    |
 | Parallel execution | Allowed on different objects           | ❌ Not allowed         |
 
@@ -681,13 +645,13 @@ Thread-1 printing...
 Thread-safe mechanism that allows multiple threads to access a shared resource concurrently.
 
 ❓ Why Use Locks Instead of synchronized?
-| Feature               | `synchronized`                                       | `Lock`                             |
+| Feature               | synchronized                                       | Lock                             |
 | --------------------- | ---------------------------------------------------- | ---------------------------------- |
-| Automatic release     | Yes (automatically released when method/block exits) | No (must manually call `unlock()`) |
-| Try to acquire        | No                                                   | Yes (`tryLock()`)                  |
-| Interruptible waiting | No                                                   | Yes (`lockInterruptibly()`)        |
-| Fairness policy       | No                                                   | Yes (can create **fair locks**)    |
-| Multiple conditions   | No                                                   | Yes (via `Condition` objects)      |
+| Automatic release     | Yes (automatically released when method/block exits) | No (must manually call unlock()) |
+| Try to acquire        | No                                                   | Yes (tryLock())                  |
+| Interruptible waiting | No                                                   | Yes (lockInterruptibly())        |
+| Fairness policy       | No                                                   | Yes (can create fair locks)    |
+| Multiple conditions   | No                                                   | Yes (via Condition objects)      |
 
 🔄 There are two types of locks:
     1️⃣ Intrinsic Locks (Monitor Locks):
@@ -724,20 +688,20 @@ public interface Lock {
 🔄 Lock Interface Methods use Case:
 | Method                              | Description                                                         |
 | ----------------------------------- | ------------------------------------------------------------------- |
-| `lock()`                            | Acquires the lock, waits indefinitely if not available.             |
-| `unlock()`                          | Releases the lock (should always be in `finally`).                  |
-| `tryLock()`                         | Attempts to acquire lock immediately; returns `true` if successful. |
-| `tryLock(long time, TimeUnit unit)` | Waits for the given time before giving up.                          |
-| `lockInterruptibly()`               | Acquires lock but allows interruption while waiting.                |
-| `isLocked()`                        | Checks if the lock is held by any thread.                           |
+| lock()                            | Acquires the lock, waits indefinitely if not available.             |
+| unlock()                          | Releases the lock (should always be in finally).                  |
+| tryLock()                         | Attempts to acquire lock immediately; returns true if successful. |
+| tryLock(long time, TimeUnit unit) | Waits for the given time before giving up.                          |
+| lockInterruptibly()               | Acquires lock but allows interruption while waiting.                |
+| isLocked()                        | Checks if the lock is held by any thread.                           |
 
     3️⃣ ReentrantLock 
     🌟 Properties:
         ✔️ A thread can acquire the same lock multiple times without being blocked (hence “reentrant”) and it maintains a count.
         ✔️ Must call unlock() the same number of times it called lock(), every lock called must be paired with an unlock call.
         ✔️ Can be fair or unfair:
-                ➤ Fair → threads acquire lock in order of request.
-                ➤ Unfair → scheduler decides (default).
+                ➤ Fair ─────────▶ threads acquire lock in order of request.
+                ➤ Unfair ─────────▶ scheduler decides (default).
 
 
     4️⃣ ReentrantReadWriteLock
@@ -745,7 +709,7 @@ public interface Lock {
         ✔️ Read Lock: can be held by multiple readers simultaneously if there’s no writer.
         ✔️ Write Lock: exclusive lock; only one thread can write at a time.
 
-    ✅ Use Case: When reads are frequent and writes are rare → improves performance.
+    ✅ Use Case: When reads are frequent and writes are rare ─────────▶ improves performance.
 
     🔗 Code Snippet:
     ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -869,7 +833,7 @@ Thread 1 released the lock
 Thread 2 released the lock
 Thread 3 acquired the lock
 Thread 3 released the lock
-👉 Now the output follows Thread 1 → Thread 2 → Thread 3 (the order in which they started waiting).
+👉 Now the output follows Thread 1 ─────────▶ Thread 2 ─────────▶ Thread 3 (the order in which they started waiting).
 
 ➤ Thread 1 and Thread 2 both say “acquired the lock” before either released it.
 ➤ That’s actually not possible if both lines refer to the same critical section protected by the same lock, because only one thread can hold a ReentrantLock at a time.
@@ -897,7 +861,7 @@ synchronized void print() { ... }  // waits indefinitely
 
 3️⃣ No Fairness Guarantee
 ➤ Thread scheduling is not fair — JVM does not guarantee FIFO order of thread execution.
-➤ A thread that waits longer doesn’t necessarily get the lock next → can lead to thread starvation.
+➤ A thread that waits longer doesn’t necessarily get the lock next ─────────▶ can lead to thread starvation.
 
 4️⃣ Cannot Try for Lock (No tryLock Equivalent)
 ➤ There’s no non-blocking attempt to acquire the lock.
@@ -956,7 +920,7 @@ A ReadWriteLock is a special kind of lock that maintains two separate locks:
 🔄 Rule of Thumb:
 | Operation       | Can run in parallel? | Condition                            |
 | --------------- | -------------------- | ------------------------------------ |
-| Multiple Reads  | ✅ Yes                | As long as **no write** is happening |
+| Multiple Reads  | ✅ Yes                | As long as no write is happening |
 | Read + Write    | ❌ No                 | Write locks block readers            |
 | Multiple Writes | ❌ No                 | Only one writer at a time            |
 | Write + Write   | ❌ No                 | Only one writer                      |
@@ -1000,10 +964,10 @@ public class ReadWriteCounter {
 ➤ rwlock creates an object that provides two locks:
     ✔️ readLock() – allows concurrent reads.
     ✔️ writeLock() – exclusive lock for writing.
-➤ count → shared resource being read/written by threads.
+➤ count ─────────▶ shared resource being read/written by threads.
 
 2️⃣ Write Operation (increment())
-➤ writeLock.lock() → acquires exclusive access to count.
+➤ writeLock.lock() ─────────▶ acquires exclusive access to count.
 ➤ While one thread holds the write lock:
     ❌ No other write thread can enter.
     ❌ No read thread can access count.
@@ -1060,8 +1024,8 @@ public class Main {
 }
 
 4️⃣ Main Class Logic
-➤ readTask → repeatedly reads the counter (10 times).
-➤ writeTask → increments the counter (10 times).
+➤ readTask ─────────▶ repeatedly reads the counter (10 times).
+➤ writeTask ─────────▶ increments the counter (10 times).
 
 5️⃣ Threads Creation
 One write thread and two read threads.
@@ -1080,7 +1044,7 @@ System.out.println("Final count:" + counter.getCount());
 👉 After all threads finish, the final count should be 10 (since one writer increments 10 times).
 
 ❓ Why ReadWriteLock Is Better Here
-| Aspect                   | `synchronized`     | `ReadWriteLock` |
+| Aspect                   | synchronized     | ReadWriteLock |
 | ------------------------ | ------------------ | --------------- |
 | Multiple readers         | ❌ Block each other | ✅ Allowed       |
 | Writer access            | Exclusive          | Exclusive       |
@@ -1183,7 +1147,7 @@ public class DeadLockExample {
 ➤ Thread-1 locks Pen.
 ➤ It tries to call paper.finishWriting() — a synchronized method.
 ➤ To enter paper.finishWriting(), it must get Paper’s lock.
-➤ But what if Thread-2 already holds the Paper lock? → Then Thread-1 waits forever.
+➤ But what if Thread-2 already holds the Paper lock? ─────────▶ Then Thread-1 waits forever.
 
 ➤ Thread-2 locks Paper.
 ➤ Then tries to call pen.finishWriting().
@@ -1219,18 +1183,18 @@ class Task2 implements Runnable{
 🔄 How tryLock() Prevents Deadlock
 ✅ tryLock() Solution
 ➤ Thread attempts to acquire lock
-➤ If lock not available → backs off instead of waiting
+➤ If lock not available ─────────▶ backs off instead of waiting
 ➤ Breaks circular wait, hence prevents deadlock
 
 
 🔄 Deadlock vs tryLock()
 Without tryLock()
-➤ Thread A holds Lock1 → waits for Lock2
-➤ Thread B holds Lock2 → waits for Lock1
+➤ Thread A holds Lock1 ─────────▶ waits for Lock2
+➤ Thread B holds Lock2 ─────────▶ waits for Lock1
 
 ❌ Deadlock
 ➤ With tryLock()
-➤ Thread A tries Lock2 → fails → releases Lock1
+➤ Thread A tries Lock2 ─────────▶ fails ─────────▶ releases Lock1
 ➤ Thread B proceeds
 ✅ No deadlock
 
@@ -1270,25 +1234,25 @@ When multiple threads want to access a finite resource
 🔄 Working of Semaphores
 Semaphore has an internal counter
 1️⃣ acquire():
-    ✔️ If counter > 0 → decrement and proceed
-    ✔️ If counter = 0 → thread blocks
+    ✔️ If counter > 0 ─────────▶ decrement and proceed
+    ✔️ If counter = 0 ─────────▶ thread blocks
 2️⃣ release():
     ✔️ Increment counter
     ✔️ Wake up one waiting thread
 
 
 🔄 Important Methods
-1️⃣ acquire() → blocks until permit available
-2️⃣ tryAcquire() → non-blocking
-3️⃣ release() → returns permit
-4️⃣ availablePermits() → remaining permits
+1️⃣ acquire() ─────────▶ blocks until permit available
+2️⃣ tryAcquire() ─────────▶ non-blocking
+3️⃣ release() ─────────▶ returns permit
+4️⃣ availablePermits() ─────────▶ remaining permits
 
 
 🔄 Real-World Use Case: Database Connection Pool
 👉 Problem:
     ✔️ Only 3 DB connections available
     ✔️ 10 threads want DB access
-    ✔️ More than 3 connections → DB crash
+    ✔️ More than 3 connections ─────────▶ DB crash
 ✅ Solution: Use Semaphore(3)
 
 
@@ -1365,7 +1329,7 @@ Semaphore semaphore = new Semaphore(3, true); // fair
 
 
 ❌ Disadvantages of Semaphore
-➤ No ownership concept: Any thread can release → error-prone
+➤ No ownership concept: Any thread can release ─────────▶ error-prone
 ➤ Hard to debug: Permit leaks cause hidden deadlocks
 ➤ Risk of forgetting release(): Leads to thread starvation
 ➤ Not reentrant: Same thread cannot re-acquire safely
@@ -1391,9 +1355,9 @@ Semaphore semaphore = new Semaphore(3, true); // fair
 🔄 Methods (Used with synchronized)
 | Method        | Description                                                               | Used By         |
 | ------------- | ------------------------------------------------------------------------- | --------------- |
-| `wait()`      | Causes current thread to **release the lock** and enter the waiting state | Consumer thread |
-| `notify()`    | Wakes up **one** waiting thread                                           | Producer thread |
-| `notifyAll()` | Wakes up **all** waiting threads                                          | Producer thread |
+| wait()      | Causes current thread to release the lock and enter the waiting state | Consumer thread |
+| notify()    | Wakes up one waiting thread                                           | Producer thread |
+| notifyAll() | Wakes up all waiting threads                                          | Producer thread |
 
 ⚠️ These methods must be called inside a synchronized block or method, otherwise you’ll get an IllegalMonitorStateException.
 
@@ -1470,10 +1434,10 @@ Consumed: 5
 | Step | Action                           | Thread State            |
 | ---- | -------------------------------- | ----------------------- |
 | 1    | Thread enters synchronized block | Running                 |
-| 2    | Calls `wait()`                   | Releases lock → Waiting |
-| 3    | Another thread calls `notify()`  | Waiting thread wakes up |
+| 2    | Calls wait()                   | Releases lock ─────────▶ Waiting |
+| 3    | Another thread calls notify()  | Waiting thread wakes up |
 | 4    | Waiting thread reacquires lock   | Runnable                |
-| 5    | Resumes after `wait()`           | Running                 |
+| 5    | Resumes after wait()           | Running                 |
 
 🚨 Important Rules
 ✔️ Must be inside a synchronized context.
@@ -1495,11 +1459,11 @@ When multiple threads access and modify shared data (like variables, objects, fi
 💣 Common Thread Safety Problems
 | Problem                | Description                                                                        |
 | ---------------------- | ---------------------------------------------------------------------------------- |
-| **Race Condition**     | Two or more threads modify shared data concurrently, causing unpredictable results |
-| **Data Inconsistency** | Shared variable values become incorrect                                            |
-| **Deadlock**           | Threads waiting indefinitely for each other’s locks                                |
-| **Starvation**         | Some threads never get CPU time                                                    |
-| **Visibility Issues**  | One thread’s updates not visible to another due to caching                         |
+| Race Condition     | Two or more threads modify shared data concurrently, causing unpredictable results |
+| Data Inconsistency | Shared variable values become incorrect                                            |
+| Deadlock           | Threads waiting indefinitely for each other’s locks                                |
+| Starvation         | Some threads never get CPU time                                                    |
+| Visibility Issues  | One thread’s updates not visible to another due to caching                         |
 
 ❌ Example (Non-thread-safe)
 class Counter {
@@ -1754,9 +1718,9 @@ Before the Executor Framework, developers had to manually handle:
 | Component                       | Description                                                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Executor                  | Base interface for executing submitted tasks.                                                                             |
-| ExecutorService           | Extends `Executor` to manage the lifecycle of tasks — includes methods like `submit()`, `shutdown()`, `invokeAll()`, etc. |
-| ScheduledExecutorService  | Extends `ExecutorService` to schedule commands to run after a delay or periodically.                                      |
-| Executors` (Utility Class) | Provides factory methods to create various pre-configured thread pools.                                                   |
+| ExecutorService           | Extends Executor to manage the lifecycle of tasks — includes methods like submit(), shutdown(), invokeAll(), etc. |
+| ScheduledExecutorService  | Extends ExecutorService to schedule commands to run after a delay or periodically.                                      |
+| Executors (Utility Class) | Provides factory methods to create various pre-configured thread pools.                                                   |
 
 
 🔄 Common Thread Pool Types (via Executors)
@@ -1834,15 +1798,15 @@ public class Main {
 
 | Feature                           |   Runnable                                  | Callable                                                                          |
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-| Package                           | `java.lang`                                 | `java.util.concurrent`                                                            |
-| Method to Implement               | `void run()`                                | `V call()`                                                                        |
-| Return Type                       | Does not return any result                  | Returns a result of type `V`                                                      |
+| Package                           | java.lang                                 | java.util.concurrent                                                            |
+| Method to Implement               | void run()                                | V call()                                                                        |
+| Return Type                       | Does not return any result                  | Returns a result of type V                                                      |
 | Checked Exception Handling        | Cannot throw checked exceptions             | Can throw checked exceptions                                                      |
 | Usage                             | when you don’t need a result from a thread  | Used when you need a result or to handle exceptions                               |
-| Result Retrieval                  | No direct way to get a result               | Returns a result via `Future.get()`                                               |
-| Thread Execution                  | Passed to `Thread` or `Executor`            | Submitted to `ExecutorService` using `submit()`                                   |
-| Introduced In                     | Java 1.0                                    | Java 5 (as part of `java.util.concurrent`)                                        |
-| Example Interface Declaration     | `public interface Runnable { void run(); }` | `public interface Callable<V> { V call() throws Exception; }`                     |
+| Result Retrieval                  | No direct way to get a result               | Returns a result via Future.get()                                               |
+| Thread Execution                  | Passed to Thread or Executor            | Submitted to ExecutorService using submit()                                   |
+| Introduced In                     | Java 1.0                                    | Java 5 (as part of java.util.concurrent)                                        |
+| Example Interface Declaration     | public interface Runnable { void run(); } | public interface Callable<V> { V call() throws Exception; }                     |
 | Typical Use Case                  | Background tasks like logging, cleanup, etc.| Computation tasks needing a result, like fetching data or performing calculations |
 
 
@@ -1909,12 +1873,12 @@ public class Main {
 🔄 Other Common Methods
 | Method                      | Description                                                             |
 | --------------------------- | ----------------------------------------------------------------------- |
-| `invokeAny()`               | Runs multiple tasks but returns the result of first successful one.     |
-| `submit()`                  | Submits a Runnable/Callable and returns a Future.                       |
-| `Future.get()`              | Waits for the task to complete and returns result.                      |
-| `Future.isDone()`           | Checks if task completed or cancelled.                                  |
-| `Future.cancel()`           | Attempts to cancel execution.                                           |
-| `Future.get(timeout, unit)` | Waits for a limited time, else throws TimeoutException.                 |
+| invokeAny()               | Runs multiple tasks but returns the result of first successful one.     |
+| submit()                  | Submits a Runnable/Callable and returns a Future.                       |
+| Future.get()              | Waits for the task to complete and returns result.                      |
+| Future.isDone()           | Checks if task completed or cancelled.                                  |
+| Future.cancel()           | Attempts to cancel execution.                                           |
+| Future.get(timeout, unit) | Waits for a limited time, else throws TimeoutException.                 |
 
 
 2️⃣ newCachedThreadPool()
@@ -1964,8 +1928,8 @@ public class CachedThreadPoolExample {
 }
 
 🔄 Internal Working
-1️⃣ First task arrives → new thread created
-2️⃣ Next tasks arrive quickly → more threads created
+1️⃣ First task arrives ─────────▶ new thread created
+2️⃣ Next tasks arrive quickly ─────────▶ more threads created
 3️⃣ Tasks finish
 4️⃣ Threads become idle
 5️⃣ Idle threads:
@@ -1999,7 +1963,7 @@ newCachedThreadPool() has NO upper limit on threads
     ✔️ Long-running
     ✔️ Blocking (DB, API calls)
     ✔️ Heavy load
-➡️ It can create too many threads → OutOfMemoryError
+➡️ It can create too many threads ─────────▶ OutOfMemoryError
 
 
 🔄 When to Use vs Avoid
@@ -2119,12 +2083,12 @@ Thread.sleep(10000);
 scheduler.shutdown();
 
 ➤ Difference:
-    ✔️ scheduleAtFixedRate() → runs periodically regardless of task duration (may overlap).
-    ✔️ scheduleWithFixedDelay() → waits for task completion + delay before next execution (no overlap)
+    ✔️ scheduleAtFixedRate() ─────────▶ runs periodically regardless of task duration (may overlap).
+    ✔️ scheduleWithFixedDelay() ─────────▶ waits for task completion + delay before next execution (no overlap)
 
 
 🔄 Advantages of Executor Framework
-✅ Reuses threads → reduces CPU and memory overhead.
+✅ Reuses threads ─────────▶ reduces CPU and memory overhead.
 ✅ Prevents overload by controlling number of concurrent threads.
 ✅ Improves performance and scalability.
 ✅ Simplifies task lifecycle management.
@@ -2221,25 +2185,25 @@ ThreadPoolExecutor(
 When a task is submitted:
 
 1️⃣ If current threads < corePoolSize
-→ Create a new thread
+─────────▶ Create a new thread
 
 2️⃣ Else if queue is NOT full
-→ Put task into queue
+─────────▶ Put task into queue
 
 3️⃣ Else if current threads < maximumPoolSize
-→ Create a new thread
+─────────▶ Create a new thread
 
 4️⃣ Else
-→ Reject the task
+─────────▶ Reject the task
 
 
 🔄 Rejection Policies
 | Policy                  | Behavior                            |
 | ----------------------- | ----------------------------------- |
-| `AbortPolicy` (default) | Throws `RejectedExecutionException` |
-| `CallerRunsPolicy`      | Caller thread runs the task         |
-| `DiscardPolicy`         | Silently drops task                 |
-| `DiscardOldestPolicy`   | Drops oldest task in queue          |
+| AbortPolicy (default) | Throws RejectedExecutionException |
+| CallerRunsPolicy      | Caller thread runs the task         |
+| DiscardPolicy         | Silently drops task                 |
+| DiscardOldestPolicy   | Drops oldest task in queue          |
 
 
 🔄 Commonly Used Factory Methods
@@ -2314,10 +2278,10 @@ maximumPoolSize   = 4
 queue capacity    = 2
 
 🔄 Task Flow
-1️⃣ First 2 tasks → new threads created
-2️⃣ Next 2 tasks → placed in queue
-3️⃣ Next 2 tasks → new threads (up to max = 4)
-4️⃣ Any further tasks → RejectedExecutionException
+1️⃣ First 2 tasks ─────────▶ new threads created
+2️⃣ Next 2 tasks ─────────▶ placed in queue
+3️⃣ Next 2 tasks ─────────▶ new threads (up to max = 4)
+4️⃣ Any further tasks ─────────▶ RejectedExecutionException
 
 
 ################################
@@ -2439,11 +2403,11 @@ Result: 42
 🔄 Key Methods of Future Interface
 | Method               | Purpose                  |
 | -------------------- | ------------------------ |
-| `get()`              | Waits and returns result |
-| `get(timeout, unit)` | Waits up to timeout      |
-| `isDone()`           | Checks if task finished  |
-| `cancel(true/false)` | Cancels execution        |
-| `isCancelled()`      | Checks cancellation      |
+| get()              | Waits and returns result |
+| get(timeout, unit) | Waits up to timeout      |
+| isDone()           | Checks if task finished  |
+| cancel(true/false) | Cancels execution        |
+| isCancelled()      | Checks cancellation      |
 
 
 🔄 Real-World Problem Example (Backend System)
@@ -2532,16 +2496,16 @@ Future allows asynchronous execution, but CompletableFuture enables non-blocking
     ✔️ Latch becomes inactive (cannot be reused)
 
 🔁 Important Methods
-➤ await() → blocks until count reaches zero
-➤ await(timeout, unit) → waits with timeout
-➤ countDown() → decreases count by 1
-➤ getCount() → current count
+➤ await() ─────────▶ blocks until count reaches zero
+➤ await(timeout, unit) ─────────▶ waits with timeout
+➤ countDown() ─────────▶ decreases count by 1
+➤ getCount() ─────────▶ current count
 
 
 🔁 Internal Working
 ➤ Internally uses AQS (AbstractQueuedSynchronizer)
-➤ await() → thread goes into wait queue
-➤ countDown() → releases threads when count == 0
+➤ await() ─────────▶ thread goes into wait queue
+➤ countDown() ─────────▶ releases threads when count == 0
 ➤ One-time use only
 
 
@@ -2675,7 +2639,7 @@ public class ApplicationStartup {
 | --------- | --------------- | ------------------------- |
 | Reusable  | ❌ No            | ✅ Yes                     |
 | Trigger   | Count reaches 0 | All threads reach barrier |
-| Direction | Workers → main  | Peer threads              |
+| Direction | Workers ─────────▶ main  | Peer threads              |
 | Use case  | Waiting         | Synchronization           |
 
 
@@ -2757,21 +2721,21 @@ class VolatileCounter {
 
 🔄 Why Do We Need AtomicInteger?
 ➤ Normal int operations like count++ are NOT atomic
-➤ synchronized → blocking + context switching
-➤ AtomicInteger → high performance, non-blocking
+➤ synchronized ─────────▶ blocking + context switching
+➤ AtomicInteger ─────────▶ high performance, non-blocking
 
 
 🔄 Core Concept 
 ➤ Uses CAS (Compare-And-Swap) at hardware level
 ➤ Operation succeeds only if expected value matches
-➤ If CAS fails → operation retries automatically
+➤ If CAS fails ─────────▶ operation retries automatically
 ➤ No locks, no blocking
 
 🔄 Example Problem Without AtomicInteger
 int count = 0;
 count++; // NOT thread-safe
 
-➤ Multiple threads → race condition
+➤ Multiple threads ─────────▶ race condition
 ➤ Lost updates
 
 
@@ -2787,8 +2751,8 @@ count.incrementAndGet(); // atomic
 ➤ get(), set()
 
 🔄 AtomicInteger vs volatile
-➤ volatile → visibility only
-➤ AtomicInteger → visibility + atomicity
+➤ volatile ─────────▶ visibility only
+➤ AtomicInteger ─────────▶ visibility + atomicity
 
 
 🔄 Real-World Use Cases
@@ -2822,7 +2786,7 @@ count.incrementAndGet(); // atomic
 ➤ CyclicBarrier is a synchronization aid
 ➤ Allows a fixed number of threads to wait for each other
 ➤ All threads must reach a common barrier point
-➤ Once reached → all threads are released together
+➤ Once reached ─────────▶ all threads are released together
 ➤ Barrier is reusable (cyclic)
 📦 Package: java.util.concurrent.CyclicBarrier
 
@@ -2843,12 +2807,12 @@ count.incrementAndGet(); // atomic
 
 
 🔄 Important Methods
-➤ await() → wait until all parties arrive
-➤ await(timeout, unit) → timed wait
-➤ getNumberWaiting() → waiting threads
-➤ getParties() → total parties
-➤ isBroken() → barrier status
-➤ reset() → manual reset
+➤ await() ─────────▶ wait until all parties arrive
+➤ await(timeout, unit) ─────────▶ timed wait
+➤ getNumberWaiting() ─────────▶ waiting threads
+➤ getParties() ─────────▶ total parties
+➤ isBroken() ─────────▶ barrier status
+➤ reset() ─────────▶ manual reset
 
 
 🔄 Barrier Action 
@@ -2972,7 +2936,7 @@ if (barrier.isBroken()) {
 | Feature        | CyclicBarrier     | CountDownLatch  |
 | -------------- | ----------------- | --------------- |
 | Reusable       | ✅ Yes            | ❌ No          |
-| Direction      | Peer-to-peer      | Worker → main   |
+| Direction      | Peer-to-peer      | Worker ─────────▶ main   |
 | Trigger        | All threads reach | Count reaches 0 |
 | Barrier action | ✅ Yes           | ❌ No           |
 
@@ -3030,8 +2994,8 @@ ForkJoinPool pool = new ForkJoinPool();
 ➤ Represents a parallel task
 
 Subclasses:
-➤ RecursiveTask<V> → returns result
-➤ RecursiveAction → no result
+➤ RecursiveTask<V> ─────────▶ returns result
+➤ RecursiveAction ─────────▶ no result
 
 
 🔄 How Fork/Join Works
@@ -3043,7 +3007,7 @@ Subclasses:
 
 🔄 Fork/Join Execution Flow
 ➤ Task checks if problem is small enough
-➤ If yes → solve directly
+➤ If yes ─────────▶ solve directly
 ➤ If no:
     ✔️ Split task into subtasks
     ✔️ fork() subtasks
@@ -3187,9 +3151,9 @@ class PrintTask extends RecursiveAction {
 🔄 Core Concept
 ➤ Internally, each Thread has a ThreadLocalMap
 ➤ Map stores:
-    ✔️ Key → ThreadLocal object
-    ✔️ Value → thread-specific value
-➤ Same ThreadLocal → different value per thread
+    ✔️ Key ─────────▶ ThreadLocal object
+    ✔️ Value ─────────▶ thread-specific value
+➤ Same ThreadLocal ─────────▶ different value per thread
 
 
 ✅ Example
@@ -3235,10 +3199,10 @@ class Service {
 }
 
 🔄 Important Methods
-➤ get() → returns thread’s value
-➤ set(value) → sets thread’s value
-➤ remove() → clears value (critical!)
-➤ withInitial() → default value
+➤ get() ─────────▶ returns thread’s value
+➤ set(value) ─────────▶ sets thread’s value
+➤ remove() ─────────▶ clears value (critical!)
+➤ withInitial() ─────────▶ default value
 
 
 🔄 ThreadLocal vs Shared Variable
@@ -3261,8 +3225,8 @@ threadLocal.remove();
 
 
 🔄 ThreadLocal vs volatile
-➤ volatile → shared variable, visibility
-➤ ThreadLocal → no sharing at all
+➤ volatile ─────────▶ shared variable, visibility
+➤ ThreadLocal ─────────▶ no sharing at all
 
 
 🔄 Common Traps
@@ -3320,7 +3284,7 @@ class PessimisticCounter {
 ➤ Assumes conflicts are rare
 ➤ No lock while reading
 ➤ Checks for conflicts before updating
-➤ If conflict → retry
+➤ If conflict ─────────▶ retry
 
 
 🔄 How It Works
@@ -3358,7 +3322,7 @@ class OptimisticCounter {
 | Blocking    | Yes                             | No              |
 | Deadlock    | Possible                        | Not possible    |
 | Performance | Lower under contention          | Higher          |
-| Examples    | `synchronized`, `ReentrantLock` | CAS, versioning |
+| Examples    | synchronized, ReentrantLock | CAS, versioning |
 
 
 🔄 Database Perspective
