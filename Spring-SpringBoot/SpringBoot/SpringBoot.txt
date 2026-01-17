@@ -63,7 +63,7 @@ In project we will develop serveral classes. All those classes we can catergoriz
 ➤ It provides support for aspect-oriented programming, allowing the separation of cross-cutting concerns or secondary logic (like logging, security, and transaction management) from the main business logic.
 Example: Security, Logging, Transaction, Exception Handling etc..
 
-❌ Problems with AOP: If we combine business logic and cross-cutting concerns in the same class, it can lead to code that is hard to read and maintain. AOP helps to separate these concerns, making the code cleaner and more modular.
+❌ Problems without AOP: If we combine business logic and cross-cutting concerns in the same class, it can lead to code that is hard to read and maintain. AOP helps to separate these concerns, making the code cleaner and more modular.
 
 
 5️⃣ Spring Web MVC
@@ -98,7 +98,7 @@ Note: JDBC will represent data in text format whereases ORM will represent data 
 1️⃣0️⃣ Spring Cloud
 ➤ It provides tools for building cloud-native applications, including service discovery, load balancing, and distributed configuration management.
 ➤ It simplifies the development of microservices-based architectures, making it easier to build and deploy scalable and resilient applications.
-➤ It provides monitoring facilities, circuit breakers, and retry mechanisms to handle failures gracefully. 
+➤ It provides monitoring facilities, circuit breakers, and retry mechanisms to handle failures gracefully.
 ➤ Distributed Messaging: It supports various messaging systems like RabbitMQ, Kafka, and ActiveMQ, allowing microservices to communicate asynchronously.
 ➤ Routing and Load Balancing: It provides tools for routing requests to different microservices and load balancing traffic to ensure high availability and performance.
 
@@ -155,7 +155,7 @@ public class Application {
 ⚡ Note:Package naming Convention will play a major role in compoenent scanning.
 ✅Example:  basePackage = com.tcs.vechiles
 ➤ There should be one basePackage for all the packages, subpackages should be made inside this basePackage.
-➤ If we have multiple basePackage we have to manually tell the SpringBootApplication which package to scan by using @ComponentScan annotation and passing the array of basePackages.  
+➤ If we have multiple basePackage we have to manually tell the SpringBootApplication which package to scan by using @ComponentScan annotation and passing the array of basePackages.
 
 
 ===================================
@@ -514,7 +514,7 @@ spring:
     url: jdbc:mysql://localhost:3306/mydb
     username: root
     password: 1234
-📌 Both properties and yml are supported by default. Spring Boot prefers application.yml if both are present.
+📌 Both properties and yml are supported by default.
 
 
 3️⃣ Passing Command Line Arguments
@@ -1308,7 +1308,7 @@ feature.b=true
 
 🌟 Evaluation Steps:
 1️⃣ Reads Environment
-2️⃣ Checks property existence
+2️⃣C hecks property existence
 3️⃣ Compares string value
 4️⃣ Applies matchIfMissing
 5️⃣ Returns TRUE / FALSE
