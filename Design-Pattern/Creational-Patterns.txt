@@ -1,10 +1,12 @@
+=============================
 🔷 Singleton Design Pattern
+=============================
 The Singleton Pattern ensures that a class has only one instance throughout the application and provides a global point of access to that instance.
 
 🔄Key Characteristics
-1️⃣ Single instance: Only one object is created.
-2️⃣ Global access point: Can be accessed from anywhere.
-3️⃣ Controlled instantiation: Constructor is private; object created internally.
+1️⃣ Single instance ─────────▶ Only one object is created.
+2️⃣ Global access point ─────────▶ Can be accessed from anywhere.
+3️⃣ Controlled instantiation ─────────▶ Constructor is private; object created internally.
 
 🔄 Real-world Analogy
 Think of a Printer Spooler — you only want one object managing all print requests to prevent conflicts.
@@ -143,8 +145,7 @@ protected Object readResolve() {
 3️⃣ Cloning
 There are two types of cloning: shallow and deep.
 1️⃣ Shallow Cloning: It creates a new instance with the same reference for the reference type field as the original instance.
-2️⃣ Deep Cloning: It creates a new instance of the reference type with a
- deep copy of the original instance.
+2️⃣ Deep Cloning: It creates a new instance of the reference type with a deep copy of the original instance.
 
 ❗ Problem:
 If Singleton implements Cloneable, clone() can create a duplicate instance.
@@ -225,7 +226,6 @@ public class Singleton {
 👉 Use volatile
 To prevent instruction reordering by the JVM or CPU, declare instance as volatile:
 private static volatile Singleton instance;
-
 👉 Without volatile, another thread might see a partially constructed object.
 
 ✅ Option 3: Bill Pugh’s Inner Static Class (Best Approach)
@@ -266,7 +266,6 @@ public enum EnumSingletonSafestPractice {
         System.out.println(System.identityHashCode(instance2));
     }
 }
-
 👉 Why best?
 ➤ Thread-safe by default
 ➤ Immune to Reflection, Serialization, and Cloning attacks
@@ -327,32 +326,30 @@ public class NotificationService { ... }
 | Spring beans                     | Maintain one instance for dependency management |
 
 
-🌟 Misllaneous Topic
+================
 🔷 Class Loader
-A Class Loader in Java is a part of the JVM responsible for loading .class files into memory when they are needed by an application.
-
-It converts the bytecode from .class files into Class objects that the JVM can use to create instances, call methods, etc.
+================
+➤ A Class Loader in Java is a part of the JVM responsible for loading .class files into memory when they are needed by an application.
+➤ It converts the bytecode from .class files into Class objects that the JVM can use to create instances, call methods, etc.
 
 🔄 Class Loading Process (3 Phases)
 When a class is needed, the JVM performs 3 major steps:
 
-⚡Step 1️⃣: Loading
+Step 1️⃣: Loading
 The .class file is located and read into memory.
 The ClassLoader loads it as a Class object into the JVM method area.
-
 ✅ Example: Class.forName("com.example.MyClass");
 
 
-⚡Step 2️⃣: Linking
+Step 2️⃣: Linking
 Linking connects the class with other classes and prepares it for execution.
 It involves 3 sub-steps:
-➤ Verification → Ensures bytecode is valid and safe (no illegal instructions).
-➤ Preparation → Allocates memory for static variables and sets default values.
-➤ Resolution → Replaces symbolic references (like method names, class names) with actual memory references.
+➤ Verification ─────────▶ Ensures bytecode is valid and safe (no illegal instructions).
+➤ Preparation ─────────▶ Allocates memory for static variables and sets default values.
+➤ Resolution ─────────▶ Replaces symbolic references (like method names, class names) with actual memory references.
 
-⚡Step 3️⃣: Initialization
+Step 3️⃣: Initialization
 Executes static blocks and initializes static variables with assigned values.
-
 This is the final step before the class can be used.
 
 
@@ -362,18 +359,17 @@ Java uses a hierarchical delegation model for class loading.
 1️⃣ Bootstrap Class Loader
 ➤ Parent of all class loaders.
 ➤ Part of the JVM itself (native code, not written in Java).
-➤ Loads core Java classes from: 
-🔗 <JAVA_HOME>/lib/rt.jar
+➤ Loads core Java classes from: <JAVA_HOME>/lib/rt.jar
 
 (In modern Java versions, from the modules folder)
 ✅ Example: java.lang.*, java.util.*
 
-2️⃣ Extension (Platform) Class Loader
-➤ Loads extension classes from: 
-🔗 <JAVA_HOME>/lib/ext/
-or any directory listed in java.ext.dirs.
 
+2️⃣ Extension (Platform) Class Loader
+➤ Loads extension classes from: <JAVA_HOME>/lib/ext/
+or any directory listed in java.ext.dirs.
 ➤ It loads classes that extend the core Java platform.
+
 
 3️⃣ System (Application) Class Loader
 Loads classes from the classpath (the folder or JAR specified when running your program).
@@ -387,11 +383,11 @@ Loads classes from the classpath (the folder or JAR specified when running your 
 ➤ Only if the parent cannot find the class, does the child attempt to load it.
 
 👉 Flow:
-Bootstrap Loader → Extension Loader → System Loader → Custom Loader (if any)
+Bootstrap Loader ─────────▶ Extension Loader ─────────▶ System Loader ─────────▶ Custom Loader (if any)
 ✔️ This avoids duplicate loading and ensures core classes are trusted (e.g., java.lang.String can’t be replaced by user code).
 
 
-✅ Code Example – Printing Class Loader Hierarchy
+✅ Code Example ─────────▶ Printing Class Loader Hierarchy
 public class ClassLoaderDemo {
     public static void main(String[] args) {
         ClassLoader classLoader = ClassLoaderDemo.class.getClassLoader();
@@ -406,7 +402,6 @@ public class ClassLoaderDemo {
 System ClassLoader: jdk.internal.loader.ClassLoaders$AppClassLoader@18b4aac2
 Extension ClassLoader: jdk.internal.loader.ClassLoaders$PlatformClassLoader@4b67cf4d
 Bootstrap ClassLoader: null
-
 ⚡ Note: null for Bootstrap because it’s implemented in native code (C/C++), not Java.
 
 
@@ -457,18 +452,18 @@ $ xxd MyClass.class | head -1
 
 🔗 If the file doesn’t start with CA FE BA BE, the JVM throws:
 java.lang.ClassFormatError: Invalid magic number
+Hence, Magic number check ─────────▶ Ensures the file is a valid .class file (starts with CAFEBABE) before the JVM loads it.
 
-Hence, Magic number check → Ensures the file is a valid .class file (starts with CAFEBABE) before the JVM loads it.
 
-  
+============================  
 🔷 Factory Design Pattern
+============================
 ➤ Factory Design Pattern is a Creational Design Pattern that provides a way to create objects without exposing the object creation logic to the client and refers to the newly created object using a common interface.
 
 ➤ Let the factory decide which subclass to instantiate.
 
 🔄Core Idea
-Instead of creating objects using new keyword everywhere,
-→ we delegate the creation logic to a Factory class.
+Instead of creating objects using new keyword everywhere,─────────▶ we delegate the creation logic to a Factory class.
 
 👉 This improves:
 1️⃣ Loose coupling
@@ -553,11 +548,10 @@ Drawing a Rectangle...
 🔄 Advantages
 | Advantage                | Explanation                                        |
 | ------------------------ | -------------------------------------------------- |
-| **Encapsulation**        | Object creation logic is hidden inside the factory |
-| **Loose coupling**       | Client depends on interface, not concrete classes  |
-| **Extensibility**        | New product types can be added easily              |
-| **Centralized creation** | All creation logic in one place                    |
-
+| Encapsulation            | Object creation logic is hidden inside the factory |
+| Loose coupling           | Client depends on interface, not concrete classes  |
+| Extensibility            | New product types can be added easily              |
+| Centralized creation     | All creation logic in one place                    |
 
 🔄 Disadvantages
 ➤ Might add extra complexity for simple object creation.
@@ -566,10 +560,10 @@ Drawing a Rectangle...
 🔄 Factory Pattern in Java (Built-in Examples)
 | Class                                                    | Description                                                   |
 | -------------------------------------------------------- | ------------------------------------------------------------- |
-| `java.util.Calendar#getInstance()`                       | Returns different `Calendar` objects based on locale/timezone |
-| `java.text.NumberFormat#getInstance()`                   | Returns a subclass instance for the given locale              |
-| `javax.xml.parsers.DocumentBuilderFactory#newInstance()` | Factory for XML parsers                                       |
-| `java.sql.DriverManager#getConnection()`                 | Factory for JDBC connections                                  |
+| java.util.Calendar#getInstance()                         | Returns different Calendar objects based on locale/timezone |
+| java.text.NumberFormat#getInstance()                     | Returns a subclass instance for the given locale              |
+| javax.xml.parsers.DocumentBuilderFactory#newInstance()   | Factory for XML parsers                                       |
+| java.sql.DriverManager#getConnection()                   | Factory for JDBC connections                                  |
 
 
 🔄 Factory Pattern in Spring Boot
@@ -583,7 +577,6 @@ Spring uses factories heavily — almost everywhere.
 ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 Shape shape = context.getBean("circle", Shape.class);
 shape.draw();
-
 👉 Spring decides which concrete class to instantiate — classic Factory pattern in action.
 
 
@@ -592,26 +585,26 @@ shape.draw();
 public RestTemplate restTemplate(RestTemplateBuilder builder) {
     return builder.build(); // Factory method
 }
-
 👉 Here, RestTemplateBuilder acts as a factory, building pre-configured RestTemplate objects.
 
 
 🔄 Real-world Use Cases in Projects
-| Use Case                           | Factory Role                                               |
-| ---------------------------------- | ---------------------------------------------------------- |
-| **Database Connection Factory**    | Create MySQL, PostgreSQL, or Mongo connections dynamically |
-| **Notification Factory**           | Return Email, SMS, or PushNotification sender              |
-| **Payment Gateway Factory**        | Create Razorpay, Stripe, or PayPal service objects         |
-| **Message Converter Factory**      | Return JSON, XML, or CSV converters based on config        |
-| **Shape/Image Processing Factory** | For UI or graphic applications                             |
+| Use Case                       | Factory Role                                               |
+| -------------------------------| ---------------------------------------------------------- |
+| Database Connection Factory    | Create MySQL, PostgreSQL, or Mongo connections dynamically |
+| Notification Factory           | Return Email, SMS, or PushNotification sender              |
+| Payment Gateway Factory        | Create Razorpay, Stripe, or PayPal service objects         |
+| Message Converter Factory      | Return JSON, XML, or CSV converters based on config        |
+| Shape/Image Processing Factory | For UI or graphic applications                             |
 
 
+==========================
 🔷 Builder Design Pattern
+==========================
 ➤ The Builder pattern is a creational design pattern used to construct complex objects step by step.
 ➤ It lets you create different representations of the same object using the same construction process.
 
-👉 Purpose:
-➤ To separate the construction logic of a complex object from its representation, so the same construction process can create different types of objects.
+👉 Purpose: To separate the construction logic of a complex object from its representation, so the same construction process can create different types of objects.
 
 🔄Real-world Analogy
 Imagine building a Burger 🍔 in a restaurant:
@@ -686,13 +679,12 @@ public class BuilderDemo {
 
 🔁 Analogy
 Think of it like this:
-    ✔️ BuilderDemo → presses a button
-    ✔️ Computer.Builder → does the construction
+    ✔️ BuilderDemo ─────────▶ presses a button
+    ✔️ Computer.Builder ─────────▶ does the construction
     ✔️ Only the factory (Computer) is allowed to create its own product
 
 🔄 Spring Boot Example
 Builder pattern is commonly used when constructing complex DTOs or entity objects.
-
 ✅  Example using Lombok’s @Builder annotation (which implements this pattern internally):
 
 import lombok.Builder;
@@ -751,7 +743,9 @@ In Spring Boot, Lombok’s @Builder is a direct application of the Builder patte
 ➤ Increases number of classes.
 
 
+=============================
 🔷 Prototype Design Pattern
+=============================
 The Prototype Design Pattern is used when the cost of creating a new object is high (e.g., complex object initialization, expensive database calls, or network calls).
 
 Instead of creating a new instance, we clone an existing object (the prototype) and modify it if needed.
@@ -863,9 +857,9 @@ Changes in referenced objects affect both original and clone.
 
 ✔️ Deep Copy
 ✅ What it does
-Copies primitives
-Creates new objects for referenced fields
-Original and clone are fully independent
+➤ Copies primitives
+➤ Creates new objects for referenced fields
+➤ Original and clone are fully independent
 
 ✅ Example
 protected Object clone() throws CloneNotSupportedException {
@@ -877,12 +871,9 @@ protected Object clone() throws CloneNotSupportedException {
 p2.address.city = "Delhi";
 ➡️ p1.address.city remains unchanged
 
-
-
 🔄 Real-Life Example in Java
 👉 In Java API
 Object.clone() — The core implementation of Prototype Pattern.
-
 Classes like java.lang.Cloneable, java.lang.Object#clone() directly follow this pattern.
 
 👉 In Frameworks
@@ -917,7 +908,9 @@ public class NotificationService {
 ➤ Requires Cloneable interface and proper handling of exceptions.
 
 
+====================================
 🔷 Abstract Factory Design Pattern
+====================================
 The Abstract Factory Pattern provides an interface for creating families of related or dependent objects without specifying their concrete classes.
 
 It’s often called a “factory of factories”.

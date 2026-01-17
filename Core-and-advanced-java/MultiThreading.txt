@@ -514,7 +514,7 @@ public class Test {
 
 ➤ When you want to synchronized some part of the method not the whole method then use synchronized block instead of synchronized keyword on the method.
 ✅Example:
- public void increment() { 
+ public void increment() {
        synchronized (this){
            Thread.yield();
            count++;
