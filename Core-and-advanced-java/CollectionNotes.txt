@@ -2002,11 +2002,11 @@ static class Entry<K,V> extends HashMap.Node<K,V> {
 Unlike HashMap (random order) or TreeMap (sorted order), LinkedHashMap offers two specific ordering modes based on a boolean flag in its constructor:
 
 1️⃣ Insertion-Order (Default)
-➤ The map remembers the order in which keys were inserted. 
+➤ The map remembers the order in which keys were inserted.
 ➤ If you re-insert a key (put a new value for an existing key), the order is not affected.
 
 2️⃣ Access-Order
-➤ The map keeps track of which entries were recently accessed. When you call get() or put(), that entry moves to the end of the list. 
+➤ The map keeps track of which entries were recently accessed. When you call get() or put(), that entry moves to the end of the list.
 ➤ This makes LinkedHashMap perfect for building LRU (Least Recently Used) Caches.
 🔗 Constructor:
 LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)

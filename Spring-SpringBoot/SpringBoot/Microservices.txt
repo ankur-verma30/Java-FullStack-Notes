@@ -670,8 +670,10 @@ Admin Server monitors health, logs, and metrics
 Eureka handles service registry
 
 
+=================
 🔷 Feign Client
-➤ Feign Client is a Declarative REST Client provided by Spring Cloud that allows microservices to communicate with each other easily — without writing boilerplate REST API calling code using RestTemplate or WebClient.
+=================
+➤ Feign Client is a declarative REST Client provided by Spring Cloud that allows microservices to communicate with each other easily — without writing boilerplate REST API calling code using RestTemplate or WebClient.
 
 ➤ Feign is like a shortcut that lets one microservice call another’s REST API just by writing a Java interface — no need to manually handle HTTP requests or JSON conversion.
 

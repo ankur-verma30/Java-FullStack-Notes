@@ -1,4 +1,6 @@
+============================
 🔷 Distributed Application
+===========================
 A distributed application is an application where components are spread across multiple computers (nodes) connected through a network, but they work together as a single system.
 ➤ They are used for Business to Business commnication unlike web applciaton communicate with Business to Client (C2B).
 
@@ -6,12 +8,12 @@ A distributed application is an application where components are spread across m
 Instead of all logic running on one server (like in a monolithic app), different parts — frontend, backend, databases, microservices, etc. — run on different machines or locations and communicate via network protocols (like HTTP, RPC, or gRPC).
 
 ✅ Example: E-commerce Application
-➤ Frontend (React app) → runs on user’s browser.
-➤ Backend API (Spring Boot) → runs on AWS server.
-➤ Database (MySQL) → runs on a separate database server.
-➤ Payment service (third-party) → hosted externally.
+➤ Frontend (React app) ─────────▶ runs on user’s browser.
+➤ Backend API (Spring Boot) ─────────▶ runs on AWS server.
+➤ Database (MySQL) ─────────▶ runs on a separate database server.
+➤ Payment service (third-party) ─────────▶ hosted externally.
+👉 All these parts interact to form one working e-commerce platform — that’s a distributed application.
 
-All these parts interact to form one working e-commerce platform — that’s a distributed application.
 
 🔄 Characteristics:
 ➤ Multiple independent nodes (different machines).
@@ -20,11 +22,13 @@ All these parts interact to form one working e-commerce platform — that’s a 
 ➤ Scalability – you can scale specific services independently.
 ➤ Fault tolerance – if one node fails, others can still run.
 
+
 🧱 Architecture Examples:
-➤ Client–Server (basic distributed system)
+➤ Client–Server (basic distributed system 2-Tier Architecture)
 ➤ 3-Tier Architecture (UI, Application Server, Database)
 ➤ Microservices Architecture (each service deployed independently)
 ➤ Cloud-Native Applications (services running across data centers)
+
 
 🧰 Technologies Used:
 ➤ APIs / REST / gRPC for communication
@@ -32,6 +36,7 @@ All these parts interact to form one working e-commerce platform — that’s a 
 ➤ Databases like MongoDB, Cassandra (distributed data)
 ➤ Load Balancers for traffic distribution
 ➤ Containers / Kubernetes for deployment
+
 
 🔁 Another Scenario of Distributed Application
 ✅Example:MMT ↔ IRCTC — A Real Distributed Interaction Example
@@ -43,13 +48,17 @@ but they interact with each other over a network to complete a single user reque
 ➤ XML and JSON data will be used as mediaters to transfer data between MMT and IRCTC.
 
 
+=====================
 🔷 Intereoperability
+=====================
 ➤ The term interoperability refers to the ability of two or more systems to work together, even if they are not built for the same purpose or use the same architecture.
 ➤ It is a way to ensure that different systems can communicate and exchange data with each other, even if they are built using different technologies or have different interfaces.
 
 
+========
 🔷 XML
-XML (eXtensible Markup Language) is a markup language used to store and transport data in a structured, human-readable, and machine-readable format.
+========
+XML (Xtensible Markup Language) is a markup language used to store and transport data in a structured, human-readable, and machine-readable format.
 
 ✅ Example:
 <Student>  -------------> compound eleement containing other elements
@@ -59,14 +68,16 @@ XML (eXtensible Markup Language) is a markup language used to store and transpor
 </Student>
 👉 This stores structured data about a student — not for displaying (like HTML), but for data exchange.
 
+
 🔄 Key Features:
-➤ Self-descriptive – Tags describe the data.
-➤ Custom tags – You can define your own (unlike HTML’s fixed tags).
-➤ Platform-independent – Works across systems and languages.
-➤ Hierarchical structure – Data stored in parent–child format.
-➤ Supports validation – You can define structure rules using:
-➤ DTD (Document Type Definition)
-➤ XSD (XML Schema Definition)
+➤ Self-descriptive ─────────▶ Tags describe the data.
+➤ Custom tags ─────────▶ You can define your own (unlike HTML’s fixed tags).
+➤ Platform-independent ─────────▶ Works across systems and languages.
+➤ Hierarchical structure ─────────▶ Data stored in parent ─ child format.
+➤ Supports validation ─────────▶ You can define structure rules using:
+    ✔️  DTD (Document Type Definition)
+    ✔️  XSD (XML Schema Definition)
+
 
 🔄 Common Uses:
 ➤ Configuration files (e.g., web.xml in Java web apps)
@@ -75,19 +86,20 @@ XML (eXtensible Markup Language) is a markup language used to store and transpor
 ➤Serialization (saving objects in XML format)
 
 
-🔷 JAXB (Java Architecture for XML Binding) — also called JAX-B API
+==========================================================================================================================
+🔷 JAXB (Java Architecture for XML Binding) — also called JAX-B API (Deprecated Not used in SpringBoot it is Automated)
+==========================================================================================================================
 ✔️ JAXB is a Java API that allows you to convert Java objects into XML (marshalling) and XML back into Java objects (unmarshalling) easily.
-
 ✔️ It’s part of the Jakarta / Java EE (formerly JAX-B) stack and simplifies XML handling in Java applications — no manual parsing required.
 
 Upto Java 1.8 JAXB was part of the Java SE platform but removed from Java 1.9 version if you want to use should have a jax-b dependency.
 
-🔄 Core Operations:
-1️⃣ Marshalling: Converts Java objects into XML.
-2️⃣ Unmarshalling: Converts XML into Java objects.
-3️⃣ Binding: Maps Java classes to XML elements and attributes.
-4️⃣ Validation: Validates XML against a schema.
-5️⃣ Schema Generation: Generates XML schemas from Java classes.
+🔄 Core Operations
+1️⃣ Marshalling ─────────▶ Converts Java objects into XML.
+2️⃣ Unmarshalling ─────────▶ Converts XML into Java objects.
+3️⃣ Binding ─────────▶ Maps Java classes to XML elements and attributes.
+4️⃣ Validation ─────────▶ Validates XML against a schema.
+5️⃣ Schema Generation ─────────▶ Generates XML schemas from Java classes.
 
 ✅ Example: 1️⃣ Create a java class
 import jakarta.xml.bind.annotation.XmlElement;
@@ -158,7 +170,9 @@ Ankur Verma - 101
 ➤ Used in Spring Boot (for XML-based request/response mapping)
 
 
+=======================================
 🔷 JSON (JavaScript Object Notation)
+=======================================
 JSON is a lightweight data-interchange format used to store and exchange data between a client and a server.
 
 It’s language-independent, but easily readable by both humans and machines.
@@ -178,7 +192,8 @@ It’s language-independent, but easily readable by both humans and machines.
 ➤ Used widely in REST APIs
 ➤ Supports basic data types: string, number, boolean, array, object, null
 
-🔄JSON in Java (Working & Usage)
+
+🔄JSON in Java (Working & Usage)(Built-in Support in Modern SpringBoot Versions)
 Java doesn’t have built-in JSON support, but several popular libraries make it easy to convert between Java objects and JSON:
 
 Common libraries:
@@ -206,7 +221,7 @@ public class Student {
     public void setRollNo(int rollNo) { this.rollNo = rollNo; }
 }
 
-🌀 Object → JSON (Serialization)
+🌀 Object ─────────▶ JSON (Serialization)
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ObjectToJson {
@@ -224,7 +239,7 @@ public class ObjectToJson {
 ✅ Output:
 {"name":"Ankur Verma","rollNo":101}
 
-🔁 JSON → Object (Deserialization)
+🔁 JSON ─────────▶ Object (Deserialization)
 public class JsonToObject {
     public static void main(String[] args) throws Exception {
         String jsonString = "{\"name\":\"Ankur Verma\",\"rollNo\":101}";
@@ -245,11 +260,11 @@ public class GsonExample {
         Student s = new Student("Ankur", 101);
         Gson gson = new Gson();
 
-        // Object → JSON
+        // Object ─────────▶ JSON
         String json = gson.toJson(s);
         System.out.println(json);
 
-        // JSON → Object
+        // JSON ─────────▶ Object
         Student obj = gson.fromJson(json, Student.class);
         System.out.println(obj.getName());
     }
@@ -262,17 +277,20 @@ Spring Boot automatically uses Jackson internally for JSON conversion.
 ➤ Data exchange between Java systems via JSON
 
 
+==================
 🔷 HTTP protocol
+==================
 ➤ HTTP (HyperText Transfer Protocol) is a client-server communication protocol used for transmitting data over the web.
 ➤ It defines how messages are formatted and transmitted, and how web servers and browsers should respond to various commands.
 ➤ It is a stateless protocol. It will treat each request independently.
 
 
 ❓How It Works
-➤ Client sends a request → (e.g., a web browser or REST client sends an HTTP request to the server).
-➤ Server processes the request → The web server receives the request, processes it, and prepares a response.
-➤ Server sends back a response → The server returns an HTTP response (status code + data).
+➤ Client sends a request ─────────▶ (e.g., a web browser or REST client sends an HTTP request to the server).
+➤ Server processes the request ─────────▶ The web server receives the request, processes it, and prepares a response.
+➤ Server sends back a response ─────────▶ The server returns an HTTP response (status code + data).
 ➤ Connection may close (in HTTP/1.1 or remain open for HTTP/2 and HTTP/3).
+
 
 🌟 Basic Structure
 1️⃣ HTTP Request Structure
@@ -294,60 +312,67 @@ Content-Length: 1234
 🔄 Common HTTP Methods
 | Method     | Description                                       |
 | ---------- | ------------------------------------------------- |
-| GET    | Retrieve data from the server (no body).          |
-| POST   | Send data to the server (used for creating data). |
-| PUT    | Update existing resource completely.              |
-| PATCH  | Update part of a resource.                        |
-| DELETE | Delete a resource.                                |
-| HEAD   | Same as GET but returns only headers.             |
+| GET        | Retrieve data from the server (no body).          |
+| POST       | Send data to the server (used for creating data). |
+| PUT        | Update existing resource completely.              |
+| PATCH      | Update part of a resource.                        |
+| DELETE     | Delete a resource.                                |
+| HEAD       | Same as GET but returns only headers.             |
+
 
 =====================
-🔹 HTTP Status Codes
+🔷 HTTP Status Codes
 ======================
-
-➤ An HTTP status code is a three-digit numeric code returned by a web server as parto of the response to an HTTP request made by a client.
+➤ An HTTP status code is a three-digit numeric code returned by a web server as part of the response to an HTTP request made by a client.
 ➤ These status codes are used to convey information about the result or status of the requested operation.
 ➤ HTTP status codes are grouped into five categories based on the first digit of the code:
-1️⃣ 1xx (Informational): These status codes indicate that the request was received and understood, and the server is continuing to process it.
+
+1️⃣ 1xx (Informational) ─────────▶ These status codes indicate that the request was received and understood, and the server is continuing to process it.
 These are typically used for informational purposes and are not commonly seen in everyday web interactions.
 
-2️⃣ 2xx (Successful): These status codes indicate that the request was successfully received, understood, and accepted by the server.
-  ✔️ 200 OK: The request has been successfully processed, and the server is returning the requested resource.
-  ✔️ 201 Created: The request has been fulfilled, resulting in the creation of a new resource.
-  ✔️ 204 No Content: The request has been fulfilled, but there is no response body(typically used for operation that don't return data, like a DELETE request).
 
-3️⃣ 3xx (Redirection): These status codes indicate that further action is needed to complete the request. These are used when the client needs to take additional steps to access the requested resource.
-  ✔️ 301 Moved Permanently: The requested resource has been permanently moved to a new URL.
-  ✔️ 302 Found: The requested resource is temporarily located at a different URL.When server sends a response with a 302 status code, it typically includes a Location header that specifies the new URL where the resource can be found. The client is expected to make a new request to this URL to access the resource.
-  ✔️ 304 Not Modified: The resource has not been modified since the last request. The client can use its cached version.
+2️⃣ 2xx (Successful) ─────────▶ These status codes indicate that the request was successfully received, understood, and accepted by the server.
+  ✔️ 200 OK ─────────▶ The request has been successfully processed, and the server is returning the requested resource.
+  ✔️ 201 Created ─────────▶ The request has been fulfilled, resulting in the creation of a new resource.
+  ✔️ 204 No Content ─────────▶ The request has been fulfilled, but there is no response body(typically used for operation that don't return data, like a DELETE request).
 
-4️⃣ 4xx (Client Error): It indicates that there was an error on the client's side, such as malformed request or authentication issues.
-  ✔️ 400 Bad Request: The server cannot process the request due to client error (e.g., malformed request syntax).
-  ✔️ 401 Unauthorized: Authentication is required and has failed or has not yet been provided.
-  ✔️ 403 Forbidden: The server understands the request but refuses to authorize it.
-  ✔️ 404 Not Found: The requested resource could not be found on the server.
 
-5️⃣ 5xx (Server Error): The server failed to fulfill a valid request.
-  ✔️ 500 Internal Server Error: A generic error message indicating that the server encountered an unexpected condition.
-  ✔️ 502 Bad Gateway: The server received an invalid response from an inbound server while acting as a gateway or proxy.
-  ✔️ 503 Service Unavailable: The server is currently unable to handle the request due to temporary overload or maintenance.
+3️⃣ 3xx (Redirection) ─────────▶ These status codes indicate that further action is needed to complete the request. These are used when the client needs to take additional steps to access the requested resource.
+  ✔️ 301 Moved Permanently ─────────▶ The requested resource has been permanently moved to a new URL.
+  ✔️ 302 Found ─────────▶ The requested resource is temporarily located at a different URL. When server sends a response with a 302 status code, it typically includes a Location header that specifies the new URL where the resource can be found. The client is expected to make a new request to this URL to access the resource.
+  ✔️ 304 Not Modified ─────────▶ The resource has not been modified since the last request. The client can use its cached version.
+
+
+4️⃣ 4xx (Client Error) ─────────▶ It indicates that there was an error on the client's side, such as malformed request or authentication issues.
+  ✔️ 400 Bad Request ─────────▶ The server cannot process the request due to client error (e.g., malformed request syntax).
+  ✔️ 401 Unauthorized ─────────▶ Authentication is required and has failed or has not yet been provided.
+  ✔️ 403 Forbidden ─────────▶ The server understands the request but refuses to authorize it.
+  ✔️ 404 Not Found ─────────▶ The requested resource could not be found on the server.
+
+
+5️⃣ 5xx (Server Error) ─────────▶ The server failed to fulfill a valid request.
+  ✔️ 500 Internal Server Error ─────────▶ A generic error message indicating that the server encountered an unexpected condition.
+  ✔️ 502 Bad Gateway ─────────▶ The server received an invalid response from an inbound server while acting as a gateway or proxy.
+  ✔️ 503 Service Unavailable ─────────▶ The server is currently unable to handle the request due to temporary overload or maintenance.
 
 | Code Range | Meaning       | Example                        |
 | ---------- | ------------- | ------------------------------ |
-| 1xx    | Informational | 100 Continue                   |
-| 2xx    | Success       | 200 OK, 201 Created            |
-| 3xx    | Redirection   | 301 Moved Permanently          |
-| 4xx    | Client Error  | 400 Bad Request, 404 Not Found |
-| 5xx    | Server Error  | 500 Internal Server Error      |
+| 1xx        | Informational | 100 Continue                   |
+| 2xx        | Success       | 200 OK, 201 Created            |
+| 3xx        | Redirection   | 301 Moved Permanently          |
+| 4xx        | Client Error  | 400 Bad Request, 404 Not Found |
+| 5xx        | Server Error  | 500 Internal Server Error      |
 
 🔄 Features
-➤ Stateless: Each request is independent; no session info is stored by default.
-➤ Text-based: Human-readable request and response format.
-➤ Extensible: Supports custom headers, cookies, and authentication.
+➤ Stateless ─────────▶ Each request is independent; no session info is stored by default.
+➤ Text-based ─────────▶ Human-readable request and response format.
+➤ Extensible ─────────▶ Supports custom headers, cookies, and authentication.
 ➤ Uses TCP (Port 80) or HTTPS (Port 443) for secure communication.
 
 
+====================================
 🔷 HTTP Request and HTTP Response
+====================================
 1️⃣ HTTP Request
 An HTTP request is a message sent by the client (like a browser or app) to ask the server to perform an action — such as fetching data, submitting a form, or deleting a record.
 
@@ -384,8 +409,9 @@ Accept: application/json
 An HTTP response is the message sent by the server back to the client after processing the request.
 
 
-
+====================
 🔷 Headers in HTTP
+====================
 ➤ HTTP Headers are key-value pairs sent between the client and server in an HTTP request or response.
 ➤ They carry metadata about the request/response — such as content type, authorization token, user agent, etc.
 
@@ -397,11 +423,14 @@ Content-Type: application/json
 User-Agent: PostmanRuntime/7.32.2
 
 👉 Here:
-    ✔️ Authorization → carries credentials or API keys
-    ✔️ Content-Type → tells the server the data format (JSON, XML, etc.)
-    ✔️ User-Agent → describes the client making the request
+    ✔️ Authorization ─────────▶ carries credentials or API keys
+    ✔️ Content-Type ─────────▶ tells the server the data format (JSON, XML, etc.)
+    ✔️ User-Agent ─────────▶ describes the client making the request
 
+
+=========================================================
 🔷 Pass Headers in Code (Spring Boot using RestTemplate)
+=========================================================
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -465,8 +494,8 @@ ResponseEntity<String> response = restTemplate.exchange(
 | Class                   | Description                                        |
 | ----------------------- | -------------------------------------------------- |
 | `HttpHeaders            | Represents HTTP header values                      |
-| `HttpEntity<T           | Represents request entity (headers + body)         |
-| `ResponseEntity<T       | Represents the response (status, headers, body)    |
+| `HttpEntity<T>           | Represents request entity (headers + body)         |
+| `ResponseEntity<T>       | Represents the response (status, headers, body)    |
 | `MediaType              | Helps specify content type like `application/json` |
 
 
@@ -523,7 +552,9 @@ Content-Length: 47
     [{"id":1,"name":"Laptop","price":50000}]
 
 
+==============================
 🔷 Media Types in Rest API
+==============================
 ➤ A Media Type (or MIME type) tells the format of data being sent or received in an HTTP message.
 ➤ It helps the client and server understand how to interpret the request or response body.
 
@@ -538,6 +569,7 @@ Content-Length: 47
 | `text/plain`          | Plain text            |
 | `multipart/form-data` | Used for file uploads |
 | `application/pdf`     | PDF file              |
+| `application/x-www-form-urlencoded` | HTML form submissions |
 
 
 1️⃣ Media Type in HTTP Request
@@ -597,17 +629,8 @@ public class UserController {
     }
 }
 
-✅ consumes → tells what type of input the API accepts
-✅ produces → tells what type of output the API returns
-
-📋 Common Media Types in REST APIs
-| Media Type                          | Use                            |
-| ----------------------------------- | ------------------------------ |
-| `application/json`                  | Most common for REST APIs      |
-| `application/xml`                   | Used in SOAP or XML-based APIs |
-| `text/plain`                        | Simple text data               |
-| `multipart/form-data`               | File uploads (e.g. image, PDF) |
-| `application/x-www-form-urlencoded` | HTML form submissions          |
+✅ consumes ─────────▶ tells what type of input the API accepts
+✅ produces ─────────▶ tells what type of output the API returns
 
 
 ⚡ Real-World Example
@@ -622,31 +645,30 @@ Content-Type: application/json
 {"message": "File uploaded successfully!"}
 
 
-
+============================
 🔷 Rest Client Development
+============================
 A REST Client is a tool, library, or component that allows you to send HTTP requests (GET, POST, PUT, DELETE, etc.) to a REST API and receive responses — typically used to test, consume, or interact with RESTful web services.
 
 A REST Client acts as a consumer of REST APIs.
 It sends HTTP requests to the server (REST API endpoint) and reads the HTTP responses returned.
 
-In springboot we can develop REST Client using 3 ways:
+In springboot we can develop REST Client using following ways:
 1️⃣ Using RestTemplate (Synchrnous Communication: sending request and wating for response then processing other requests)
-2️⃣ Using WebClient (Synchrnous + Asynchrnous Communication)
-3️⃣ Using Feign
+2️⃣ Using RestClient
+3️⃣ Using WebClient (Synchrnous + Asynchrnous Communication)
+4️⃣ Using FeignClient (Declarative REST Client)
 
-🔄 Example in Real Life
+✅ Example in Real Life
 ➤ When you use Postman, you’re using a REST Client application to test APIs.
 ➤ When a frontend app (React, Angular, Flutter) calls an API using fetch() or axios, those are REST Client libraries making HTTP calls.
 
-✅ Example - Java REST Client Using RestTemplate
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
 
-
-🔄 Working of RestTemplate
+==================
+🔷 RestTemplate
+==================
 ➤ RestTemplate is a class provided by Spring Framework that acts as a synchronous REST client.
 ➤ It allows your Spring application to make HTTP requests (GET, POST, PUT, DELETE) to consume REST APIs.
-
 ➤ Think of it as your Java-based Postman — but used inside your application code.
 
 
@@ -658,22 +680,17 @@ import org.springframework.http.ResponseEntity;
 
 
 3️⃣ How It Works Internally
-Here’s the internal flow:
-
-[Your Spring App] → (RestTemplate) → [HTTP Request] → [Target REST API] 
-→ [Response] → (RestTemplate parses it) → [Java Object or String]
+Here’s the internal flow: [Your Spring App] ─────────▶ (RestTemplate) ─────────▶ [HTTP Request] ─────────▶ [Target REST API] ─────────▶ [Response] ─────────▶ (RestTemplate parses it) ─────────▶ [Java Object or String]
 
 
 ✅ Example Flow:
 You call:
 restTemplate.getForObject("https://jsonplaceholder.typicode.com/posts/1", Post.class);
-→ It makes a GET request to that URL
-→ Gets the JSON response
-→ Converts it automatically into a Post Java object using Jackson JSON Mapper
+─────────▶ It makes a GET request to that URL
+─────────▶ Gets the JSON response
+─────────▶ Converts it automatically into a Post Java object using Jackson JSON Mapper
 
-
-✅ Example:
-Let's say we have StudentService and a client Service that calls it.
+✅ Example: Let's say we have StudentService and a client Service that calls it.
 
 🔗 StudentController.java (Server/API Provider)
 package com.example.demo.controller;
@@ -762,11 +779,10 @@ class Student {
 
 🔄 Running the Example
 ➤ Run the StudentController application (port 8080).
-→ It exposes an endpoint:
-GET http://localhost:8080/api/students/1
+─────────▶ It exposes an endpoint: GET http://localhost:8080/api/students/1
 
 ➤ Run StudentClient class (it can be in another app or in same app).
-→ It makes a GET call using RestTemplate.
+─────────▶ It makes a GET call using RestTemplate.
 
 
 ✅ You’ll see output like:
@@ -816,7 +832,7 @@ Problems with WebClient
     ✔️ Mono / Flux learning curve
     ✔️ Overkill for simple MVC apps
 
-Solution → RestClient
+Solution ─────────▶ RestClient
     ✔️ Blocking (simple mental model)
     ✔️ Fluent API
     ✔️ Future-proof
@@ -951,7 +967,7 @@ RestClient.builder()
 
 
 🔄 Interceptors (Cross-Cutting Concerns)
-1️⃣ Inside the Builder  
+1️⃣ Inside the Builder
 RestClient.builder()
     .requestInterceptor((request, body, execution) -> {
         System.out.println("Request URL: " + request.getURI());
@@ -1013,10 +1029,10 @@ RestClient.builder()
 | Feature        | RestTemplate | RestClient |
 | -------------- | ------------ | ---------- |
 | API Style      | Imperative   | Fluent     |
-| Future Support | ❌            | ✅          |
+| Future Support | ❌            | ✅       |
 | Error Handling | Weak         | Strong     |
 | Configuration  | Hard         | Easy       |
-| Spring Boot 3  | ❌            | ✅          |
+| Spring Boot 3  | ❌            | ✅       |
 
 
 ==============
@@ -1025,20 +1041,17 @@ RestClient.builder()
 ➤ WebClient is part of Spring WebFlux, a reactive web framework introduced in Spring 5.
 ➤ It is used to make asynchronous, non-blocking HTTP requests to REST APIs.
 
-👉 Think of it as:
-A reactive, lightweight, and flexible version of RestTemplate
+👉 Think of it as: A reactive, lightweight, and flexible version of RestTemplate
 
 
 🔄 Why WebClient Was Introduced
-➤ RestTemplate (older client) works in a blocking manner —
-that means each thread waits for the response before continuing.
-➤ In contrast, WebClient is non-blocking —
-it can handle many requests concurrently with fewer threads, improving performance and scalability.
+➤ RestTemplate (older client) works in a blocking manner —that means each thread waits for the response before continuing.
+➤ In contrast, WebClient is non-blocking — it can handle many requests concurrently with fewer threads, improving performance and scalability.
 
 
-🔄 Key Features of WebClient
-| Feature                      | Description                                                               |
-| ---------------------------- | ------------------------------------------------------------------------- |
+🔄 Key Features of WebCl
+| Feature                  | Description                                                               |
+| -------------------------| ------------------------------------------------------------------------- |
 | Reactive (Non-blocking)  | Uses Project Reactor (`Mono` and `Flux`) for async programming.           |
 | Lightweight              | Doesn’t depend on Servlet API. Works in both Spring MVC and WebFlux apps. |
 | Supports Streaming       | Can handle continuous data streams (e.g., SSE, WebSockets).               |
@@ -1064,14 +1077,14 @@ Mono<Student> is a reactive type that represents one asynchronous result (like a
 
 
 🔄 WebClient vs RestTemplate
-| Feature                   | `RestTemplate`                  | `WebClient`                 |
-| ------------------------- | ------------------------------- | --------------------------- |
+| Feature               | `RestTemplate`                  | `WebClient`                 |
+| ----------------------| ------------------------------- | --------------------------- |
 | Introduced In         | Spring 3                        | Spring 5 (WebFlux)          |
 | Type                  | Synchronous (Blocking)          | Asynchronous (Non-blocking) |
 | Performance           | Slower (one thread per request) | Faster (reactive model)     |
-| Reactive Support      | ❌ No                            | ✅ Yes                       |
-| Streaming Support     | ❌ No                            | ✅ Yes                       |
-| Recommended By Spring | Deprecated (for new apps)       | ✅ Official Replacement      |
+| Reactive Support      | ❌ No                            | ✅ Yes                    |
+| Streaming Support     | ❌ No                            | ✅ Yes                    |
+| Recommended By Spring | Deprecated (for new apps)       | ✅ Official Replacement     |
 
 
 🔄 Maven dependency for WebClient:
@@ -1080,13 +1093,13 @@ Mono<Student> is a reactive type that represents one asynchronous result (like a
     <artifactId>spring-boot-starter-webflux</artifactId>
 </dependency>
 
-➤ spring-boot-starter-web --> class
-➤ spring-boot-starter-webflux --> interface
+➤ spring-boot-starter-web ─────────▶ class
+➤ spring-boot-starter-webflux ─────────▶ interface
 
 
 🔄 Reactive Concepts Used
-1️⃣ Mono<T> → represents 0 or 1 asynchronous result (like one Student).
-2️⃣ Flux<T> → represents 0 or many asynchronous results (like list of Students).
+1️⃣ Mono<T> ─────────▶ represents 0 or 1 asynchronous result (like one Student).
+2️⃣ Flux<T> ─────────▶ represents 0 or many asynchronous results (like list of Students).
 
 ✅ Example:
 Flux<Student> students = webClient.get()
@@ -1113,9 +1126,10 @@ public class StudentService {
 it can handle hundreds of concurrent API calls efficiently.
 
 
+====================
 🔷 Spring Data REST
+====================
 ➤ Spring Data REST is a module of the Spring Data project that automatically exposes RESTful APIs for your Spring Data Repositories — without writing any controller code.
-
 ➤ If you already have a JpaRepository, Spring Data REST will automatically create REST endpoints (GET, POST, PUT, DELETE) for you.
 
 🔄 How It Works
@@ -1168,8 +1182,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
 3️⃣ Run the Application
 When you start your Spring Boot app, Spring Data REST automatically generates endpoints like:
-| HTTP Method | Endpoint         | Description                        |
-| ----------- | ---------------- | ---------------------------------- |
+| HTTP Method | Endpoint     | Description                        |
+| ----------- | -------------| ---------------------------------- |
 | GET     | `/students`      | Get all students (with pagination) |
 | GET     | `/students/{id}` | Get student by ID                  |
 | POST    | `/students`      | Create a new student               |
@@ -1210,8 +1224,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByNameContaining(@Param("name") String name);
 }
 👉 Now you can access:
-For findBy queries we have to add /search to the path, for example:
-GET /students/search/byName?name=Ankur
+For findBy queries we have to add /search to the path, for example ─────────▶ eGET /students/search/byName?name=Ankur
 
 🔄 Internals & Concepts
 ➤ Spring Data REST uses HAL (Hypertext Application Language) format by default for HATEOAS links.
@@ -1342,10 +1355,12 @@ List<User> users = mongoTemplate.find(query, User.class);
 | Complex filters, dynamic criteria, aggregations | `MongoTemplate`   |
 
 
+================================
 🔷 REST API Exception handling
+================================
 In springboot we can handle exception in 2 ways:
-| Type                         | Description                                                                 | Scope               |
-| ---------------------------- | --------------------------------------------------------------------------- | ------------------- |
+| Type                     | Description                                                             | Scope               |
+| -------------------------| ------------------------------------------------------------------------| ------------------- |
 | Global Exception Handler | Handles exceptions across all controllers using `@RestControllerAdvice` | Application-wide    |
 | Local Exception Handler  | Handles exceptions within a single controller using `@ExceptionHandler` | Controller-specific |
 
@@ -1455,7 +1470,7 @@ public class StudentController {
 ✔️ The local exception handler catches it first (if available).
 ✔️ If not defined locally, then the global handler catches it.
 
-🧾 5️⃣ Sample JSON Response (From Global Handler)
+5️⃣ Sample JSON Response (From Global Handler)
 {
   "message": "Student with ID 10 not found!",
   "path": "uri=/api/students/10",
@@ -1518,52 +1533,59 @@ public class GlobalRestExceptionHandler {
 ➤ Cleaner and preferred for Spring Boot RESTful APIs.
 
 
-🔷 REST(Representation State Transfer) Architecture Principles 
-1️⃣ Client-Server Architecture  
-➤ Separation of concerns between client (frontend/UI) and server (backend).  
-➤ Client handles UI and user interaction; server handles data storage and logic.  
+================================================================
+🔷 REST(Representation State Transfer) Architecture Principles
+================================================================
+1️⃣ Client-Server Architecture
+➤ Separation of concerns between client (frontend/UI) and server (backend).
+➤ Client handles UI and user interaction; server handles data storage and logic.
 ➤ Enables scalability, modularity, and independent development.
 
-2️⃣ Statelessness  
-➤ Each request from client to server must contain all required information.  
-➤ Server does not store any client session data.  
+
+2️⃣ Statelessness
+➤ Each request from client to server must contain all required information.
+➤ Server does not store any client session data.
 ➤ Improves reliability and scalability since each request is independent.
 
-3️⃣ Cacheability  
-➤ Responses must define themselves as cacheable or non-cacheable.  
-➤ Reduces client-server interactions, improves performance.  
-➤ Example: HTTP headers like Cache-Control, ETag.
 
-4️⃣ Uniform Interface  
-➤ Common standard way to communicate between client and server.  
-➤ Core of REST design — ensures simplicity and decoupling.  
+3️⃣ Cacheability
+➤ Responses must define themselves as cacheable or non-cacheable.
+➤ Reduces client-server interactions, improves performance.
+✅ Example: HTTP headers like Cache-Control, ETag.
+
+
+4️⃣ Uniform Interface
+➤ Common standard way to communicate between client and server.
+➤ Core of REST design — ensures simplicity and decoupling.
 ➤ Includes:
     ✔️ Resource Identification (using URIs)
     ✔️ Manipulation of Resources through representations (JSON/XML)
     ✔️ Self-descriptive messages (metadata in headers)
     ✔️ HATEOAS (Hypermedia as the Engine of Application State)
 
-5️⃣ Layered System  
-➤ Architecture composed of hierarchical layers (client, API gateway, server, DB).  
-➤ Each layer has a specific function and does not need to know others’ details.  
+5️⃣ Layered System
+➤ Architecture composed of hierarchical layers (client, API gateway, server, DB).
+➤ Each layer has a specific function and does not need to know others’ details.
 ➤ Improves scalability and security through load balancers, proxies, etc.
 
-6️⃣ Code-on-Demand (Optional)  
-➤ Allows server to send executable code (like JavaScript) to client for execution.  
+6️⃣ Code-on-Demand (Optional)
+➤ Allows server to send executable code (like JavaScript) to client for execution.
 ➤ Adds flexibility, but rarely used due to security concerns.
 
 
+===========================================================
 🔷 HATEOAS (Hypermedia As The Engine Of Application State)
-➤ HATEOAS is a REST principle that allows a client to dynamically navigate a REST API using hyperlinks provided in the responses.  
+===========================================================
+➤ HATEOAS is a REST principle that allows a client to dynamically navigate a REST API using hyperlinks provided in the responses.
 ➤ It means that each response from the server includes links (URLs) to related actions or resources — guiding the client on what can be done next.
 
-2️⃣ Purpose  
-➤ Makes REST APIs more discoverable and self-descriptive.  
-➤ Client does not need hard-coded knowledge of API routes.  
-➤ Reduces coupling between client and server.  
+2️⃣ Purpose
+➤ Makes REST APIs more discoverable and self-descriptive.
+➤ Client does not need hard-coded knowledge of API routes.
+➤ Reduces coupling between client and server.
 ➤ Enables API evolution without breaking clients.
 
-✅ Example  
+✅ Example
    ➤ Without HATEOAS:
        {
          "id": 1,
@@ -1582,20 +1604,20 @@ public class GlobalRestExceptionHandler {
            "update": { "href": "http://localhost:8080/api/students/1" },
            "delete": { "href": "http://localhost:8080/api/students/1" }
          }
-       } 
-🔗 _links.self → shows the current resource link
-🔗 _links.update → tells where to send a PUT request to update
-🔗 _links.delete → tells where to send a DELETE request
-🔗 _links.all-students → provides link to fetch all students
+       }
+🔗 _links.self ─────────▶ shows the current resource link
+🔗 _links.update ─────────▶ tells where to send a PUT request to update
+🔗 _links.delete ─────────▶ tells where to send a DELETE request
+🔗 _links.all-students ─────────▶ provides link to fetch all students
 
 
-4️⃣ Key Components  
-➤ Resource Representation → The actual data (like student details).  
-➤ Hypermedia Links → Embedded links to related resources/actions.  
-➤ Relation Types → Describe purpose of each link (self, update, delete, etc.)
+4️⃣ Key Components
+➤ Resource Representation ─────────▶ The actual data (like student details).
+➤ Hypermedia Links ─────────▶ Embedded links to related resources/actions.
+➤ Relation Types ─────────▶ Describe purpose of each link (self, update, delete, etc.)
 
-5️⃣ Implementation In Spring Boot  
-➤ Spring provides support via `spring-hateoas` library.  
+5️⃣ Implementation In Spring Boot
+➤ Spring provides support via `spring-hateoas` library.
 ➤ You can use classes like:
          ✔️ EntityModel<T> : wraps a resource and adds links.
          ✔️ WebMvcLinkBuilder : used to build links to controller methods.
@@ -1636,21 +1658,21 @@ public class GlobalRestExceptionHandler {
 ➤ Especially useful for large-scale or evolving APIs.
 
 
-🔷 working of HATEOAS with REST API in springboot
-
+🔄 Working of HATEOAS with REST API in springboot
 Dependency for HATEOAS project:
-spring data jpa
-lombok
-MySQL Driver
-Spring HATEOAS
+✔️ spring data jpa
+✔️ lombok
+✔️ MySQL Driver
+✔️ Spring HATEOAS
+
 
 🔄 Add Dependency
 Add this to your pom.xml:
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-hateoas</artifactId>
 </dependency>
+
 
 🔄 Create a Simple Entity (Example: Student) Work without extending RepresentationModel class
 public class Student {
@@ -1661,7 +1683,8 @@ public class Student {
     // Constructors, Getters, Setters
 }
 
-🔄 Create a JpaRepository 
+
+🔄 Create a JpaRepository
 package com.example.spring_rest_demo.repository;
 
 import com.example.spring_rest_demo.entity.Student;
@@ -1671,6 +1694,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(collectionResourceRel = "students", path = "students")
 public interface StudentRepository extends JpaRepository<Student, Long> {}
+
 
 🔄 Create a Controller with HATEOAS Support
 package com.example.spring_rest_demo.controller;
@@ -1748,19 +1772,15 @@ You’ll get this:
 ➤ Client doesn’t need to know URL structure — it just follows these links.
 
 
-
 ==================================
 🔷 Logging in Spring Boot: SLF4J
 ==================================
 ➤ Logging is an essential aspect of the application development that allows developers to monitor and troubleshoot their applications.
-
 ➤ Spring Boot supports various logging frameworks, such as Logback, Log4J2, and Java Util Logging (JUL) out of the box.
 
-🔄 understanding frameworks:
+🔄 Understanding frameworks:
 1️⃣ Logback: A popular logging framework that serves as default in many SpringBoot applications. It offers a flexible configuration and good performance.
-
 2️⃣ Log4J2: A logging framework similar to Logback with features such as asynchronous logging and support various output formats.
-
 3️⃣ Java Util Logging (JUL): A logging framework that is a part of the Java platform. While it's less feature rich than some third-party frameworks, it is straightforward to use.
 
 4️⃣ Log Monitoring Tools
@@ -1768,7 +1788,7 @@ You’ll get this:
 2. WinScp -- GUI tool
    ➤ Using WinScp we can upload and download files from windows to linux or vice versa using the file explorer.
 3. ELK -- GUI tool
-    ➤ E = Elasticsearch, L = Logstash, K = Kibana     
+    ➤ E = Elasticsearch, L = Logstash, K = Kibana
 4. Splunk(Licensed) -- GUI tool
 
 🔄 How to Connect to Putty
@@ -1808,14 +1828,14 @@ Spring Boot provides annotations like @Slf4j and @Log4j2 to help with logging, t
 ➤ Spring Boot internally uses SLF4J + Logback by default.
 ➤ Think of SLF4J as a “universal adapter” that lets you switch logging backends easily without changing your application code.
 
-❓ Why Use SLF4J 
-➤ Abstraction layer: decouples logging framework from code.
-➤ Better performance: lazy evaluation of log messages ({} placeholders).
-➤ Integration: widely supported in Spring, Hibernate, etc.
-➤ Flexibility: easily switch from Logback → Log4j2 without code changes.
+❓ Why Use SLF4J
+➤ Abstraction layer ─────────▶ decouples logging framework from code.
+➤ Better performance ─────────▶ lazy evaluation of log messages ({} placeholders).
+➤ Integration ─────────▶ widely supported in Spring, Hibernate, etc.
+➤ Flexibility ─────────▶ easily switch from Logback ─────────▶ Log4j2 without code changes.
 
 ❓ How Logging Works in Spring Boot
-➤ By defaultSLF4J API is used in code.
+➤ By default SLF4J API is used in code.
 ➤ Logback is the underlying implementation.
 ➤ Configurations are auto-loaded from:
   ✔️ application.properties or
@@ -1910,12 +1930,12 @@ public void init() {
 }
 
 🔄 Logback Architecture (Default in Spring Boot)
-🔗 Logger → Appender → Layout → Destination
+🔗 Logger ─────────▶ Appender ─────────▶ Layout ─────────▶ Destination
 
-➤ Logger: The entry point in your code (LoggerFactory.getLogger(...))
-➤ Appender: Defines where to send logs (console, file, socket)
-➤ Layout / Encoder: Defines how the log message looks
-➤ Destination: Final output (file, stdout,+ Database etc.)
+➤ Logger ─────────▶ The entry point in your code (LoggerFactory.getLogger(...))
+➤ Appender ─────────▶ Defines where to send logs (console, file, socket)
+➤ Layout / Encoder ─────────▶ Defines how the log message looks
+➤ Destination ─────────▶ Final output (file, stdout,+ Database etc.)
 
 🔄 Configure in logback-spring.xml (Advanced)
 When we have application.properties, we should use logback-spring.xml for logging configuration specifically.
@@ -1923,9 +1943,9 @@ When we have application.properties, we should use logback-spring.xml for loggin
 🔗 Code Example:
 <configuration>
 
-👉 Console Appender 
+👉 Console Appender
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder> // encoder is a formatter for the output 
+        <encoder> // encoder is a formatter for the output
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n</pattern>
         </encoder>
     </appender>
@@ -1995,8 +2015,9 @@ Understanding structure:
 👉 Rolling based of size and time can be used at the same time whatever happens first will make logs accordingly.
 
 
-
+========================
 🔷 SpringBoot Acuators
+========================
 Spring Boot Actuator is a module provided by Spring Boot that adds production-ready features to your application.
 It allows you to monitor and manage your application by exposing endpoints that provide insights into:
 ✔️ Application health
@@ -2004,8 +2025,7 @@ It allows you to monitor and manage your application by exposing endpoints that 
 ✔️ Environment properties
 ✔️ Logging levels
 ✔️ Thread dumps
-
-Actuators help you observe and manage your Spring Boot application in production or development without writing additional monitoring code.
+👉 Actuators help you observe and manage your Spring Boot application in production or development without writing additional monitoring code.
 
 
 ⚡ Key Features of Actuator
@@ -2034,10 +2054,10 @@ Tracks recent HTTP requests and responses.
 
 8️⃣ Integration with Monitoring Tools
 Works with Prometheus, Grafana, New Relic, or Spring Boot Admin for full monitoring dashboards.
-
 ✔️ All these actuators endpoints are predefined and they are binded to HTTP GET requests.
 ✔️ In Actuator we have a special endpoint called /shutdown which is used to shutdown the application.
 ✔️ This endpoint is binded to HTTP POST requests.
+
 
 🔄 Why Use Spring Boot Actuator❓
 1️⃣ Production-Ready Monitoring
