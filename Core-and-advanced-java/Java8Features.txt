@@ -1271,3 +1271,103 @@ intStream.forEach(System.out::println); // 1 2 3
 Primitive streams also support .parallel()
 
 
+============================
+🔷 Interview Trap Questions
+=============================
+❓ Question: What is the difference between:
+Stream.of(arr)
+Arrays.stream(arr)
+─────────▶ when arr is int[]?
+
+✅ Answer:
+Case 1️⃣: Object Array (Integer[] or String[])
+Integer[] arr = {1, 2, 3};
+Stream.of(arr);
+
+What happens?
+➤ Stream.of(T... values) expects objects
+➤ Integer[] is an object array
+➤ Java expands the array
+
+🔗 Resulting Stream: Stream<Integer>  → 1, 2, 3
+🔗 Same as: Arrays.stream(arr);
+✅ Both behave identically for object arrays
+
+ Case 2️⃣: Primitive Array (int[]) ⚠️ TRICKY PART
+int[] arr = {1, 2, 3};
+Stream.of(arr);
+
+Method Signature:
+static <T> Stream<T> of(T... values)
+👉 int[] is itself ONE object
+So Java thinks: T = int[]
+
+Resulting Stream: Stream<int[]>   // ONE element (the whole array)
+Visual:
+Stream
+ └── [1, 2, 3]   ← single element
+❌ NOT: 1, 2, 3
+
+
+🔄 Proof by Code
+int[] arr = {1, 2, 3};
+
+Stream.of(arr)
+      .forEach(System.out::println);
+✅ Output:[I@6d311334]
+👉 That’s the array reference, not numbers.
+
+
+✅ Correct Way for Primitive Arrays
+Arrays.stream(arr)
+      .forEach(System.out::println);
+
+Output:
+1
+2
+3
+❓ Why?
+Arrays.stream(int[]) returns: IntStream
+👉 Which is designed specifically for primitives
+
+
+❓ Why Java Did This?
+Java streams follow type safety and method overloading rules.
+
+Primitive arrays:
+    ✔️ Are NOT objects like Integer
+    ✔️ Cannot be auto-expanded
+    ✔️ Need special handling
+
+That’s why Java introduced:
+    ✔️ IntStream
+    ✔️ LongStream
+    ✔️ DoubleStream
+
+
+❓ What is the difference between:
+
+map(List::stream)
+flatMap(List::stream)
+
+✅ Answer:
+🔄 map(List::stream)
+Stream<List<String>> → Stream<Stream<String>>
+❌ Nested stream
+❌ Usually not useful
+
+🔄 flatMap(List::stream)
+Stream<List<String>> → Stream<String>
+✔️ Flattened
+✔️ Correct result
+
+🔄 Visual Difference
+map:
+[ [A, B], [C, D] ]
+ ↓
+[ Stream(A,B), Stream(C,D) ]
+
+flatMap:
+[ [A, B], [C, D] ]
+ ↓
+A, B, C, D
