@@ -2,28 +2,33 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX✅ Core Concepts O
 ###########################################
 🌊 Variables and Scoping (var, let, const)
 ###########################################
+==========================
 🔷 Scopes in JavaScript
-| Scope              | Applies to            | Stored in                              |
-| ------------------ | --------------------- | -------------------------------------- |
-| **Global Scope**   | `window` / `global`   | Global Object                          |
-| **Function Scope** | `var` inside function | Execution Context Variable Environment |
-| **Block Scope**    | `{ }`, loops, if      | Lexical Environment                    |
+==========================
+| Scope          | Applies to          | Stored in                              |
+| ---------------| --------------------| -------------------------------------- |
+| Global Scope   | window / global     | Global Object                          |
+| Function Scope | var inside function | Execution Context Variable Environment |
+| Block Scope    | { }, loops, if      | Lexical Environment                    |
 
 
+=======================
 🔷 var vs let vs const
-| Feature                            | `var`                            | `let`            | `const`          |
+=======================
+| Feature                            | var                              | let              | const            |
 | ---------------------------------- | -------------------------------- | ---------------- | ---------------- |
 | Scope                              | Function                         | Block            | Block            |
-| Hoisted?                           | Yes (initialized as `undefined`) | Yes (but in TDZ) | Yes (but in TDZ) |
+| Hoisted?                           | Yes (initialized as undefined)   | Yes (but in TDZ) | Yes (but in TDZ) |
 | Re-declaration                     | Allowed                          | ❌ Not allowed   | ❌ Not allowed  |
 | Re-assignment                      | Allowed                          | Allowed          | ❌ Not allowed   |
 | Attached to Global Object?         | Yes                              | ❌               | ❌              |
 | Can be declared without assignment | Yes                              | Yes              | ❌ No            |
-👉 TDZ- Temporal Dead Zone
-A zone between the start of the scope and declaration where let/const exist but cannot be accessed.
+👉 TDZ- Temporal Dead Zone ─────────▶ A zone between the start of the scope and declaration where let/const exist but cannot be accessed.
 
 
+======================
 🔷 Hoisting Behavior
+======================
 console.log(a); // undefined
 var a = 10;
 
@@ -89,7 +94,9 @@ function deepFreeze(obj) {
 👉 In strict mode ─────────▶ JavaScript will throw a TypeError if modification is attempted.
 
 
+=========================
 🔷 Closure + Loop Traps
+=========================
 ❓ Why does var fail inside the loops?
 for(var i = 1; i <= 3; i++){
   setTimeout(() => console.log(i), 1000);
@@ -123,16 +130,15 @@ x=100; // ❌ ReferenceError
 🌊 Hoisting
 #############
 JavaScript moves declarations to the top of the current scope (compile phase) before code execution.
-
 Only declarations are hoisted — not initializations.
 
 | Type                 | Hoisted?           | Value Before Declaration         | Notes                        |
 | -------------------- | ------------------ | -------------------------------- | ---------------------------- |
-| `var`                | Yes                | `undefined`                      | Function-scoped              |
-| `let`                | Yes                | TDZ (ReferenceError if accessed) | Block-scoped                 |
-| `const`              | Yes                | TDZ + must be initialized        | Block-scoped                 |
+| var                  | Yes                | undefined                        | Function-scoped              |
+| let                  | Yes                | TDZ (ReferenceError if accessed) | Block-scoped                 |
+| const                | Yes                | TDZ + must be initialized        | Block-scoped                 |
 | Function Declaration | Yes                | Actual function                  | Can be called before defined |
-| Function Expression  | Only variable name | `undefined` if accessed early    | Depends on var/let/const     |
+| Function Expression  | Only variable name | undefined if accessed early      | Depends on var/let/const     |
 
 
 ✅ Examples
@@ -189,7 +195,8 @@ function hello() {
 var hello = function() {
   console.log("B");
 };
-✅ Output: "A" Function declaration hoisted first ─────────▶ overwrites var declaration.
+✅ Output ─────────▶ "A" Function declaration hoisted first ─────────▶ overwrites var declaration.
+JavaScript Specification Rule ─────────▶ Function declarations are hoisted before variable declarations.
 
 
 #################################
@@ -285,8 +292,8 @@ console.log(obj.a);
 🔷 Type Conversion vs Type Coercion
 | Term                | Who triggers? | Explicit?     | Example      |
 | ------------------- | ------------- | ------------- | ------------ |
-| **Type Conversion** | Developer     | Yes           | `String(10)` |
-| **Type Coercion**   | JavaScript    | No (implicit) | `"5" * 2`    |
+| Type Conversion | Developer     | Yes           | String(10) |
+| Type Coercion   | JavaScript    | No (implicit) | "5" * 2    |
 
 🔷 Explicit Conversion
 ➤ To Number
@@ -379,13 +386,13 @@ false
 ########################################################
 🌊 Operators (Arithmetic, Logical, Comparison, Bitwise)
 ########################################################
-🔷 Arithmetic Operators(+, -, *, /, %, ++, --, **)
+🔷 Arithmetic Operators(+, -, *, /, %, ++, --, )
 
 let a = 10;
 let b = 3;
 console.log(a + b); // 13
 console.log(a % b); // 1
-console.log(a ** 2); // 100
+console.log(a  2); // 100
 
 👉 + also does string concatenation: "5" + 2 // "52"
 
@@ -397,8 +404,8 @@ Ordinary Comparisons(<, >, <=, >=)
 🔄 Equality
 | Operator | Behavior                          |
 | -------- | --------------------------------- |
-| `==`     | loose equality → coercion happens |
-| `===`    | strict equality → **no coercion** |
+| ==     | loose equality → coercion happens |
+| ===    | strict equality → no coercion |
 "5" == 5   // true
 "5" === 5  // false
 👉 Always prefer === in interviews & real projects.
@@ -481,11 +488,11 @@ Control flow defines the order in which code is executed.
 🔷 Conditional Statements
 | Statement       | Usage                                     |
 | --------------- | ----------------------------------------- |
-| `if`            | Runs code only if condition is true       |
-| `if…else`       | Runs alternate code if condition is false |
-| `else if`       | Multiple conditions                       |
-| `switch`        | Compare value against multiple cases      |
-| Ternary (`? :`) | Short if-else for simple expressions      |
+| if            | Runs code only if condition is true       |
+| if…else       | Runs alternate code if condition is false |
+| else if       | Multiple conditions                       |
+| switch        | Compare value against multiple cases      |
+| Ternary (? :) | Short if-else for simple expressions      |
 
 ✅ Example
 let age = 18;
@@ -517,12 +524,12 @@ console.log(result);
 Loops help repeat tasks until a condition is met.
 | Loop Type    | Best Use Case                               |
 | ------------ | ------------------------------------------- |
-| `for`        | Known number of iterations                  |
-| `while`      | Loop until condition becomes false          |
-| `do…while`   | Runs at least once                          |
-| `for…of`     | Iterating over **arrays / iterable values** |
-| `for…in`     | Iterating over **object keys**              |
-| `.forEach()` | Array iteration (callback based)            |
+| for        | Known number of iterations                  |
+| while      | Loop until condition becomes false          |
+| do…while   | Runs at least once                          |
+| for…of     | Iterating over arrays / iterable values |
+| for…in     | Iterating over object keys              |
+| .forEach() | Array iteration (callback based)            |
 
 ✅ For Loop Example
 for (let i = 0; i < 5; i++) {
@@ -560,14 +567,14 @@ for (const key in user) {
 const nums = [1, 2, 3];
 
 nums.forEach((n, i) => {
-  console.log(`Index ${i}: ${n}`);
+  console.log(Index ${i}: ${n});
 });
 
 🔷 Loop Control Keywords
 | Keyword    | Purpose                                   |
 | ---------- | ----------------------------------------- |
-| `break`    | Stop the loop entirely                    |
-| `continue` | Skip current iteration & move to next one |
+| break    | Stop the loop entirely                    |
+| continue | Skip current iteration & move to next one |
 
 ✅ Example
 for (let i = 1; i <= 5; i++) {
@@ -585,10 +592,10 @@ JavaScript uses exceptions to handle errors in runtime
 The main keyword used:
 | Keyword   | Purpose                          |
 | --------- | -------------------------------- |
-| `try`     | Wraps code that may throw error  |
-| `catch`   | Handles the error if thrown      |
-| `throw`   | Manually create/customize errors |
-| `finally` | Runs always (success OR error)   |
+| try     | Wraps code that may throw error  |
+| catch   | Handles the error if thrown      |
+| throw   | Manually create/customize errors |
+| finally | Runs always (success OR error)   |
 
 🔷 Basic Syntax
 try {
