@@ -1371,3 +1371,21 @@ flatMap:
 [ [A, B], [C, D] ]
  ↓
 A, B, C, D
+
+
+=============================================
+🔷 toList() vs collect(Collectors.toList())
+=============================================
+toList() (Java 16+)
+List<Integer> list = nums.stream().toList();
+
+Collectors.toList() (Java 8)
+List<Integer> list = nums.stream()
+                         .collect(Collectors.toList());
+
+🔄 Difference between toList 🆚 collect(Collectors.toList())
+| Feature        | toList()  | Collectors.toList() |
+| -------------- | --------- | ------------------- |
+| Java Version   | 16+       | 8+                  |
+| Modifiable     | ❌ No     | ✅ Yes             |
+| Implementation | Immutable | Mutable             |
