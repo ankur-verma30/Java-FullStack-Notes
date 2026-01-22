@@ -1,6 +1,7 @@
+==============================================
 🔴 S – Single Responsibility Principle (SRP)
+==============================================
 A class should have only ONE reason to change.
-
 👉 This does NOT mean “only one method”.
 👉 It means one responsibility / one axis of change.
 
@@ -20,10 +21,11 @@ class UserService {
     }
 }
 
+
 ❌ Why this violates SRP?
-➤ Registration logic changes → class changes
-➤ Email logic changes → class changes
-➤ DB logic changes → class changes
+➤ Registration logic changes ─────────▶ class changes
+➤ Email logic changes ─────────▶ class changes
+➤ DB logic changes ─────────▶ class changes
 👉 Multiple reasons to change
 
 
@@ -49,9 +51,9 @@ class UserRepository {
 
 
 🌱 Spring Boot Mapping
-🔗 @Controller → HTTP handling
-🔗 @Service → Business logic
-🔗 @Repository → DB logic
+🔗 @Controller ─────────▶ HTTP handling
+🔗 @Service ─────────▶ Business logic
+🔗 @Repository ─────────▶ DB logic
 
 
 🔵 O – Open/Closed Principle (OCP)
@@ -70,7 +72,7 @@ class DiscountService {
         return 0;
     }
 }
-❌ Every new discount → modify this class
+❌ Every new discount ─────────▶ modify this class
 ❌ Breaks OCP
 
 ✅ OCP Compliant Design (Using Polymorphism)
@@ -98,7 +100,7 @@ class DiscountService {
         return discount.apply(amount);
     }
 }
-👉 Add new discount → no modification
+👉 Add new discount ─────────▶ no modification
 
 
 🌱 Spring Boot Mapping

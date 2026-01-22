@@ -1,0 +1,19 @@
+Q1. Why React?
+─────────▶React simplifies building complex UIs by making the UI declarative, component-based, and state-driven, allowing predictable rendering and efficient updates using a virtual DOM.
+
+
+Q2. Why is React a library, not a framework?
+─────────▶React focuses only on the view layer and leaves routing, state management, and networking to external libraries, giving developers flexibility.
+
+
+Q3. What problem does React solve?
+─────────▶React solves the problem of managing complex UI state and keeping the UI in sync with data efficiently.
+
+
+O4. “Why React is mostly SPA?”
+─────────▶ React is optimized for long-lived UI sessions where state changes frequently. SPA allows React to manage state and UI efficiently without full page reloads.
+
+
+O5. “Is React only SPA?”
+─────────▶ No. React can be used with SSR and hybrid models using frameworks like Next.js.
+

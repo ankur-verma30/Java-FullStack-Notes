@@ -1,0 +1,998 @@
+=================
+🔷 React topics
+=================
+1️⃣ React Fundamentals (Core Foundation)
+1. What is React & Why React?
+2. SPA vs MPA (from React perspective)
+3. React Architecture Overview
+4. Virtual DOM
+
+Reconciliation Algorithm
+
+React Fiber Architecture (high level)
+
+JSX Syntax & Rules
+
+JSX vs JavaScript
+
+Babel & JSX Compilation (how JSX converts to React.createElement)
+
+React.createElement Deep Dive
+
+React Element vs Component
+
+Component-Based Architecture
+
+Functional Components
+
+Class Components (legacy but interview-important)
+
+Differences: Functional vs Class Components
+
+React Rendering Flow
+
+2. Project Setup & Tooling
+
+Create React App (CRA) Internals
+
+Vite + React Setup
+
+Folder Structure Best Practices
+
+Entry Point (index.js / main.jsx)
+
+Root API (createRoot)
+
+StrictMode
+
+Development vs Production Builds
+
+Environment Variables in React
+
+Build Process Overview
+
+3. JSX & Rendering Mechanics
+
+Expressions in JSX
+
+Conditional Rendering
+
+Rendering Lists
+
+Keys in React (importance & pitfalls)
+
+Fragment (<> </>)
+
+Rendering Null vs Undefined
+
+Boolean Rendering Behavior
+
+Re-render Triggers
+
+React Rendering vs DOM Rendering
+
+4. Props System (Data Flow)
+
+Props Basics
+
+Passing Props
+
+Destructuring Props
+
+Props Children
+
+Default Props
+
+Props Validation (PropTypes)
+
+One-Way Data Flow
+
+Immutable Props
+
+Props vs State
+
+Lifting State Up
+
+Props Drilling Problem
+
+5. State Management (Core React State)
+
+What is State
+
+useState Hook Internals
+
+State Initialization Patterns
+
+Functional State Updates
+
+State Batching
+
+Asynchronous State Updates
+
+Updating Objects in State
+
+Updating Arrays in State
+
+Immutability in State
+
+Derived State
+
+State Anti-Patterns
+
+6. Event Handling
+
+Synthetic Events
+
+Event Binding in React
+
+Event Bubbling in React
+
+Preventing Default Behavior
+
+Handling Forms
+
+Controlled Components
+
+Uncontrolled Components
+
+Form Validation Patterns
+
+7. Component Lifecycle (Very Important)
+
+Component Lifecycle Phases
+
+Mounting Phase
+
+Updating Phase
+
+Unmounting Phase
+
+Class Lifecycle Methods (all)
+
+componentDidMount
+
+componentDidUpdate
+
+componentWillUnmount
+
+Lifecycle Mapping: Class → Hooks
+
+Side Effects in React
+
+Cleanup Mechanism
+
+8. Hooks (Deep Dive – Most Important Section)
+
+Rules of Hooks
+
+Why Hooks Were Introduced
+
+useEffect Deep Dive
+
+Effect Dependency Array
+
+Multiple Effects Pattern
+
+Cleanup in useEffect
+
+useLayoutEffect
+
+useMemo
+
+Memoization Concepts
+
+useCallback
+
+useRef
+
+DOM Refs vs Mutable Refs
+
+useContext
+
+useReducer
+
+useReducer vs useState
+
+Custom Hooks
+
+Hook Composition
+
+Common Hook Pitfalls
+
+Hooks Performance Issues
+
+9. Context API & Global State
+
+Context API Basics
+
+Creating Context
+
+Provider & Consumer Pattern
+
+Context Re-render Problem
+
+Context + useReducer Pattern
+
+When NOT to Use Context
+
+Context vs Redux
+
+Context Performance Optimization
+
+10. Conditional & Dynamic UI Patterns
+
+Conditional Component Rendering
+
+Dynamic Class Names
+
+Inline Styles vs CSS
+
+Conditional Hooks (anti-pattern)
+
+Feature Flags in React
+
+Render Props Pattern
+
+Higher Order Components (HOC)
+
+11. Performance Optimization (Critical for 3+ Years)
+
+React.memo
+
+Memoization Strategies
+
+Preventing Unnecessary Re-renders
+
+Reconciliation Optimization
+
+Key Stability & Performance
+
+useCallback vs useMemo (interview traps)
+
+Lazy Initialization
+
+Code Splitting Concepts
+
+React.lazy
+
+Suspense (for code splitting)
+
+Virtualization (windowing concept)
+
+Debouncing & Throttling in React
+
+12. Refs & DOM Control
+
+useRef Deep Dive
+
+Forward Refs
+
+forwardRef
+
+Imperative Handle
+
+useImperativeHandle
+
+Accessing DOM Nodes Safely
+
+Controlled vs Uncontrolled DOM
+
+13. Styling in React
+
+CSS in React Overview
+
+Inline Styling
+
+CSS Modules
+
+Styled Components (conceptual)
+
+Conditional Styling Patterns
+
+Theming Concepts
+
+CSS Performance in React
+
+14. Forms (Advanced)
+
+Controlled Forms Deep Dive
+
+Large Form Optimization
+
+Dynamic Forms
+
+Form State Management Patterns
+
+Validation Strategies
+
+Error Handling in Forms
+
+15. Error Handling
+
+Error Boundaries
+
+componentDidCatch
+
+Error Handling in Hooks
+
+Global Error Handling Strategy
+
+Fallback UI Patterns
+
+16. Routing (React Perspective)
+
+SPA Routing Concept
+
+Client Side Routing
+
+Route Matching Concepts
+
+Protected Routes Pattern
+
+Lazy Loaded Routes
+
+Navigation Lifecycle
+
+Route State Management
+
+17. Data Fetching & Side Effects
+
+Data Fetching Patterns
+
+Fetch vs Axios (React usage)
+
+Loading State Patterns
+
+Error State Patterns
+
+Pagination & Infinite Scroll
+
+Polling
+
+Caching Strategies
+
+Optimistic UI Updates
+
+Abort Controllers
+
+Race Condition Handling
+
+18. State Management Libraries (React Ecosystem)
+
+When React State Is Not Enough
+
+Redux Core Concepts
+
+Redux Data Flow
+
+Redux Toolkit Concepts
+
+React-Redux Hooks
+
+Redux vs Context
+
+Side Effects in Redux
+
+Global vs Local State Decision
+
+19. Testing in React
+
+Testing Philosophy in React
+
+Unit Testing Components
+
+Integration Testing
+
+Testing Hooks
+
+Mocking API Calls
+
+Snapshot Testing
+
+Testing Performance-Sensitive Components
+
+20. Accessibility (Often Ignored, Interview Favorite)
+
+ARIA in React
+
+Semantic HTML in React
+
+Keyboard Navigation
+
+Screen Reader Compatibility
+
+Accessibility Testing
+
+21. Security in React
+
+XSS in React
+
+dangerouslySetInnerHTML
+
+Authentication Flow (React side)
+
+Authorization UI Patterns
+
+Secure State Handling
+
+Token Storage Patterns
+
+22. Advanced React Patterns
+
+Compound Components
+
+Controlled vs Uncontrolled Pattern
+
+Container-Presenter Pattern
+
+Smart vs Dumb Components
+
+State Machines in React
+
+Event Delegation in React
+
+Headless Components
+
+23. Concurrent & Modern React
+
+Concurrent Rendering Concepts
+
+Automatic Batching
+
+Transitions
+
+useTransition
+
+useDeferredValue
+
+Suspense for Data Fetching (conceptual)
+
+Streaming UI Concepts
+
+24. Architecture & Scalability
+
+Feature-Based Folder Structure
+
+Atomic Design in React
+
+Monorepo React Architecture
+
+Micro-Frontend Concepts
+
+Large Scale State Design
+
+Performance Budgeting
+
+25. Deployment & Production
+
+Production Build Optimization
+
+Bundle Size Analysis
+
+Environment Based Builds
+
+Runtime Configuration
+
+Logging in React
+
+Monitoring React Apps
+
+Handling Production Errors
+
+26. React Interview Internals (3+ Years Level)
+
+How React Decides to Re-render
+
+Diffing Algorithm Deep Dive
+
+Fiber vs Stack Reconciler
+
+Why Keys Matter Internally
+
+Hooks Execution Order
+
+Closure Problems in Hooks
+
+Stale State Problems
+
+React Anti-Patterns
+
+Common React Interview Traps
+
+27. Real-World Engineering Practices
+
+Writing Reusable Components
+
+Component API Design
+
+Handling Legacy Code
+
+Refactoring React Code
+
+Performance Debugging
+
+Profiling React Apps
+
+Code Review Best Practices
+
+
+Next.js topics
+Layout
+
+Templates
+
+Pages (page.tsx)
+
+Loading UI (loading.tsx)
+
+Error Handling (error.tsx)
+
+Not Found Handling (not-found.tsx)
+
+Route Segment Boundaries
+
+Metadata File Convention
+
+Server-First Architecture
+
+4. Rendering Strategies (Deep Dive)
+
+Client-Side Rendering (CSR)
+
+Server-Side Rendering (SSR)
+
+Static Site Generation (SSG)
+
+Incremental Static Regeneration (ISR)
+
+Streaming Rendering
+
+Partial Prerendering
+
+Dynamic Rendering
+
+Static Rendering
+
+Rendering Decision Tree
+
+Performance Trade-offs
+
+Rendering Debugging
+
+5. Server Components (Advanced)
+
+What are React Server Components
+
+Server vs Client Components
+
+use client Directive
+
+Server Component Lifecycle
+
+Data Fetching in Server Components
+
+Server Component Composition Rules
+
+Passing Props Between Server & Client
+
+Server-Only Code
+
+Server Component Performance
+
+Server Component Caching
+
+Common Server Component Pitfalls
+
+6. Client Components
+
+When to Use Client Components
+
+Client Component Boundaries
+
+State Management in Client Components
+
+Hooks Usage Constraints
+
+Browser APIs Usage
+
+Client-Side Navigation
+
+Client Component Optimization
+
+Hydration Mechanics
+
+Hydration Errors
+
+Avoiding Over-Hydration
+
+7. Navigation & Routing APIs
+
+Link Component
+
+useRouter
+
+usePathname
+
+useSearchParams
+
+useParams
+
+Programmatic Navigation
+
+Shallow Routing
+
+Prefetching
+
+Navigation Caching
+
+Redirects
+
+Rewrites
+
+Route Guards Patterns
+
+8. Data Fetching (Critical Section)
+
+Fetch API in Next.js
+
+Request Memoization
+
+Data Fetching in Server Components
+
+Data Fetching in Client Components
+
+Static Data Fetching
+
+Dynamic Data Fetching
+
+Revalidation Strategies
+
+Time-Based Revalidation
+
+On-Demand Revalidation
+
+Fetch Caching Options
+
+cache Option
+
+revalidate Option
+
+no-store Strategy
+
+Parallel Data Fetching
+
+Sequential Data Fetching
+
+Data Fetching Error Handling
+
+9. Caching & Performance Optimization
+
+Full Route Cache
+
+Data Cache
+
+Request Cache
+
+Cache Invalidation
+
+Cache Tagging
+
+Cache Revalidation
+
+Edge Cache
+
+Browser Cache Behavior
+
+CDN Caching
+
+Performance Profiling
+
+Lighthouse Optimization
+
+Web Vitals in Next.js
+
+10. API Routes & Backend Capabilities
+
+API Routes Overview
+
+Route Handlers (route.ts)
+
+HTTP Methods
+
+Request & Response Objects
+
+Middleware vs Route Handlers
+
+Server-Only APIs
+
+Streaming Responses
+
+File Upload Handling
+
+Background Tasks
+
+API Security Best Practices
+
+Rate Limiting Patterns
+
+11. Middleware
+
+Middleware Fundamentals
+
+Middleware Execution Order
+
+Edge Runtime
+
+Middleware vs Server Components
+
+Request Interception
+
+Authentication via Middleware
+
+Authorization via Middleware
+
+Redirects in Middleware
+
+Rewrites in Middleware
+
+Performance Considerations
+
+12. Authentication & Authorization
+
+Authentication Strategies
+
+Session-Based Auth
+
+Token-Based Auth
+
+JWT Handling
+
+Secure Cookies
+
+Auth in Server Components
+
+Auth in Client Components
+
+Middleware Auth Patterns
+
+Role-Based Access Control
+
+Protecting Routes
+
+Secure API Routes
+
+13. Forms & Mutations
+
+Forms in Next.js
+
+Server Actions
+
+Server Action Lifecycle
+
+Form Submission Flow
+
+Optimistic UI
+
+Form Validation
+
+Error Handling in Forms
+
+File Uploads via Server Actions
+
+Redirects after Mutations
+
+Security in Mutations
+
+14. Styling & Assets
+
+CSS Modules
+
+Global CSS
+
+Scoped Styling Rules
+
+Tailwind Integration
+
+CSS-in-JS Support
+
+Font Optimization
+
+Image Optimization (next/image)
+
+Static Assets Handling
+
+SVG Handling
+
+Asset Caching
+
+15. Metadata & SEO
+
+Metadata API
+
+Static Metadata
+
+Dynamic Metadata
+
+Open Graph Tags
+
+Twitter Cards
+
+Robots Metadata
+
+Sitemap Generation
+
+Canonical URLs
+
+SEO Rendering Strategies
+
+Performance vs SEO Trade-offs
+
+16. Error Handling & Observability
+
+Global Error Handling
+
+Route-Level Error Handling
+
+Client Errors vs Server Errors
+
+Logging Strategies
+
+Error Boundaries
+
+Custom Error Pages
+
+Monitoring & Tracing
+
+Debugging Production Issues
+
+17. Internationalization (i18n)
+
+Built-in i18n Routing
+
+Locale Detection
+
+Locale-Based Routing
+
+Dynamic Locale Switching
+
+SEO for i18n
+
+Performance Implications
+
+Middleware i18n Handling
+
+18. Advanced Routing Patterns
+
+Multi-Tenant Routing
+
+Subdomain Routing
+
+Micro-Frontend Patterns
+
+Feature-Based Routing
+
+Modular Route Design
+
+Large-Scale Route Organization
+
+19. Edge & Runtime Concepts
+
+Node.js Runtime
+
+Edge Runtime
+
+Runtime Selection
+
+Limitations of Edge
+
+Performance Benefits
+
+Use Cases for Edge Functions
+
+20. Security Best Practices
+
+XSS Prevention
+
+CSRF Protection
+
+Secure Headers
+
+Environment Variable Security
+
+Secrets Management
+
+API Security
+
+Middleware Security
+
+Production Hardening
+
+21. Testing in Next.js
+
+Unit Testing Strategy
+
+Integration Testing
+
+E2E Testing
+
+Testing Server Components
+
+Testing Client Components
+
+Mocking Data Fetching
+
+CI Testing Pipelines
+
+22. Build, Deployment & DevOps
+
+Build Optimization
+
+Static Export
+
+Server Deployment
+
+Edge Deployment
+
+Environment Management
+
+CI/CD Pipelines
+
+Monorepo Support
+
+Dockerizing Next.js
+
+Production Debugging
+
+23. Scalability & Architecture
+
+Monolith vs Modular Next.js
+
+Domain-Driven Design in Next.js
+
+Clean Architecture Patterns
+
+Large Team Code Organization
+
+Performance at Scale
+
+Cost Optimization
+
+Observability at Scale
+
+24. Interview-Focused Advanced Topics
+
+Rendering Decision Scenarios
+
+Server vs Client Trade-offs
+
+Caching Interview Traps
+
+Data Fetching Edge Cases
+
+Auth Architecture Questions
+
+SEO vs Performance Trade-offs
+
+Real-World Production Failures
+
+Migration from Pages Router
+
+Legacy Code Modernization
+
+25. Real-World Production Mastery
+
+Handling Traffic Spikes
+
+Debugging Hydration Issues
+
+Memory Leaks in Next.js
+
+Production Performance Bottlenecks
+
+Cost vs Performance Decisions
+
+Next.js Version Upgrades
+
+Backward Compatibility
+
+Long-Term Maintenance

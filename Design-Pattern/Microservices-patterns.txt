@@ -2,8 +2,7 @@
 Saga is a microservices transaction management pattern used when a distributed transaction spans multiple services.
 Instead of using a global transaction (which is impossible across microservices), Saga breaks the workflow into a sequence of local transactions, each with a compensating transaction to undo its effect if anything fails.
 
-Simple idea:
-Each microservice completes its step and triggers the next. If any step fails, compensating actions undo the previous successful steps.
+Simple idea: Each microservice completes its step and triggers the next. If any step fails, compensating actions undo the previous successful steps.
 
 ❓ Why Do We Need Saga
 ➤ No distributed ACID transactions across microservices
@@ -13,7 +12,7 @@ Each microservice completes its step and triggers the next. If any step fails, c
 ➤ Allows failure recovery without rolling back DB transactions
 
 
-✅ 3. Types of Saga
+✅ Types of Saga
 🔄 Choreography Saga (Event-driven)
 ➤ No central orchestrator.
 ➤ Each service listens to events and publishes new events.
@@ -79,7 +78,6 @@ Scenario: User places an order
 9️⃣ Order → mark as failed
 
 
-🔷 Orchestration Saga
 Dependencies
 <dependency>
     <groupId>org.springframework.kafka</groupId>
@@ -228,7 +226,6 @@ public class InventoryFailedListener {
 
 
 ✅ 2. Orchestration Saga Pattern (Coordinator + Services)
-
 Here we introduce a Saga Orchestrator, which calls microservices and triggers compensations on failure.
 🔄 Services:
 1️⃣ Order Service

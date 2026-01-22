@@ -193,6 +193,12 @@ WHERE oi.product_id IN (
     SELECT product_id FROM products WHERE category = "Electronics"
 );
 
+-- Using subquery only
+select * from customers where customer_id in(
+select customer_id from orders where order_id in
+(select order_id from order_items where product_id in
+(select product_id from products where category="Electronics")));
+
 -- =============================================
 -- SUBQUERIES WITH AVERAGE CALCULATION
 -- =============================================
@@ -213,7 +219,7 @@ SELECT AVG(total_spent) AS average_customer_spending FROM
  (SELECT customer_id, SUM(total_amount) AS total_spent FROM orders GROUP BY customer_id) AS customer_total;
 
 -- Final query - Find customers who spent more than average
-SELECT *, 
+SELECT * 
     (SELECT SUM(total_amount) FROM orders WHERE customer_id = customers.customer_id) AS total_spent 
 FROM customers 
 WHERE
