@@ -1,0 +1,96 @@
+===========================
+🔷 1️⃣ Parking Lot System
+===========================
+Design an in-memory backend for a single-floor parking lot that can:
+➤ Park vehicles
+➤ Unpark vehicles
+➤ Track available slots
+➤ Generate parking tickets
+➤ No UI, no database, no threads.
+
+🏗️ System Description
+➤ The parking lot has a fixed number of parking slots.
+➤ Each slot can hold only one vehicle and has a size constraint.
+➤ Vehicle Types
+    ✔️ Bike
+    ✔️ Car
+    ✔️ Truck
+Each vehicle type requires a minimum slot size.
+
+📦 Slot Types & Rules
+Slot Type	Can Park
+| Slot Type | Can Park |
+| --------- | -------- |
+| SMALL     | Bike     |
+| MEDIUM    | Car      |
+| LARGE     | Truck    |
+🚫 You cannot park a bigger vehicle in a smaller slot
+✔️ Each vehicle occupies exactly one slot
+
+🔑 Core Features (Must Implement)
+1️⃣ Park Vehicle
+parkVehicle(Vehicle vehicle)
+
+Behavior
+➤ Assign the nearest available slot that fits the vehicle
+➤ Generate a unique ticket ID
+Print: Vehicle CAR parked at slot S2. Ticket: T123
+If no slot is available: No available slot for CAR
+
+
+2️⃣ Unpark Vehicle
+unparkVehicle(String ticketId)
+
+Behavior
+➤ Free the slot associated with the ticket
+➤ Remove the vehicle from parking
+
+Print: Vehicle CAR with ticket T123 unparked from slot S2
+If ticket is invalid: Invalid ticket ID
+
+
+3️⃣ Show Available Slots
+showAvailableSlots()
+
+Behavior
+➤ Print available slots grouped by type
+
+✅ Example:
+SMALL: S1, S3
+MEDIUM: S5
+LARGE: none
+
+
+4️⃣ Print Ticket
+Ticket should contain:
+    ✔️ Ticket ID
+    ✔️ Vehicle number
+    ✔️ Vehicle type
+    ✔️ Slot ID
+
+
+📌 Important Constraints
+➤ Single floor only
+➤ One vehicle per slot
+➤ No system clock usage
+➤ In-memory data only
+➤ Code should never crash, only print errors
+
+
+🧪 Testing Requirement
+In main():
+    ✔️ Create parking lot with mixed slots
+    ✔️ Park 3–4 vehicles
+    ✔️ Try parking when full
+    ✔️ Unpark a vehicle
+    ✔️ Park again
+    ✔️ Show available slots at each stage
+
+🚫 What NOT to Do
+➤ No database
+➤ No multithreading
+➤ No Spring Boot
+➤ No unnecessary design patterns
+➤ No static-everything design
+
+✅ Solution:

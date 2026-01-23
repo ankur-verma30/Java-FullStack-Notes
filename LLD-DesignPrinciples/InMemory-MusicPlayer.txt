@@ -1,0 +1,52 @@
+Problem Statement
+Design an in-memory music player backend. The system must maintain a Global Library of all available songs. Users can create separate Playlists by selecting songs from this global library.
+The core challenge is Simulation: Time is not real-time. It is simulated via commands. Playback starts at 0 and only advances when the user explicitly triggers a "Forward" command.
+
+
+Features & Requirements
+1. Library Management (Global Song Pool)
+Add Song to Library: Register a new song into the system. Song to have properties like SongID, Name, Artist, and Duration (in seconds). ( You can add if you feel anything else is required). 
+Get Song: Retrieve song details by SongID and print them out.
+Constraint: Songs added here are available globally but belong to no playlist initially.
+
+
+2. Playlist Management
+Create Playlist: Create a new, empty playlist with a unique PlaylistID or Name.
+Add Song to Playlist: Given a PlaylistID and a SongID, add that song to the end of the specified playlist.
+
+Remove Song from Playlist: Remove a song from a playlist (does not delete it from the Global Library).
+A song cannot be removed from a playlist if the song is currently being played. --- not implemented yet
+ 
+
+3. Playback Control
+Play(playlist_id): Starts the specified playlist from the beginning..
+Pause(playlist_id)): Pauses playback at the current time. Then if the time passes the playlist time should not increment.
+
+
+Time Simulation
+For any playlist the time always initializes at zero seconds when the playlist is created.
+TIme only moves when the increment/forward method is called on the playlist. Time is strictly event-driven, not real-time. Do not use system clocks 
+Forward(seconds, playlist_id): Simulates the passing of time for the given playlist
+If PLAYING: Advances the timer. If the time exceeds the current song's duration, transition to the next song(s).
+If PAUSED: Time passes, but playback position does not change.
+If IDLE (Playlist ended): Do nothing. Print out playlist over.
+Next(playlist_id): Skips immediately to the start of the next song in the queue.
+Current(playlist_id): shows which song is currently being played.
+Showplaylist(playlist_id): Displays the songs remaining in the current active playlist.
+ShowFullPlaylist(playlist_id): Prints the entire list of songs in the playlist, regardless of whether they have been played or not.
+ShowRemainingSongs(playlist_id):Prints only the songs that are "next in row". This lists all songs positioned after the currently playing song. (Does not include the current song).
+GetCurrentSong(playlist_id): Returns the current song, status (Playing/Paused), and timestamp (e.g., "Playing 'Song A' @ 45s").
+
+Note: 
+Multiple playlists can exist at any given time.
+Please treat the method signatures and entities above as guidelines rather than strict rules. Feel free to design your own implementation. 
+
+Technical Constraints & Expectations
+Storage: No Database. Use in-memory data structures (Lists, Maps, Queues, etc.).
+Interface: CLI, Web, REST API, or UI are not expected. A main driver program is sufficient.
+Data: Create your own sample data. You  hardcode the data in the main driver class for test runs
+Testing: Every method should have print statements wherever applicable. For example: If a song is added to playlist successfully print (“Songid1 successfully added to playlistid1”)
+Failures: Ensure proper error handling, in case of failures code should fail gracefully and not stop executing the entire flow.
+Quality:
+Code must be functionally correct and demo-able.
+Code must be modular.
