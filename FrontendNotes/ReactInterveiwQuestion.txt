@@ -17,3 +17,22 @@ O4. “Why React is mostly SPA?”
 O5. “Is React only SPA?”
 ─────────▶ No. React can be used with SSR and hybrid models using frameworks like Next.js.
 
+
+Q6: How does React update UI?
+─────────▶ React recalculates the UI using a virtual DOM, diffs it with the previous version during reconciliation, and applies minimal changes to the real DOM in the commit phase.
+
+
+Q7: Why Fiber architecture?
+─────────▶ Fiber allows React to pause, prioritize, and resume rendering work, improving responsiveness for complex UIs.
+
+
+Q8: Why hooks must be called in same order?
+─────────▶ Hooks are stored sequentially in Fiber nodes, so consistent order ensures correct state mapping.
+
+
+Q9: Why does React use Virtual DOM?
+─────────▶ React uses a virtual DOM to calculate UI changes efficiently in memory and apply only the minimal required updates to the real DOM.
+
+
+Q10: Is Virtual DOM faster than direct DOM manipulation?
+─────────▶ Not inherently. Virtual DOM helps React batch and optimize updates, which often results in better performance for complex UIs.

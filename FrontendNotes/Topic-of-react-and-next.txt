@@ -1,3 +1,6 @@
+Prompt: now i will give you each topic and give me a detailed notes for the 3.5 yrs of experience pov in detailded assume that i don't know anything about react and you are my brain and explain me each and every topics in depth
+
+
 =================
 🔷 React topics
 =================
@@ -514,6 +517,21 @@ Performance Debugging
 Profiling React Apps
 
 Code Review Best Practices
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Next.js topics
