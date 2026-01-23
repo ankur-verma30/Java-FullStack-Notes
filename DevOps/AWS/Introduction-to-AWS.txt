@@ -12,7 +12,9 @@ Cloud computing is the on-demand delivery of compute, storage, networking, datab
 👉 Cloud is a model that allows us to rent IT resources instead of owning physical infrastructure, improving scalability, cost efficiency, and speed.
 
 
-🔄 Public Cloud vs Private Cloud vs Hybrid Cloud
+##################################################
+🔷 Public Cloud vs Private Cloud vs Hybrid Cloud
+##################################################
 🔄 Public Cloud
 Infrastructure owned and managed by third-party providers like AWS, Azure, GCP.
 
@@ -173,6 +175,30 @@ Despite public cloud popularity, some companies are repatriating workloads.
     ✔️ Secure multi-user AWS environment
 
 
+🔐 Least Privilege Principle (AWS IAM)
+Least Privilege means: Give users, roles, or services only the minimum permissions they need to do their job—nothing extra.
+
+In AWS IAM terms:
+➤ Allow only required actions (s3:GetObject, not s3:*)
+➤ Allow access to only specific resources (one bucket, not all buckets)
+➤ Avoid using broad policies like AdministratorAccess
+➤ Prefer roles over users for services (EC2, Lambda, etc.)
+
+✅ Example: 
+Instead of this ❌
+"Action": "s3:*",
+"Resource": "*"
+
+Do this ✅
+"Action": "s3:GetObject",
+"Resource": "arn:aws:s3:::my-bucket/*"
+
+Why it matters:
+🔒 Reduces security risk
+💥 Limits damage if credentials are compromised
+📋 Follows AWS security best practices
+
+
 🔄 IAM Core Components
 1️⃣ IAM Users
 Represents a human or application that needs AWS access.
@@ -180,16 +206,114 @@ Represents a human or application that needs AWS access.
 🌟 Characteristics
 ➤ Has unique credentials
 ➤ Can log in via:
-    ✔️ AWS Console
-    ✔️ AWS CLI
-    ✔️ SDK / API
-➤ Credentials
-    ✔️ Password (Console access)
-    ✔️ Access Key + Secret Key (Programmatic access)
-➤ Best Practices
-    ❌ Never use root user
-    ❌ Never hardcode access keys
-    ✅ Enable MFA
+1️⃣ Login via AWS Management Console (Browser)
+✅ Used by:
+    ✔️ Humans(developers, admins)
+    ✔️ Manual Operations
+
+Steps:
+1️⃣ Open: Open: https://aws.amazon.com/console
+2️⃣ Click Sign in
+3️⃣ Choose one:
+    ✔️ Root user(email+ password) ❌not recommended
+    ✔️ IAM user
+4️⃣ For IAM User:
+    ✔️ Enter Account ID/ Alias
+    ✔️ Create IAM username
+    ✔️ Create password
+5️⃣ (Optional but recommended) Enter MFA code
+
+🔐 Authentication Used:
+➤ Username + Password
+➤ Optional MFA
+
+
+2️⃣ Login via AWS CLI
+✅ Used by:
+    ✔️ Developers 
+    ✔️ DevOps/ Automation
+    ✔️ CI/CD
+
+🔄 Prerequisite:
+➤ Install AWS CLI
+➤ check AWS CLI version: aws --version
+
+Method 1️⃣: Using Access Key and Secret Key
+Steps:
+1️⃣ Create IAM User
+2️⃣ Enable Programmatic access
+3️⃣ Download Access Key and Secret Key
+4️⃣ Configure AWS CLI
+    🔗 aws configure
+
+5️⃣ Enter:
+AWS Access Key ID: ********
+AWS Secret Access Key: ********
+Default region: ap-south-1
+Default output format: json
+
+6️⃣ Verify: aws sts get-caller-identity
+3️⃣ Login via SDK / API
+
+
+Method 2️⃣: Using IAM Role(Recommended)
+Used when:
+    ✔️ Running CLI on EC2
+    ✔️ Running inside Lambda/ECS
+
+Steps:
+1️⃣ Create IAM Role
+2️⃣ Attach required policies
+3️⃣ Attach role to EC2 instance
+4️⃣ CLI automatically get credentials from role
+✅ No access keys stored
+
+🔐 Authentication Used:
+Access Key + Secret Key
+OR Temporary credentials via IAM Role
+
+
+🔄 Login via AWS SDK/ API (Programmatic Access)
+✅ Used by:
+    ✔️ Application(Java, Node.js, Python, etc.)
+    ✔️ Backend Services
+    ✔️ Microservices
+
+Method 1️⃣: Access Key + Secret Key
+Steps:
+1️⃣ Create IAM User
+2️⃣ Enable programmatic access
+3️⃣ Configure credentials:
+    ✔️ Environment variables
+    ✔️ Config file
+    ✔️ Directly in SDK (❌ not recommended)
+
+✅ Example (Environment Variables):
+export AWS_ACCESS_KEY_ID=xxxx
+export AWS_SECRET_ACCESS_KEY=yyyy
+export AWS_REGION=ap-south-1
+
+✅ Java SDK Example:
+S3Client s3 = S3Client.builder()
+        .region(Region.AP_SOUTH_1)
+        .build();
+👉 SDK auto-picks credentials from env/config
+
+
+Method 2️⃣: IAM Role
+Used when: App runs on EC2 / ECS / Lambda
+
+Steps:
+1️⃣ Create IAM Role
+2️⃣ Attach policies
+3️⃣ Attach role to service
+4️⃣ SDK automatically fetches temporary credentials from:
+    ✔️ EC2 metadata service
+    ✔️ Task role
+    ✔️ Lambda execution role
+
+✅ No hardcoded secrets
+✅ Auto-rotation 
 
 
 2️⃣ IAM Groups
@@ -218,6 +342,15 @@ Used to grant temporary permissions.
     ✔️ Temporary credentials
     ✔️ Auto-rotation
     ✔️ More secure
+
+
+🔄 AWS STS(Security Token Service)
+AWS STS issues temporary security credentials for IAM users, roles, or federated users.
+These credentials include:
+    ✔️ Access Key
+    ✔️ Secret Key
+    ✔️ Session Token
+    ✔️ Limited lifetime (15 min – 12 hrs)
 
 
 ✅ Common Scenario
@@ -267,7 +400,7 @@ Attached to resource itself
 
 
 🔄 IAM Authentication vs Authorization
-🔄 Root User 
+🔄 Root User
 ➤ Created when AWS account is created
 ➤ Has full unrestricted access
 
@@ -277,7 +410,7 @@ Attached to resource itself
 ➤ Store credentials securely
 
 
-🔄 IAM Security Best Practices 
+🔄 IAM Security Best Practices
 ➤ Principle of Least Privilege
 ➤ Use roles instead of access keys
 ➤ Enable MFA
