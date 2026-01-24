@@ -639,3 +639,496 @@ Virtual DOM allows React to:
 ➤ Frequent state updates
 ➤ Large unoptimized lists
 ➤ Poor component structure
+
+
+=============================
+🔷 Reconciliation Algorithm
+=============================
+Reconciliation is the process of comparing the previous UI tree with the new UI tree and deciding what needs to change in the real DOM.
+
+
+🔄 Why Reconciliation Exists
+🌟 Core Problem
+➤ On every state/props change:
+    ✔️ React re-executes components
+    ✔️ A new Virtual DOM tree is produced
+➤ Comparing two arbitrary trees is O(n³) (too slow)
+➡️ React uses heuristics to make this O(n).
+
+
+🔄 Reconciliation in React’s Architecture
+State / Props Change
+        ↓
+Re-render Components
+        ↓
+New Virtual DOM Tree
+        ↓
+Reconciliation (Diffing)
+        ↓
+Minimal DOM Mutations
+👉 Reconciliation runs before the commit phase.
+
+
+🔄 Core Assumptions (Heuristics) React Uses
+React’s reconciliation algorithm is based on two critical assumptions:
+1️⃣ Different Element Types = Different Trees
+<div />
+<span />
+
+➤ React assumes they are completely different
+➤ Old subtree is destroyed
+➤ New subtree is created
+👉 No deep comparison across different types
+
+
+2️⃣ Stable Keys Preserve Identity
+{items.map(item => <Item key={item.id} />)}
+
+➤ Keys help React match:
+    ✔️ Old nodes
+    ✔️ New nodes
+➤ Without keys → React falls back to index-based matching
+
+
+🔄 Reconciliation Rules
+Case 1️⃣: Same Type, Same Key
+➤ Reuse existing DOM node
+➤ Update only changed props
+➤ Reconcile children recursively
+
+Case 2️⃣: Same Type, Different Props
+➤ DOM node reused
+➤ Only prop differences applied
+
+Case 3️⃣: Different Type
+➤ Old node unmounted
+➤ New node mounted
+➤ State is lost
+
+Case 4️⃣: Lists with Keys
+➤ Keys define identity
+➤ React:
+    ✔️ Moves nodes
+    ✔️ Inserts new ones
+    ✔️ Removes deleted ones
+
+
+🔄 Reconciliation of Lists
+1️⃣ Without Keys
+{items.map(item => <Item />)}
+
+➤ React uses index
+➤ Causes:
+    ✔️ Wrong DOM reuse
+    ✔️ State bugs
+    ✔️ Performance issues
+
+2️⃣ With Keys
+{items.map(item => <Item key={item.id} />)}
+
+➤ Stable identity
+➤ Correct matching
+➤ Minimal DOM updates
+
+
+🔄 Why Keys Matter
+➤ Keys tell React: “This element corresponds to the same entity across renders”
+➤ React builds a map of keys → fibers
+➤ Efficient lookup instead of sequential matching
+
+
+🔄 Reconciliation & Component State
+➤ If component is reused: State is preserved
+➤ If component is destroyed: State is reset
+➤ Reconciliation decides state preservation
+
+
+🔄 Fiber’s Role in Reconciliation
+➤ Fiber represents a unit of work
+➤ Reconciliation:
+    ✔️ Creates work-in-progress Fiber tree
+    ✔️ Compares with current Fiber tree
+➤ Fiber enables:
+    ✔️ Pausing
+    ✔️ Resuming
+    ✔️ Aborting reconciliation
+
+
+🔄 Render Phase vs Commit Phase
+Reconciliation happens in:
+    ✔️ Render phase
+    ✔️ Pure computation
+    ✔️ No DOM mutation
+
+DOM updates happen in:
+    ✔️ Commit phase
+    ✔️ Side effects applied
+
+
+🔄 Performance Characteristics
+1️⃣ Complexity
+➤ O(n) due to heuristics
+➤ Fast enough for large trees
+
+2️⃣ Performance Bottlenecks
+➤ Large component trees
+➤ Frequent re-renders
+➤ Poor key choices
+➤ Inline object/array props
+
+
+🔄 Common Reconciliation Anti-Patterns
+➤ Using array index as key
+➤ Changing keys on every render
+➤ Conditional component types
+➤ Deep component nesting
+
+
+🔄 Traps
+❌ “React compares entire DOM trees deeply”
+✅ React uses heuristics, not deep diff
+
+❌ “Keys improve rendering speed automatically”
+✅ Keys improve correctness & identity matching
+
+❌ “Reconciliation updates DOM”
+✅ Reconciliation calculates, commit mutates
+
+
+=============================
+🔷 React Fiber Architecture
+=============================
+🔄 React Fiber
+➤ Fiber is React’s new internal reconciliation engine
+➤ Introduced in React 16
+➤ Replaced the old Stack Reconciler
+👉 Fiber is not a feature — it’s an internal architecture change.
+
+
+🔄 Why Fiber Was Introduced
+🚫 Problem with Old Stack Reconciler
+➤ Rendering was synchronous
+➤ Large updates:
+    ✔️ Blocked the main thread
+    ✔️ Caused jank & freezes
+➤ No way to pause or prioritize work
+
+
+🔄 Real-World Issue
+➤ User scrolls
+➤ Large component tree update happens
+➤ UI freezes ❌
+➡️ Fiber solved this.
+
+
+🔄 Core Goal of Fiber
+React Fiber enables:
+🟢 Interruptible rendering
+🟢 Prioritized updates
+🟢 Better user experience
+🟢 Concurrent features
+👉 Fiber’s goal is responsiveness, not raw speed.
+
+
+🔄 Conceptual Understanding of Fiber
+1️⃣ Fiber (High-Level)
+➤ A unit of work
+➤ A node in React’s internal tree
+➤ Each component = one Fiber node
+
+2️⃣ Fiber Stores
+➤ Component type
+➤ Props
+➤ State
+➤ Hooks state
+➤ Effect info
+➤ Child / sibling / parent links
+
+
+🔄 Fiber Tree vs Virtual DOM
+| Concept     | Purpose                |
+| ----------- | ---------------------- |
+| Virtual DOM | UI description         |
+| Fiber Tree  | Execution & scheduling |
+👉 Fiber is the data structure that powers reconciliation.
+
+
+🔄 How Fiber Changes Rendering
+Old Model (Stack Reconciler)
+Render everything → Block UI → Commit
+
+
+🔄 Fiber Model
+Break work into units
+↓
+Pause if needed
+↓
+Resume later
+↓
+Commit when ready
+
+
+🔄 Render Phase in Fiber
+Fiber breaks rendering into:
+    ✔️ Small units of work
+
+React can:
+    ✔️ Pause rendering
+    ✔️ Abort rendering
+    ✔️ Restart rendering
+👉 Render phase is interruptible
+
+
+🔄 Commit Phase
+➤ Commit phase:
+    ✔️ Applies DOM updates
+    ✔️ Runs effects
+➤ Not interruptible
+
+
+🔄 Priority-Based Scheduling
+Fiber assigns priorities:
+➤ User input → High
+➤ Animations → Medium
+➤ Data fetch → Low
+👉 React schedules work accordingly to keep UI responsive.
+
+
+🔄 Concurrency
+Fiber enables:
+➤ Concurrent rendering
+➤ Time slicing
+➤ Background updates
+👉 React can prepare UI without blocking user interaction.
+
+
+🔄 Hooks & Fiber (Why Rules Exist)
+➤ Hooks state is stored on Fiber nodes
+➤ Hook order matters
+➤ Same call order → same Fiber mapping
+➡️ This is why Rules of Hooks exist
+
+
+🔄 Fiber Enables Modern React Features
+Fiber is the foundation for:
+➤ Concurrent rendering
+➤ Transitions
+➤ Suspense
+➤ Deferred updates
+➤ Automatic batching
+
+
+🔄 What Fiber Does NOT Do
+❌ Fiber does NOT make React automatically faster
+❌ Fiber does NOT remove re-renders
+❌ Fiber does NOT change public API
+
+
+🔄 Traps
+❌ “Fiber is Virtual DOM”
+✅ Fiber implements Virtual DOM
+
+❌ “Fiber is async rendering”
+✅ Fiber enables interruptible rendering
+
+❌ “Fiber is only for performance”
+✅ Fiber is for responsiveness
+
+
+=======================
+🔷 JSX Syntax & Rules
+=======================
+🔄 JSX
+➤ JSX = JavaScript XML
+➤ Syntax extension for JavaScript
+➤ Used to describe UI structure
+const element = <h1>Hello</h1>;
+
+👉 JSX is a syntax sugar that allows writing UI code declaratively, which is later transformed into React.createElement calls.
+
+
+🔄 JSX is NOT HTML
+➤ JSX looks like HTML
+➤ JSX is JavaScript
+➤ Parsed by Babel, not browser
+➤ Follows JS rules, not HTML rules
+
+
+🔄 Why JSX Exists
+Problem Without JSX
+React.createElement(
+  'div',
+  null,
+  React.createElement('h1', null, 'Hello')
+);
+
+➤ Hard to read
+➤ Hard to maintain
+➤ Poor developer experience
+
+JSX Solves:
+➤ Readability
+➤ Declarative UI
+➤ Component composability
+
+
+🔄 JSX Compilation
+JSX Code
+<h1 className="title">Hello</h1>
+
+Compiles To
+React.createElement(
+  'h1',
+  { className: 'title' },
+  'Hello'
+);
+👉 JSX never runs in browser directly.
+
+
+🔄 JSX Syntax Rules
+1️⃣ Single Parent Rule
+return (
+  <div>
+    <h1 />
+    <p />
+  </div>
+);
+
+❌ Invalid:
+<h1 />
+<p />
+
+
+2️⃣ Use className (Not class)
+<div className="box" />
+Reason: class is a reserved JS keyword
+
+
+3️⃣ Self-Closing Tags
+<img />
+<input />
+
+
+4️⃣ CamelCase Attributes
+onClick
+tabIndex
+htmlFor
+
+
+5️⃣ JavaScript Expressions in {}
+<h1>{user.name}</h1>
+➤ Allowed:
+    ✔️ Variables
+    ✔️ Function calls
+    ✔️ Ternary expressions
+
+➤ Not allowed:
+    ✔️ if
+    ✔️ for
+    ✔️ while
+
+
+🔄 Conditional Rendering in JSX
+➤ Using Ternary: {isLoggedIn ? <Home /> : <Login />}
+➤ Using Logical AND: {isAdmin && <AdminPanel />}
+
+👉 Common Trap: {count && <p>{count}</p>}
+0 is falsy → nothing renders
+
+
+🔄 JSX Children Rules
+<Component>
+  <h1>Hello</h1>
+</Component>
+
+➤ Children passed as props.children
+➤ Can be:
+    ✔️ Element
+    ✔️ String
+    ✔️ Array
+    ✔️ Function
+
+
+🔄 JSX & Expressions vs Statements (Important)
+| Allowed             | Not Allowed |
+| ------------------- | ----------- |
+| `user.name`         | `if`        |
+| `a + b`             | `for`       |
+| `condition ? x : y` | `switch`    |
+👉 JSX allows expressions only
+
+
+🔄 JSX & Lists
+{items.map(item => (
+  <Item key={item.id} />
+))}
+
+Rules:
+➤ Always use key
+➤ Keys must be stable
+➤ Avoid index as key
+
+
+🔄 JSX Fragments
+1️⃣ Long Syntax
+<React.Fragment>
+  <h1 />
+  <p />
+</React.Fragment>
+
+2️⃣ Short Syntax
+<>
+  <h1 />
+  <p />
+</>
+
+
+🔄 JSX & Boolean / Null Rendering
+| Value       | Rendered?  |
+| ----------- | ---------  |
+| `null`      | ❌         |
+| `undefined` | ❌         |
+| `false`     | ❌         |
+| `true`      | ❌         |
+| `0`         | ✅         |
+
+
+🔄 JSX & Inline Styles
+<div style={{ backgroundColor: 'red' }} />
+
+Rules:
+➤ Style is an object
+➤ CamelCase keys
+➤ Values are strings or numbers
+
+
+🔄 JSX & Security (XSS)
+➤ JSX escapes values by default
+➤ Prevents XSS attacks
+<p>{userInput}</p> // safe
+
+Dangerous API: dangerouslySetInnerHTML
+
+
+🔄 Common JSX Anti-Patterns
+➤ Inline object creation
+➤ Complex logic inside JSX
+➤ Using index as key
+➤ Heavy computations in JSX
+
+
+🔄 JSX Performance Considerations
+➤ JSX creates new objects on every render
+➤ Expensive expressions cause re-render cost
+➤ Extract logic outside JSX
+
+
+🔄 JSX Traps
+❌ JSX is HTML
+✅ JSX is JavaScript
+
+❌ JSX is required for React
+✅ React works without JSX
+
+❌ JSX improves performance
+✅ JSX improves readability

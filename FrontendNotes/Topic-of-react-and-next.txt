@@ -9,12 +9,9 @@ Prompt: now i will give you each topic and give me a detailed notes for the 3.5 
 2. SPA vs MPA (from React perspective)
 3. React Architecture Overview
 4. Virtual DOM
-
-Reconciliation Algorithm
-
-React Fiber Architecture (high level)
-
-JSX Syntax & Rules
+5. Reconciliation Algorithm
+6. React Fiber Architecture (high level)
+7. JSX Syntax & Rules
 
 JSX vs JavaScript
 

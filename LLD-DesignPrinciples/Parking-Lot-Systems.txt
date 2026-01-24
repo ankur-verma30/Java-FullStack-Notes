@@ -1,5 +1,5 @@
 ===========================
-🔷 1️⃣ Parking Lot System
+1️⃣ Parking Lot System
 ===========================
 Design an in-memory backend for a single-floor parking lot that can:
 ➤ Park vehicles

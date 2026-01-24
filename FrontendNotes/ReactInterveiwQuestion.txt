@@ -36,3 +36,35 @@ Q9: Why does React use Virtual DOM?
 
 Q10: Is Virtual DOM faster than direct DOM manipulation?
 ─────────▶ Not inherently. Virtual DOM helps React batch and optimize updates, which often results in better performance for complex UIs.
+
+
+Q11: How does React decide what to re-render?
+─────────▶ React re-executes components to create a new virtual DOM and uses reconciliation to diff it with the previous tree, applying only the minimal required DOM changes.
+
+
+Q12: Why are keys important?
+─────────▶ Keys help React uniquely identify elements across renders, ensuring correct state preservation and efficient reconciliation.
+
+
+Q13: What happens if keys change?
+─────────▶ React treats the component as new, unmounts the old one, and mounts a new one, losing state.
+
+
+Q14: What is React Fiber?
+─────────▶ React Fiber is React’s internal reconciliation architecture that allows rendering work to be split into small units, paused, resumed, and prioritized to improve UI responsiveness.
+
+
+Q15: Why Fiber was introduced?
+─────────▶ To solve UI blocking caused by synchronous rendering in large component trees.
+
+
+Q16: How does Fiber help UX?
+─────────▶ By prioritizing user interactions and avoiding long blocking renders.
+
+
+Q17: Why JSX?
+─────────▶ JSX makes UI code more readable and declarative by allowing developers to write component structure similar to HTML while still being JavaScript.
+
+
+Q18: Why only one root element?
+─────────▶ JSX expressions must return a single JavaScript expression, which maps to one root element.
