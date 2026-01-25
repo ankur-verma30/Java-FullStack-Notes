@@ -68,3 +68,45 @@ Q17: Why JSX?
 
 Q18: Why only one root element?
 ─────────▶ JSX expressions must return a single JavaScript expression, which maps to one root element.
+
+
+Q19: What is the difference between JSX and JavaScript?
+─────────▶ JSX is a syntax extension for JavaScript that makes UI code more readable. It compiles to plain JavaScript function calls and does not introduce a new runtime.
+
+
+Q20: Why JSX allows only expressions?
+─────────▶ Because JSX itself is an expression and must return a value that React can render.
+
+
+Q21: Can a component return multiple elements?
+─────────▶  Yes (using Fragment)
+
+
+Q22: Is JSX an element or component?
+─────────▶ <h1 /> → Element
+<MyComponent /> → Element referring to a Component
+
+
+Q23: Why elements are cheap?
+─────────▶ Just plain JS objects
+
+
+Q24: Can we store elements in variables?
+─────────▶ Yes
+
+
+Q25: Can a component return multiple elements?
+─────────▶ Yes (using Fragment)
+
+
+Q26: Is JSX an element or component?
+─────────▶ <h1 /> → Element
+<MyComponent /> → Element referring to a Component
+
+
+Q27: Why elements are cheap?
+─────────▶ Just plain JS objects
+
+
+Q28: Can we store elements in variables?
+─────────▶ Yes
