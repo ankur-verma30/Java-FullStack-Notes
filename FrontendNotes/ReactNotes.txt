@@ -1,7 +1,7 @@
 ===============================
 🔷 What is React & Why React
-🔄 React Definition
- React is a JavaScript librry for building user interfaces
+===============================
+React is a JavaScript librry for building user interfaces
 ➤ Focuses only on the View layer
 ➤ UI is built using components
 ➤ UI updates are declarative, not imperative
@@ -12,7 +12,7 @@
 ❌ Not a full MVC solution
 ❌ Not responsible for routing, HTTP, or state persistence
 ❌ Not replacing JavaScript
-✅ React does one thing extremely well → UI rendering.
+✅ React does one thing extremely well ─────────▶ UI rendering.
 
 
 🔄 Creation of React
@@ -56,7 +56,7 @@ UI = f(state)
 
 
 3️⃣ Unidirectional Data Flow
-➤ Data flows top → down
+➤ Data flows top ─────────▶ down
 ➤ Parent controls child
 ➤ Predictable state changes
 
@@ -184,6 +184,25 @@ This answer defines SPA vs MPA.
     ✔️ Server-side rendered pages without Hydration
 
 
+🔄 Hydration
+➤ React makes the already-loaded HTML interactive in the browser.
+➤ The page looks ready, but buttons don’t work yet.
+➤ Hydration is the step where React connects JavaScript to that HTML so clicks, inputs, etc. start working.
+
+✅ Simple Example
+Step 1️⃣: Server sends HTML (SSR)
+The server sends this to the browser: <button>Click me</button>
+You can see the button, but it does nothing yet.
+
+Step 2️⃣: Hydration happens in browser
+React’s JavaScript loads and runs: <button onClick={() => alert("Hello!")}>Click me</button>
+
+Now React:
+➤ Finds the existing <button>
+➤ Attaches the onClick handler
+✅ The button becomes clickable
+
+
 🔄 Problems with MPA (Why React Exists)
 1️⃣ Performance Issues
     🚫 Full page reloads
@@ -215,12 +234,11 @@ This answer defines SPA vs MPA.
 2️⃣ React JS bundle loads
 3️⃣ React builds UI using JS
 4️⃣ User clicks a link
-5️⃣ React 
+5️⃣ React
     ✔️ Change state
     ✔️ Updates components
     ✔️ Updates DOM
 6️⃣ URL may change without page reload
-
 Key Rule: Page never reloads ─────────▶ only components change
 
 
@@ -373,9 +391,9 @@ Commit Phase (Real DOM Update)
 5️⃣ Renderer
 ➤ Applies changes to target platform
 ✅ Examples:
-    ✔️ ReactDOM → Browser
-    ✔️ React Native → Mobile
-    ✔️ React Three Fiber → WebGL
+    ✔️ ReactDOM ─────────▶ Browser
+    ✔️ React Native ─────────▶ Mobile
+    ✔️ React Three Fiber ─────────▶ WebGL
 
 
 🔄 React Rendering Pipeline
@@ -424,16 +442,16 @@ Commit Phase (Real DOM Update)
 
 🔄 React’s Internal Trees
 React maintains multiple trees:
-    ✔️ Current Tree → what user sees
-    ✔️ Work-In-Progress Tree → new changes
-    ✔️ Alternate Tree → for diffing
+    ✔️ Current Tree ─────────▶ what user sees
+    ✔️ Work-In-Progress Tree ─────────▶ new changes
+    ✔️ Alternate Tree ─────────▶ for diffing
 
 
 🔄 Scheduling & Priority
 React assigns priorities:
-    ✔️ User interactions → high priority
-    ✔️ Data fetching → low priority
-    ✔️ Background updates → deferred
+    ✔️ User interactions ─────────▶ high priority
+    ✔️ Data fetching ─────────▶ low priority
+    ✔️ Background updates ─────────▶ deferred
 👉 Enables smooth UI under heavy load
 
 
@@ -454,7 +472,7 @@ Hooks integrate deeply:
 
 🔄 Data Flow Architecture
 ➤ Unidirectional
-➤ Parent → Child
+➤ Parent ─────────▶ Child
 ➤ State changes flow downward
 ➤ UI updates flow upward via callbacks
 
@@ -533,7 +551,7 @@ Core Problem
 
 🔄 How Virtual DOM Works
 1️⃣ Initial Render
-➤ JSX → React.createElement
+➤ JSX ─────────▶ React.createElement
 ➤ React creates Virtual DOM tree
 ➤ React creates Real DOM
 ➤ DOM is mounted
@@ -588,7 +606,7 @@ Virtual DOM allows React to:
 
 
 🔄 Virtual DOM & Re-rendering
-➤ State change → re-render
+➤ State change ─────────▶ re-render
 ➤ Re-render = new Virtual DOM
 ➤ React does NOT update DOM immediately
 ➤ DOM update happens after diffing
@@ -687,7 +705,7 @@ React’s reconciliation algorithm is based on two critical assumptions:
 ➤ Keys help React match:
     ✔️ Old nodes
     ✔️ New nodes
-➤ Without keys → React falls back to index-based matching
+➤ Without keys ─────────▶ React falls back to index-based matching
 
 
 🔄 Reconciliation Rules
@@ -733,7 +751,7 @@ Case 4️⃣: Lists with Keys
 
 🔄 Why Keys Matter
 ➤ Keys tell React: “This element corresponds to the same entity across renders”
-➤ React builds a map of keys → fibers
+➤ React builds a map of keys ─────────▶ fibers
 ➤ Efficient lookup instead of sequential matching
 
 
@@ -855,7 +873,7 @@ React Fiber enables:
 
 🔄 How Fiber Changes Rendering
 Old Model (Stack Reconciler)
-Render everything → Block UI → Commit
+Render everything ─────────▶ Block UI ─────────▶ Commit
 
 
 🔄 Fiber Model
@@ -888,9 +906,9 @@ React can:
 
 🔄 Priority-Based Scheduling
 Fiber assigns priorities:
-➤ User input → High
-➤ Animations → Medium
-➤ Data fetch → Low
+➤ User input ─────────▶ High
+➤ Animations ─────────▶ Medium
+➤ Data fetch ─────────▶ Low
 👉 React schedules work accordingly to keep UI responsive.
 
 
@@ -905,7 +923,7 @@ Fiber enables:
 🔄 Hooks & Fiber (Why Rules Exist)
 ➤ Hooks state is stored on Fiber nodes
 ➤ Hook order matters
-➤ Same call order → same Fiber mapping
+➤ Same call order ─────────▶ same Fiber mapping
 ➡️ This is why Rules of Hooks exist
 
 
@@ -1033,7 +1051,7 @@ htmlFor
 ➤ Using Logical AND: {isAdmin && <AdminPanel />}
 
 👉 Common Trap: {count && <p>{count}</p>}
-0 is falsy → nothing renders
+0 is falsy ─────────▶ nothing renders
 
 
 🔄 JSX Children Rules
@@ -1287,8 +1305,8 @@ const element = <h1>Hello</h1>;
 🔄 Babel
 ➤ Babel is a JavaScript compiler / transpiler
 ➤ In React, Babel is used to:
-    ✔️ Convert JSX → JavaScript
-    ✔️ Convert modern JS (ES6+) → browser-compatible JS
+    ✔️ Convert JSX ─────────▶ JavaScript
+    ✔️ Convert modern JS (ES6+) ─────────▶ browser-compatible JS
 
 
 🔄 Key Responsibility for React
@@ -1374,8 +1392,8 @@ React.createElement(
   { age: 25 }
 );
 
-➤ If type is string → HTML element
-➤ If type is function/class → React Component
+➤ If type is string ─────────▶ HTML element
+➤ If type is function/class ─────────▶ React Component
 
 
 🔄 JSX Fragment Compilation
@@ -1398,7 +1416,7 @@ React.createElement(
 @babel/preset-react
 
 Handles:
-    ✔️ JSX → React.createElement
+    ✔️ JSX ─────────▶ React.createElement
     ✔️ JSX fragments
     ✔️ JSX spread props
 
@@ -1552,8 +1570,8 @@ class Welcome extends React.Component {
     return <h1>Hello</h1>;
   }
 }
-➤ Welcome → Component
-➤ <h1>Hello</h1> → Element
+➤ Welcome ─────────▶ Component
+➤ <h1>Hello</h1> ─────────▶ Element
 ➤ render() must return React Elements
 
 
