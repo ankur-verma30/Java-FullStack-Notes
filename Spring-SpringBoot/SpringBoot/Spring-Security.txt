@@ -1,23 +1,23 @@
-🔷 Spring Security?
-
+=====================
+🔷 Spring Security
+=====================
 Spring Security is a powerful and customizable security framework provided by the Spring ecosystem.
 It is used to secure Java web applications, especially Spring Boot applications, by handling
-✔️ Authentication → Who are you
-✔️ Authorization → What are you allowed to do?
-
-It’s like a security guard that checks the identity of users and ensures they can only access what they’re permitted to.
+✔️ Authentication ─────────▶ Who are you
+✔️ Authorization ─────────▶ What are you allowed to do?
+👉 It’s like a security guard that checks the identity of users and ensures they can only access what they’re permitted to.
 
 
 🔄 Core Features of Spring Security
-| Feature                    | Description                                                                   |
-| -------------------------- | ----------------------------------------------------------------------------- |
-| 🔑 **Authentication**      | Verifies the user’s identity (e.g., via username/password, JWT, OAuth2, etc.) |
-| 🧾 **Authorization**       | Controls access to specific endpoints or resources                            |
-| 🧱 **Session Management**  | Handles login sessions, cookies, and logout behavior                          |
-| 🕵️ **CSRF Protection**    | Prevents Cross-Site Request Forgery attacks                                   |
-| 🛡️ **CORS Handling**      | Controls which front-end origins can access backend APIs                      |
-| 🔒 **Password Encryption** | Uses secure hashing (e.g., BCrypt) for passwords                              |
-| 🌐 **Integration Support** | Works with JWT, OAuth2, LDAP, SSO, etc.                                       |
+| Feature                 | Description                                                                   |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| 🔑 Authentication      | Verifies the user’s identity (e.g., via username/password, JWT, OAuth2, etc.) |
+| 🧾 Authorization       | Controls access to specific endpoints or resources                            |
+| 🧱 Session Management  | Handles login sessions, cookies, and logout behavior                          |
+| 🕵️ CSRF Protection     | Prevents Cross-Site Request Forgery attacks                                   |
+| 🛡️ CORS Handling       | Controls which front-end origins can access backend APIs                      |
+| 🔒 Password Encryption | Uses secure hashing (e.g., BCrypt) for passwords                              |
+| 🌐 Integration Support | Works with JWT, OAuth2 etc.                                                   |
 
 
 🔄 How Spring Security Works
@@ -47,24 +47,23 @@ The framework automatically returns a 401 Unauthorized or 403 Forbidden response
 
 
 🔄 Key Components
-| Component                 | Description                                                              |
-| ------------------------- | ------------------------------------------------------------------------ |
-| **SecurityFilterChain**   | Defines which routes are secured and what kind of authentication applies |
-| **AuthenticationManager** | Core engine that performs authentication                                 |
-| **UserDetailsService**    | Loads user info from DB or memory                                        |
-| **UserDetails**           | Represents a single user                                                 |
-| **PasswordEncoder**       | Encrypts and verifies passwords                                          |
-| **SecurityContextHolder** | Stores the authenticated user details in current thread                  |
+| Component             | Description                                                              |
+| ----------------------| ------------------------------------------------------------------------ |
+| SecurityFilterChain   | Defines which routes are secured and what kind of authentication applies |
+| AuthenticationManager | Core engine that performs authentication                                 |
+| UserDetailsService    | Loads user info from DB or memory                                        |
+| UserDetails           | Represents a single user                                                 |
+| PasswordEncoder       | Encrypts and verifies passwords                                          |
+| SecurityContextHolder | Stores the authenticated user details in current thread                  |
 
 ➤ By default spring security gives password and after that the endpoints can be accessed by using:
-✔️ username: user 
+✔️ username: user
 ✔️ password: <password given on console>
 
 We can override the default behavior by using:
 🔗 spring.security.user.name=your-username
 🔗 spring.security.user.password=your-password
-
-We do not need security for all the endpoints just some of it so we can configure it using configuration file of spring security.
+👉 We do not need security for all the endpoints just some of it so we can configure it using configuration file of spring security.
 
 ✅ Example (Modern Spring Boot 3+)
 In Spring Boot 3, security configuration uses a bean instead of extending WebSecurityConfigurerAdapter (which is deprecated).
@@ -78,8 +77,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/public/**").permitAll()   // no auth required
-                .requestMatchers("/api/admin/**").hasRole("ADMIN") // only ADMIN
+                .requestMatchers("/api/public/").permitAll()   // no auth required
+                .requestMatchers("/api/admin/").hasRole("ADMIN") // only ADMIN
                 .anyRequest().authenticated()                    // others need login
             )
             .httpBasic(Customizer.withDefaults()); // basic auth (username/password)
@@ -107,18 +106,20 @@ public class SecurityConfig {
     }
 }
 👉 Now:
-✔️ /api/public/** → accessible to everyone
-✔️ /api/admin/** → accessible only to ADMIN
-✔️ /api/** → requires authentication
+✔️ /api/public/ ─────────▶ accessible to everyone
+✔️ /api/admin/ ─────────▶ accessible only to ADMIN
+✔️ /api/ ─────────▶ requires authentication
+
 
 🔄 Types of Authentication Supported
-| Type                     | Description                                                                     |
-| ------------------------ | ------------------------------------------------------------------------------- |
-| **Basic Auth**           | Username and password in the request header (simple, but not very secure alone) |
-| **Form Login**           | Traditional HTML login form                                                     |
-| **JWT (JSON Web Token)** | Token-based authentication for REST APIs                                        |
-| **OAuth2 / SSO**         | Login with Google, GitHub, etc.                                                 |
-| **LDAP**                 | Enterprise authentication system                                                |
+| Type                 | Description                                                                     |
+| ---------------------| ------------------------------------------------------------------------------- |
+| Basic Auth           | Username and password in the request header (simple, but not very secure alone) |
+| Form Login           | Traditional HTML login form                                                     |
+| JWT (JSON Web Token) | Token-based authentication for REST APIs                                        |
+| OAuth2 / SSO         | Login with Google, GitHub, etc.                                                 |
+| LDAP                 | Enterprise authentication system                                                |
+
 
 🔄 Spring Security + Microservices
 ➤ In a microservice architecture:
@@ -126,18 +127,20 @@ public class SecurityConfig {
     ✔️ Individual microservices use Spring Security to verify and authorize requests based on roles/claims inside the JWT.
 
 ➤ Common pattern:
-    ✔️ Gateway validates the token → passes user info in headers.
+    ✔️ Gateway validates the token ─────────▶ passes user info in headers.
     ✔️ Downstream services apply @PreAuthorize or role-based access control.
 
 
+=====================
 🔷 Role-Based Login
+=====================
 Role-Based Login (or Role-Based Access Control, RBAC) means:
 ➤ Users have roles, e.g., USER, ADMIN.
 ➤ Access to endpoints is restricted based on roles.
 ✅ Example:
-✔️ /admin/** → only ADMIN can access
-✔️ /user/** → only USER or ADMIN can access
-✔️ /public/** → everyone can access
+✔️ /admin/ ─────────▶ only ADMIN can access
+✔️ /user/ ─────────▶ only USER or ADMIN can access
+✔️ /public/ ─────────▶ everyone can access
 
 Spring Security makes this easy using:
 ➤ hasRole("ROLE")
@@ -157,9 +160,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // for REST APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/api/user/**").hasRole("USER")
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/public/").permitAll()
+                .requestMatchers("/api/user/").hasRole("USER")
+                .requestMatchers("/api/admin/").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(Customizer.withDefaults()) // form-based login
@@ -191,6 +194,7 @@ public class SecurityConfig {
 👉 hasRole("USER") checks for ROLE_USER.
 👉 formLogin() enables login page, httpBasic() allows basic auth for APIs
 
+
 🔄 Using @PreAuthorize for Method-Level Security
 You can secure individual methods instead of entire paths:
 
@@ -214,10 +218,10 @@ public class RoleController {
 👉 Enable method-level security:
 @EnableMethodSecurity // // Enables @PreAuthorize, @PostAuthorize, @Secured
 @Configuration
-public class MethodSecurityConfig {
-}
+public class MethodSecurityConfig {}
 ✔️ Spring does not enable method-level security by default.
 ✔️ So you need to explicitly tell Spring: “Hey, look for method-level security annotations.”
+
 
 🔄 Password Encoding
 Spring Security requires encoded passwords.
@@ -227,6 +231,7 @@ Using BCryptPasswordEncoder ensures passwords are safely hashed.
 public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
 }
+
 
 🔄 JDBC Authentication
 ➤ Spring Security loads users and their roles from a relational database.
@@ -261,7 +266,7 @@ CREATE TABLE authorities (
     FOREIGN KEY (username) REFERENCES users(username)
 );
 
-INSERT INTO users VALUES ('ankur', '$2a$10$AqHq0Yc0p8Uov7E1dQJ6Bu4rF2EvzpYH7QvZ.3pFZ9/V36q3Yd4xi', true); 
+INSERT INTO users VALUES ('ankur', '$2a$10$AqHq0Yc0p8Uov7E1dQJ6Bu4rF2EvzpYH7QvZ.3pFZ9/V36q3Yd4xi', true);
 -- password=1234 (BCrypt)
 
 INSERT INTO authorities VALUES ('ankur', 'ROLE_USER');
@@ -282,9 +287,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/user/**").hasRole("USER")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/public/").permitAll()
+                .requestMatchers("/user/").hasRole("USER")
+                .requestMatchers("/admin/").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(Customizer.withDefaults())
@@ -303,17 +308,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-➤ DataSource → Spring Boot automatically configures this if you set database properties in 
+➤ DataSource ─────────▶ Spring Boot automatically configures this if you set database properties in application.properties.
 
-🔗 application.properties: 
-
+🔗 application.properties:
 spring.datasource.url=jdbc:mysql://localhost:3306/springsecurity
 spring.datasource.username=root
 spring.datasource.password=yourpassword
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.hibernate.ddl-auto=none
 
-➤ JdbcUserDetailsManager → Loads user credentials and roles from the DB.
+➤ JdbcUserDetailsManager ─────────▶ Loads user credentials and roles from the DB.
     ✔️ Uses default queries:
         🔗 SELECT username, password, enabled FROM users WHERE username = ?
         🔗 SELECT username, authority FROM authorities WHERE username = ?
@@ -322,9 +326,8 @@ spring.jpa.hibernate.ddl-auto=none
         🔗 manager.setUsersByUsernameQuery("custom query");
         🔗 manager.setAuthoritiesByUsernameQuery("custom query");
 
-
-➤ PasswordEncoder → Passwords in the DB must be encoded (BCrypt recommended).
-➤ Roles → Must start with ROLE_ if using hasRole() in SecurityFilterChain.
+➤ PasswordEncoder ─────────▶ Passwords in the DB must be encoded (BCrypt recommended).
+➤ Roles ─────────▶ Must start with ROLE_ if using hasRole() in SecurityFilterChain.
 
 
 3️⃣ How It Works at Runtime
@@ -336,10 +339,11 @@ spring.jpa.hibernate.ddl-auto=none
 ➤ If successful, user is authenticated and roles are applied for authorization.
 
 
+===========
 🔷 OAuth2
-OAuth2 (Open Authorization 2.0) is a framework for authorization — not authentication.
-
-It allows an app (Client) to securely access resources (like user data) from another service (Resource Server) without sharing credentials (like passwords).
+===========
+➤ OAuth2 (Open Authorization 2.0) is a framework for authorization — not authentication.
+➤ It allows an app (Client) to securely access resources (like user data) from another service (Resource Server) without sharing credentials (like passwords).
 
 ✅ Example
 ➤ You click “Login with Google” on Spotify:
@@ -349,37 +353,36 @@ It allows an app (Client) to securely access resources (like user data) from ano
 ➤ That’s OAuth2 in action.
 
 🔄 Key Roles in OAuth2
-| Role                     | Description                               | Example               |
-| ------------------------ | ----------------------------------------- | --------------------- |
-| **Resource Owner**       | The user who owns the data                | You                   |
-| **Client**               | The app that wants access                 | Spotify               |
-| **Authorization Server** | Issues access tokens after verifying user | Google                |
-| **Resource Server**      | Hosts protected APIs or data              | Google’s userinfo API |
+| Role                 | Description                               | Example               |
+| ---------------------| ----------------------------------------- | --------------------- |
+| Resource Owner       | The user who owns the data                | You                   |
+| Client               | The app that wants access                 | Spotify               |
+| Authorization Server | Issues access tokens after verifying user | Google                |
+| Resource Server      | Hosts protected APIs or data              | Google’s userinfo API |
 
 
 🔄 OAuth2 Grant Types (Flows)
 Each “flow” defines how tokens are issued. Spring Security supports all major ones.
 
-| Grant Type               | Use Case                                     | Who Uses It        |
-| ------------------------ | -------------------------------------------- | ------------------ |
-| **Authorization Code**   | Server-side web apps (secure, uses redirect) | Login with Google  |
-| **Implicit**             | Deprecated (for SPAs, not secure)            | Old JS apps        |
-| **Password Credentials** | User directly gives username/password        | Internal apps only |
-| **Client Credentials**   | Service-to-service (no user involved)        | Microservices      |
-| **Refresh Token**        | Used to renew access tokens                  | All apps           |
+| Grant Type           | Use Case                                     | Who Uses It        |
+| ---------------------| -------------------------------------------- | ------------------ |
+| Authorization Code   | Server-side web apps (secure, uses redirect) | Login with Google  |
+| Implicit             | Deprecated (for SPAs, not secure)            | Old JS apps        |
+| Password Credentials | User directly gives username/password        | Internal apps only |
+| Client Credentials   | Service-to-service (no user involved)        | Microservices      |
+| Refresh Token        | Used to renew access tokens                  | All apps           |
 
 🔄 Tokens in OAuth2
-| Token Type                    | Purpose                           | Example                   |
-| ----------------------------- | --------------------------------- | ------------------------- |
-| **Access Token**              | Grants access to resource         | `ya29.a0AfH6S...`         |
-| **Refresh Token**             | Used to get a new access token    | `1//0gLqF7L5...`          |
-| **ID Token (OpenID Connect)** | Contains user identity info (JWT) | `eyJhbGciOiJIUzI1NiIs...` |
-
-👉 ID Token = only when OAuth2 + OpenID Connect (OIDC) used → gives authentication info.
+| Token Type                | Purpose                           | Example                   |
+| --------------------------| --------------------------------- | ------------------------- |
+| Access Token              | Grants access to resource         | `ya29.a0AfH6S...`         |
+| Refresh Token             | Used to get a new access token    | `1//0gLqF7L5...`          |
+| ID Token (OpenID Connect) | Contains user identity info (JWT) | `eyJhbGciOiJIUzI1NiIs...` |
+👉 ID Token = only when OAuth2 + OpenID Connect (OIDC) used ─────────▶ gives authentication info.
 
 
 🔄 OAuth2 Flow in Steps (Authorization Code Grant)
-1️⃣ → User clicks “Login with Google”
+1️⃣ User clicks “Login with Google”
 
 👉 Spring redirects to:
 https://accounts.google.com/o/oauth2/auth?
@@ -388,25 +391,27 @@ https://accounts.google.com/o/oauth2/auth?
  &scope=email profile
  &response_type=code
 
-2️⃣ → Google shows consent screen
+
+2️⃣ Google shows consent screen
 👉 User grants access.
 
-3️⃣ → Google redirects back with code
+
+3️⃣ Google redirects back with code
 http://localhost:8080/login/oauth2/code/google?code=abc123
 
-4️⃣ → Spring exchanges code for tokens
-👉 Spring Security automatically calls Google token endpoint to get:
 
+4️⃣ Spring exchanges code for tokens
+👉 Spring Security automatically calls Google token endpoint to get:
 {
  "access_token": "ya29.a0AfH6S...",
  "id_token": "eyJhbGciOiJIUzI1NiIs..."
 }
 
-Step 5️⃣ → Spring fetches user info from Google
-👉 User info API:
-https://www.googleapis.com/oauth2/v3/userinfo
+Step 5️⃣ Spring fetches user info from Google
+👉 User info API: https://www.googleapis.com/oauth2/v3/userinfo
 
-6️⃣ → User authenticated ✅
+
+6️⃣ User authenticated
 Spring Security creates a OAuth2AuthenticationToken and logs the user in.
 
 
@@ -422,6 +427,7 @@ Dependencies (pom.xml):
     <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
 
+
 🔗 application.yml
 spring:
   security:
@@ -435,6 +441,7 @@ spring:
               - email
               - profile
 ✔️ Spring Security auto-configures /oauth2/authorization/google and /login/oauth2/code/google.
+
 
 🔄 Security Configuration
 @Configuration
@@ -462,14 +469,15 @@ public class SecurityConfig {
 When user logs in:
 ➤ Spring fetches the tokens and stores them in a SecurityContext.
 ➤ It creates:
-    ✔️ OAuth2User → contains user info (email, name, picture)
-    ✔️ OAuth2AuthenticationToken → represents logged-in session
+    ✔️ OAuth2User ─────────▶ contains user info (email, name, picture)
+    ✔️ OAuth2AuthenticationToken ─────────▶ represents logged-in session
 
 ➤ You can access them in controller:
 @GetMapping("/user")
 public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
     return principal.getAttributes();
 }
+
 
 9️⃣ Role of OAuth2 in Microservices
 In microservices, OAuth2 is often used for:
@@ -481,29 +489,27 @@ In microservices, OAuth2 is often used for:
 
 🔄Spring Authorization Server
 ➤ If you want your own Google-like login system, use:
-
 <dependency>
     <groupId>org.springframework.security</groupId>
     <artifactId>spring-authorization-server</artifactId>
 </dependency>
 👉 It lets you:
-✔️ Issue JWTs
-✔️ Manage client apps
-✔️ Implement all OAuth2 flows
+    ✔️ Issue JWTs
+    ✔️ Manage client apps
+    ✔️ Implement all OAuth2 flows
 👉 Used in microservices as a central auth service.
 
 
 4️⃣ OAuth2 in Microservices Architecture
 Typical layout:
-
-[Auth Server] → issues JWT access tokens
+[Auth Server] ─────────▶ issues JWT access tokens
    ↓
-[API Gateway] → validates JWT before forwarding
+[API Gateway] ─────────▶ validates JWT before forwarding
    ↓
-[Microservices] → act as Resource Servers
+[Microservices] ─────────▶ act as Resource Servers
 👉 Each microservice:
-✔️ doesn’t handle login directly
-✔️ just validates the JWT → ensures scalability and central security.
+    ✔️ doesn’t handle login directly
+    ✔️ just validates the JWT ─────────▶ ensures scalability and central security.
 
 
 🔷 If want to configure OAuth with Github.com
@@ -512,6 +518,7 @@ Typical layout:
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-oauth2-client</artifactId>
 </dependency>
+
 
 2️⃣ Register Your App on GitHub
 ➤ Go to https://github.com/settings/developers
@@ -552,9 +559,9 @@ server:
   port: 8080
 
 👉 Explanation:
-➤ registration.github → defines the OAuth app registration (client details).
-➤ provider.github → defines GitHub-specific OAuth endpoints.
-➤ redirect-uri → must match what you registered in GitHub Developer settings.
+➤ registration.github ─────────▶ defines the OAuth app registration (client details).
+➤ provider.github ─────────▶ defines GitHub-specific OAuth endpoints.
+➤ redirect-uri ─────────▶ must match what you registered in GitHub Developer settings.
 
 
 4️⃣ Create Security Configuration
@@ -589,7 +596,7 @@ public class SecurityConfig {
     }
 }
 👉 Explanation:
-✔️ /login → public route for manual login.
+✔️ /login ─────────▶ public route for manual login.
 ✔️ All other routes require authentication.
 ✔️ .oauth2Login() automatically configures the OAuth2 flow.
 
@@ -620,7 +627,9 @@ public class HomeController {
 }
 
 
+=====================
 🔷 JWT + SpringBoot
+=====================
 JWT (JSON Web Token) is a compact, URL-safe way to represent claims (user data or permissions) between two parties — typically client and server — in a secure and stateless way.
 
 ➤ JWT is a string-based token.
@@ -632,14 +641,14 @@ JWT (JSON Web Token) is a compact, URL-safe way to represent claims (user data o
 A JWT has 3 parts, separated by dots (.):
 🔗 xxxxx.yyyyy.zzzzz
 
-➤ Header → metadata
-➤ Payload → actual user data
-➤ Signature → to verify integrity
+➤ Header ─────────▶ metadata
+➤ Payload ─────────▶ actual user data
+➤ Signature ─────────▶ to verify integrity
 
 ✅ Example:
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.      → Header (Base64)
-eyJzdWIiOiJhbmF1ciIsImlhdCI6MTY3NDAxMzM1NSwiZXhwIjoxNjc0MDEzNjU1fQ.  → Payload (Base64)
-OHkHac4ZsnbnT7dbDLyJo4sP0wvZ6Oey_cwe5UB0kX8  → Signature
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.      ─────────▶ Header (Base64)
+eyJzdWIiOiJhbmF1ciIsImlhdCI6MTY3NDAxMzM1NSwiZXhwIjoxNjc0MDEzNjU1fQ.  ─────────▶ Payload (Base64)
+OHkHac4ZsnbnT7dbDLyJo4sP0wvZ6Oey_cwe5UB0kX8  ─────────▶ Signature
 
 3️⃣ What’s Inside?
 ➤ Header (JSON)
@@ -671,8 +680,8 @@ HMACSHA256(
 
 
 4️⃣ Why Use JWT?
-| Feature         | Explanation                                           |
-| --------------- | ----------------------------------------------------- |
+| Feature          | Explanation                                           |
+| ---------------  | ----------------------------------------------------- |
 | ✅ Stateless     | Server doesn’t store sessions; token carries all info |
 | ✅ Scalable      | Ideal for microservices and distributed systems       |
 | ✅ Secure        | Signed (and optionally encrypted)                     |
@@ -685,7 +694,7 @@ Here’s how JWT authentication works inside SpringBoot:
      |   Client   |  --->   |  /login (Auth)  |
      +------------+         +-----------------+
              |                      |
-             |   POST credentials    |
+             |   POST credentials   |
              |--------------------->|
              |                      |
              |   JWT issued         |
@@ -700,9 +709,9 @@ Here’s how JWT authentication works inside SpringBoot:
 ➤ Server validates credentials.
 ➤ Server creates a JWT token signed with a secret key.
 ➤ Token is sent back to client.
-➤ For every next request → client includes JWT in the Authorization header:
+➤ For every next request ─────────▶ client includes JWT in the Authorization header:
     🔗 Authorization: Bearer <token>
-➤ Server verifies signature → grants access.
+➤ Server verifies signature ─────────▶ grants access.
 
 
 6️⃣ Implementation in Spring Boot
@@ -719,12 +728,14 @@ Here’s how JWT authentication works inside SpringBoot:
     <artifactId>jjwt-api</artifactId>
     <version>0.11.5</version>
 </dependency>
+
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
     <artifactId>jjwt-impl</artifactId>
     <version>0.11.5</version>
     <scope>runtime</scope>
 </dependency>
+
 <dependency>
     <groupId>io.jsonwebtoken</groupId>
     <artifactId>jjwt-jackson</artifactId>
@@ -848,14 +859,14 @@ public class SecurityConfig {
 
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    } 
+    }
 }
 
 5️⃣ Authentication Controller
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import lombok.RequiredArgsConstructor; 
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
