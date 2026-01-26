@@ -15,24 +15,16 @@ Prompt: now i will give you each topic and give me a detailed notes for the 3.5 
 8. JSX vs JavaScript
 9.Babel & JSX Compilation (how JSX converts to React.createElement) and React.createElement
 10. React Element vs Component
-
-Component-Based Architecture
-
-Functional Components
-
-Class Components (legacy but interview-important)
-
-Differences: Functional vs Class Components
-
-React Rendering Flow
+11. Component-Based Architecture
+12. Functional Components
+13. Class Components (legacy but interview-important)
+14. Differences: Functional vs Class Components
+15. React Rendering Flow
 
 2. Project Setup & Tooling
-
-Create React App (CRA) Internals
-
-Vite + React Setup
-
-Folder Structure Best Practices
+1. Create React App (CRA) Internals
+2. Vite + React Setup
+3. Folder Structure Best Practices
 
 Entry Point (index.js / main.jsx)
 
