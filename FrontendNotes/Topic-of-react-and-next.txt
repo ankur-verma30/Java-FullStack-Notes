@@ -21,34 +21,24 @@ Prompt: now i will give you each topic and give me a detailed notes for the 3.5 
 14. Differences: Functional vs Class Components
 15. React Rendering Flow
 
+
 2. Project Setup & Tooling
 1. Create React App (CRA) Internals
 2. Vite + React Setup
 3. Folder Structure Best Practices
+4  1. Entry Point (index.js / main.jsx)
+   2. Root API (createRoot)
+   3. StrictMode
+   4. Development vs Production Builds
+   5. Environment Variables in React
+   6. Build Process Overview
 
-Entry Point (index.js / main.jsx)
-
-Root API (createRoot)
-
-StrictMode
-
-Development vs Production Builds
-
-Environment Variables in React
-
-Build Process Overview
 
 3. JSX & Rendering Mechanics
-
-Expressions in JSX
-
-Conditional Rendering
-
-Rendering Lists
-
-Keys in React (importance & pitfalls)
-
-Fragment (<> </>)
+1. Expressions in JSX
+2. Conditional Rendering
+3. Rendering Lists and Keys in React (importance & pitfalls)
+4. Fragment (<> </>)
 
 Rendering Null vs Undefined
 
@@ -57,6 +47,7 @@ Boolean Rendering Behavior
 Re-render Triggers
 
 React Rendering vs DOM Rendering
+
 
 4. Props System (Data Flow)
 

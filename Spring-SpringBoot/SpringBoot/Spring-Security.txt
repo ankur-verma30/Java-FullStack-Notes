@@ -563,6 +563,99 @@ User findByUsername(@Param("username") String username);
 ➤ Building queries using StringBuilder
 
 
+==========================================================================================
+                              SPRING SECURITY FLOWCHART
+==========================================================================================
+
+      [ Request ]
+          |
+          v
++-----------------------------+
+| (Servlet Container) Tomcat  |
++-------------+---------------+
+              |
+              v
++-------------------------------------------------------+
+|                    FILTERS CHAIN                      |
+|                                                       |
+|   +-----------+                                       |      (If Auth Success)
+|   |  Filter 1 | ------------------------------------------------------------------+
+|   +-----------+                                       |                           |
+|         |                                             |                           |
+|         v                                             |                           v
+|   +===============================================+   |     +---------------------------+
+|   |            SECURITY FILTER CHAIN              |   |     | (Servlets)                |
+|   |                                               |   |     |    Dispatcher Servlet     |
+|   | +-------------------------------------------+ |   |     +-------------+-------------+
+|   | | SecurityContextPersistenceFilter          | |   |                   |
+|   | +-------------------------------------------+ |   |                   v
+|   | +-------------------------------------------+ |   |     +-------------+-------------+
+|   | | UsernamePasswordAuthenticationFilter      | |   |     |       Interceptors        |
+|   | | (Initiates Auth for Login)                | |   |     +-------------+-------------+
+|   | +---+---------------------------------------+ |   |                   |
+|   |     |                                         |   |                   v
+|   |     | (1. Pass "Authenticate" Request)        |   |     +-------------+-------------+
+|   |     v                                         |   |     |        Controller         |
+|   | +-------------------------------------------+ |   |     +---------------------------+
+|   | | BasicAuthenticationFilter                 | |   |
+|   | +-------------------------------------------+ |   |
+|   +=====================+=========================+   |
+|                         ^                             |
++-------------------------|-----------------------------+
+                          | (3. Return fully "Authenticated" response)
+                          | (4. Stores in SecurityContext)
+                          |
++-------------------------+-----------------------------------------------------------+
+|                               AUTHENTICATION LOGIC                                  |
+|                                                                                     |
+|    +-------------------------------------------+                                    |
+|    | <<Interface>> AuthenticationManager       |                                    |
+|    |-------------------------------------------|                                    |
+|    | Implementation: ProviderManager           |                                    |
+|    +--------------------+----------------------+                                    |
+|                         |                                                           |
+|                         | (2. Delegates Authentication to)                          |
+|                         v                                                           |
+|    +-------------------------------------------+                                    |
+|    | <<Interface>> AuthenticationProvider      |                                    |
+|    +--------------------+----------------------+                                    |
+|                         |                                                           |
+|          +--------------+------------------+-----------------------+                |
+|          |              |                  |                       |                |
+|          v              v                  v                       v                |
+| +----------------+ +---------+ +------------------------+ +-----------------------+ |
+| | DaoAuth...     | | JWT...  | | OAuth2LoginAuth...     | | Auth Provider N...    | |
+| | Provider       | | Provider| | Provider               | |                       | |
+| +-------+--------+ +---------+ +------------------------+ +-----------------------+ |
+|         |                                                                           |
++---------|---------------------------------------------------------------------------+
+          |
+          | (Specific flow for DaoAuthenticationProvider)
+          v
++-------------------------------------------------------------------------------------+
+|                             DATA & VERIFICATION LAYER                               |
+|                                                                                     |
+|   +-----------------------------+                                                   |
+|   | DaoAuthenticationProvider   | ------------------------+                         |
+|   +-------------+---------------+                         |                         |
+|                 |                                         | uses                    |
+|                 | uses                                    v                         |
+|                 v                            +---------------------------+          |
+|   +-----------------------------+            |      PasswordEncoder      |          |
+|   | <<Interface>>               |            | (Hashes & matches raw PW) |          |
+|   | UserDetailsService          |            +---------------------------+          |
+|   +-------------+---------------+                                                   |
+|                 |                                                                   |
+|        +--------+------------------+                                                |
+|        |                           |                                                |
+|        v                           v                                                |
+| +------------------------+  +----------------------------+                          |
+| | InMemoryUserDetails... |  | JdbcUserDetailsManager     |       +--------+         |
+| | (Users in RAM)         |  | (Manage users in DB)       | ----> |   DB   |         |
+| +------------------------+  +----------------------------+       +--------+         |
+|                                                                                     |
++-------------------------------------------------------------------------------------+
+
 =====================
 🔷 Spring Security
 =====================
@@ -676,14 +769,15 @@ public class SecurityConfig {
 ✔️ /api/ ─────────▶ requires authentication
 
 
-🔄 Types of Authentication Supported
-| Type                 | Description                                                                     |
-| ---------------------| ------------------------------------------------------------------------------- |
-| Basic Auth           | Username and password in the request header (simple, but not very secure alone) |
-| Form Login           | Traditional HTML login form                                                     |
-| JWT (JSON Web Token) | Token-based authentication for REST APIs                                        |
-| OAuth2 / SSO         | Login with Google, GitHub, etc.                                                 |
-| LDAP                 | Enterprise authentication system                                                |
+🔄 Types of Authentication 
+1️⃣ Form Login(Stateful)
+2️⃣ Basic Authentication(Stateless)
+3️⃣ JWT(Stateless)
+4️⃣ OAuth2
+    ✔️ Authorization Code(Stateful or stateless)
+    ✔️ Client Credentials(Stateless)
+    ✔️ Password Grant(Stateless)
+5️⃣ API Key Authentication(Stateless)
 
 
 🔄 Spring Security + Microservices
@@ -788,14 +882,186 @@ public class MethodSecurityConfig {}
 ✔️ So you need to explicitly tell Spring: “Hey, look for method-level security annotations.”
 
 
-🔄 Password Encoding
-Spring Security requires encoded passwords.
-Using BCryptPasswordEncoder ensures passwords are safely hashed.
+=============================
+🔷 Encoding vs Encrypting
+=============================
+🔄 Encoding
+Encoding = changing data into another format so it can be transmitted or stored safely.
+👉 It is NOT for security
+👉 Anyone can decode it
 
+✅ Example
+hello → aGVsbG8= (Base64 encoding)
+
+🔄 Why Encoding is Used
+➤ Data transfer
+➤ Data formatting
+➤ Handling special characters
+
+🔄 Key Point
+❌ Encoding does not protect data
+❌ No secret key required
+
+
+🔄 Encrypting
+Encryption = converting data into unreadable form to protect it from unauthorized access.
+👉 Used for security
+👉 Requires a key
+
+✅ Example
+hello → 9f8a7b2c...
+Without the key → data is useless
+
+
+🔄 Why Encryption is Used
+➤ Protect passwords
+➤ Secure messages
+➤ Secure network communication
+
+
+✅ Simple Real-Life Example
+1️⃣ Encoding
+➤ Sending text in a format computers understand: "@" → %40
+➤ Anyone can decode %40 → @
+
+2️⃣ Encryption
+➤ Locking data with a key: Message → Locked box → Key required
+➤ Without key → cannot read message
+
+
+🔄 Key Differences
+| Encoding              | Encryption               |
+| --------------------- | ------------------------ |
+| For data formatting   | For data security        |
+| No secret key         | Requires secret key      |
+| Easily reversible     | Reversible only with key |
+| Used for transmission | Used for protection      |
+| Example: Base64       | Example: AES, RSA        |
+
+
+🔄 Trap ⚠️
+PasswordEncoder does NOT encrypt passwords.
+👉 It hashes them
+👉 Hashing ≠ Encoding ≠ Encryption
+
+
+🔄 Where Each is Used (Spring / Backend Context)
+➤ Encoding: URL encoding, Base64
+➤ Encryption: HTTPS (TLS), JWT signing keys
+➤ Hashing: Password storage (BCrypt)
+
+
+=============================================================
+🔷 Password Encoding (Password Encoder in Spring Security)
+=============================================================
+PasswordEncoder is used to convert a plain password into a secure hashed form and to verify passwords during login.
+👉 It never decrypts passwords
+👉 It only hashes and compares
+
+
+🔄 Why Do We Need PasswordEncoder?
+❌ Without PasswordEncoder (BAD)
+password = "admin123"
+
+🚫 Problems:
+➤ Anyone with DB access can see passwords
+➤ One data leak = all users hacked
+
+✅ With PasswordEncoder (GOOD)
+password = "$2a$10$K9Jv...."
+
+➤ Password is unreadable
+➤ Even developers can’t see original password
+➤ Safe against DB leaks
+
+
+🔄 Where PasswordEncoder Is Used?
+1️⃣ During User Registration
+user.setPassword(passwordEncoder.encode(rawPassword));
+
+2️⃣ During Login (Automatically)
+Spring Security compares passwords using the encoder.
+
+4️⃣ Most Common Implementation: BCryptPasswordEncoder
 @Bean
 public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
 }
+👉 BCrypt is the default and recommended encoder
+
+
+5️⃣ How PasswordEncoder Works
+There are two main operations:
+1️⃣ encode(rawPassword)
+2️⃣ matches(rawPassword, encodedPassword)
+
+
+Step 1️⃣: Encoding a Password (Registration Time)
+✅ Example
+Raw password: admin123
+
+🔗 What BCrypt does internally:
+Step 1️⃣: Generate Salt
+Salt = random string (e.g. $2a$10$K9Jv...)
+
+➤ Salt is random
+➤ Different for every user
+➤ Prevents rainbow-table attacks
+
+Step 2️⃣: Hash Password + Salt
+hash = BCrypt(admin123 + salt)
+
+➤ Uses one-way hashing
+➤ Cannot be reversed
+
+
+Step 3️⃣: Store Everything Together
+$2a$10$<salt><hash>
+👉 Stored in DB as ONE string
+
+👉 Salt is stored inside the encoded password itself
+👉 You don’t manage salt manually.
+
+
+Step 2️⃣: Password Verification (Login Time)
+🔗 User logs in with: admin123
+🔗 Spring Security does: passwordEncoder.matches(rawPassword, storedEncodedPassword)
+
+
+Internal Steps of matches():
+1️⃣ Extract salt from stored hash
+2️⃣ Hash entered password using SAME salt
+3️⃣ Compare generated hash with stored hash
+4️⃣ If match → login success ✅
+👉 No decryption involved ❌
+
+
+🔄 Why BCrypt Is Secure?
+➤ Uses adaptive hashing
+➤ Supports work factor (strength)
+➤ Slow by design → protects against brute-force
+✅ Example: new BCryptPasswordEncoder(12);
+
+👉 Higher strength = slower hashing = more secure
+
+
+🔄 PasswordEncoder Interface (Behind the Scenes)
+public interface PasswordEncoder {
+
+    String encode(CharSequence rawPassword);
+
+    boolean matches(CharSequence rawPassword, String encodedPassword);
+}
+
+
+🔄 Other PasswordEncoders (FYI)
+| Encoder                      | Status          |
+| ---------------------------- | -------------   |
+| BCryptPasswordEncoder        | ✅ Recommended |
+| PBKDF2PasswordEncoder        | ✅ Secure      |
+| SCryptPasswordEncoder        | ✅ Secure      |
+| NoOpPasswordEncoder          | ❌ Never use   |
+| MessageDigestPasswordEncoder | ❌ Deprecated  |
 
 
 🔄 JDBC Authentication
@@ -839,7 +1105,6 @@ INSERT INTO authorities VALUES ('ankur', 'ROLE_USER');
 
 
 2️⃣ Spring Security Configuration for JDBC Authentication
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -902,6 +1167,9 @@ spring.jpa.hibernate.ddl-auto=none
     ✔️ Load roles/authorities
 ➤ Checks password using PasswordEncoder.
 ➤ If successful, user is authenticated and roles are applied for authorization.
+
+
+
 
 
 ===========
