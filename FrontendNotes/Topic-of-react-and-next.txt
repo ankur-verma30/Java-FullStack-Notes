@@ -510,11 +510,9 @@ Code Review Best Practices
 
 
 Next.js topics
-Layout
-
-Templates
-
-Pages (page.tsx)
+1. Layout
+2. Templates
+3. Pages (page.tsx)
 
 Loading UI (loading.tsx)
 

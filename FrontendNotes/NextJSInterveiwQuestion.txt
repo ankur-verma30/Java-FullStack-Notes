@@ -1,0 +1,39 @@
+Q1: What’s the difference between layout and page?
+─────────▶
+➤ Layout persists
+➤ Page re-renders per route
+➤ Layout wraps nested routes
+
+
+Q2: Why use layouts?
+─────────▶ shared UI + nested routes + persistence + performance
+
+
+Q3: Are layouts server components?
+─────────▶
+➤ yes by default
+➤ can be client with "use client"
+
+
+Q4: What persists when navigating?
+─────────▶ layout remains mounted, only children changes
+
+
+Q5: Difference between layout and template?
+─────────▶
+➤ layout persists
+➤ template remounts on navigation
+
+
+Q6: When would you use template?
+─────────▶
+➤ reset UI state on navigation
+➤ re-trigger animations
+➤ form reset per route
+
+
+Q7: Why not always use templates?
+─────────▶
+➤ lose persistence benefits
+➤ performance overhead
+➤ unnecessary remounting
