@@ -1,6 +1,5 @@
 Q1: What’s the difference between layout and page?
-─────────▶
-➤ Layout persists
+─────────▶ Layout persists
 ➤ Page re-renders per route
 ➤ Layout wraps nested routes
 
@@ -10,8 +9,7 @@ Q2: Why use layouts?
 
 
 Q3: Are layouts server components?
-─────────▶
-➤ yes by default
+─────────▶ yes by default
 ➤ can be client with "use client"
 
 
@@ -20,20 +18,40 @@ Q4: What persists when navigating?
 
 
 Q5: Difference between layout and template?
-─────────▶
-➤ layout persists
+─────────▶ layout persists
 ➤ template remounts on navigation
 
 
 Q6: When would you use template?
-─────────▶
-➤ reset UI state on navigation
+─────────▶ reset UI state on navigation
 ➤ re-trigger animations
 ➤ form reset per route
 
 
 Q7: Why not always use templates?
-─────────▶
-➤ lose persistence benefits
+─────────▶ lose persistence benefits
 ➤ performance overhead
 ➤ unnecessary remounting
+
+
+Q8: What is page.tsx?
+─────────▶ route endpoint
+➤ maps to URL
+➤ part of file-based routing
+
+
+Q9: Is page.tsx server or client?
+─────────▶ server by default
+➤ client if "use client"
+
+
+Q10: How do you access dynamic route params?
+─────────▶ params argument
+
+
+Q11: How do you access query params?
+─────────▶ searchParams
+
+
+Q12: Best practice for interactivity?
+─────────▶ server page + client child components
