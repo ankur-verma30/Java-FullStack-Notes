@@ -347,18 +347,6 @@ From React POV, architecture answers:
 👉 React architecture is about rendering, reconciliation, and committing UI updates efficiently.
 
 
-🔄 High-Level React Architecture
-React internally works in three major layers:
-
-State / Props Change
-        ↓
-Render Phase (Virtual DOM)
-        ↓
-Reconciliation (Diffing)
-        ↓
-Commit Phase (Real DOM Update)
-
-
 🔄 Core Building Blocks of React
 1️⃣ React Elements
 ➤ Smallest unit in React
@@ -394,30 +382,6 @@ Commit Phase (Real DOM Update)
     ✔️ ReactDOM ─────────▶ Browser
     ✔️ React Native ─────────▶ Mobile
     ✔️ React Three Fiber ─────────▶ WebGL
-
-
-🔄 React Rendering Pipeline
-1️⃣ State / props change
-2️⃣ React calls component functions
-3️⃣ New React elements are created
-4️⃣ New Fiber Tree is built
-5️⃣ Reconciliation happens
-6️⃣ DOM updates are prepared
-7️⃣ Changes committed to real DOM
-
-
-🔄 Render Phase vs Commit Phase (Very Important)
-1️⃣ Render Phase
-➤ Pure calculation
-➤ No DOM updates
-➤ Can be paused, restarted, or discarded
-➤ Runs component functions
-
-2️⃣ Commit Phase
-➤ Actual DOM updates
-➤ Cannot be interrupted
-➤ Effects (useEffect) are scheduled
-👉 React may render multiple times before committing once
 
 
 🔄 React Fiber Architecture (Why React Is Powerful)
@@ -486,15 +450,6 @@ Hooks integrate deeply:
 | Scheduler  | Priority        |
 | Hooks      | State & effects |
 
-
-🔄 What Triggers Re-Render (Architecture POV)
-➤ State update
-➤ Props change
-➤ Context value change
-➤ Parent re-render
-👉 React does NOT re-render because DOM changed
-
-
 🔄 Common Architectural Misconceptions
 ❌ React updates DOM directly
 ✅ React updates Virtual DOM first
@@ -503,7 +458,7 @@ Hooks integrate deeply:
 ✅ Re-render = recalculation
 
 ❌ Hooks store state globally
-✅ State is stored per Fiber 
+✅ State is stored per Fiber
 
 
 ======================
@@ -569,7 +524,6 @@ Core Problem
 🔄 Virtual DOM Internals
 Virtual DOM nodes are plain JS objects
 ✅ Example:
-
 {
   type: 'div',
   props: {
@@ -596,7 +550,6 @@ Virtual DOM nodes are plain JS objects
 ❌ Wrong Belief
 Virtual DOM is faster than real DOM
 
-
 ✅ Correct Truth
 Virtual DOM allows React to:
     ✔️ Batch updates
@@ -610,18 +563,6 @@ Virtual DOM allows React to:
 ➤ Re-render = new Virtual DOM
 ➤ React does NOT update DOM immediately
 ➤ DOM update happens after diffing
-
-
-🔄 Virtual DOM & Reconciliation
-➤ Reconciliation = process of comparing:
-    ✔️ Previous Virtual DOM
-    ✔️ New Virtual DOM
-
-➤ Determines:
-    ✔️ What changed
-    ✔️ What stayed same
-    ✔️ What needs DOM updates
-👉 Virtual DOM is the input to reconciliation
 
 
 🔄 Fiber & Virtual DOM Relationship
@@ -699,9 +640,6 @@ React’s reconciliation algorithm is based on two critical assumptions:
 👉 No deep comparison across different types
 
 
-2️⃣ Stable Keys Preserve Identity
-{items.map(item => <Item key={item.id} />)}
-
 ➤ Keys help React match:
     ✔️ Old nodes
     ✔️ New nodes
@@ -722,13 +660,6 @@ Case 3️⃣: Different Type
 ➤ Old node unmounted
 ➤ New node mounted
 ➤ State is lost
-
-Case 4️⃣: Lists with Keys
-➤ Keys define identity
-➤ React:
-    ✔️ Moves nodes
-    ✔️ Inserts new ones
-    ✔️ Removes deleted ones
 
 
 🔄 Reconciliation of Lists
@@ -813,146 +744,6 @@ DOM updates happen in:
 ✅ Reconciliation calculates, commit mutates
 
 
-=============================
-🔷 React Fiber Architecture
-=============================
-🔄 React Fiber
-➤ Fiber is React’s new internal reconciliation engine
-➤ Introduced in React 16
-➤ Replaced the old Stack Reconciler
-👉 Fiber is not a feature — it’s an internal architecture change.
-
-
-🔄 Why Fiber Was Introduced
-🚫 Problem with Old Stack Reconciler
-➤ Rendering was synchronous
-➤ Large updates:
-    ✔️ Blocked the main thread
-    ✔️ Caused jank & freezes
-➤ No way to pause or prioritize work
-
-
-🔄 Real-World Issue
-➤ User scrolls
-➤ Large component tree update happens
-➤ UI freezes ❌
-➡️ Fiber solved this.
-
-
-🔄 Core Goal of Fiber
-React Fiber enables:
-🟢 Interruptible rendering
-🟢 Prioritized updates
-🟢 Better user experience
-🟢 Concurrent features
-👉 Fiber’s goal is responsiveness, not raw speed.
-
-
-🔄 Conceptual Understanding of Fiber
-1️⃣ Fiber (High-Level)
-➤ A unit of work
-➤ A node in React’s internal tree
-➤ Each component = one Fiber node
-
-2️⃣ Fiber Stores
-➤ Component type
-➤ Props
-➤ State
-➤ Hooks state
-➤ Effect info
-➤ Child / sibling / parent links
-
-
-🔄 Fiber Tree vs Virtual DOM
-| Concept     | Purpose                |
-| ----------- | ---------------------- |
-| Virtual DOM | UI description         |
-| Fiber Tree  | Execution & scheduling |
-👉 Fiber is the data structure that powers reconciliation.
-
-
-🔄 How Fiber Changes Rendering
-Old Model (Stack Reconciler)
-Render everything ─────────▶ Block UI ─────────▶ Commit
-
-
-🔄 Fiber Model
-Break work into units
-↓
-Pause if needed
-↓
-Resume later
-↓
-Commit when ready
-
-
-🔄 Render Phase in Fiber
-Fiber breaks rendering into:
-    ✔️ Small units of work
-
-React can:
-    ✔️ Pause rendering
-    ✔️ Abort rendering
-    ✔️ Restart rendering
-👉 Render phase is interruptible
-
-
-🔄 Commit Phase
-➤ Commit phase:
-    ✔️ Applies DOM updates
-    ✔️ Runs effects
-➤ Not interruptible
-
-
-🔄 Priority-Based Scheduling
-Fiber assigns priorities:
-➤ User input ─────────▶ High
-➤ Animations ─────────▶ Medium
-➤ Data fetch ─────────▶ Low
-👉 React schedules work accordingly to keep UI responsive.
-
-
-🔄 Concurrency
-Fiber enables:
-➤ Concurrent rendering
-➤ Time slicing
-➤ Background updates
-👉 React can prepare UI without blocking user interaction.
-
-
-🔄 Hooks & Fiber (Why Rules Exist)
-➤ Hooks state is stored on Fiber nodes
-➤ Hook order matters
-➤ Same call order ─────────▶ same Fiber mapping
-➡️ This is why Rules of Hooks exist
-
-
-🔄 Fiber Enables Modern React Features
-Fiber is the foundation for:
-➤ Concurrent rendering
-➤ Transitions
-➤ Suspense
-➤ Deferred updates
-➤ Automatic batching
-
-
-🔄 What Fiber Does NOT Do
-❌ Fiber does NOT make React automatically faster
-❌ Fiber does NOT remove re-renders
-❌ Fiber does NOT change public API
-
-
-🔄 Traps
-❌ “Fiber is Virtual DOM”
-✅ Fiber implements Virtual DOM
-
-❌ “Fiber is async rendering”
-✅ Fiber enables interruptible rendering
-
-❌ “Fiber is only for performance”
-✅ Fiber is for responsiveness
-
-
 =======================
 🔷 JSX Syntax & Rules
 =======================
@@ -961,11 +752,10 @@ Fiber is the foundation for:
 ➤ Syntax extension for JavaScript
 ➤ Used to describe UI structure
 const element = <h1>Hello</h1>;
-
 👉 JSX is a syntax sugar that allows writing UI code declaratively, which is later transformed into React.createElement calls.
 
 
-🔄 JSX is NOT HTML
+🚫 JSX is NOT HTML
 ➤ JSX looks like HTML
 ➤ JSX is JavaScript
 ➤ Parsed by Babel, not browser
@@ -980,9 +770,9 @@ React.createElement(
   React.createElement('h1', null, 'Hello')
 );
 
-➤ Hard to read
-➤ Hard to maintain
-➤ Poor developer experience
+❌ Hard to read
+❌ Hard to maintain
+❌ Poor developer experience
 
 JSX Solves:
 ➤ Readability
@@ -991,10 +781,10 @@ JSX Solves:
 
 
 🔄 JSX Compilation
-JSX Code
+🔗 JSX Code
 <h1 className="title">Hello</h1>
 
-Compiles To
+🔗 Compiles To
 React.createElement(
   'h1',
   { className: 'title' },
@@ -1067,12 +857,12 @@ htmlFor
     ✔️ Function
 
 
-🔄 JSX & Expressions vs Statements (Important)
+🔄 JSX & Expressions vs Statements
 | Allowed             | Not Allowed |
 | ------------------- | ----------- |
-| `user.name`         | `if`        |
-| `a + b`             | `for`       |
-| `condition ? x : y` | `switch`    |
+| user.name           | if          |
+| a + b               | for         |
+| condition ? x : y   | switch      |
 👉 JSX allows expressions only
 
 
@@ -1104,11 +894,11 @@ Rules:
 🔄 JSX & Boolean / Null Rendering
 | Value       | Rendered?  |
 | ----------- | ---------  |
-| `null`      | ❌         |
-| `undefined` | ❌         |
-| `false`     | ❌         |
-| `true`      | ❌         |
-| `0`         | ✅         |
+| null        | ❌         |
+| undefined   | ❌         |
+| false       | ❌         |
+| true        | ❌         |
+| 0           | ✅         |
 
 
 🔄 JSX & Inline Styles
@@ -1124,7 +914,6 @@ Rules:
 ➤ JSX escapes values by default
 ➤ Prevents XSS attacks
 <p>{userInput}</p> // safe
-
 Dangerous API: dangerouslySetInnerHTML
 
 
@@ -1189,12 +978,10 @@ const element = <h1 className="title">Hello</h1>;
 👉 JSX changes how you write, not what runs.
 
 
-🔄 JSX is Just a Function Call (Internals)
-JSX
-<div>Hello</div>
+🔄 JSX is Just a Function Call
+JSX: <div>Hello</div>
 
-👉 Becomes
-React.createElement('div', null, 'Hello');
+👉 Becomes: React.createElement('div', null, 'Hello');
 
 ➤ JSX is syntactic sugar
 ➤ JavaScript engine never sees JSX
@@ -1218,9 +1005,7 @@ JavaScript
     ✔️ Expressions (a + b)
 
 JSX
-➤ Allows only expressions
-{condition && <Component />}
-
+✅ Allows only expressions: {condition && <Component />}
 ❌ Not allowed: {if (x) { ... }}
 
 
@@ -1241,17 +1026,7 @@ Allowed:
 ➤ Template literals are unnecessary
 
 
-🔄 JSX vs Template Engines (Angular / Vue)
-| Feature     | JSX              | Templates       |
-| ----------- | ---------------- | --------------- |
-| Logic       | Full JS          | Limited         |
-| Scope       | JS lexical scope | Template scope  |
-| Debugging   | JS stack traces  | Template errors |
-| Flexibility | High             | Medium          |
-👉 JSX gives full JavaScript power
-
-
-🔄 JSX & Type Safety 
+🔄 JSX & Type Safety
 JSX works with:
     ✔️ TypeScript
     ✔️ ESLint
@@ -1310,16 +1085,13 @@ const element = <h1>Hello</h1>;
 
 
 🔄 Key Responsibility for React
-JSX  --->  React.createElement() calls
-
-
-🔄 JSX is Just Syntactic Sugar
+JSX  ─────────▶  React.createElement() calls
 JSX is just syntactic sugar over React.createElement
 
-JSX Code
+🔗 JSX Code
 const element = <h1>Hello React</h1>;
 
-After Babel Compilation
+🔗 After Babel Compilation
 const element = React.createElement(
   "h1",
   null,
@@ -1329,14 +1101,13 @@ const element = React.createElement(
 
 
 🔄 React.createElement
-Syntax
-React.createElement(type, props, children)
+Syntax: React.createElement(type, props, children)
 
 | Parameter  | Meaning                     |
 | ---------- | --------------------------- |
-| `type`     | HTML tag OR React component |
-| `props`    | Attributes / props object   |
-| `children` | Text or child elements      |
+| type       | HTML tag OR React component |
+| props      | Attributes / props object   |
+| children   | Text or child elements      |
 
 ✅ Example with Props
 <h1 className="title">Hello</h1>
@@ -1349,72 +1120,8 @@ React.createElement(
 );
 
 
-✅ JSX with Multiple Children
-🔗 JSX
-<div>
-  <h1>Hello</h1>
-  <p>Welcome</p>
-</div>
-
-🔗 Compiled JavaScript
-React.createElement(
-  "div",
-  null,
-  React.createElement("h1", null, "Hello"),
-  React.createElement("p", null, "Welcome")
-);
-👉 Nested tree structur
-👉 Each JSX element becomes a React.createElement call
-
-
-🔄 JSX with JavaScript Expressions
-🔗 JSX
-const name = "Ankur";
-<h1>Hello {name}</h1>
-
-🔗 Compiled Output
-React.createElement(
-  "h1",
-  null,
-  "Hello ",
-  name
-);
-👉 Expressions are passed as children
-
-
-🔄 JSX with Components
-🔗 JSX
-<MyComponent age={25} />
-
-🔗 Compiled Output
-React.createElement(
-  MyComponent,
-  { age: 25 }
-);
-
-➤ If type is string ─────────▶ HTML element
-➤ If type is function/class ─────────▶ React Component
-
-
-🔄 JSX Fragment Compilation
-🔗 JSX
-<>
-  <h1>Title</h1>
-  <p>Text</p>
-</>
-
-🔗 Compiled Output
-React.createElement(
-  React.Fragment,
-  null,
-  React.createElement("h1", null, "Title"),
-  React.createElement("p", null, "Text")
-);
-
-
 🔄 Babel Presets Used in React
 @babel/preset-react
-
 Handles:
     ✔️ JSX ─────────▶ React.createElement
     ✔️ JSX fragments
@@ -1425,8 +1132,7 @@ Handles:
 ➤ Since React 17+, Babel can generate:
 import { jsx as _jsx } from "react/jsx-runtime";
 
-➤ Instead of:
-React.createElement(...)
+➤ Instead of: React.createElement(...)
 👉 This is why React import is not required anymore
 
 
@@ -1434,9 +1140,7 @@ React.createElement(...)
 ➤ Classic Runtime (Before React 17)
 import React from "react";
 
-➤ JSX compiles to:
-React.createElement(...)
-
+➤ JSX compiles to: React.createElement(...)
 ➤ Automatic Runtime (React 17+)
 // No React import needed
 
@@ -1497,7 +1201,6 @@ const element = React.createElement(
     children: "Hello React"
   }
 }
-
 👉 Key Takeaways
 ➤ Element is NOT a DOM node
 ➤ Element is NOT a component
@@ -1576,14 +1279,12 @@ class Welcome extends React.Component {
 
 
 🔄 Elements are Immutable – Why It Matters
-You CANNOT do this: element.props.children = "Hi";
-❌ Not allowed
+You CANNOT do this: element.props.children = "Hi"; ❌ Not allowed
 
 
 🔄 Correct Way
 Create a new element
 const newElement = <h1>Hi</h1>;
-
 🔑 React uses immutability to:
     ✔️ Compare previous vs next UI
     ✔️ Perform efficient reconciliation
@@ -1685,7 +1386,7 @@ App
  │         ├── Post
  │         └── Comment
  └── Footer
-👉 Data flows top → down (unidirectional)
+👉 Data flows top ─────────▶ down (unidirectional)
 
 
 🔄 Types of Components (Architectural POV)
@@ -1724,7 +1425,7 @@ UserDashboard
 
 
 🔄 Component Composition
-❌ Instead of inheritance → composition
+❌ Instead of inheritance ─────────▶ composition
 function Card({ children }) {
   return <div className="card">{children}</div>;
 }
@@ -1744,7 +1445,7 @@ Components are:
 
 <Button type="primary" />
 <Button type="danger" />
-👉 Same component → different behavior/UI
+👉 Same component ─────────▶ different behavior/UI
 
 
 🔄 Encapsulation
@@ -1775,28 +1476,17 @@ Props (Child)
   ↓
 UI
 
-Child → Parent communication via: Callback functions
+Child ─────────▶ Parent communication via: Callback functions
 <Child onClick={handleClick} />
 
 
 🔄 Component Re-rendering Model
-➤ State change → Component re-renders
+➤ State change ─────────▶ Component re-renders
 ➤ Re-render means:
     ✔️ Function runs again
     ✔️ New React elements created
 ➤ React compares old vs new elements
 👉 Architecture supports predictable rendering
-
-
-🔄 Folder Structure
-components/
- ├── Button/
- │    ├── Button.jsx
- │    ├── Button.css
- │    └── index.js
- ├── Card/
- └── Modal/
-👉 Scales well for large apps.
 
 
 🔄 Advantages of Component-Based Architecture
@@ -1823,7 +1513,7 @@ components/
 🔄 React-Specific Architectural Philosophy
 ➤ Components are pure functions of props + state
 ➤ UI is deterministic
-➤ Same input → same output
+➤ Same input ─────────▶ same output
 
 
 ========================
@@ -1873,12 +1563,11 @@ function ComponentName({ title, count }) {
 function Greeting({ name }) {
   return <h1>Hello {name}</h1>;
 }
-
 Usage: <Greeting name="Ankur" />
 
 
 🔄 Functional Components are Pure Functions
-Same props + same state → same UI
+Same props + same state ─────────▶ same UI
 
 function Sum({ a, b }) {
   return <p>{a + b}</p>;
@@ -1901,7 +1590,7 @@ function Counter() {
     </button>
   );
 }
-👉 State updates → component re-renders
+👉 State updates ─────────▶ component re-renders
 
 
 🔄 Lifecycle Behavior in Functional Components
@@ -1975,18 +1664,6 @@ WRONG
 WRONG — Hooks enhance functional components
 
 
-🔄 Real-World Usage Pattern
-function Page() {
-  return (
-    <>
-      <Header />
-      <Content />
-      <Footer />
-    </>
-  );
-}
-👉 Each part is a functional component
-
 =====================
 🔷 Class Components
 =====================
@@ -2006,8 +1683,7 @@ Before React Hooks:
 ➤ Functional components ❌ no state
 ➤ Functional components ❌ no lifecycle methods
 
-So:
-    ✔️ Class components handled
+So Class components handled:
     ✔️ State
     ✔️ Lifecycle methods
     ✔️ Side effects
@@ -2027,46 +1703,6 @@ class MyComponent extends React.Component {
 Mandatory:
     ✔️ extends React.Component
     ✔️ render() method
-
-
-🔄 State in Class Components
-class Counter extends React.Component {
-  state = { count: 0 };
-
-  increment = () => {
-    this.setState({ count: this.state.count + 1 });
-  };
-
-  render() {
-    return <button onClick={this.increment}>{this.state.count}</button>;
-  }
-}
-👉 State updates via setState()
-
-
-🔄 Props in Class Components
-Accessed via this.props
-<h1>{this.props.name}</h1>
-👉 Props are read-only
-
-
-🔄 Lifecycle Methods
-Class components introduced lifecycle hooks:
-
-1️⃣ Mounting
-➤ constructor
-➤ componentDidMount
-
-2️⃣ Updating
-componentDidUpdate
-
-3️⃣ Unmounting
-componentWillUnmount
-
-componentDidMount() {
-  // API call
-}
-👉 These map conceptually to useEffect
 
 
 🔄 Why Class Components Are Called “Legacy”
@@ -2092,7 +1728,7 @@ Hooks allow:
 | ------------------ | ------------------ |
 | Simple functions   | ES6 classes        |
 | Hooks              | Lifecycle methods  |
-| No `this`          | Heavy `this` usage |
+| No this            | Heavy this usage   |
 | Recommended        | Legacy             |
 | Better readability | Verbose            |
 
@@ -2123,7 +1759,7 @@ class ErrorBoundary extends React.Component {
 =========================
 🔷 React Rendering Flow
 =========================
-State/Props change → Re-render → Reconciliation → Commit → DOM Update
+State/Props change ─────────▶ Re-render ─────────▶ Reconciliation ─────────▶ Commit ─────────▶ DOM Update
 👉 Everything in React fits into this pipeline.
 
 
@@ -2146,7 +1782,7 @@ React rendering happens in two major phases:
 🔄 Phase 1️⃣: Render Phase (Pure & Interruptible)
 What Happens Here?
 ➤ React calls your functional components
-➤ JSX → React Elements
+➤ JSX ─────────▶ React Elements
 ➤ Builds a new Virtual DOM tree
 ➤ Diffs with previous tree (reconciliation)
 👉 NO DOM mutations here
@@ -2211,7 +1847,7 @@ Minimal DOM Operations
    ↓
 3️⃣ Component function executes
    ↓
-4️⃣ JSX → React Elements
+4️⃣ JSX ─────────▶ React Elements
    ↓
 5️⃣ Virtual DOM Tree built
    ↓
@@ -2486,8 +2122,8 @@ Not React itself, but:
 This tells the compiler: “Whenever you see @/..., look inside src/...”
 
 2️⃣ Framework support
-Next.js → reads tsconfig/jsconfig automatically
-Vite / Webpack → need extra alias config
+Next.js ─────────▶ reads tsconfig/jsconfig automatically
+Vite / Webpack ─────────▶ need extra alias config
 
 ✅ Example (Vite):
 resolve: {
@@ -2517,7 +2153,7 @@ Both are acceptable — consistency matters.
 
 
 ================================
-🔷 Entry Point → Build Process
+🔷 Entry Point ─────────▶ Build Process
 ================================
 🔄 Entry Point (index.js / main.jsx)
 The entry point is the first JS file executed by the browser after bundling.
@@ -2550,7 +2186,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 2️⃣ React finds #root element in index.html
 3️⃣ createRoot() creates a React root container
 4️⃣ root.render() renders <App /> inside it
-5️⃣ React builds Virtual DOM → commits changes to real DOM
+5️⃣ React builds Virtual DOM ─────────▶ commits changes to real DOM
 
 
 🔄 Root API (createRoot) – React 18+
@@ -2584,7 +2220,7 @@ root.render(<App />);
 🔄 Most important behavior (React 18)
 In development, StrictMode intentionally:
   ✔️ renders components twice
-  ✔️ runs effects twice (setup → cleanup → setup)
+  ✔️ runs effects twice (setup ─────────▶ cleanup ─────────▶ setup)
 
 In production, This is to catch:
   ✔️ API calls placed incorrectly
@@ -2654,7 +2290,7 @@ They are values stored outside code, used for:
 
 🔄 Typical usage pattern
 const BASE_URL = import.meta.env.VITE_API_URL;
-fetch(`${BASE_URL}/users`);
+fetch(${BASE_URL}/users);
 
 
 🔄 Build Process Overview (React App Lifecycle)
@@ -2765,7 +2401,7 @@ const city = "Delhi";
 
 2️⃣ Function calls
 function getGreeting(name) {
-  return `Hello ${name}`;
+  return Hello ${name};
 }
 <h1>{getGreeting("Ankur")}</h1>
 
@@ -2784,8 +2420,8 @@ function getGreeting(name) {
 
 6️⃣ Logical AND (&&) for conditional rendering
 {isAdmin && <button>Delete</button>}
-👉 If isAdmin is true → renders button
-If false → renders nothing
+👉 If isAdmin is true ─────────▶ renders button
+If false ─────────▶ renders nothing
 
 
 7️⃣ Array mapping
@@ -2795,7 +2431,7 @@ const users = ["A", "B", "C"];
     <li key={u}>{u}</li>
   ))}
 </ul>
-👉 map() returns an array of elements → React renders them.
+👉 map() returns an array of elements ─────────▶ React renders them.
 
 8️⃣ Inline object access
 const user = { name: "Ankur", age: 22 };
@@ -2942,7 +2578,7 @@ function AdminPanel({ isAdmin }) {
 
 ⚠️ Trap with &&
 {count && <p>Count is {count}</p>}
-✔️ If count = 0 → React renders 0 ❌ (because 0 is falsy but still renderable)
+✔️ If count = 0 ─────────▶ React renders 0 ❌ (because 0 is falsy but still renderable)
 ✅ Fix: {count > 0 && <p>Count is {count}</p>}
 
 
@@ -3089,7 +2725,7 @@ Sometimes you don’t hide the component, you just change its style:
 🔷 Rendering Lists
 ====================
 ➤ Rendering lists means displaying multiple UI elements from an array of data using .map().
-➤ React is declarative, so we convert data → UI.
+➤ React is declarative, so we convert data ─────────▶ UI.
 
 
 🔄 The Core Pattern: map()
@@ -3282,7 +2918,7 @@ Sometimes you want multiple elements per item without extra wrapper div:
 ❌ Using unstable keys
 key={Math.random()}
 key={Date.now()}
-👉 This forces React to remount every time → performance + bugs.
+👉 This forces React to remount every time ─────────▶ performance + bugs.
 
 ❌ Index as key with dynamic list
 Leads to:
@@ -3324,7 +2960,7 @@ return (
   </div>
 );
 
-Solution 2️⃣ (Fragment → no extra DOM)
+Solution 2️⃣ (Fragment ─────────▶ no extra DOM)
 return (
   <React.Fragment>
     <h1>Hello</h1>
@@ -3458,7 +3094,7 @@ Use <div> when:
 ➤ Only key is commonly used.
 ➤ You cannot do: <React.Fragment className="box">
 ➤ Fragments don’t support className or styling because they don’t exist in DOM.
-➤ If you need styling → use <div>.
+➤ If you need styling ─────────▶ use <div>.
 
 
 ================================
@@ -3495,7 +3131,7 @@ Common use cases:
 🔄 null / undefined in Conditional Rendering Patterns
 ✅ Pattern 1️⃣: && rendering
 {isAdmin && <AdminPanel />}
-➤ If isAdmin is false, React renders false → nothing shown.
+➤ If isAdmin is false, React renders false ─────────▶ nothing shown.
 👉 Same for null/undefined.
 
 
@@ -3527,11 +3163,11 @@ renders empty text node (not visible but exists)
 
 🔄 What values React can render in JSX?
 ✅ React can render:
-➤ string → "hello"
-➤ number → 10
-➤ JSX element → <h1/>
-➤ arrays of renderables → [<li/>, <li/>]
-➤ null, undefined, false → renders nothing
+➤ string ─────────▶ "hello"
+➤ number ─────────▶ 10
+➤ JSX element ─────────▶ <h1/>
+➤ arrays of renderables ─────────▶ [<li/>, <li/>]
+➤ null, undefined, false ─────────▶ renders nothing
 
 
 ❌ React cannot render:
@@ -3569,8 +3205,8 @@ In JSX:
 
 🔄 Why this matters?
 This behavior is the reason this pattern works: {isLoggedIn && <Dashboard />}
-  ✔️ If isLoggedIn === true → React renders <Dashboard />
-  ✔️ If isLoggedIn === false → React renders false → nothing appears
+  ✔️ If isLoggedIn === true ─────────▶ React renders <Dashboard />
+  ✔️ If isLoggedIn === false ─────────▶ React renders false ─────────▶ nothing appears
 👉 This is the most common React conditional rendering pattern.
 
 
@@ -3578,10 +3214,10 @@ This behavior is the reason this pattern works: {isLoggedIn && <Dashboard />}
 {isAdmin && <AdminPanel />}
 
 Behavior:
-| Value of `isAdmin` | Result                   |
+| Value of isAdmin | Result                   |
 | ------------------ | ------------------------ |
-| `true`             | `<AdminPanel />` renders |
-| `false`            | nothing renders          |
+| true             | <AdminPanel /> renders |
+| false            | nothing renders          |
 
 
 🔄 ⚠️ Interview Trap: 0 && <Component />
@@ -3589,7 +3225,7 @@ This is a classic bug.
 {0 && <h1>Hello</h1>}
 
 What happens?
-➤ JS evaluates 0 && <h1/> → returns 0
+➤ JS evaluates 0 && <h1/> ─────────▶ returns 0
 ➤ React renders 0 (because numbers are renderable)
 
 ✅ Output on UI: 0
@@ -3602,8 +3238,8 @@ or
 {isLoggedIn || <Login />}
 
 Behavior:
-➤ If isLoggedIn is false → React renders <Login />
-➤ If isLoggedIn is true → React renders true → nothing shows 😐
+➤ If isLoggedIn is false ─────────▶ React renders <Login />
+➤ If isLoggedIn is true ─────────▶ React renders true ─────────▶ nothing shows 😐
 ➤ So || is usually used like: {userName || "Guest"}
 
 ✅ Example: <h1>Hello {userName || "Guest"}</h1>
@@ -3624,8 +3260,8 @@ or
 Booleans are commonly used in props:
 <button disabled={isDisabled}>Submit</button>
 
-➤ If isDisabled = true → button disabled
-➤ If isDisabled = false → button enabled
+➤ If isDisabled = true ─────────▶ button disabled
+➤ If isDisabled = false ─────────▶ button enabled
 
 
 🔄 Boolean rendering inside arrays / lists
@@ -3654,7 +3290,7 @@ setCount(count); // React may bail out (no re-render)
 
 
 🔄 Re-render Trigger 2️⃣: Props Change
-If parent passes new props → child re-renders.
+If parent passes new props ─────────▶ child re-renders.
 <Child value={count} />
 
 When count changes, <Child /> re-renders.
@@ -3668,12 +3304,12 @@ function Parent() {
   const [x, setX] = useState(0);
   return <Child />;
 }
-👉 When x changes → Parent re-renders → Child also re-renders.
+👉 When x changes ─────────▶ Parent re-renders ─────────▶ Child also re-renders.
 ✅ This is why performance optimization matters in large trees.
 
 
 🔄 Re-render Trigger 4️⃣: Context Value Change (useContext)
-If a component consumes context and the context value changes → it re-renders.
+If a component consumes context and the context value changes ─────────▶ it re-renders.
 
 const theme = useContext(ThemeContext);
 👉 Context updates can cause wide re-renders if not designed properly.
@@ -3828,7 +3464,7 @@ React is efficient because:
 🔄 Common Misconception
 ❌ Wrong belief: Virtual DOM makes React fast
 ✅ Correct understanding: Virtual DOM helps React compute minimal DOM changes, so browser does less work.
-👉 Browser DOM updates are expensive → React reduces them.
+👉 Browser DOM updates are expensive ─────────▶ React reduces them.
 
 
 🔄 When React Rendering becomes slow
@@ -3909,7 +3545,7 @@ function App() {
 function UserRow({ id, onDelete }) {
   return <button onClick={() => onDelete(id)}>Delete</button>;
 }
-👉 This is how child “communicates” back to parent → via callback props.
+👉 This is how child “communicates” back to parent ─────────▶ via callback props.
 
 
 🔄 Destructuring Props
@@ -3991,7 +3627,7 @@ Profile.propTypes = {
 
 
 🔄 One-Way Data Flow
-Core React rule: Data flows from Parent → Child only
+Core React rule: Data flows from Parent ─────────▶ Child only
 
 ✅ Example:
 <App>
@@ -4015,7 +3651,7 @@ function Child({ name }) {
 }
 
 ✅ Correct idea:
-➤ If you need changes → update state in parent
+➤ If you need changes ─────────▶ update state in parent
 ➤ pass updated props again
 
 
@@ -4065,7 +3701,7 @@ function UsersList({ query }) {
 🔄 Props Drilling Problem
 Passing props through multiple intermediate components that don’t need them.
 
-✅ Example: App → A → B → C
+✅ Example: App ─────────▶ A ─────────▶ B ─────────▶ C
 Only C needs the prop, but A and B must forward it.
 👉 Problems:
   ✔️ messy code
@@ -4086,7 +3722,7 @@ State is a component’s internal memory that can change over time and causes th
 
 🔄 Key Points
 ➤ State is owned by the component
-➤ When state changes → React re-renders the component
+➤ When state changes ─────────▶ React re-renders the component
 ➤ State is used for dynamic UI
   ✔️ form inputs
   ✔️ toggles
@@ -4285,8 +3921,8 @@ setItems((prev) => [...prev].sort((a, b) => a.price - b.price));
 🔄 Immutability in State
 ➤ Never change the existing state directly. Always create a new copy.
 ➤ React uses reference comparison:
-    ✔️ oldState !== newState → update UI
-    ✔️ oldState === newState → skip updates
+    ✔️ oldState !== newState ─────────▶ update UI
+    ✔️ oldState === newState ─────────▶ skip updates
 
 ➤ So immutability helps React:
     ✔️ detect changes quickly
@@ -4310,7 +3946,7 @@ Because it can go out of sync:
   ✔️ fullName state doesn’t automatically update
 
 ✅ Correct approach: compute derived values during render
-const fullName = `${firstName} ${lastName}`;
+const fullName = ${firstName} ${lastName};
 👉 No extra state needed.
 
 
@@ -4355,7 +3991,7 @@ const [a, setA] = useState();
 const [b, setB] = useState();
 const [c, setC] = useState();
 
-👉 If updates are related → consider:
+👉 If updates are related ─────────▶ consider:
   ✔️ grouping into object
   ✔️ useReducer
 

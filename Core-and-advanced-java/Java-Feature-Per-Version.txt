@@ -1,0 +1,422 @@
+############
+🔷 Java 11
+############
+
+================================================================================
+Feature 1️⃣: var in Lambda Parameters (local variable type inference in lambdas)
+================================================================================
+Java 11 introduced Local-Variable Syntax for Lambda Parameters, extending the var keyword (from Java 10) to lambda expressions. This enables type inference for lambda parameters, making code more concise while maintaining readability.
+
+🔄 Key Benefits
+➤ Consistency: Matches local variable syntax (var x) -> ...
+➤ Annotations: Add annotations directly to parameters like (@NonNull var x)
+➤ Cleaner code: Reduces verbosity in functional interfaces
+
+✅ Code Examples
+Before Java 11 (verbose or implicit):
+
+✔️ Explicit types
+BinaryOperator<Integer> add = (Integer a, Integer b) -> a + b;
+
+✔️ Implicit (no types) - works but can't add annotations
+BinaryOperator<Integer> add2 = (a, b) -> a + b;
+Java 11 with var (clean + annotatable):
+
+
+✅ Example:
+import javax.annotation.Nonnull;
+
+Works perfectly - compiler infers Integer
+BinaryOperator<Integer> add = (var a, var b) -> a + b;
+
+Add annotations easily!
+BinaryOperator<Integer> safeAdd = (@Nonnull var a, @Nonnull var b) -> a + b;
+
+public class LambdaVarDemo {
+    public static void main(String[] args) {
+        System.out.println(add.apply(10, 20)); ─────────▶ 30
+        System.out.println(safeAdd.apply(15, 25)); ─────────▶ 40
+    }
+}
+
+🔄 Strict Rules (Java 11+ only)
+✅ VALID
+(var x) -> x * 2
+(var a, var b) -> a + b
+
+❌ INVALID - Mixing var + implicit
+(var a, b) -> a + b   Compilation error
+
+
+❌ INVALID - Mixing var + explicit types
+(var a, String b) -> a + b   Compilation error
+
+
+❌ INVALID - Single var without parentheses
+var x -> x * 2   Compilation error - needs (var x)
+Primary use case: Adding annotations to lambda parameters without explicit types, perfect for Spring Boot @RequestParam validators or @NonNull checks in your microservices projects.
+
+
+================================
+Feature 2️⃣: Standard Library
+================================
+1️⃣ New String Methods ─────────▶ isBlank(), lines(), strip(), stripLeading(), stripTrailing(), repeat(n)
+
+2️⃣ New Files Methods
+➤ Files.readString(Path)
+➤ Files.writeString(Path, String)
+
+3️⃣ New Optional Method ─────────▶ Optional.isEmpty()
+
+
+====================================================================================================================================
+Feature 3️⃣: Running Java Without Compilation ─────────▶ Single-file source execution ─────────▶ java Hello.java (no javac needed)
+====================================================================================================================================
+Java 11 introduced Launch Single-File Source-Code Programs (JEP 330), allowing direct execution of .java source files without explicit javac compilation. The source compiles in-memory and runs immediately—no .class files generated on disk.
+
+Purpose: Bridge gap between scripting languages (Python/Node: python script.py) and Java's traditional compile-run model.
+
+🔄 How It Works
+When you run java Hello.java, Java launcher:
+1️⃣ Detects .java extension (or --source flag)
+2️⃣ Compiles source in memory only
+3️⃣ Executes first class with main() method
+👉 Passes command-line args normally
+
+✅ Code Examples
+Simple Hello World:
+
+// Hello.java
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello " + (args.length > 0 ? args[0] : "World") + "!");
+    }
+}
+
+🔗 bash
+java Hello.java Ankur
+# Output: Hello Ankur!
+
+
+🔄 Multiple Classes (First class = entry point):
+// Calculator.java
+public class Calculator {
+    public static void main(String[] args) {
+        MathUtils utils = new MathUtils();
+        System.out.printf("Sum: %.2f%n", utils.sum(10, 20, 30));
+    }
+}
+
+class MathUtils {
+    public double sum(double... values) {
+        return java.util.Arrays.stream(values).sum();
+    }
+}
+
+🔗 bash
+java Calculator.java
+# Output: Sum: 60.00
+
+
+🔄 Key Rules & Options
+Auto-Detection:
+🔗 bash
+java MyProgram.java arg1 arg2  # .java = source mode
+java --source 11 script arg1    # Force source mode
+
+
+🔄 Class Name ≠ File Name (OK!):
+// Main.java (class MyApp)
+class MyApp {
+    public static void main(String[] args) { /* ... */ }
+}
+java Main.java  # Works! Uses first class
+
+
+✅ Benefits of Single-File Execution
+➤ Script-like simplicity ─────────▶ java Hello.java vs javac Hello.java && java Hello
+➤ No bytecode clutter ─────────▶ In-memory compilation = clean directories
+➤ Rapid prototyping ─────────▶ Test algorithms/DS instantly
+➤ Learning/Teaching ─────────▶ Beginners skip compilation step
+➤ CI/CD friendly ─────────▶ One-liner builds in pipelines
+
+
+🚫 Limitations:
+❌ Single file only (no --class-path multi-file)
+❌ First class must have public static void main
+❌ No .class output—purely in-memory
+
+
+############
+🔷 Java 17
+############
+
+===========================
+Feature 1️⃣: Sealed Classes
+============================
+Purpose: Restrict inheritance hierarchy to known, explicit subclasses for better modeling, exhaustive pattern matching, and client code optimization.
+
+🔄 Syntax 
+sealed class Shape           // Restricts who can extend
+    permits Circle, Square { }  // Explicit whitelist
+
+final class Circle extends Shape { }     // ✅ No further extension
+non-sealed class Square extends Shape { } // ✅ Can be extended
+sealed class Rectangle extends Shape     // ✅ Further restricts
+    permits FilledRect { }
+
+
+🔄 Inheritance Options for Subclasses
+| Modifier   | Meaning                         | Use Case                 |
+| ---------- | ------------------------------- | ------------------------ |
+| final      | Cannot be extended              | Leaf nodes (Circle)      |
+| sealed     | Restricts further (own permits) | Intermediate (Rectangle) |
+| non-sealed | Open to extension               | Flexible nodes (Square)  |
+
+
+✅ Example
+// Shape.java - Single file for demo
+sealed interface Vehicle permits Car, Truck { 
+    String getRegNo();
+}
+
+final record Car(String regNo, int seats) implements Vehicle {
+    public String getRegNo() { return regNo; }
+}
+
+non-sealed record Truck(String regNo, int load) implements Vehicle {
+    public String getRegNo() { return regNo; }
+}
+
+public class Demo {
+    public static void main(String[] args) {
+        Vehicle[] vehicles = { 
+            new Car("KA123", 4), 
+            new Truck("KA456", 5000) 
+        };
+        
+        // Exhaustive switch (compiler verifies)
+        for (Vehicle v : vehicles) {
+            String type = switch (v) {
+                case Car c -> "Car: " + c.seats() + " seats";
+                case Truck t -> "Truck: " + t.load() + "kg";
+            };
+            System.out.println(type);
+        }
+    }
+}
+
+🔄 Real-World Benefits for Spring Boot
+1️⃣ Domain Models
+sealed class OrderStatus permits Pending, Shipped, Delivered { }
+final class Pending extends OrderStatus { }
+final class Delivered extends OrderStatus {
+    LocalDateTime deliveredAt;
+}
+
+
+2️⃣ API Response Types
+sealed interface ApiResponse permits Success, Error { }
+final record Success<T>(T data) implements ApiResponse { }
+final record Error(String message) implements ApiResponse { }
+
+
+=====================
+Feature 2️⃣: Records
+=====================
+Records are a special final class for immutable data carriers that auto-generate boilerplate code, replacing verbose POJOs/DTOs.
+
+🔄 Syntax
+public record Person(String name, int age) { }
+
+🔄 Compiler generates
+➤ Private final fields ─────────▶ private final String name; private final int age;
+➤ Canonical constructor
+➤ Accessor methods: name(), age(), equals(), hashCode(), toString()
+
+
+✅ Example
+// Records.java - Single file demo
+record Point(int x, int y) { }
+record Circle(Point center, int radius) { }
+
+record Order(String id, double amount, String status) {
+    // Custom validation constructor
+    public Order {
+        if (amount < 0) throw new IllegalArgumentException("Amount can't be negative");
+    }
+    
+    // Custom method
+    public boolean isHighValue() {
+        return amount > 1000;
+    }
+}
+
+public class Demo {
+    public static void main(String[] args) {
+        Point p1 = new Point(10, 20);
+        Point p2 = new Point(10, 20);
+        
+        System.out.println(p1);        // Point[x=10, y=20]
+        System.out.println(p1.equals(p2)); // true
+        System.out.println(p1.hashCode() == p2.hashCode()); // true
+        
+        Order order = new Order("ORD-123", 1500.0, "SHIPPED");
+        System.out.println(order.isHighValue()); // true
+    }
+}
+
+
+🔄 Auto-Generated Methods
+| Method                 | Implementation           |
+| ---------------------- | ------------------------ |
+| Point(int x, int y)    | Canonical constructor    |
+| int x(), int y()       | Accessors (not getters!) |
+| boolean equals(Object) | Compares all components  |
+| int hashCode()         | Hash of all components   |
+| String toString()      | Point[x=10, y=20]        |
+
+
+🔄 Key Features
+➤ Immutable - All fields final
+➤ Compact - 1 line vs 50-line POJO
+➤ Thread-safe by design
+➤ Works with Sealed Classes & Pattern Matching
+➤ Implements java.lang.Record
+
+
+🔄 Use Cases
+1️⃣ DTOs / API Responses:
+record ApiResponse<T>(boolean success, T data, String message) { }
+@GetMapping("/users/{id}")
+public ApiResponse<User> getUser(@PathVariable Long id) {
+    return new ApiResponse<>(true, userService.find(id), "Success");
+}
+
+
+2️⃣ Spring Boot with JPA:
+record CreateUserRequest(@NotBlank String name, @Email String email) { }
+
+@PutMapping("/users")
+public ResponseEntity<User> updateUser(@Valid @RequestBody CreateUserRequest req) {
+    // Auto-validated, immutable DTO
+}
+
+
+3️⃣ Event Sourcing / Domain Events:
+sealed interface DomainEvent permits UserCreated, OrderPlaced { }
+record UserCreated(String userId, LocalDateTime timestamp) implements DomainEvent { }
+record OrderPlaced(String orderId, BigDecimal amount) implements DomainEvent { }
+
+
+🔄 Advanced Features
+1️⃣ Custom Constructor (Validation):
+record Product(String name, double price) {
+    public Product {
+        if (price <= 0) throw new IllegalArgumentException("Invalid price");
+    }
+}
+
+2️⃣ Static Members:
+record Temperature(double celsius) {
+    public static Temperature fromFahrenheit(double f) {
+        return new Temperature((f - 32) * 5.0 / 9.0);
+    }
+}
+
+
+🔄 Benefits
+✅ 80% less code for data classes
+✅ Zero bugs in equals/hashCode/toString
+✅ Immutable = thread-safe
+✅ Pattern matching ready
+✅ JSON serialization friendly
+
+
+🔄 Limitations
+❌ Final - Cannot extend other classes
+❌ No setters - Immutable only
+❌ No instance fields beyond components
+❌ No static initializers
+❌ Limited inheritance (interfaces only)
+
+
+🔄 vs Traditional POJO (50 lines → 1 line)
+// ❌ OLD POJO (50 lines)
+class Point {
+    private final int x, y;
+    public Point(int x, int y) { this.x = x; this.y = y; }
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public boolean equals(Object o) { /* 20 lines */ }
+    public int hashCode() { /* 10 lines */ }
+    public String toString() { /* 5 lines */ }
+}
+
+// ✅ NEW RECORD (1 line)
+record Point(int x, int y) { }
+
+
+========================================================
+Feature 2️⃣: New Random Generator API (java.util.random)
+========================================================
+➤ Replaces: Legacy java.util.Random / ThreadLocalRandom
+➤ Package: java.util.random.*
+➤ Core: RandomGenerator interface + RandomGeneratorFactory
+
+❓ Why Introduced
+Old Random was:
+➤ Single algorithm (LCG)
+➤ Poor parallel performance
+➤ No Stream API integration
+➤ Limited statistical quality
+
+New API: Multiple high-quality algorithms, splittable, stream-friendly.
+
+Factory API (Main Entry Point)
+// Get available algorithms
+RandomGeneratorFactory.all().forEach(System.out::println);
+// [L32X64MixRandom, XORWOW, L64X128MixRandom, ...]
+
+// By name (17 built-in algorithms)
+RandomGenerator rng1 = RandomGeneratorFactory.of("L64X128MixRandom").create(42L);
+RandomGenerator rng2 = RandomGenerator.of("Random").create(); // Default
+
+// Default (fastest jumpable)
+RandomGenerator rng3 = RandomGenerator.getDefault();
+
+
+✅ Example
+import java.util.random.*;
+
+public class RandomDemo {
+    public static void main(String[] args) {
+        RandomGenerator rng = RandomGenerator.of("L64X128MixRandom").create(12345L);
+        
+        // 1. Basic usage
+        System.out.println("Random int: " + rng.nextInt(1, 100));
+        
+        // 2. Stream generation
+        rng.ints(5, 1, 10)
+           .forEach(i -> System.out.print(i + " "));
+        System.out.println();
+        
+        // 3. Splittable - Perfect for parallel processing
+        var children = rng.splits(3);
+        children.forEach(r -> 
+            System.out.println(r.nextLong(1000))
+        );
+    }
+}
+
+✅ Output
+Random int: 73
+7 3 9 2 6
+847
+392
+156
+
+👉 Key Points
+➤ Same seed = same output every run
+➤ Splittable: Children get independent but derived state
+➤ L64X128MixRandom: High-quality, fast, 192-bit internal state
