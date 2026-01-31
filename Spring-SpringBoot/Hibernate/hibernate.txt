@@ -2157,3 +2157,127 @@ public class User {
 ➤ Cache invalidation: Must keep cache in sync with DB (stale data risk).
 ➤ Not useful for write-heavy apps (frequent updates reduce caching efficiency).
 ➤ Needs careful configuration to avoid memory overhead.
+
+
+=================================================
+🔷 @JsonManagedReference and @JsonBackReference
+=================================================
+✅ Why they are needed?
+
+In bi-directional relationships (very common in JPA):
+
+Example:
+
+User -> List<Orders>
+
+Orders -> User
+
+When Jackson converts object to JSON, it goes like:
+
+✅ User → Orders → User → Orders → User → …
+➡️ This causes infinite recursion → StackOverflowError
+
+✅ What @JsonManagedReference does
+📌 Meaning:
+
+👉 “This is the parent / forward side that should be included in JSON output”
+
+Example:
+
+In User class (Parent):
+
+@OneToMany(mappedBy = "user")
+@JsonManagedReference
+private List<Orders> orders;
+
+
+✅ When you serialize User, it will include:
+
+{
+  "id": 1,
+  "name": "Ankur",
+  "orders": [
+    { "orderID": 101, "orderType": "Medicine" }
+  ]
+}
+
+✅ What @JsonBackReference does
+📌 Meaning:
+
+👉 “This is the child / back side that should be ignored in JSON output to stop recursion”
+
+Example:
+
+In Orders class (Child):
+
+@ManyToOne
+@JsonBackReference
+private User user;
+
+
+✅ When you serialize Orders, it will NOT include user again.
+
+So the JSON becomes:
+
+{
+  "orderID": 101,
+  "orderType": "Medicine"
+}
+
+✅ Working Summary (Most Important)
+🔥 Jackson Rule:
+
+@JsonManagedReference → Serialize normally
+
+@JsonBackReference → Do NOT serialize (ignored during JSON output)
+
+So recursion breaks here:
+
+User → Orders → ❌ User not serialized again
+
+✅ Real Example Code (Perfect)
+User.java
+@Entity
+@Getter @Setter
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer userId;
+
+    private String name;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Orders> orders;
+}
+
+Orders.java
+@Entity
+@Getter @Setter
+public class Orders {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer orderID;
+
+    private String orderType;
+
+    @ManyToOne
+    @JsonBackReference
+    private User user;
+}
+
+✅ Interview One-Liner ⭐
+
+👉 "@JsonManagedReference is used on the parent side to allow serialization, and @JsonBackReference is used on the child side to prevent infinite recursion by skipping the back reference."
+
+⚠️ Important Note
+
+These work only for parent-child type relations (OneToMany / ManyToOne).
+
+For complex graphs / multiple relations, better approach is:
+
+✅ @JsonIgnore
+or
+✅ @JsonIdentityInfo (best for many-to-many recursion)

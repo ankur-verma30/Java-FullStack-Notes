@@ -1,0 +1,2442 @@
+1. What is Redis?
+Redis (Remote Dictionary Server) is an open-source, in-memory data structure store that can be used as:
+
+Database
+Cache
+Message broker
+Streaming engine
+
+Key Characteristics:
+
+In-Memory Storage: Data stored in RAM for ultra-fast access (sub-millisecond latency)
+Persistent: Optional disk persistence
+Single-Threaded: Uses single-threaded event loop (but uses multiple threads for I/O operations)
+Data Structures: Supports rich data types beyond simple key-value pairs
+Atomic Operations: All operations are atomic
+Replication: Master-slave replication support
+High Availability: Redis Sentinel for monitoring and automatic failover
+Clustering: Horizontal scaling support
+
+
+2. Redis Data Structures
+2.1 String
+Simple key-value pairs. Maximum size: 512 MB
+Use Cases:
+
+Caching HTML fragments, API responses
+Session storage
+Counters (page views, likes)
+Distributed locks
+
+Commands:
+bashSET key value
+GET key
+INCR counter
+DECR counter
+APPEND key value
+SETEX key seconds value  # Set with expiration
+SETNX key value          # Set if not exists
+MSET key1 val1 key2 val2 # Multiple set
+MGET key1 key2           # Multiple get
+2.2 List
+Ordered collection of strings (linked list implementation)
+Use Cases:
+
+Message queues
+Activity feeds
+Latest items (news feed)
+Undo/Redo operations
+
+Commands:
+bashLPUSH list value         # Push to left (head)
+RPUSH list value         # Push to right (tail)
+LPOP list                # Pop from left
+RPOP list                # Pop from right
+LRANGE list 0 -1         # Get all elements
+LLEN list                # Get length
+LTRIM list start stop    # Trim list
+LINDEX list index        # Get by index
+BLPOP list timeout       # Blocking pop (for queues)
+2.3 Set
+Unordered collection of unique strings
+Use Cases:
+
+Tags
+Unique visitors tracking
+Social graph (friends, followers)
+Item filtering
+
+Commands:
+bashSADD set member          # Add member
+SREM set member          # Remove member
+SISMEMBER set member     # Check membership
+SMEMBERS set             # Get all members
+SCARD set                # Get cardinality (count)
+SINTER set1 set2         # Intersection
+SUNION set1 set2         # Union
+SDIFF set1 set2          # Difference
+SPOP set                 # Remove and return random
+2.4 Sorted Set (ZSet)
+Ordered set where each member has a score
+Use Cases:
+
+Leaderboards
+Priority queues
+Rate limiters
+Time series data
+Range queries
+
+Commands:
+bashZADD zset score member
+ZREM zset member
+ZSCORE zset member
+ZRANK zset member        # Get rank (0-based)
+ZRANGE zset 0 -1         # Get by rank range
+ZRANGEBYSCORE zset min max # Get by score range
+ZINCRBY zset increment member
+ZCARD zset               # Get count
+ZCOUNT zset min max      # Count in score range
+2.5 Hash
+Collection of field-value pairs (like a mini Redis inside Redis)
+Use Cases:
+
+User profiles
+Product details
+Session data
+Configuration
+
+Commands:
+bashHSET hash field value
+HGET hash field
+HMSET hash f1 v1 f2 v2   # Multiple set
+HMGET hash f1 f2         # Multiple get
+HGETALL hash             # Get all fields and values
+HDEL hash field
+HEXISTS hash field
+HINCRBY hash field increment
+HKEYS hash               # Get all fields
+HVALS hash               # Get all values
+2.6 Bitmap
+String of bits (efficient for boolean flags)
+Use Cases:
+
+User online status
+Feature flags
+Daily active users tracking
+
+Commands:
+bashSETBIT key offset value
+GETBIT key offset
+BITCOUNT key             # Count set bits
+BITOP operation destkey key1 key2
+2.7 HyperLogLog
+Probabilistic data structure for cardinality estimation
+Use Cases:
+
+Unique visitor counting (with 0.81% error rate)
+Memory-efficient counting
+
+Commands:
+bashPFADD key element
+PFCOUNT key
+PFMERGE destkey sourcekey1 sourcekey2
+2.8 Geospatial
+Store and query geographical data
+Use Cases:
+
+Location-based services
+Nearby places
+
+Commands:
+bashGEOADD key longitude latitude member
+GEODIST key member1 member2 unit
+GEORADIUS key long lat radius unit
+GEOPOS key member
+2.9 Streams
+Append-only log data structure
+Use Cases:
+
+Event sourcing
+Activity feeds
+Real-time analytics
+
+Commands:
+bashXADD stream * field value
+XREAD COUNT count STREAMS stream ID
+XRANGE stream start end
+XLEN stream
+
+3. Redis Core Concepts
+3.1 Persistence
+RDB (Redis Database)
+
+Point-in-time snapshots at specified intervals
+Compact single-file snapshots
+Faster restarts
+Disadvantage: Data loss possible between snapshots
+
+Configuration:
+bashsave 900 1      # After 900 sec if at least 1 key changed
+save 300 10     # After 300 sec if at least 10 keys changed
+save 60 10000   # After 60 sec if at least 10000 keys changed
+AOF (Append Only File)
+
+Logs every write operation
+More durable (configurable fsync policies)
+Larger files
+Can be rewritten/compacted
+
+Configuration:
+bashappendonly yes
+appendfsync always    # Sync every write (slowest, safest)
+appendfsync everysec  # Sync every second (good compromise)
+appendfsync no        # Let OS decide (fastest, less safe)
+3.2 Expiration & Eviction
+TTL (Time To Live)
+bashEXPIRE key seconds
+EXPIREAT key timestamp
+TTL key              # Check remaining time
+PERSIST key          # Remove expiration
+Eviction Policies
+When max memory reached:
+
+noeviction: Return errors (default)
+allkeys-lru: Evict least recently used keys
+allkeys-lfu: Evict least frequently used keys
+volatile-lru: Evict LRU among keys with TTL
+volatile-lfu: Evict LFU among keys with TTL
+allkeys-random: Random eviction
+volatile-random: Random among keys with TTL
+volatile-ttl: Evict keys with shortest TTL
+
+3.3 Replication
+
+Master-Slave architecture
+Asynchronous replication
+Read scaling through slaves
+Automatic reconnection
+
+bash# On slave
+REPLICAOF host port
+# or in config
+replicaof 127.0.0.1 6379
+3.4 Redis Sentinel
+High availability solution:
+
+Monitoring
+Notification
+Automatic failover
+Configuration provider
+
+3.5 Redis Cluster
+
+Horizontal scaling
+Automatic sharding (16384 hash slots)
+Multi-master architecture
+Automatic failover
+
+3.6 Pub/Sub
+Message broadcasting system:
+bashPUBLISH channel message
+SUBSCRIBE channel
+PSUBSCRIBE pattern    # Pattern-based subscription
+UNSUBSCRIBE channel
+3.7 Transactions
+bashMULTI                 # Start transaction
+SET key1 value1
+SET key2 value2
+EXEC                  # Execute transaction
+# or
+DISCARD              # Cancel transaction
+Note: Redis transactions are not like RDBMS transactions:
+
+No rollback
+All commands executed sequentially
+Atomic execution
+
+3.8 Lua Scripting
+Execute Lua scripts atomically:
+bashEVAL script numkeys key [key ...] arg [arg ...]
+EVALSHA sha1 numkeys key [key ...] arg [arg ...]
+3.9 Pipelining
+Send multiple commands without waiting for responses:
+
+Reduces RTT (Round Trip Time)
+Improves throughput
+
+
+4. Spring Boot Redis Implementation
+4.1 Project Setup
+pom.xml:
+xml<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+        <relativePath/>
+    </parent>
+    
+    <groupId>com.example</groupId>
+    <artifactId>redis-demo</artifactId>
+    <version>1.0.0</version>
+    
+    <dependencies>
+        <!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <!-- Spring Data Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        
+        <!-- Lettuce (default Redis client) -->
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </dependency>
+        
+        <!-- Jackson for JSON serialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Spring Boot Starter Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Redis Test Container (optional) -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.19.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+application.yml:
+yamlspring:
+  application:
+    name: redis-demo
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: # if password protected
+      database: 0
+      timeout: 60000ms
+      
+      # Lettuce connection pool
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+        shutdown-timeout: 100ms
+      
+      # Jedis connection pool (alternative)
+      # jedis:
+      #   pool:
+      #     max-active: 8
+      #     max-idle: 8
+      #     min-idle: 0
+      #     max-wait: -1ms
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10 minutes in milliseconds
+      cache-null-values: false
+      key-prefix: "app::"
+      use-key-prefix: true
+
+# Logging
+logging:
+  level:
+    org.springframework.data.redis: DEBUG
+4.2 Redis Configuration Classes
+RedisConfig.java:
+javapackage com.example.config;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
+
+@Configuration
+@EnableCaching
+public class RedisConfig {
+
+    /**
+     * Configure RedisTemplate for custom operations
+     * RedisTemplate provides high-level abstractions for Redis operations
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(
+            RedisConnectionFactory connectionFactory) {
+        
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        
+        // Use StringRedisSerializer for keys
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+        
+        // Use Jackson2JsonRedisSerializer for values
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.activateDefaultTyping(
+            LaissezFaireSubTypeValidator.instance,
+            ObjectMapper.DefaultTyping.NON_FINAL,
+            JsonTypeInfo.As.PROPERTY
+        );
+        
+        GenericJackson2JsonRedisSerializer jsonSerializer = 
+            new GenericJackson2JsonRedisSerializer(objectMapper);
+        
+        template.setValueSerializer(jsonSerializer);
+        template.setHashValueSerializer(jsonSerializer);
+        
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    /**
+     * Configure CacheManager for @Cacheable annotations
+     */
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.activateDefaultTyping(
+            LaissezFaireSubTypeValidator.instance,
+            ObjectMapper.DefaultTyping.NON_FINAL,
+            JsonTypeInfo.As.PROPERTY
+        );
+        
+        GenericJackson2JsonRedisSerializer jsonSerializer = 
+            new GenericJackson2JsonRedisSerializer(objectMapper);
+        
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(10))
+            .serializeKeysWith(
+                RedisSerializationContext.SerializationPair
+                    .fromSerializer(new StringRedisSerializer())
+            )
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair
+                    .fromSerializer(jsonSerializer)
+            )
+            .disableCachingNullValues();
+        
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(config)
+            .build();
+    }
+
+    /**
+     * Configure multiple cache configurations
+     */
+    @Bean
+    public CacheManager customCacheManager(RedisConnectionFactory connectionFactory) {
+        
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration
+            .defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(10));
+        
+        RedisCacheConfiguration userCacheConfig = RedisCacheConfiguration
+            .defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(30));
+        
+        RedisCacheConfiguration productCacheConfig = RedisCacheConfiguration
+            .defaultCacheConfig()
+            .entryTtl(Duration.ofHours(1));
+        
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(defaultConfig)
+            .withCacheConfiguration("users", userCacheConfig)
+            .withCacheConfiguration("products", productCacheConfig)
+            .build();
+    }
+}
+4.3 Entity Classes
+User.java:
+javapackage com.example.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@RedisHash(value = "User", timeToLive = 3600) // 1 hour TTL
+public class User implements Serializable {
+    
+    @Id
+    private String id;
+    
+    @Indexed // Creates secondary index
+    private String email;
+    
+    private String name;
+    private String password;
+    private Integer age;
+    private String city;
+    private LocalDateTime createdAt;
+    private Boolean active;
+}
+Product.java:
+javapackage com.example.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Product implements Serializable {
+    
+    private String id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer quantity;
+    private String category;
+}
+4.4 Repository Layer
+UserRepository.java (using Spring Data Redis):
+javapackage com.example.repository;
+
+import com.example.model.User;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends CrudRepository<User, String> {
+    
+    // Custom query methods
+    Optional<User> findByEmail(String email);
+    List<User> findByCity(String city);
+    List<User> findByActive(Boolean active);
+}
+UserRedisRepository.java (using RedisTemplate):
+javapackage com.example.repository;
+
+import com.example.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@Repository
+@RequiredArgsConstructor
+public class UserRedisRepository {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String KEY_PREFIX = "user:";
+
+    public void save(User user) {
+        String key = KEY_PREFIX + user.getId();
+        redisTemplate.opsForValue().set(key, user);
+        // Set expiration
+        redisTemplate.expire(key, 1, TimeUnit.HOURS);
+    }
+
+    public User findById(String id) {
+        String key = KEY_PREFIX + id;
+        return (User) redisTemplate.opsForValue().get(key);
+    }
+
+    public void delete(String id) {
+        String key = KEY_PREFIX + id;
+        redisTemplate.delete(key);
+    }
+
+    public Boolean exists(String id) {
+        String key = KEY_PREFIX + id;
+        return redisTemplate.hasKey(key);
+    }
+
+    // Hash operations for storing user fields separately
+    public void saveAsHash(User user) {
+        String key = KEY_PREFIX + "hash:" + user.getId();
+        redisTemplate.opsForHash().put(key, "id", user.getId());
+        redisTemplate.opsForHash().put(key, "name", user.getName());
+        redisTemplate.opsForHash().put(key, "email", user.getEmail());
+        redisTemplate.opsForHash().put(key, "age", user.getAge());
+        redisTemplate.expire(key, 1, TimeUnit.HOURS);
+    }
+
+    public String getFieldFromHash(String userId, String field) {
+        String key = KEY_PREFIX + "hash:" + userId;
+        Object value = redisTemplate.opsForHash().get(key, field);
+        return value != null ? value.toString() : null;
+    }
+}
+4.5 Service Layer with Caching
+UserService.java:
+javapackage com.example.service;
+
+import com.example.model.User;
+import com.example.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserService {
+    
+    private final UserRepository userRepository;
+
+    /**
+     * @Cacheable - Caches the result
+     * If data exists in cache, method won't execute
+     */
+    @Cacheable(value = "users", key = "#id")
+    public Optional<User> getUserById(String id) {
+        log.info("Fetching user from database: {}", id);
+        return userRepository.findById(id);
+    }
+
+    /**
+     * @Cacheable with condition
+     * Only cache if user is active
+     */
+    @Cacheable(value = "users", key = "#email", condition = "#result.isPresent() && #result.get().active")
+    public Optional<User> getUserByEmail(String email) {
+        log.info("Fetching user by email from database: {}", email);
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * @CachePut - Always executes method and updates cache
+     * Used for update operations
+     */
+    @CachePut(value = "users", key = "#user.id")
+    public User createUser(User user) {
+        log.info("Creating new user: {}", user.getEmail());
+        user.setId(UUID.randomUUID().toString());
+        user.setCreatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    /**
+     * @CachePut for update
+     */
+    @CachePut(value = "users", key = "#user.id")
+    public User updateUser(User user) {
+        log.info("Updating user: {}", user.getId());
+        return userRepository.save(user);
+    }
+
+    /**
+     * @CacheEvict - Removes entry from cache
+     */
+    @CacheEvict(value = "users", key = "#id")
+    public void deleteUser(String id) {
+        log.info("Deleting user: {}", id);
+        userRepository.deleteById(id);
+    }
+
+    /**
+     * @CacheEvict with allEntries - Clears entire cache
+     */
+    @CacheEvict(value = "users", allEntries = true)
+    public void deleteAllUsers() {
+        log.info("Deleting all users and clearing cache");
+        userRepository.deleteAll();
+    }
+
+    /**
+     * Multiple cache annotations using @Caching
+     */
+    @CacheEvict(value = "users", allEntries = true)
+    public List<User> getUsersByCity(String city) {
+        log.info("Fetching users by city: {}", city);
+        return userRepository.findByCity(city);
+    }
+}
+ProductService.java (Manual caching with RedisTemplate):
+javapackage com.example.service;
+
+import com.example.model.Product;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ProductService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String PRODUCT_KEY_PREFIX = "product:";
+    private static final long CACHE_TTL = 30; // minutes
+
+    public Product getProduct(String productId) {
+        String key = PRODUCT_KEY_PREFIX + productId;
+        
+        // Try to get from cache
+        Product product = (Product) redisTemplate.opsForValue().get(key);
+        
+        if (product != null) {
+            log.info("Product found in cache: {}", productId);
+            return product;
+        }
+        
+        // Simulate database fetch
+        log.info("Product not in cache, fetching from database: {}", productId);
+        product = fetchFromDatabase(productId);
+        
+        if (product != null) {
+            // Store in cache with TTL
+            redisTemplate.opsForValue().set(key, product, CACHE_TTL, TimeUnit.MINUTES);
+        }
+        
+        return product;
+    }
+
+    public void updateProduct(Product product) {
+        String key = PRODUCT_KEY_PREFIX + product.getId();
+        
+        // Update in database
+        saveToDatabase(product);
+        
+        // Update cache
+        redisTemplate.opsForValue().set(key, product, CACHE_TTL, TimeUnit.MINUTES);
+        log.info("Product updated in cache: {}", product.getId());
+    }
+
+    public void deleteProduct(String productId) {
+        String key = PRODUCT_KEY_PREFIX + productId;
+        
+        // Delete from database
+        deleteFromDatabase(productId);
+        
+        // Remove from cache
+        redisTemplate.delete(key);
+        log.info("Product removed from cache: {}", productId);
+    }
+
+    // Simulate database operations
+    private Product fetchFromDatabase(String productId) {
+        // Simulate delay
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return new Product(productId, "Sample Product", "Description", 
+                          java.math.BigDecimal.valueOf(99.99), 10, "Electronics");
+    }
+
+    private void saveToDatabase(Product product) {
+        log.info("Saving product to database: {}", product.getId());
+    }
+
+    private void deleteFromDatabase(String productId) {
+        log.info("Deleting product from database: {}", productId);
+    }
+}
+4.6 Advanced Redis Operations Service
+RedisOperationsService.java:
+javapackage com.example.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class RedisOperationsService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    // ========== STRING OPERATIONS ==========
+    
+    public void setWithExpiry(String key, Object value, long timeout, TimeUnit unit) {
+        redisTemplate.opsForValue().set(key, value, timeout, unit);
+    }
+
+    public Object get(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public Boolean setIfAbsent(String key, Object value) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value);
+    }
+
+    public Long increment(String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
+
+    public Long incrementBy(String key, long delta) {
+        return redisTemplate.opsForValue().increment(key, delta);
+    }
+
+    // ========== LIST OPERATIONS ==========
+    
+    public Long pushToList(String key, Object value) {
+        return redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    public Object popFromList(String key) {
+        return redisTemplate.opsForList().leftPop(key);
+    }
+
+    public List<Object> getListRange(String key, long start, long end) {
+        return redisTemplate.opsForList().range(key, start, end);
+    }
+
+    public Long getListSize(String key) {
+        return redisTemplate.opsForList().size(key);
+    }
+
+    // Blocking pop for queue implementation
+    public Object blockingPop(String key, long timeout, TimeUnit unit) {
+        return redisTemplate.opsForList().leftPop(key, timeout, unit);
+    }
+
+    // ========== SET OPERATIONS ==========
+    
+    public Long addToSet(String key, Object... values) {
+        return redisTemplate.opsForSet().add(key, values);
+    }
+
+    public Boolean isMemberOfSet(String key, Object value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    public Set<Object> getSetMembers(String key) {
+        return redisTemplate.opsForSet().members(key);
+    }
+
+    public Set<Object> getSetIntersection(String key1, String key2) {
+        return redisTemplate.opsForSet().intersect(key1, key2);
+    }
+
+    public Set<Object> getSetUnion(String key1, String key2) {
+        return redisTemplate.opsForSet().union(key1, key2);
+    }
+
+    public Long removeFromSet(String key, Object... values) {
+        return redisTemplate.opsForSet().remove(key, values);
+    }
+
+    // ========== SORTED SET OPERATIONS ==========
+    
+    public Boolean addToSortedSet(String key, Object value, double score) {
+        return redisTemplate.opsForZSet().add(key, value, score);
+    }
+
+    public Set<Object> getSortedSetRange(String key, long start, long end) {
+        return redisTemplate.opsForZSet().range(key, start, end);
+    }
+
+    public Set<ZSetOperations.TypedTuple<Object>> getSortedSetRangeWithScores(
+            String key, long start, long end) {
+        return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+    }
+
+    public Set<Object> getSortedSetRangeByScore(String key, double min, double max) {
+        return redisTemplate.opsForZSet().rangeByScore(key, min, max);
+    }
+
+    public Long getSortedSetRank(String key, Object value) {
+        return redisTemplate.opsForZSet().rank(key, value);
+    }
+
+    public Double getSortedSetScore(String key, Object value) {
+        return redisTemplate.opsForZSet().score(key, value);
+    }
+
+    public Double incrementSortedSetScore(String key, Object value, double delta) {
+        return redisTemplate.opsForZSet().incrementScore(key, value, delta);
+    }
+
+    public Long getSortedSetSize(String key) {
+        return redisTemplate.opsForZSet().size(key);
+    }
+
+    // ========== HASH OPERATIONS ==========
+    
+    public void putToHash(String key, String hashKey, Object value) {
+        redisTemplate.opsForHash().put(key, hashKey, value);
+    }
+
+    public Object getFromHash(String key, String hashKey) {
+        return redisTemplate.opsForHash().get(key, hashKey);
+    }
+
+    public Map<Object, Object> getAllFromHash(String key) {
+        return redisTemplate.opsForHash().entries(key);
+    }
+
+    public Boolean hashKeyExists(String key, String hashKey) {
+        return redisTemplate.opsForHash().hasKey(key, hashKey);
+    }
+
+    public Long deleteFromHash(String key, Object... hashKeys) {
+        return redisTemplate.opsForHash().delete(key, hashKeys);
+    }
+
+    public Long incrementHashValue(String key, String hashKey, long delta) {
+        return redisTemplate.opsForHash().increment(key, hashKey, delta);
+    }
+
+    // ========== KEY OPERATIONS ==========
+    
+    public Boolean delete(String key) {
+        return redisTemplate.delete(key);
+    }
+
+    public Long delete(Collection<String> keys) {
+        return redisTemplate.delete(keys);
+    }
+
+    public Boolean expire(String key, long timeout, TimeUnit unit) {
+        return redisTemplate.expire(key, timeout, unit);
+    }
+
+    public Long getExpire(String key, TimeUnit unit) {
+        return redisTemplate.getExpire(key, unit);
+    }
+
+    public Boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
+    }
+
+    public Set<String> keys(String pattern) {
+        return redisTemplate.keys(pattern);
+    }
+}
+4.7 Practical Use Cases Implementation
+LeaderboardService.java:
+javapackage com.example.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+@Service
+@RequiredArgsConstructor
+public class LeaderboardService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String LEADERBOARD_KEY = "game:leaderboard";
+
+    /**
+     * Add or update player score
+     */
+    public void updateScore(String playerId, double score) {
+        redisTemplate.opsForZSet().add(LEADERBOARD_KEY, playerId, score);
+    }
+
+    /**
+     * Increment player score
+     */
+    public Double incrementScore(String playerId, double delta) {
+        return redisTemplate.opsForZSet().incrementScore(LEADERBOARD_KEY, playerId, delta);
+    }
+
+    /**
+     * Get top N players
+     */
+    public Map<String, Double> getTopPlayers(int count) {
+        Set<ZSetOperations.TypedTuple<Object>> topPlayers = 
+            redisTemplate.opsForZSet().reverseRangeWithScores(LEADERBOARD_KEY, 0, count - 1);
+        
+        Map<String, Double> result = new LinkedHashMap<>();
+        if (topPlayers != null) {
+            topPlayers.forEach(tuple -> 
+                result.put((String) tuple.getValue(), tuple.getScore())
+            );
+        }
+        return result;
+    }
+
+    /**
+     * Get player rank (1-based)
+     */
+    public Long getPlayerRank(String playerId) {
+        Long rank = redisTemplate.opsForZSet().reverseRank(LEADERBOARD_KEY, playerId);
+        return rank != null ? rank + 1 : null;
+    }
+
+    /**
+     * Get player score
+     */
+    public Double getPlayerScore(String playerId) {
+        return redisTemplate.opsForZSet().score(LEADERBOARD_KEY, playerId);
+    }
+
+    /**
+     * Remove player from leaderboard
+     */
+    public void removePlayer(String playerId) {
+        redisTemplate.opsForZSet().remove(LEADERBOARD_KEY, playerId);
+    }
+
+    /**
+     * Get players in score range
+     */
+    public Set<Object> getPlayersByScoreRange(double minScore, double maxScore) {
+        return redisTemplate.opsForZSet().rangeByScore(LEADERBOARD_KEY, minScore, maxScore);
+    }
+}
+RateLimiterService.java:
+javapackage com.example.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+public class RateLimiterService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    /**
+     * Simple rate limiter using counter
+     * @param key - unique identifier (e.g., userId, IP)
+     * @param maxRequests - maximum requests allowed
+     * @param windowSeconds - time window in seconds
+     * @return true if request is allowed
+     */
+    public boolean isAllowed(String key, int maxRequests, int windowSeconds) {
+        String rateLimitKey = "ratelimit:" + key;
+        
+        Long currentCount = redisTemplate.opsForValue().increment(rateLimitKey);
+        
+        if (currentCount == null) {
+            return false;
+        }
+        
+        if (currentCount == 1) {
+            // First request, set expiry
+            redisTemplate.expire(rateLimitKey, windowSeconds, TimeUnit.SECONDS);
+        }
+        
+        return currentCount <= maxRequests;
+    }
+
+    /**
+     * Sliding window rate limiter using sorted set
+     */
+    public boolean isAllowedSlidingWindow(String key, int maxRequests, int windowSeconds) {
+        String rateLimitKey = "ratelimit:sliding:" + key;
+        long now = System.currentTimeMillis();
+        long windowStart = now - (windowSeconds * 1000L);
+        
+        // Remove old entries
+        redisTemplate.opsForZSet().removeRangeByScore(rateLimitKey, 0, windowStart);
+        
+        // Count current entries
+        Long count = redisTemplate.opsForZSet().zCard(rateLimitKey);
+        
+        if (count != null && count >= maxRequests) {
+            return false;
+        }
+        
+        // Add current request
+        redisTemplate.opsForZSet().add(rateLimitKey, String.valueOf(now), now);
+        redisTemplate.expire(rateLimitKey, windowSeconds, TimeUnit.SECONDS);
+        
+        return true;
+    }
+
+    /**
+     * Token bucket rate limiter
+     */
+    public boolean consumeToken(String key, int tokensPerWindow, int windowSeconds) {
+        String tokenKey = "ratelimit:token:" + key;
+        String timestampKey = "ratelimit:token:ts:" + key;
+        
+        Long tokens = (Long) redisTemplate.opsForValue().get(tokenKey);
+        Long lastRefill = (Long) redisTemplate.opsForValue().get(timestampKey);
+        
+        long now = System.currentTimeMillis();
+        
+        if (tokens == null || lastRefill == null) {
+            // Initialize
+            redisTemplate.opsForValue().set(tokenKey, tokensPerWindow - 1);
+            redisTemplate.opsForValue().set(timestampKey, now);
+            redisTemplate.expire(tokenKey, windowSeconds * 2, TimeUnit.SECONDS);
+            redisTemplate.expire(timestampKey, windowSeconds * 2, TimeUnit.SECONDS);
+            return true;
+        }
+        
+        // Refill tokens based on time elapsed
+        long elapsedSeconds = (now - lastRefill) / 1000;
+        long tokensToAdd = (elapsedSeconds * tokensPerWindow) / windowSeconds;
+        tokens = Math.min(tokens + tokensToAdd, tokensPerWindow);
+        
+        if (tokens > 0) {
+            redisTemplate.opsForValue().set(tokenKey, tokens - 1);
+            redisTemplate.opsForValue().set(timestampKey, now);
+            return true;
+        }
+        
+        return false;
+    }
+}
+SessionService.java:
+javapackage com.example.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+public class SessionService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String SESSION_PREFIX = "session:";
+    private static final long SESSION_TIMEOUT = 30; // minutes
+
+    /**
+     * Create a new session
+     */
+    public String createSession(String userId, Map<String, Object> sessionData) {
+        String sessionId = UUID.randomUUID().toString();
+        String key = SESSION_PREFIX + sessionId;
+        
+        sessionData.put("userId", userId);
+        sessionData.put("createdAt", System.currentTimeMillis());
+        
+        redisTemplate.opsForHash().putAll(key, sessionData);
+        redisTemplate.expire(key, SESSION_TIMEOUT, TimeUnit.MINUTES);
+        
+        return sessionId;
+    }
+
+    /**
+     * Get session data
+     */
+    public Map<Object, Object> getSession(String sessionId) {
+        String key = SESSION_PREFIX + sessionId;
+        
+        Map<Object, Object> sessionData = redisTemplate.opsForHash().entries(key);
+        
+        if (!sessionData.isEmpty()) {
+            // Refresh expiry on access
+            redisTemplate.expire(key, SESSION_TIMEOUT, TimeUnit.MINUTES);
+        }
+        
+        return sessionData;
+    }
+
+    /**
+     * Update session attribute
+     */
+    public void updateSessionAttribute(String sessionId, String attribute, Object value) {
+        String key = SESSION_PREFIX + sessionId;
+        redisTemplate.opsForHash().put(key, attribute, value);
+        redisTemplate.expire(key, SESSION_TIMEOUT, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Delete session
+     */
+    public void deleteSession(String sessionId) {
+        String key = SESSION_PREFIX + sessionId;
+        redisTemplate.delete(key);
+    }
+
+    /**
+     * Check if session exists
+     */
+    public boolean sessionExists(String sessionId) {
+        String key = SESSION_PREFIX + sessionId;
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+}
+DistributedLockService.java:
+javapackage com.example.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class DistributedLockService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String LOCK_PREFIX = "lock:";
+
+    /**
+     * Acquire distributed lock
+     * @param lockKey - unique lock identifier
+     * @param timeout - lock timeout in seconds
+     * @return lock identifier if successful, null otherwise
+     */
+    public String acquireLock(String lockKey, long timeout) {
+        String key = LOCK_PREFIX + lockKey;
+        String lockId = UUID.randomUUID().toString();
+        
+        Boolean acquired = redisTemplate.opsForValue()
+            .setIfAbsent(key, lockId, timeout, TimeUnit.SECONDS);
+        
+        if (Boolean.TRUE.equals(acquired)) {
+            log.info("Lock acquired: {} with id: {}", lockKey, lockId);
+            return lockId;
+        }
+        
+        log.warn("Failed to acquire lock: {}", lockKey);
+        return null;
+    }
+
+    /**
+     * Release distributed lock
+     * @param lockKey - unique lock identifier
+     * @param lockId - lock identifier returned from acquireLock
+     * @return true if successfully released
+     */
+    public boolean releaseLock(String lockKey, String lockId) {
+        String key = LOCK_PREFIX + lockKey;
+        String currentLockId = (String) redisTemplate.opsForValue().get(key);
+        
+        if (lockId.equals(currentLockId)) {
+            redisTemplate.delete(key);
+            log.info("Lock released: {} with id: {}", lockKey, lockId);
+            return true;
+        }
+        
+        log.warn("Lock not released - ID mismatch: {}", lockKey);
+        return false;
+    }
+
+    /**
+     * Try to acquire lock with retry
+     */
+    public String acquireLockWithRetry(String lockKey, long timeout, 
+                                      int maxRetries, long retryDelayMs) {
+        for (int i = 0; i < maxRetries; i++) {
+            String lockId = acquireLock(lockKey, timeout);
+            if (lockId != null) {
+                return lockId;
+            }
+            
+            try {
+                Thread.sleep(retryDelayMs);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return null;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Execute task with lock
+     */
+    public <T> T executeWithLock(String lockKey, long timeout, 
+                                 java.util.function.Supplier<T> task) {
+        String lockId = acquireLock(lockKey, timeout);
+        
+        if (lockId == null) {
+            throw new RuntimeException("Could not acquire lock: " + lockKey);
+        }
+        
+        try {
+            return task.get();
+        } finally {
+            releaseLock(lockKey, lockId);
+        }
+    }
+}
+4.8 Controller Layer
+UserController.java:
+javapackage com.example.controller;
+
+import com.example.model.User;
+import com.example.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+    
+    private final UserService userService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable String id) {
+        Optional<User> user = userService.getUserById(id);
+        return user.map(ResponseEntity::ok)
+                  .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        Optional<User> user = userService.getUserByEmail(email);
+        return user.map(ResponseEntity::ok)
+                  .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable String id, 
+                                          @RequestBody User user) {
+        user.setId(id);
+        User updatedUser = userService.updateUser(user);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+RedisController.java:
+javapackage com.example.controller;
+
+import com.example.service.LeaderboardService;
+import com.example.service.RateLimiterService;
+import com.example.service.RedisOperationsService;
+import com.example.service.SessionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+@RestController
+@RequestMapping("/api/redis")
+@RequiredArgsConstructor
+public class RedisController {
+    
+    private final RedisOperationsService redisOps;
+    private final LeaderboardService leaderboardService;
+    private final RateLimiterService rateLimiterService;
+    private final SessionService sessionService;
+
+    // String operations
+    @PostMapping("/string/{key}")
+    public ResponseEntity<Void> setString(@PathVariable String key, 
+                                         @RequestBody String value) {
+        redisOps.setWithExpiry(key, value, 10, TimeUnit.MINUTES);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/string/{key}")
+    public ResponseEntity<Object> getString(@PathVariable String key) {
+        Object value = redisOps.get(key);
+        return ResponseEntity.ok(value);
+    }
+
+    // Counter operations
+    @PostMapping("/counter/{key}/increment")
+    public ResponseEntity<Long> incrementCounter(@PathVariable String key) {
+        Long value = redisOps.increment(key);
+        return ResponseEntity.ok(value);
+    }
+
+    // List operations
+    @PostMapping("/list/{key}")
+    public ResponseEntity<Void> pushToList(@PathVariable String key, 
+                                          @RequestBody String value) {
+        redisOps.pushToList(key, value);
+        return ResponseEntity.ok().build();
+    }
+
+    // Leaderboard operations
+    @PostMapping("/leaderboard/{playerId}/score")
+    public ResponseEntity<Void> updateScore(@PathVariable String playerId, 
+                                           @RequestParam double score) {
+        leaderboardService.updateScore(playerId, score);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/leaderboard/top/{count}")
+    public ResponseEntity<Map<String, Double>> getTopPlayers(@PathVariable int count) {
+        return ResponseEntity.ok(leaderboardService.getTopPlayers(count));
+    }
+
+    // Rate limiter
+    @GetMapping("/ratelimit/{userId}/check")
+    public ResponseEntity<Boolean> checkRateLimit(@PathVariable String userId) {
+        boolean allowed = rateLimiterService.isAllowed(userId, 10, 60);
+        return ResponseEntity.ok(allowed);
+    }
+
+    // Session operations
+    @PostMapping("/session")
+    public ResponseEntity<String> createSession(@RequestParam String userId, 
+                                               @RequestBody Map<String, Object> data) {
+        String sessionId = sessionService.createSession(userId, data);
+        return ResponseEntity.ok(sessionId);
+    }
+
+    @GetMapping("/session/{sessionId}")
+    public ResponseEntity<Map<Object, Object>> getSession(@PathVariable String sessionId) {
+        return ResponseEntity.ok(sessionService.getSession(sessionId));
+    }
+}
+
+5. Scenario-Based Interview Questions
+Q1: Cache Stampede / Thundering Herd Problem
+Scenario: When a cached item expires, multiple requests simultaneously try to regenerate it, causing high database load.
+Solutions:
+java@Service
+public class CacheStampedeService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final DistributedLockService lockService;
+
+    // Solution 1: Use distributed lock
+    public User getUserWithLock(String userId) {
+        String cacheKey = "user:" + userId;
+        String lockKey = "lock:user:" + userId;
+        
+        // Try cache first
+        User user = (User) redisTemplate.opsForValue().get(cacheKey);
+        if (user != null) {
+            return user;
+        }
+        
+        // Acquire lock
+        String lockId = lockService.acquireLock(lockKey, 10);
+        if (lockId != null) {
+            try {
+                // Double-check cache
+                user = (User) redisTemplate.opsForValue().get(cacheKey);
+                if (user != null) {
+                    return user;
+                }
+                
+                // Fetch from database
+                user = fetchFromDatabase(userId);
+                redisTemplate.opsForValue().set(cacheKey, user, 10, TimeUnit.MINUTES);
+                return user;
+            } finally {
+                lockService.releaseLock(lockKey, lockId);
+            }
+        } else {
+            // Wait and retry
+            try {
+                Thread.sleep(100);
+                return getUserWithLock(userId);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    // Solution 2: Probabilistic early expiration
+    public User getUserWithProbabilisticExpiry(String userId) {
+        String cacheKey = "user:" + userId;
+        String timestampKey = "user:ts:" + userId;
+        
+        User user = (User) redisTemplate.opsForValue().get(cacheKey);
+        Long timestamp = (Long) redisTemplate.opsForValue().get(timestampKey);
+        
+        if (user != null && timestamp != null) {
+            long ttl = 600; // 10 minutes in seconds
+            long elapsed = (System.currentTimeMillis() - timestamp) / 1000;
+            double probability = Math.exp(-elapsed / ttl);
+            
+            // Randomly refresh before expiry
+            if (Math.random() < (1 - probability) * 0.1) {
+                // Async refresh
+                CompletableFuture.runAsync(() -> refreshCache(userId));
+            }
+            
+            return user;
+        }
+        
+        return refreshCache(userId);
+    }
+
+    private User refreshCache(String userId) {
+        User user = fetchFromDatabase(userId);
+        redisTemplate.opsForValue().set("user:" + userId, user, 10, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("user:ts:" + userId, 
+                                       System.currentTimeMillis(), 10, TimeUnit.MINUTES);
+        return user;
+    }
+}
+Q2: Cache Penetration
+Scenario: Requests for non-existent data bypass cache and hit database repeatedly.
+Solutions:
+java@Service
+public class CachePenetrationService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    // Solution 1: Cache null values
+    public User getUserCacheNull(String userId) {
+        String key = "user:" + userId;
+        Object cached = redisTemplate.opsForValue().get(key);
+        
+        if (cached != null) {
+            return cached.equals("NULL") ? null : (User) cached;
+        }
+        
+        User user = fetchFromDatabase(userId);
+        
+        if (user == null) {
+            // Cache null with shorter TTL
+            redisTemplate.opsForValue().set(key, "NULL", 1, TimeUnit.MINUTES);
+            return null;
+        }
+        
+        redisTemplate.opsForValue().set(key, user, 10, TimeUnit.MINUTES);
+        return user;
+    }
+
+    // Solution 2: Bloom Filter
+    private BloomFilter<String> bloomFilter = BloomFilter.create(
+        Funnels.stringFunnel(Charset.defaultCharset()),
+        1000000,
+        0.01
+    );
+
+    public User getUserWithBloomFilter(String userId) {
+        // Check Bloom filter first
+        if (!bloomFilter.mightContain(userId)) {
+            return null; // Definitely doesn't exist
+        }
+        
+        String key = "user:" + userId;
+        User user = (User) redisTemplate.opsForValue().get(key);
+        
+        if (user != null) {
+            return user;
+        }
+        
+        user = fetchFromDatabase(userId);
+        if (user != null) {
+            redisTemplate.opsForValue().set(key, user, 10, TimeUnit.MINUTES);
+        }
+        
+        return user;
+    }
+
+    // Initialize Bloom filter with existing IDs
+    public void initializeBloomFilter() {
+        List<String> existingUserIds = getAllUserIdsFromDatabase();
+        existingUserIds.forEach(bloomFilter::put);
+    }
+}
+Q3: Cache Avalanche
+Scenario: Many cache keys expire simultaneously, causing database overload.
+Solutions:
+java@Service
+public class CacheAvalancheService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    // Solution 1: Random TTL
+    public void cacheWithRandomTTL(String key, Object value) {
+        int baseTTL = 600; // 10 minutes
+        int randomOffset = new Random().nextInt(120); // 0-2 minutes
+        redisTemplate.opsForValue().set(key, value, 
+                                       baseTTL + randomOffset, TimeUnit.SECONDS);
+    }
+
+    // Solution 2: Never expire + async refresh
+    public User getUserNeverExpire(String userId) {
+        String key = "user:" + userId;
+        String versionKey = "user:version:" + userId;
+        
+        User user = (User) redisTemplate.opsForValue().get(key);
+        Long version = (Long) redisTemplate.opsForValue().get(versionKey);
+        
+        if (user != null) {
+            // Check if version is stale (async refresh trigger)
+            if (version != null && System.currentTimeMillis() - version > 300000) {
+                CompletableFuture.runAsync(() -> {
+                    User freshUser = fetchFromDatabase(userId);
+                    redisTemplate.opsForValue().set(key, freshUser);
+                    redisTemplate.opsForValue().set(versionKey, System.currentTimeMillis());
+                });
+            }
+            return user;
+        }
+        
+        // Initial load
+        user = fetchFromDatabase(userId);
+        redisTemplate.opsForValue().set(key, user);
+        redisTemplate.opsForValue().set(versionKey, System.currentTimeMillis());
+        return user;
+    }
+
+    // Solution 3: Multi-level cache
+    private final ConcurrentHashMap<String, User> localCache = new ConcurrentHashMap<>();
+    
+    public User getUserMultiLevel(String userId) {
+        // L1: Local cache
+        User user = localCache.get(userId);
+        if (user != null) {
+            return user;
+        }
+        
+        // L2: Redis cache
+        String key = "user:" + userId;
+        user = (User) redisTemplate.opsForValue().get(key);
+        if (user != null) {
+            localCache.put(userId, user);
+            return user;
+        }
+        
+        // L3: Database
+        user = fetchFromDatabase(userId);
+        if (user != null) {
+            redisTemplate.opsForValue().set(key, user, 10, TimeUnit.MINUTES);
+            localCache.put(userId, user);
+        }
+        
+        return user;
+    }
+}
+Q4: Hot Key Problem
+Scenario: A single key receives massive traffic, overwhelming a single Redis node.
+Solutions:
+java@Service
+public class HotKeyService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    // Solution 1: Local cache for hot keys
+    private final Cache<String, Object> localCache = Caffeine.newBuilder()
+        .maximumSize(1000)
+        .expireAfterWrite(Duration.ofMinutes(1))
+        .build();
+
+    public Object getHotKey(String key) {
+        // Try local cache first
+        Object value = localCache.getIfPresent(key);
+        if (value != null) {
+            return value;
+        }
+        
+        // Try Redis
+        value = redisTemplate.opsForValue().get(key);
+        if (value != null) {
+            localCache.put(key, value);
+        }
+        
+        return value;
+    }
+
+    // Solution 2: Key sharding
+    public void setWithSharding(String key, Object value) {
+        int shardCount = 10;
+        int shardIndex = key.hashCode() % shardCount;
+        String shardedKey = key + ":shard:" + shardIndex;
+        redisTemplate.opsForValue().set(shardedKey, value, 10, TimeUnit.MINUTES);
+    }
+
+    public Object getWithSharding(String key) {
+        int shardCount = 10;
+        int shardIndex = new Random().nextInt(shardCount);
+        String shardedKey = key + ":shard:" + shardIndex;
+        return redisTemplate.opsForValue().get(shardedKey);
+    }
+}
+Q5: Distributed Counter with Race Condition
+Scenario: Multiple services incrementing a counter concurrently.
+Solution:
+java@Service
+public class DistributedCounterService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    // Redis INCR is atomic, so no race condition
+    public Long incrementPageView(String pageId) {
+        String key = "pageview:" + pageId;
+        return redisTemplate.opsForValue().increment(key);
+    }
+
+    // For complex operations, use Lua script for atomicity
+    public Long incrementWithLimit(String key, long maxValue) {
+        String luaScript = 
+            "local current = redis.call('GET', KEYS[1]) " +
+            "if current == false then " +
+            "  redis.call('SET', KEYS[1], 1) " +
+            "  return 1 " +
+            "end " +
+            "current = tonumber(current) " +
+            "if current < tonumber(ARGV[1]) then " +
+            "  return redis.call('INCR', KEYS[1]) " +
+            "else " +
+            "  return current " +
+            "end";
+        
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+        script.setScriptText(luaScript);
+        script.setResultType(Long.class);
+        
+        return redisTemplate.execute(script, 
+                                    Collections.singletonList(key), 
+                                    String.valueOf(maxValue));
+    }
+}
+Q6: Session Clustering
+Scenario: Multiple application instances need to share session data.
+Solution: Already covered in SessionService above, but here's an additional implementation with Spring Session:
+xml<!-- Add to pom.xml -->
+<dependency>
+    <groupId>org.springframework.session</groupId>
+    <artifactId>spring-session-data-redis</artifactId>
+</dependency>
+java@Configuration
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 1800)
+public class SessionConfig {
+    // Spring Session automatically handles session storage in Redis
+}
+Q7: Implement a Simple Pub/Sub Chat
+Solution:
+java@Service
+@Slf4j
+public class ChatService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public void publishMessage(String channel, String message) {
+        redisTemplate.convertAndSend(channel, message);
+        log.info("Published to {}: {}", channel, message);
+    }
+}
+
+@Component
+@Slf4j
+public class ChatMessageListener {
+    
+    @Bean
+    RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        
+        container.addMessageListener(
+            new MessageListenerAdapter(new MessageListener() {
+                @Override
+                public void onMessage(Message message, byte[] pattern) {
+                    log.info("Received: {}", new String(message.getBody()));
+                }
+            }),
+            new ChannelTopic("chat:general")
+        );
+        
+        return container;
+    }
+}
+Q8: Implement Sliding Window Rate Limiter
+Already covered in RateLimiterService above with isAllowedSlidingWindow method.
+Q9: Redis Transaction Example
+java@Service
+public class TransactionService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public void transferPoints(String fromUser, String toUser, int points) {
+        redisTemplate.execute(new SessionCallback<List<Object>>() {
+            @Override
+            public List<Object> execute(RedisOperations operations) throws DataAccessException {
+                String fromKey = "user:points:" + fromUser;
+                String toKey = "user:points:" + toUser;
+                
+                // Watch keys for optimistic locking
+                operations.watch(fromKey);
+                
+                Integer fromPoints = (Integer) operations.opsForValue().get(fromKey);
+                
+                if (fromPoints == null || fromPoints < points) {
+                    operations.unwatch();
+                    throw new RuntimeException("Insufficient points");
+                }
+                
+                // Start transaction
+                operations.multi();
+                
+                operations.opsForValue().increment(fromKey, -points);
+                operations.opsForValue().increment(toKey, points);
+                
+                // Execute transaction
+                return operations.exec();
+            }
+        });
+    }
+}
+Q10: Redis Pipeline for Bulk Operations
+java@Service
+public class PipelineService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public void bulkSet(Map<String, Object> data) {
+        redisTemplate.executePipelined(new SessionCallback<Object>() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                data.forEach((key, value) -> {
+                    operations.opsForValue().set(key, value);
+                });
+                return null;
+            }
+        });
+    }
+
+    public List<Object> bulkGet(List<String> keys) {
+        return redisTemplate.executePipelined(new SessionCallback<Object>() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                keys.forEach(operations.opsForValue()::get);
+                return null;
+            }
+        });
+    }
+}
+
+6. Additional Interview Questions & Answers
+General Questions
+Q: What is Redis and why is it fast?
+A: Redis is an in-memory data structure store. It's fast because:
+
+Data stored in RAM (not disk)
+Simple data structures optimized for speed
+Single-threaded architecture (no context switching, no locks)
+Efficient I/O multiplexing
+C implementation, optimized algorithms
+
+Q: Redis is single-threaded, but how does it handle concurrent connections?
+A: Redis uses an event loop with I/O multiplexing (epoll/kqueue). One thread handles all client requests sequentially, but the OS kernel handles network I/O for multiple connections simultaneously. Redis 6.0 introduced multi-threading for I/O operations while keeping command execution single-threaded.
+Q: What's the difference between Redis and Memcached?
+A:
+
+Data structures: Redis supports rich types; Memcached only key-value
+Persistence: Redis has RDB/AOF; Memcached is volatile
+Replication: Redis supports master-slave; Memcached doesn't
+Transactions: Redis has MULTI/EXEC; Memcached doesn't
+Lua scripting: Redis supports it; Memcached doesn't
+Threading: Memcached is multi-threaded; Redis traditionally single-threaded
+
+Q: When would you choose Redis vs a traditional database?
+A: Use Redis for:
+
+Caching
+Real-time analytics
+Session storage
+Leaderboards
+Rate limiting
+Pub/Sub messaging
+Temporary data with TTL
+
+Use traditional DB for:
+
+Complex queries with JOINs
+Large datasets (> available RAM)
+ACID transactions across multiple records
+Long-term persistent storage
+
+Q: Explain Redis persistence mechanisms.
+A:
+
+RDB (Snapshotting):
+
+Point-in-time snapshots
+Compact, fast recovery
+Risk of data loss between snapshots
+
+
+AOF (Append-Only File):
+
+Logs every write operation
+More durable
+Larger file size
+Can be rewritten to optimize
+
+
+Hybrid: RDB + AOF (recommended)
+
+Q: What is Redis Sentinel?
+A: High availability solution providing:
+
+Monitoring: Checks if master/slaves are working
+Notification: Alerts via API
+Automatic failover: Promotes slave to master
+Configuration provider: Clients discover current master
+
+Q: What is Redis Cluster?
+A: Horizontal scaling solution:
+
+Data automatically sharded across nodes
+16384 hash slots distributed
+Each node handles subset of slots
+Multi-master architecture
+Automatic failover
+No single point of failure
+
+Q: How does Redis handle data that exceeds memory?
+A: Uses eviction policies when maxmemory reached:
+
+noeviction: Return errors
+allkeys-lru/lfu: Evict least recently/frequently used
+volatile-lru/lfu: Evict among keys with TTL
+allkeys-random: Random eviction
+volatile-random: Random among keys with TTL
+volatile-ttl: Evict shortest TTL first
+
+Q: What's the maximum size of a key and value in Redis?
+A:
+
+Key: Up to 512 MB (but keep short for performance)
+Value: Up to 512 MB
+Recommended: Keys under 1 KB, values under 10 MB
+
+Q: How do you monitor Redis?
+A:
+
+INFO command: Comprehensive stats
+MONITOR: Real-time command logging
+SLOWLOG: Slow query log
+Redis CLI --stat: Real-time stats
+External tools: RedisInsight, Grafana + Prometheus
+
+Q: What are Redis best practices?
+A:
+
+Use connection pooling
+Set appropriate maxmemory and eviction policy
+Use pipelining for bulk operations
+Avoid large keys (> 1 MB)
+Use Hash for objects instead of serialized strings
+Set TTL on keys when possible
+Use appropriate data structures
+Enable persistence (RDB + AOF)
+Monitor memory usage
+Use Redis Cluster for scaling
+
+This comprehensive guide covers Redis from fundamentals to advanced implementation. Practice the code examples and understand the scenarios to master Redis for interviews and production use. Sonnet 4.5Claude is AI and can make mistakes. Please double-check responses.
+
+
+
+Scenario 1: Appointment Slot Management
+Question: In your Hospital Management System, multiple patients are trying to book the same doctor's appointment slot simultaneously (e.g., Dr. Smith's 10:00 AM slot on Monday). How would you use Redis to prevent double-booking?
+Expected Answer:
+
+Use Redis distributed locks with SETNX (Set if Not Exists) command
+Lock key pattern: appointment:lock:doctor:{doctorId}:slot:{slotId}
+Acquire lock before checking availability and booking
+Set expiration on lock (e.g., 5 seconds) to prevent deadlocks
+If lock acquisition fails, inform user slot is being booked
+Release lock after successful booking or on failure
+Alternative: Use Redis transactions (MULTI/EXEC) with WATCH for optimistic locking
+
+Follow-up: What if the application crashes while holding the lock?
+
+The TTL on the lock ensures automatic release
+Use a unique lock identifier (UUID) to ensure only the lock owner can release it
+
+
+Scenario 2: Doctor Availability Caching
+Question: When patients search for available doctors by department and date, this query hits your database frequently. How would you implement caching for doctor availability using Redis?
+Expected Answer:
+
+Cache doctor availability using Redis Sorted Set or Hash
+Key structure: doctor:availability:{departmentId}:{date}
+Store available time slots with doctor IDs
+Set TTL of 15-30 minutes (balance between freshness and performance)
+Implement cache-aside pattern: Check cache → if miss, query DB → populate cache
+Use @Cacheable annotation with custom cache key
+When doctor updates schedule, use @CacheEvict to invalidate specific cache entries
+Consider caching for "today" and "tomorrow" slots with different TTLs
+
+Follow-up: What happens when a doctor updates their availability?
+
+Use @CacheEvict or manually delete affected cache keys
+Pattern: doctor:availability:* for that doctor
+Could use Redis pub/sub to notify other service instances
+
+
+Scenario 3: Patient Session Management
+Question: Your hospital system needs to manage sessions for thousands of concurrent users (patients, doctors, staff) across multiple application servers. How would you implement distributed session management using Redis?
+Expected Answer:
+
+Use Spring Session with Redis for centralized session storage
+Store session data as Redis Hash: spring:session:sessions:{sessionId}
+Session attributes stored as hash fields
+Set session timeout (e.g., 30 minutes) using Redis TTL
+Enable @EnableRedisHttpSession annotation
+Configure serialization (JSON preferred over Java serialization)
+Session includes: userId, role, permissions, last accessed time
+Supports horizontal scaling - any server can access any session
+Session invalidation on logout removes Redis key
+
+Follow-up: How do you handle session timeout extension on user activity?
+
+Spring Session automatically updates TTL on each request
+Redis EXPIRE command resets timeout on access
+
+
+Scenario 4: Real-Time Bed Availability Dashboard
+Question: Hospital administrators need a real-time dashboard showing bed availability across different wards. Multiple staff members update bed statuses (occupied, available, maintenance) simultaneously. How would you implement this using Redis?
+Expected Answer:
+
+Use Redis Hash to store bed information
+Key: ward:beds:{wardId}, Fields: bed_{bedNumber}, Value: {status, patientId, lastUpdated}
+Use Redis Pub/Sub for real-time updates to dashboard
+When bed status changes: Update hash + Publish message to channel ward:updates
+Frontend subscribes to WebSocket connected to Redis pub/sub
+Alternative: Use Redis Streams for event sourcing and audit trail
+Counter for quick stats: ward:{wardId}:available:count using INCR/DECR
+Set TTL cautiously or make persistent, depending on requirement
+
+Follow-up: How would you handle analytics on bed occupancy over time?
+
+Use Redis Time Series or Sorted Set with timestamp as score
+Periodically aggregate and move to primary database for long-term storage
+
+
+Scenario 5: Preventing Duplicate Prescription Processing
+Question: When a doctor submits a prescription, there's a risk of accidental duplicate submission due to network issues or double-clicking. How would you prevent duplicate prescription creation using Redis?
+Expected Answer:
+
+Implement idempotency using Redis
+Generate unique prescription ID on client side (UUID)
+Use SETNX with key: prescription:idempotent:{prescriptionId}
+Set short TTL (e.g., 5 minutes)
+Before processing: Check if key exists
+If exists: Return already processed response
+If not exists: Set key, process prescription, return success
+Can store processing result in the key for retrieval
+After successful DB save, keep key for TTL duration to handle retries
+
+
+Scenario 6: Rate Limiting Patient Portal API
+Question: To prevent abuse and ensure fair usage, you need to limit patients to 100 API requests per hour on the patient portal. How would you implement rate limiting using Redis?
+Expected Answer:
+
+Use Sliding Window Rate Limiter with Redis Sorted Set
+Key: ratelimit:patient:{patientId}
+Score: timestamp in milliseconds
+On each request:
+
+Remove entries older than 1 hour: ZREMRANGEBYSCORE
+Count current entries: ZCARD
+If count < 100: Allow, add new entry with current timestamp
+If count >= 100: Deny with 429 status
+
+
+Set TTL on key (e.g., 2 hours) for cleanup
+Alternative: Token Bucket using String counter with timestamp
+Can have different limits for different API endpoints
+Example: Booking API - 10/hour, View records - 100/hour
+
+Small code reference:
+java// Key concept
+String key = "ratelimit:patient:" + patientId;
+long now = System.currentTimeMillis();
+long hourAgo = now - 3600000;
+
+// Remove old entries, count, add new
+redisTemplate.opsForZSet().removeRangeByScore(key, 0, hourAgo);
+Long count = redisTemplate.opsForZSet().zCard(key);
+if (count < 100) {
+    redisTemplate.opsForZSet().add(key, UUID.randomUUID().toString(), now);
+    return true; // Allow
+}
+return false; // Rate limit exceeded
+
+Scenario 7: Emergency Contact Notification Queue
+Question: In emergency situations, the system needs to notify multiple staff members immediately. How would you implement a priority-based notification queue using Redis?
+Expected Answer:
+
+Use Redis Sorted Set for priority queue
+Key: notifications:emergency
+Score: Priority value (higher = more urgent) + timestamp
+Members: Notification payload (JSON)
+Critical staff (doctors on duty): Priority 100
+Available nurses: Priority 80
+Administrative staff: Priority 50
+Workers consume using ZPOPMAX (highest priority first)
+Alternative: Use Redis Streams with consumer groups
+Each notification type gets its own stream
+Multiple workers can process in parallel
+Acknowledgment mechanism ensures delivery
+
+
+Scenario 8: Lab Test Result Caching Strategy
+Question: Lab test results are frequently accessed by doctors but rarely change once finalized. How would you design an efficient caching strategy for lab reports using Redis?
+Expected Answer:
+
+Cache-aside pattern with aggressive TTL since data rarely changes
+Key structure: lab:test:{testId}, patient:tests:{patientId} (list of test IDs)
+Cache complete test result as JSON (hash alternative for partial updates)
+TTL: 24 hours for pending tests, No expiry (or very long) for finalized tests
+Use @Cacheable for reads, @CachePut when result updated
+When test finalized: Update cache and never expire
+For patient's test list: Cache with TTL, invalidate on new test
+Consider two-tier: Recent tests (Redis) + All tests (Database)
+Use Redis pub/sub to notify doctor's screen when result ready
+
+Follow-up: How do you handle memory management for thousands of test results?
+
+Use eviction policy: allkeys-lru or volatile-lru
+Older test results evicted first
+Critical recent tests stay in cache
+Set maxmemory appropriately
+
+
+Scenario 9: Pharmacy Inventory Low-Stock Alerts
+Question: The pharmacy inventory system needs to send real-time alerts when medicine stock falls below threshold. Multiple staff might be consuming inventory simultaneously. How would you implement this using Redis?
+Expected Answer:
+
+Store inventory in Redis Hash: Key: pharmacy:inventory, Fields: medicine_{id}, Values: quantity
+Use Lua scripts for atomic stock deduction and threshold check
+Script checks current stock, decrements, and publishes alert if below threshold
+Key for threshold: pharmacy:threshold:{medicineId} or in hash as separate field
+Redis Pub/Sub channel: pharmacy:alerts:lowstock
+Subscribers: Pharmacy staff notification service, procurement system
+Prevent race conditions using Lua script atomicity
+Alternative: Use Redis Streams for alert history and tracking
+Maintain sync with primary database periodically
+
+Small Lua script concept:
+lua-- Atomic decrement with threshold check
+local quantity = redis.call('HINCRBY', KEYS[1], KEYS[2], -ARGV[1])
+if quantity <= tonumber(ARGV[2]) then
+    redis.call('PUBLISH', 'pharmacy:alerts:lowstock', KEYS[2])
+end
+return quantity
+
+Scenario 10: Appointment Reminder Scheduling
+Question: The system needs to send appointment reminders (email/SMS) 24 hours and 1 hour before appointments. How would you implement a delayed job queue using Redis?
+Expected Answer:
+
+Use Redis Sorted Set as delayed queue
+Key: reminders:queue
+Score: Unix timestamp when reminder should be sent
+Member: Reminder details (appointmentId, type, contact)
+Scheduler polls every minute using ZRANGEBYSCORE with current time
+Fetches due reminders: score <= current timestamp
+Process reminders (send email/SMS)
+Remove from queue: ZREM
+Alternative: Redis Streams with time-based consumption
+Create reminder on appointment booking with two entries (24h, 1h before)
+If appointment cancelled: Remove reminder using ZREM
+Can add retry mechanism using separate sorted set
+
+
+Scenario 11: Doctor Performance Leaderboard
+Question: Management wants a real-time leaderboard showing doctors ranked by patient satisfaction scores this month. How would you implement this using Redis?
+Expected Answer:
+
+Use Redis Sorted Set for leaderboard
+Key: leaderboard:doctors:{year}:{month}
+Score: Average satisfaction rating or total points
+Member: Doctor ID
+Update score when patient submits feedback using ZADD or ZINCRBY
+Retrieve top N doctors: ZREVRANGE with scores
+Get doctor's rank: ZREVRANK
+Set monthly TTL, auto-cleanup old leaderboards
+Can maintain multiple leaderboards: by department, hospital-wide
+For complex scoring: Calculate score in application, store in Redis
+Display on dashboard: Rankings update in real-time
+
+
+Scenario 12: Concurrent Billing Prevention
+Question: When generating invoices for patient treatments, you need to ensure a patient doesn't get duplicate bills for the same service. How would you handle this with Redis?
+Expected Answer:
+
+Use Redis distributed lock during billing process
+Lock key: billing:lock:patient:{patientId}
+Check if bill already exists using Redis cache before DB query
+Key: bill:exists:{patientId}:{serviceId}:{date} with boolean value
+If exists in cache: Prevent duplicate
+If not: Acquire lock, double-check database, create bill, cache the fact
+Use SETNX with TTL for lock
+Alternative: Redis Set maintaining patient:{patientId}:billed:services with service IDs
+Before billing: Check set membership SISMEMBER
+After billing: Add to set SADD
+Set reasonable TTL (e.g., 30 days) for set cleanup
+
+
+Scenario 13: Patient Medical History Timeline
+Question: Doctors need to quickly view a patient's medical history timeline (visits, diagnoses, treatments) without loading the entire history from database. How would you cache this efficiently?
+Expected Answer:
+
+Use Redis List for chronological timeline
+Key: patient:timeline:{patientId}
+Store recent N events (e.g., last 50) as JSON strings
+Use LPUSH for new events (newest first)
+Trim list: LTRIM to maintain size limit
+Retrieve: LRANGE 0 -1 for full recent history or LRANGE 0 19 for latest 20
+Set TTL (e.g., 7 days) as timeline is frequently accessed
+For full history: Fall back to database
+Alternative: Redis Sorted Set with timestamp scores for range queries
+On new medical event: Update cache and database
+Use @CachePut or manual cache update
+
+
+Scenario 14: Multi-Hospital Data Segregation
+Question: Your system manages multiple hospitals, and data must be completely segregated. How would you structure Redis keys to ensure data isolation?
+Expected Answer:
+
+Use namespace/prefix pattern: hospital:{hospitalId}:entity:...
+Examples:
+
+hospital:H001:patient:12345
+hospital:H001:appointments:doctor:D001
+hospital:H002:pharmacy:inventory
+
+
+Benefits: Clear separation, easy to delete all hospital data
+Can use Redis databases (0-15) but namespacing is preferred
+Configure separate Redis instances for critical isolation
+Use middleware/interceptor to automatically prefix keys based on context
+For multi-tenancy: Hospital ID from JWT token or session
+Ensures no data leakage between hospitals
+Monitoring and quotas per hospital easier
+
+
+Scenario 15: Handling Cache Stampede During Peak Hours
+Question: During morning hours (8-10 AM), thousands of patients check appointment availability simultaneously. When cache expires, all requests hit the database. How would you prevent this cache stampede?
+Expected Answer:
+
+Solution 1: Distributed Lock Approach
+
+First request acquires lock, fetches from DB, updates cache
+Other requests wait briefly and retry from cache
+
+
+Solution 2: Probabilistic Early Expiration
+
+Refresh cache probabilistically before actual expiration
+Reduces likelihood of simultaneous cache misses
+
+
+Solution 3: Cache Never Expires + Background Refresh
+
+Cache doesn't expire
+Background job refreshes every X minutes
+Always serve from cache (may be slightly stale)
+
+
+Solution 4: Request Coalescing
+
+Multiple simultaneous requests for same data merged
+Only one DB call made
+All requests get same result
+
+
+
+Best for Hospital System:
+
+Use distributed lock with short timeout
+Cache doctor availability with 10-minute TTL
+Lock prevents stampede on cache miss
+Background job pre-warms cache at 7:30 AM daily
+
+Small pattern:
+java// Pseudo-code for lock-based approach
+public List<Appointment> getAvailableSlots(String doctorId, LocalDate date) {
+    String cacheKey = "availability:" + doctorId + ":" + date;
+    
+    // Try cache first
+    List<Appointment> slots = (List) redisTemplate.opsForValue().get(cacheKey);
+    if (slots != null) return slots;
+    
+    // Acquire lock to prevent stampede
+    String lockKey = "lock:" + cacheKey;
+    String lockId = acquireLock(lockKey, 5); // 5 sec timeout
+    
+    if (lockId != null) {
+        try {
+            // Double-check cache
+            slots = (List) redisTemplate.opsForValue().get(cacheKey);
+            if (slots != null) return slots;
+            
+            // Fetch from DB and cache
+            slots = appointmentRepository.findAvailableSlots(doctorId, date);
+            redisTemplate.opsForValue().set(cacheKey, slots, 10, TimeUnit.MINUTES);
+            return slots;
+        } finally {
+            releaseLock(lockKey, lockId);
+        }
+    } else {
+        // Wait and retry from cache
+        Thread.sleep(50);
+        return getAvailableSlots(doctorId, date);
+    }
+}
+
+Scenario 16: Analytics Dashboard Real-Time Metrics
+Question: The hospital dashboard shows real-time metrics: total appointments today, revenue, patient count. How would you optimize these counts using Redis instead of querying the database repeatedly?
+Expected Answer:
+
+Use Redis Counters for real-time metrics
+Keys structure:
+
+metrics:{date}:appointments:count - Atomic counter
+metrics:{date}:revenue:total - Increment by amount
+metrics:{date}:patients:unique - HyperLogLog for unique count
+
+
+On appointment booking: INCR metrics:{today}:appointments:count
+On payment: INCRBY metrics:{today}:revenue:total {amount}
+For unique patients: PFADD metrics:{today}:patients:unique {patientId}
+Dashboard queries Redis every few seconds
+Set TTL on daily keys: Keep for 30 days, auto-cleanup
+Batch sync to database hourly for permanent analytics
+Use Redis Hash for complex metrics:
+
+metrics:{date} hash with fields: appointments, revenue, patients
+
+
+
+Benefits:
+
+Sub-millisecond response time
+No database load
+Real-time updates
+Scalable for high-frequency updates
+
+
+Additional Concepts to Mention
+Connection Pooling:
+
+Use Lettuce (default) or Jedis with proper pool configuration
+Max connections based on concurrent users
+Timeout settings to prevent blocking
+
+Serialization:
+
+Prefer JSON (Jackson) over Java serialization
+Human-readable in Redis
+Language-independent
+Smaller size compared to Java serialization
+
+Monitoring:
+
+Use Redis INFO command for memory, connections
+Set up CloudWatch/Prometheus alerts
+Monitor key expiration, eviction rate
+Track cache hit/miss ratio
+
+Data Consistency:
+
+Cache-aside: Application manages cache explicitly
+Write-through: Write to cache and DB simultaneously
+Write-behind: Write to cache, async to DB
+For hospital system: Prefer cache-aside with TTL
+
+Redis vs Database for Specific Features:
+
+Use Redis: Sessions, recent appointments, counters, leaderboards
+Use Database: Patient medical history (permanent), billing records, audit logs
+Hybrid: Recent data in Redis, full data in DB
+

@@ -1,0 +1,773 @@
+=================
+🔷 Apache Kafka
+=================
+➤ Apache Kafka is a distributed event streaming platform designed to handle high-throughput, real-time data feeds.
+➤ Think of it as a highly scalable messaging system that acts as a buffer between data producers and consumers.
+
+Real-world analogy: Imagine a news agency where reporters (producers) write stories that get published in different newspaper sections (topics).
+Readers (consumers) subscribe to specific sections they're interested in. The printing press (Kafka broker) ensures every subscriber gets their copy, even if they read it later.
+
+
+🔄 Core Concepts
+1️⃣ Producer
+➤ A producer is an application that publishes (writes) data to Kafka topics.
+➤ Producers send records to topics without knowing who will consume them.
+
+
+2️⃣ Consumer
+➤ A consumer is an application that subscribes to topics and processes the stream of records.
+➤ Consumers pull data from Kafka at their own pace.
+
+
+3️⃣ Topic
+➤ A topic is a category or feed name to which records are published.
+➤ Topics are multi-subscriber - multiple consumers can read from the same topic independently. Topics are split into partitions.
+🟢 Real life analogy: It is like a book shelf which contains similar types of books(partition)
+
+
+4️⃣ Partition
+➤ A partition is an ordered, immutable sequence of records within a topic. ➤ Each partition is an ordered queue where new records are appended to the end.
+➤ Partitions enable parallelism and scalability.
+🟢 Real life analogy: It is like a book which contains sequence of pages(records) with unique page numbers(offset)
+
+Key points about partitions:
+➤ Each record in a partition gets a sequential ID called an offset
+➤ Partitions are distributed across different Kafka brokers
+➤ Order is guaranteed only within a partition, not across partitions
+➤ More partitions = more parallelism
+
+
+5️⃣ Broker
+➤ A Kafka broker is a server that stores data and serves client requests.
+➤ A Kafka cluster consists of multiple brokers for fault tolerance and scalability.
+
+
+6️⃣ Cluster
+➤ A group of Kafka brokers working together.
+➤ Clusters provide high availability and distribute load.
+
+
+7️⃣ Offset
+➤ An offset is a unique identifier for each record within a partition.
+➤ It's like a bookmark that tells consumers where they are in reading the partition.
+
+
+8️⃣ Consumer Group
+➤ A consumer group is a set of consumers working together to consume a topic.
+➤ Each partition is consumed by exactly one consumer within the group, enabling parallel processing.
+✅ Example: If a topic has 4 partitions and a consumer group has 2 consumers, each consumer reads from 2 partitions.
+
+
+9️⃣ Replication (duplication of partition)
+➤ Kafka replicates partitions across multiple brokers for fault tolerance. ➤ If one broker fails, another broker with a replica can take over.
+➤ Replication Factor: Number of copies of a partition. If replication factor = 3, each partition exists on 3 different brokers.
+
+
+1️⃣0️⃣ Leader and Follower(Master-Slave Architecture)
+➤ Leader ─────────▶ One replica of a partition that handles all read and write requests
+➤ Follower ─────────▶ Other replicas that replicate data from the leader. Followers can take over if the leader fails.
+
+
+1️⃣1️⃣ Consensus Protocol ZooKeeper (Legacy) and KRaft
+➤ ZooKeeper ─────────▶ Previously used for cluster coordination, leader election, and configuration management
+➤ KRaft (Kafka Raft) ─────────▶ New consensus protocol that removes ZooKeeper dependency (Kafka 3.0+)
+
+
+1️⃣2️⃣ Record/Message
+A record consists of:
+➤ Key ─────────▶ Optional, used for partitioning
+➤ Value ─────────▶ The actual data
+➤ Timestamp ─────────▶ When the record was created
+➤ Headers ─────────▶ Optional metadata
+
+
+🔄 Kafka Works
+Message Flow:
+1️⃣ Producer creates a message
+2️⃣ Producer sends message to a specific topic
+3️⃣ Kafka determines which partition to write to (based on key or round-robin)
+4️⃣ Message is written to the leader partition
+5️⃣ Followers replicate the message
+6️⃣ Consumers in consumer groups read from partitions
+7️⃣ Consumers commit offsets after processing
+
+
+🔄 Partitioning Strategy
+When a producer sends a message, Kafka decides which partition using:
+➤ Key-based ─────────▶ If a key is provided, Kafka uses a hash of the key to determine the partition (same key always goes to same partition)
+➤ Round-robin ─────────▶ If no key, messages are distributed evenly across partitions
+➤ Custom partitioner ─────────▶ You can write your own logic
+
+
+🔄 Delivery Semantics
+➤ At-most-once ─────────▶ Messages may be lost but never redelivered
+    ✔️ Producer doesn't wait for acknowledgment
+    ✔️ Fast but risky
+
+➤ At-least-once ─────────▶ Messages are never lost but may be redelivered
+    ✔️ Producer waits for acknowledgment and retries on failure
+    ✔️ Safe but may create duplicates
+
+➤ Exactly-once ─────────▶ Messages are delivered exactly once
+    ✔️ Uses idempotent producers and transactional APIs
+    ✔️ Most reliable but with performance overhead
+
+
+🔄 Retention Policy
+➤ Kafka retains messages for a configurable period (default 7 days) or until a size limit is reached. 
+➤ Messages aren't deleted after consumption - multiple consumers can read the same data.
+
+
+🔄 Kafka Architecture
+┌──────────────────────────────────────────────┐
+│                    Kafka Cluster             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
+│  │ Broker 1 │  │ Broker 2 │  │ Broker 3 │    │
+│  │          │  │          │  │          │    │
+│  │ Topic A  │  │ Topic A  │  │ Topic B  │    │
+│  │ Part 0   │  │ Part 1   │  │ Part 0   │    │
+│  │ (Leader) │  │ (Leader) │  │(Follower)│    │
+│  └──────────┘  └──────────┘  └──────────┘    │
+└──────────────────────────────────────────────┘
+       ▲                                    │
+       │                                    │
+  Producers                            Consumers
+
+
+
+####################
+🔷 Kafka Consumers
+####################
+package com.example.kafka.consumer;
+
+import com.example.kafka.model.OrderEvent;
+import com.example.kafka.model.UserEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Kafka Consumer Service
+ * Demonstrates various consumption patterns
+ */
+@Service
+@Slf4j
+public class KafkaConsumerService {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Basic Consumer - Consumes user events
+     * @KafkaListener automatically subscribes to topic
+     */
+    @KafkaListener(
+        topics = "${kafka.topics.user-events}",
+        groupId = "${spring.kafka.consumer.group-id}",
+        containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void consumeUserEvent(
+        @Payload UserEvent userEvent,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Consumed User Event: {}", userEvent);
+            
+            // Process the event
+            processUserEvent(userEvent);
+            
+            // Manually acknowledge after successful processing
+            acknowledgment.acknowledge();
+            
+        } catch (Exception e) {
+            log.error("Error processing user event: {}", e.getMessage(), e);
+            // Don't acknowledge - message will be reprocessed
+        }
+    }
+
+    /**
+     * Consumer with metadata
+     * Access partition, offset, key, and custom headers
+     */
+    @KafkaListener(
+        topics = "${kafka.topics.order-events}",
+        groupId = "${spring.kafka.consumer.group-id}",
+        containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void consumeOrderEventWithMetadata(
+        ConsumerRecord<String, String> record,
+        @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+        @Header(KafkaHeaders.OFFSET) long offset,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Consumed from Topic: {}, Partition: {}, Offset: {}", topic, partition, offset);
+            log.info("Key: {}, Value: {}", record.key(), record.value());
+            
+            // Deserialize manually if needed
+            OrderEvent orderEvent = objectMapper.readValue(record.value(), OrderEvent.class);
+            
+            // Process the event
+            processOrderEvent(orderEvent);
+            
+            // Acknowledge
+            acknowledgment.acknowledge();
+            
+        } catch (Exception e) {
+            log.error("Error processing order event: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Batch Consumer
+     * Consumes multiple messages at once for better throughput
+     */
+    @KafkaListener(
+        topics = "${kafka.topics.user-events}",
+        groupId = "batch-consumer-group",
+        containerFactory = "batchListenerContainerFactory"
+    )
+    public void consumeUserEventsBatch(
+        List<UserEvent> userEvents,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Consumed batch of {} user events", userEvents.size());
+            
+            // Process all events in batch
+            for (UserEvent event : userEvents) {
+                processUserEvent(event);
+            }
+            
+            // Acknowledge entire batch
+            acknowledgment.acknowledge();
+            
+        } catch (Exception e) {
+            log.error("Error processing user events batch: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Multiple Topics Consumer
+     * One consumer listening to multiple topics
+     */
+    @KafkaListener(
+        topics = {"${kafka.topics.user-events}", "${kafka.topics.order-events}"},
+        groupId = "multi-topic-consumer-group",
+        containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void consumeFromMultipleTopics(
+        @Payload String message,
+        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Consumed from topic: {}, Message: {}", topic, message);
+            
+            // Route based on topic
+            if (topic.contains("user-events")) {
+                UserEvent userEvent = objectMapper.readValue(message, UserEvent.class);
+                processUserEvent(userEvent);
+            } else if (topic.contains("order-events")) {
+                OrderEvent orderEvent = objectMapper.readValue(message, OrderEvent.class);
+                processOrderEvent(orderEvent);
+            }
+            
+            acknowledgment.acknowledge();
+            
+        } catch (Exception e) {
+            log.error("Error processing message from multiple topics: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Consumer with Topic Pattern
+     * Listens to all topics matching a pattern
+     */
+    @KafkaListener(
+        topicPattern = ".*-events-topic",
+        groupId = "pattern-consumer-group",
+        containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void consumeWithPattern(
+        @Payload String message,
+        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Pattern consumer - Topic: {}, Message: {}", topic, message);
+            acknowledgment.acknowledge();
+        } catch (Exception e) {
+            log.error("Error in pattern consumer: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Specific Partition Consumer
+     * Consumes from specific partition(s)
+     */
+    @KafkaListener(
+        topicPartitions = @org.springframework.kafka.annotation.TopicPartition(
+            topic = "${kafka.topics.user-events}",
+            partitions = {"0", "1"}
+        ),
+        groupId = "partition-specific-group",
+        containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void consumeFromSpecificPartitions(
+        @Payload UserEvent userEvent,
+        @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Consumed from partition {}: {}", partition, userEvent);
+            processUserEvent(userEvent);
+            acknowledgment.acknowledge();
+        } catch (Exception e) {
+            log.error("Error consuming from specific partition: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Consumer with Concurrency
+     * Multiple consumer instances for parallel processing
+     */
+    @KafkaListener(
+        topics = "${kafka.topics.order-events}",
+        groupId = "concurrent-consumer-group",
+        containerFactory = "kafkaListenerContainerFactory",
+        concurrency = "5" // 5 consumer threads
+    )
+    public void consumeWithConcurrency(
+        @Payload OrderEvent orderEvent,
+        @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+        Acknowledgment acknowledgment
+    ) {
+        try {
+            log.info("Thread {}: Processing order from partition {}: {}", 
+                Thread.currentThread().getName(), partition, orderEvent.getOrderId());
+            
+            processOrderEvent(orderEvent);
+            acknowledgment.acknowledge();
+            
+        } catch (Exception e) {
+            log.error("Error in concurrent consumer: {}", e.getMessage(), e);
+        }
+    }
+
+    // Business logic methods
+
+    private void processUserEvent(UserEvent userEvent) {
+        log.info("Processing user event: Type={}, UserId={}", 
+            userEvent.getEventType(), userEvent.getUserId());
+        
+        switch (userEvent.getEventType()) {
+            case "CREATED":
+                log.info("New user created: {}", userEvent.getUsername());
+                break;
+            case "UPDATED":
+                log.info("User updated: {}", userEvent.getUsername());
+                break;
+            case "DELETED":
+                log.info("User deleted: {}", userEvent.getUserId());
+                break;
+            case "LOGIN":
+                log.info("User login: {} from {}", userEvent.getUsername(), userEvent.getIpAddress());
+                break;
+            default:
+                log.warn("Unknown event type: {}", userEvent.getEventType());
+        }
+    }
+
+    private void processOrderEvent(OrderEvent orderEvent) {
+        log.info("Processing order event: Status={}, OrderId={}, Amount={}",
+            orderEvent.getStatus(), orderEvent.getOrderId(), orderEvent.getAmount());
+        
+        switch (orderEvent.getStatus()) {
+            case "CREATED":
+                log.info("New order created: {} for user {}", 
+                    orderEvent.getOrderId(), orderEvent.getUserId());
+                break;
+            case "CONFIRMED":
+                log.info("Order confirmed: {}", orderEvent.getOrderId());
+                break;
+            case "SHIPPED":
+                log.info("Order shipped: {} to {}", 
+                    orderEvent.getOrderId(), orderEvent.getShippingAddress());
+                break;
+            case "DELIVERED":
+                log.info("Order delivered: {}", orderEvent.getOrderId());
+                break;
+            case "CANCELLED":
+                log.info("Order cancelled: {}", orderEvent.getOrderId());
+                break;
+            default:
+                log.warn("Unknown order status: {}", orderEvent.getStatus());
+        }
+    }
+}
+
+
+########################################################
+🔷 Creating REST Controller for testing Kafka Producers
+########################################################
+package com.example.kafka.controller;
+
+import com.example.kafka.model.OrderEvent;
+import com.example.kafka.model.UserEvent;
+import com.example.kafka.producer.KafkaProducerService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * REST Controller for Kafka Operations
+ * Provides endpoints to trigger message production
+ */
+@RestController
+@RequestMapping("/api/kafka")
+@Slf4j
+public class KafkaController {
+
+    @Autowired
+    private KafkaProducerService producerService;
+
+    /**
+     * Send a user event
+     * POST /api/kafka/user-event
+     */
+    @PostMapping("/user-event")
+    public ResponseEntity<Map<String, String>> sendUserEvent(@RequestBody UserEvent userEvent) {
+        try {
+            // Set timestamp if not provided
+            if (userEvent.getTimestamp() == null) {
+                userEvent.setTimestamp(LocalDateTime.now());
+            }
+            
+            // Set userId if not provided
+            if (userEvent.getUserId() == null) {
+                userEvent.setUserId(UUID.randomUUID().toString());
+            }
+            
+            producerService.sendUserEventWithCallback(userEvent);
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "User event sent successfully");
+            response.put("userId", userEvent.getUserId());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error sending user event: {}", e.getMessage(), e);
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Send an order event
+     * POST /api/kafka/order-event
+     */
+    @PostMapping("/order-event")
+    public ResponseEntity<Map<String, String>> sendOrderEvent(@RequestBody OrderEvent orderEvent) {
+        try {
+            // Set orderId if not provided
+            if (orderEvent.getOrderId() == null) {
+                orderEvent.setOrderId("ORD-" + UUID.randomUUID().toString());
+            }
+            
+            // Set orderDate if not provided
+            if (orderEvent.getOrderDate() == null) {
+                orderEvent.setOrderDate(LocalDateTime.now());
+            }
+            
+            producerService.sendOrderEvent(orderEvent);
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Order event sent successfully");
+            response.put("orderId", orderEvent.getOrderId());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error sending order event: {}", e.getMessage(), e);
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Generate sample user event
+     * GET /api/kafka/generate/user-event
+     */
+    @GetMapping("/generate/user-event")
+    public ResponseEntity<Map<String, String>> generateUserEvent() {
+        try {
+            UserEvent userEvent = UserEvent.builder()
+                .userId(UUID.randomUUID().toString())
+                .eventType("CREATED")
+                .username("user_" + System.currentTimeMillis())
+                .email("user@example.com")
+                .timestamp(LocalDateTime.now())
+                .ipAddress("192.168.1.1")
+                .metadata("Generated from REST API")
+                .build();
+            
+            producerService.sendUserEventWithCallback(userEvent);
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Sample user event generated and sent");
+            response.put("userId", userEvent.getUserId());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error generating user event: {}", e.getMessage(), e);
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Generate sample order event
+     * GET /api/kafka/generate/order-event
+     */
+    @GetMapping("/generate/order-event")
+    public ResponseEntity<Map<String, String>> generateOrderEvent() {
+        try {
+            OrderEvent orderEvent = OrderEvent.builder()
+                .orderId("ORD-" + UUID.randomUUID().toString())
+                .userId(UUID.randomUUID().toString())
+                .status("CREATED")
+                .amount(new BigDecimal("299.99"))
+                .currency("USD")
+                .itemCount(3)
+                .orderDate(LocalDateTime.now())
+                .shippingAddress("123 Main St, City, Country")
+                .paymentMethod("CREDIT_CARD")
+                .build();
+            
+            producerService.sendOrderEvent(orderEvent);
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Sample order event generated and sent");
+            response.put("orderId", orderEvent.getOrderId());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error generating order event: {}", e.getMessage(), e);
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Send multiple events for load testing
+     * GET /api/kafka/load-test?count=100
+     */
+    @GetMapping("/load-test")
+    public ResponseEntity<Map<String, Object>> loadTest(
+        @RequestParam(defaultValue = "100") int count
+    ) {
+        try {
+            long startTime = System.currentTimeMillis();
+            
+            for (int i = 0; i < count; i++) {
+                UserEvent userEvent = UserEvent.builder()
+                    .userId(UUID.randomUUID().toString())
+                    .eventType("CREATED")
+                    .username("user_" + i)
+                    .email("user" + i + "@example.com")
+                    .timestamp(LocalDateTime.now())
+                    .ipAddress("192.168.1." + (i % 255))
+                    .metadata("Load test event " + i)
+                    .build();
+                
+                producerService.sendUserEvent(userEvent);
+            }
+            
+            long endTime = System.currentTimeMillis();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", count + " events sent successfully");
+            response.put("count", count);
+            response.put("timeTaken", (endTime - startTime) + "ms");
+            response.put("throughput", (count * 1000.0) / (endTime - startTime) + " events/sec");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error in load test: {}", e.getMessage(), e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Health check endpoint
+     * GET /api/kafka/health
+     */
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "UP");
+        response.put("message", "Kafka service is running");
+        return ResponseEntity.ok(response);
+    }
+}
+
+
+##############################################
+🔷Creating Error Handlers for Kafka Consumers
+##############################################
+package com.example.kafka.errorhandler;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.listener.CommonErrorHandler;
+import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Component;
+
+/**
+ * Custom Error Handler for Kafka Consumers
+ * Handles exceptions during message consumption
+ */
+@Component
+@Slf4j
+public class KafkaErrorHandler implements CommonErrorHandler {
+
+    /**
+     * Handle errors during batch processing
+     */
+    @Override
+    public void handleBatch(Exception thrownException, 
+                           org.apache.kafka.clients.consumer.ConsumerRecords<?, ?> data,
+                           Consumer<?, ?> consumer,
+                           MessageListenerContainer container,
+                           Runnable invokeListener) {
+        
+        log.error("Error in batch processing. Total records: {}, Error: {}", 
+            data.count(), thrownException.getMessage());
+        
+        // Log all failed records
+        data.forEach(record -> {
+            log.error("Failed record - Topic: {}, Partition: {}, Offset: {}, Key: {}", 
+                record.topic(), record.partition(), record.offset(), record.key());
+        });
+        
+        // Decide whether to retry or send to DLT
+        if (shouldRetry(thrownException)) {
+            log.info("Retrying batch processing");
+            invokeListener.run();
+        } else {
+            log.error("Moving batch to Dead Letter Topic");
+            // Send to DLT logic here
+        }
+    }
+
+    /**
+     * Handle errors during single record processing
+     */
+    @Override
+    public boolean handleOne(Exception thrownException,
+                            ConsumerRecord<?, ?> record,
+                            Consumer<?, ?> consumer,
+                            MessageListenerContainer container) {
+        
+        log.error("Error processing record - Topic: {}, Partition: {}, Offset: {}, Error: {}", 
+            record.topic(), record.partition(), record.offset(), thrownException.getMessage());
+        
+        // Check if error is recoverable
+        if (isRecoverableError(thrownException)) {
+            log.info("Recoverable error, will retry");
+            return true; // Retry
+        } else {
+            log.error("Non-recoverable error, sending to DLT");
+            sendToDeadLetterTopic(record, thrownException);
+            return false; // Don't retry, move on
+        }
+    }
+
+    /**
+     * Determine if error is recoverable
+     */
+    private boolean isRecoverableError(Exception exception) {
+        // Transient errors that might succeed on retry
+        return exception instanceof org.springframework.dao.TransientDataAccessException
+            || exception instanceof java.net.SocketTimeoutException
+            || exception instanceof org.springframework.kafka.KafkaException;
+    }
+
+    /**
+     * Determine if should retry based on exception type
+     */
+    private boolean shouldRetry(Exception exception) {
+        return isRecoverableError(exception);
+    }
+
+    /**
+     * Send failed message to Dead Letter Topic
+     */
+    private void sendToDeadLetterTopic(ConsumerRecord<?, ?> record, Exception exception) {
+        try {
+            log.info("Sending record to DLT - Topic: {}, Partition: {}, Offset: {}", 
+                record.topic(), record.partition(), record.offset());
+            
+            // Build message with error details
+            Message<?> message = MessageBuilder
+                .withPayload(record.value())
+                .setHeader(KafkaHeaders.TOPIC, "dead-letter-topic")
+                .setHeader("original-topic", record.topic())
+                .setHeader("original-partition", record.partition())
+                .setHeader("original-offset", record.offset())
+                .setHeader("error-message", exception.getMessage())
+                .setHeader("error-class", exception.getClass().getName())
+                .setHeader("timestamp", System.currentTimeMillis())
+                .build();
+            
+            // Send to DLT (would need KafkaTemplate injected)
+            // kafkaTemplate.send(message);
+            
+            log.info("Record sent to DLT successfully");
+            
+        } catch (Exception e) {
+            log.error("Failed to send record to DLT: {}", e.getMessage(), e);
+        }
+    }
+}

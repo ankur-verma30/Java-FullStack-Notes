@@ -1,0 +1,1134 @@
+================================
+🔷 Hospital Management System
+================================
+🔄 Pitch Deck
+Hi, I built a Hospital Management System to digitize and streamline hospital operations like user management, patient records, appointment scheduling, billing, and pharmacy workflows. The main goal of this project is to reduce manual work, avoid appointment conflicts, maintain accurate medical history, and improve overall hospital efficiency.
+
+The system supports role-based access control, where different roles such as admin, doctor, patient etc have different permissions. The Admin can create, update, and manage users like doctors, nurses, staff, and patients, and assign roles to ensure secure access. 
+
+The Doctor module allows doctors to manage their schedules, view assigned appointments, and access patient medical records for diagnosis and treatment planning.
+
+The Patient module allows patients to view their personal medical history, track appointment history, and also book, reschedule, or cancel appointments.
+For Patient Management, I implemented a complete registration workflow where patient details like demographics, insurance, and emergency contacts are stored. The system maintains medical records including patient history, diagnosis, prescriptions, and uploaded test reports, making it easier for doctors to access everything in one place.
+
+For Appointment Scheduling, I built a booking system with doctor availability and slot-based scheduling. Each appointment has a status like Scheduled, Completed, or Cancelled, and the system checks slot availability to avoid double booking.
+
+For Billing and Invoicing, the system generates invoices for consultations, tests, and treatments, and also tracks payments, dues, and history. I also planned the design to support third-party payment gateway integration.
+
+Additionally, I built Pharmacy Management with inventory tracking, low-stock and expiry alerts, and prescription linking so medicines can be mapped to patient prescriptions.
+
+Currently, Laboratory Management and Reporting/Analytics dashboards are under development, and the next step is to integrate test workflows and generate operational insights like revenue and appointment trends.
+
+
+🔄 🚫 Problems Faced While Building HMS
+1️⃣ Role-Based Access Control (RBAC) Complexity
+➤ Deciding who can access what (Admin vs Doctor vs Patient vs Staff)
+➤ Preventing unauthorized actions like:
+➤ Patient editing other patient records
+➤ Doctor accessing non-assigned patients
+➤ Implementing permissions cleanly without duplicating code
+👉 “Handling RBAC properly was challenging because security and data privacy are critical in hospital systems.”
+
+
+2️⃣ Appointment Slot Conflicts & Double Booking
+➤ Preventing 2 patients from booking the same doctor + same time slot
+➤ Handling cases like:
+    ✔️ Reschedule overlap
+    ✔️ Cancel and re-book logic
+    ✔️ Ensuring appointment status transitions are consistent
+    (Scheduled → Completed / Cancelled)
+👉 “The biggest challenge was making appointment scheduling reliable and conflict-free.”
+
+
+3️⃣ Database Design + Relationship Management
+Designing tables and relationships for:
+    ✔️Users ↔ Patients ↔ Doctors ↔ Appointments ↔ Billing ↔ Prescriptions
+    ✔️Avoiding redundancy and ensuring data integrity using:
+    ✔️Primary keys, foreign keys
+    ✔️Unique constraints
+    ✔️Handling updates without breaking references
+👉 “Getting the schema right was important because everything depends on patient and appointment data.”
+
+
+4️⃣ Maintaining Accurate Medical Records & File Upload Handling
+➤ Managing structured data (diagnosis, treatment plans) + files (reports, prescriptions)
+➤ 🚫 Problems like:
+    ✔️ File storage location decision
+    ✔️ Linking reports to the correct patient & visit
+    ✔️ Validations (file size/type) and safe uploads
+👉 “Medical records require correctness and traceability, so file management was a key challenge.”
+
+
+5️⃣ Billing Calculation + Payment Tracking Accuracy
+Generating correct invoices based on:
+➤ Consultation fees
+➤ Tests/treatments
+➤ Pharmacy medicines
+➤ Tracking partial payments, pending dues, payment history
+➤ Avoiding mismatches between bill and services used
+👉 “Billing required careful validation because even small mistakes impact trust and finance.”
+
+
+6️⃣ Validations + Error Handling Across Modules
+➤ Handling invalid inputs, empty fields, wrong IDs
+➤ Showing meaningful errors instead of app crash
+➤ Preventing inconsistent states (like booking without patient record)
+
+
+🔄 Top 3 Future Features to Add
+1️⃣ Lab + Report Module (End-to-End Integration)
+➤ Doctors can raise lab test requests
+➤ Lab staff can upload results
+➤ Patients can view/download reports
+➤ Reports auto-linked to medical records + billing
+👉 Completes the patient treatment cycle + adds real hospital workflow.
+
+
+2️⃣ Advanced Analytics Dashboard (Admin + Department Level)
+Track:
+    ✔️ Daily/weekly patient inflow
+    ✔️ Doctor-wise appointment load
+    ✔️ Revenue trends & pending dues
+    ✔️ Department performance
+    ✔️ Filters by date range / doctor / department
+👉 Adds decision-making power for management.
+
+
+3️⃣ Smart Notifications + Reminders (SMS/Email + WhatsApp)
+➤ Appointment reminders before visit time
+➤ Billing due alerts
+➤ Prescription refill reminders
+➤ Emergency notifications (optional)
+👉 Improves patient experience + reduces missed appointments.
+
+
+
+🔄 How I Prioritize Features
+prioritize features based on Impact + Urgency + Effort + Risk.
+1️⃣ Business Impact / User Value
+➤ Which feature improves patient care, hospital operations, or revenue the most?
+➤ Example: Appointment + Billing has high impact → top priority
+
+
+2️⃣ Critical Workflow Dependency
+➤ Features that unblock other modules come first
+✅ Example: User + RBAC → Patient → Appointment → Billing
+(because billing depends on appointments)
+
+
+3️⃣ Frequency of Use (Daily Usage)
+➤ Features used daily should be built first
+
+✅ Example:
+    ✔️ Appointment booking = daily
+    ✔️ Analytics dashboard = weekly/monthly
+
+
+4️⃣ Risk & Complexity
+High-risk features should be done earlier to avoid surprises later
+✅ Example:
+    ✔️ Payment gateway integration
+    ✔️ Role-based security
+    ✔️ File uploads
+
+
+🔄 Best Priority Order for Your HMS
+P0️⃣ (Must Have / Core System)
+➤ User Management + RBAC
+➤ Patient Registration + Medical Records
+➤ Appointment Scheduling
+
+
+P1️⃣ (Revenue & Operations)
+➤ Billing + Payment Tracking
+➤ Pharmacy Inventory + Prescription integration
+
+
+P2️⃣ (Enhancements)
+➤ Notifications + Reminders
+➤ Analytics Dashboard
+
+
+#######################################
+🔷AWS Deployment Architecture for HMS
+#######################################
+Hospital Management System will be deployed as containerized microservices on AWS using:
+1️⃣ Docker for containerization
+2️⃣ Amazon EKS (Elastic Kubernetes Service) for orchestration
+3️⃣ Jenkins for CI/CD pipeline
+4️⃣ GitHub for source code management
+
+
+🔄 AWS Infrastructure Components
+1️⃣ Core Services
+➤ Amazon EKS(Elastic Kubernetes Service) ─────────▶ Managed Kubernetes cluster for running your microservices
+➤ Amazon ECR(Elastic Container Registry) ─────────▶ Private Docker container registry for storing images
+➤ Amazon RDS(Relational Database Service) ─────────▶ Managed MySQL database for persistent data
+➤ Amazon ElastiCache ─────────▶ Redis for session management and caching
+➤ Amazon S3(Simple Storage Service) ─────────▶ Storage for medical reports, test results, and backups
+
+
+2️⃣ Networking
+➤ VPC ─────────▶ Isolated network for your infrastructure
+➤ Public Subnets ─────────▶ For load balancers and NAT gateways
+➤ Private Subnets ─────────▶ For EKS nodes and RDS databases
+➤ Application Load Balancer ─────────▶ For routing traffic to services
+➤ NAT Gateway ─────────▶ For outbound internet access from private subnets
+
+
+3️⃣ Security & Monitoring
+➤ AWS IAM ─────────▶ Role-based access control
+➤ AWS Secrets Manager ─────────▶ For storing database credentials and API keys
+➤ Amazon CloudWatch ─────────▶ Logging and monitoring
+➤ AWS WAF ─────────▶ Web application firewall for API protection
+
+
+
+🔄 Microservices Architecture
+Based on your requirements, here's the microservice breakdown:
+Core Microservices
+➤ User Service - User management, authentication, authorization
+➤ Patient Service - Patient registration, medical records
+➤ Appointment Service - Scheduling, booking, availability management
+➤ Billing Service - Invoice generation, payment tracking
+➤ Pharmacy Service - Inventory, prescription management
+➤ Laboratory Service - Test management, results tracking
+➤ Notification Service - Email, SMS, Kafka-based notifications
+➤ Communication Service - WebSocket-based chat system
+➤ API Gateway - Single entry point, routing, rate limiting
+
+Supporting Services
+➤ Config Server - Centralized configuration management
+➤ Service Discovery - Eureka or AWS Cloud Map for service registration
+
+
+🔄 Deployment Steps
+Phase 1️⃣: AWS Infrastructure Setup
+1️⃣ VPC Configuration
+➤ Create VPC with CIDR block (e.g., 10.0.0.0/16)
+➤ Create 3 public subnets across availability zones
+➤ Create 3 private subnets across availability zones
+➤ Set up Internet Gateway for public subnets
+➤ Configure NAT Gateways for private subnet internet access
+➤ Create route tables and associate with subnets
+
+
+2️⃣ Security Groups
+➤ ALB Security Group: Allow HTTP (80), HTTPS (443) from internet
+➤ EKS Node Security Group: Allow traffic from ALB, inter-node communication
+➤ RDS Security Group: Allow MySQL (3306) only from EKS nodes
+➤ Redis Security Group: Allow Redis (6379) only from EKS nodes
+
+
+3️⃣ RDS Database Setup
+➤ Launch RDS MySQL instance in private subnet
+➤ Configure Multi-AZ deployment for high availability
+➤ Set up automated backups
+➤ Create database schemas for each microservice
+➤ Store credentials in AWS Secrets Manager
+
+
+4️⃣ ElastiCache Redis
+➤ Create Redis cluster in private subnet
+➤ Configure cluster mode for scalability
+➤ Set up backup and maintenance windows
+
+
+Phase 2️⃣: EKS Cluster Setup
+1️⃣ Create EKS Cluster
+➤ Use AWS Console or CLI to create EKS cluster
+➤ Choose Kubernetes version (1.28+)
+➤ Select VPC and subnets created earlier
+➤ Configure cluster endpoint access (public + private)
+➤ Enable control plane logging to CloudWatch
+
+
+2️⃣ Node Groups
+➤ Create managed node group for worker nodes
+➤ Choose instance types (t3.medium/large for production)
+➤ Configure auto-scaling (min: 2, desired: 3, max: 10)
+➤ Enable SSH access for troubleshooting
+➤ Add nodes to private subnets
+
+
+3️⃣ Install Essential Add-ons
+➤ AWS Load Balancer Controller: For ALB integration
+➤ EBS CSI Driver: For persistent volume provisioning
+➤ CoreDNS: For service discovery
+➤ Metrics Server: For resource monitoring
+➤ Cluster Autoscaler: For automatic node scaling
+
+
+Phase 3️⃣: Container Registry Setup
+1️⃣ Amazon ECR Setup
+
+Create ECR repositories for each microservice:
+➤ user-service
+➤ patient-service
+➤ appointment-service
+➤ billing-service
+➤ pharmacy-service
+➤ laboratory-service
+➤ notification-service
+➤ communication-service
+➤ api-gateway
+
+
+2️⃣ Repository Configuration
+➤ Enable image scanning on push for security
+➤ Set lifecycle policies to remove old images
+➤ Configure cross-region replication for high availability
+
+
+Phase 4️⃣: Jenkins Pipeline Setup
+1️⃣ Jenkins Installation
+➤ Deploy Jenkins on EC2 instance or EKS cluster
+➤ Install in public subnet with security group allowing port 8080
+➤ Configure persistent storage using EBS volume
+➤ Set up SSL certificate for HTTPS access
+
+
+2️⃣ Jenkins Plugin Installation
+➤ Git plugin for GitHub integration
+➤ Docker Pipleline plugin
+➤ Kubernetes plugin for deployment
+➤ AWS credentials plugin for ECR access
+➤ Pipleline plugin
+➤ GitHub Integration plugin
+➤ Slack/Email notification plugins
+
+
+3️⃣ Jenkins Pipeline Configuration
+➤ Configure AWS credentials for ECR and EKS access.
+➤ Set up kubeconfig for EKS cluster access.
+➤ Create service account in Kubernetes for Jenkins.
+➤ Configure GitHub webhook for automatic triggers
+➤ Set up build agents(master-slave configuration).
+
+
+Phaes 5️⃣: GitHub Repository structure
+hospital-management-system/
+├── microservices/
+│   ├── user-service/
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   ├── pom.xml
+│   │   └── k8s/
+│   │       ├── deployment.yaml
+│   │       ├── service.yaml
+│   │       └── configmap.yaml
+│   ├── patient-service/
+│   ├── appointment-service/
+│   └── ... (other services)
+├── frontend/
+│   ├── src/
+│   ├── Dockerfile
+│   └── k8s/
+├── infrastructure/
+│   ├── terraform/ (optional)
+│   └── k8s/
+│       ├── namespace.yaml
+│       ├── secrets.yaml
+│       └── ingress.yaml
+├── jenkins/
+│   └── Jenkinsfile
+└── README.md
+
+
+Phase 6️⃣: Kubernetes Deployment
+1️⃣ Namespace Setup
+➤ Create separate namespaces for environments (dev, staging, prod)
+➤ Apply resource quotas and limits per namespace
+
+
+2️⃣ ConfigMaps and Secrets
+Create ConfigMaps for application properties
+Store database URLs, service endpoints
+Create Kubernetes Secrets from AWS Secrets Manager
+Configure external-secrets operator for automatic sync
+
+
+3️⃣ Deployment Configuration
+Each microservice needs:
+➤ Deployment ─────────▶ Defines pods, replicas, resource limits
+➤ Service ─────────▶ Exposes pods internally (ClusterIP)
+➤ HPA ─────────▶ Horizontal Pod Autoscaler for scaling based on CPU/memory
+➤ PodDisruptionBudget ─────────▶ Ensures availability during updates
+
+
+4️⃣ Ingress Configuration
+➤ Install NGINX Ingress Controller or use ALB Ingress
+➤ Configure routing rules for each service
+➤ Set up SSL/TLS certificates using AWS ACM
+➤ Configure path-based routing to microservices
+
+
+Phase 7️⃣: Jenkins Pipleline Stages
+Pipeline Overview
+The Jenkins pipeline will have these stages for each microservice:
+
+Stage 1️⃣: Checkout Code
+➤ Pull latest code from GitHub branch
+➤ Triggered by GitHub webhook on push/PR
+
+
+Stage 2️⃣: Build Application
+➤ For Spring Boot: Maven clean package
+➤ For React: npm install and npm build
+➤ Run unit tests and generate reports
+
+
+Stage 3️⃣: Code Quality Analysis
+➤ SonarQube scanning (optional)
+➤ Check test coverage thresholds
+➤ Security vulnerability scanning
+
+
+Stage 4️⃣: Build Docker Image
+➤ Build Docker image using Dockerfile
+➤ Tag image with build number and git commit SHA
+➤ Apply semantic versioning
+
+
+Stage 5️⃣: Push to ECR
+➤ Authenticate with ECR using AWS credentials
+➤ Push Docker image to ECR repository
+➤ Scan image for vulnerabilities
+
+
+
+Stage 6️⃣: Update Kubernetes Manifests
+➤ Update deployment YAML with new image tag
+➤ Use sed or yq to modify image version
+➤ Commit changes back to Git (GitOps approach)
+
+
+Stage 7️⃣: Deploy to EKS
+➤ Apply updated Kubernetes manifests using kubectl
+➤ Perform rolling update strategy
+➤ Wait for deployment to stabilize
+
+
+Stage 8️⃣: Health Check
+➤ Verify all pods are running
+➤ Check service endpoints are responding
+➤ Run smoke tests against deployed services
+
+
+Stage 9️⃣: Notifications
+➤ Send success/failure notifications via Slack/Email
+➤ Update Jira tickets (if integrated)
+
+
+Phase 8️⃣: Pipeline Workflow
+1️⃣ Development Flow
+➤ Developer pushes code to feature branch in GitHub
+➤ GitHub webhook triggers Jenkins pipeline
+➤ Jenkins builds and tests the application
+➤ If tests pass, Docker image is built and pushed to ECR
+➤ Image is deployed to DEV namespace in EKS
+➤ Automated tests run against DEV environment
+
+
+2️⃣ Staging Flow
+➤ Developer creates Pull Request to staging branch
+➤ Code review and approval process
+➤ On merge, Jenkins pipeline deploys to STAGING namespace
+➤ QA team performs testing
+➤ Performance and integration tests run
+
+
+3️⃣ Production Flow
+➤ After staging approval, merge to main/production branch
+➤ Jenkins pipeline with additional approval gate
+➤ Deploy to PROD namespace with blue-green or canary strategy
+➤ Monitor CloudWatch metrics and logs
+➤ Rollback capability if issues detected
+
+
+Phase 9️⃣: Monitoring and Logging
+1️⃣ Logging Setup
+➤ Deploy Fluentd as DaemonSet for log collection
+➤ Forward logs to CloudWatch Logs
+➤ Create log groups for each microservice
+➤ Set up log retention policies
+
+
+2️⃣ Monitoring Setup
+➤ Deploy Prometheus for metrics collection
+➤ Install Grafana for visualization
+➤ Create dashboards for:
+    ✔️ Pod CPU and memory usage
+    ✔️ Request rate and latency
+    ✔️ Database connection pools
+    ✔️ Kafka consumer lag
+➤ Set up alerts for critical thresholds
+
+
+3️⃣ Distributed Tracing
+➤ Implement AWS X-Ray or Jaeger
+➤ Trace requests across microservices
+➤ Identify performance bottlenecks
+
+
+Phase 1️⃣0️⃣: Additional Configurations
+1️⃣ Kafka Setup for Notifications
+➤ Deploy Kafka cluster on EKS using Strimzi operator
+➤ Or use Amazon MSK (Managed Streaming for Kafka)
+➤ Configure topics for appointment reminders, billing alerts
+➤ Set up consumer groups in notification service
+
+
+2️⃣ WebSocket for Real-time Chat
+➤ Deploy communication service with WebSocket support
+➤ Use Redis for session storage across pods
+➤ Configure sticky sessions at load balancer level
+➤ Scale WebSocket pods independently
+
+
+3️⃣ Database Migration Strategy
+➤ Use Liquibase or Flyway for schema migrations
+➤ Run migrations as Kubernetes Jobs before deployment
+➤ Version control all database changes
+
+
+4️⃣ Backup and Disaster Recovery
+➤ Configure RDS automated backups (daily)
+➤ Set up cross-region RDS read replicas
+➤ Backup Kubernetes configurations to S3
+➤ Document restore procedures
+
+
+🔄 Security Best Practices
+1️⃣ Network Security
+➤ Use private subnets for all backend services
+➤ Implement network policies in Kubernetes
+➤ Enable VPC Flow Logs for traffic analysis
+
+
+2️⃣ Application Security
+➤ Store secrets in AWS Secrets Manager, not in code
+➤ Implement JWT token validation in API Gateway
+➤ Enable HTTPS/TLS for all communications
+➤ Regular security patching of base images
+
+
+3️⃣ Access Control
+➤ Use IAM roles for service accounts (IRSA)
+➤ Implement RBAC in Kubernetes
+➤ Enable MFA for AWS console access
+➤ Audit logs for all access attempts
+
+
+4️⃣ Compliance
+➤ Encrypt data at rest (RDS, S3)
+➤ Encrypt data in transit (TLS)
+➤ HIPAA compliance for patient data
+➤ Regular compliance audits
+
+
+🔄 Cost Optimization
+➤ Use Spot Instances for non-critical workloads
+➤ Implement cluster autoscaling to scale down during off-hours
+➤ Use Reserved Instances for predictable workloads
+➤ Set up CloudWatch billing alerts
+➤ Right-size EC2 instances based on actual usage
+➤ Use S3 lifecycle policies for old data archival
+
+
+===========================================================
+🔷 Common Deployment Scenarios, Problems, and Solutions
+===========================================================
+Scenario 1️⃣: Database Connection Failures After Deployment
+🚫 Problem
+➤ Microservices deployed successfully but cannot connect to RDS MySQL database
+➤ Pods are in CrashLoopBackOff state
+➤ Error logs show "Connection refused" or "Unable to connect to database"
+
+🌊 Root Causes
+➤ Security group rules not allowing traffic from EKS nodes to RDS
+➤ Wrong database endpoint URL in ConfigMap
+➤ Database credentials not properly synced from AWS Secrets Manager
+➤ RDS instance in different VPC or subnet than expected
+➤ Network ACLs blocking traffic
+
+✅ Solution
+➤ Verify security group attached to RDS allows inbound traffic on port 3306 from EKS node security group
+➤ Check database endpoint URL is correct (use RDS endpoint, not IP)
+➤ Validate credentials in Kubernetes secrets match RDS master credentials
+➤ Use AWS VPC Reachability Analyzer to test connectivity
+➤ Test connection from within a pod using MySQL client before deploying application
+➤ Ensure proper DNS resolution for RDS endpoint
+
+
+Scenario 2️⃣: Pod Memory/CPU Resource Exhaustion
+🚫 Problem
+➤ Pods getting OOMKilled (Out of Memory Killed)
+➤ Application becomes unresponsive under load
+➤ Nodes running out of resources
+➤ HPA (Horizontal Pod Autoscaler) not scaling pods
+
+🌊 Root Causes
+➤ Resource limits set too low in deployment YAML
+➤ Memory leaks in application code
+➤ No resource requests defined, causing scheduling issues
+➤ JVM heap size not optimized for container environment
+➤ Too many pods scheduled on single node
+
+✅ Solution
+➤ Set appropriate resource requests and limits based on application profiling
+➤ For Spring Boot: Set JVM heap size to 70-80% of container memory limit
+➤ Monitor actual resource usage in CloudWatch/Prometheus and adjust accordingly
+➤ Configure HPA based on CPU and memory thresholds
+➤ Use VerticalPodAutoscaler for automatic resource adjustment recommendations
+➤ Implement proper connection pooling to prevent resource exhaustion
+➤ Use cluster autoscaler to add nodes when resources are insufficient
+
+
+Scenario 3: Service Discovery Issues Between Microservices
+🚫 Problem
+➤ User Service cannot communicate with Patient Service
+➤ DNS resolution failures for service names
+➤ 503 Service Unavailable errors
+➤ Services timing out when calling each other
+
+🌊 Root Causes
+➤ Kubernetes Service not created or misconfigured
+➤ Wrong service name used in application properties
+➤ Services deployed in different namespaces without proper DNS addressing
+➤ CoreDNS pods not running properly in kube-system namespace
+➤ Network policies blocking inter-service communication
+
+✅ Solution
+➤ Verify Kubernetes Services are created with correct selectors matching pod labels
+➤ Use fully qualified domain names: <service-name>.<namespace>.svc.cluster.local
+➤ Check CoreDNS pods are running: kubectl get pods -n kube-system
+➤ Test DNS resolution from within pods using nslookup or dig
+➤ Review and update network policies to allow required traffic
+➤ Use service mesh like Istio for better traffic management and observability
+➤ Ensure service ports match container ports in deployments
+
+
+Scenario 4️⃣: Load Balancer Health Check Failures
+🚫 Problem
+➤ ALB showing all targets as unhealthy
+➤ Traffic not reaching pods
+➤ 502 Bad Gateway errors from load balancer
+➤ Ingress controller not routing traffic properly
+
+🌊 Root Causes
+➤ Health check endpoint not implemented in application
+➤ Health check path misconfigured in ingress/service
+➤ Application takes too long to start (exceeds health check timeout)
+➤ Wrong port configured for health checks
+➤ Security groups blocking health check traffic
+
+✅ Solution
+➤ Implement /health or /actuator/health endpoint in all microservices
+➤ Configure proper readiness and liveness probes in pod spec
+➤ Increase initialDelaySeconds to allow application startup time
+➤ Set appropriate timeout and failure threshold values
+➤ Ensure health check path returns 200 OK response
+➤ Verify target group settings in ALB match service configurations
+➤ Check security groups allow traffic from ALB to pods on correct ports
+
+
+Scenario 5️⃣: Docker Image Pull Failures
+🚫 Problem
+➤ Pods stuck in ImagePullBackOff state
+➤ Error: "Failed to pull image" or "ErrImagePull"
+➤ Deployment rollout stuck waiting for pods
+
+🌊 Root Causes
+➤ ECR authentication token expired
+➤ Wrong image name or tag in deployment YAML
+➤ IAM role for EKS nodes lacks ECR pull permissions
+➤ Image doesn't exist in ECR repository
+➤ Network issues accessing ECR from private subnets
+
+✅ Solution
+➤ Verify IAM role attached to EKS node group has ➤ AmazonEC2ContainerRegistryReadOnly policy
+➤ Check image name follows correct format: <account-id>.dkr.ecr.<region>.amazonaws.com/<repo>:<tag>
+➤ List images in ECR to confirm tag exists: aws ecr list-images
+➤ Use imagePullPolicy: Always or IfNotPresent appropriately
+➤ For private repositories, create Kubernetes secret with ECR credentials
+➤ Ensure NAT Gateway is configured for private subnet internet access
+➤ Test image pull manually using docker pull from worker node
+
+
+Scenario 6️⃣: Jenkins Pipeline Authentication Failures
+🚫 Problem
+➤ Jenkins cannot push images to ECR
+➤ kubectl commands fail with "unauthorized" error
+➤ Jenkins cannot access EKS cluster
+➤ AWS credentials not working in pipeline
+
+🌊 Root Causes
+➤ AWS credentials not configured in Jenkins
+➤ IAM role lacks necessary permissions
+➤ Kubeconfig not properly set up for EKS access
+➤ ECR login token expired during long builds
+➤ Service account in Kubernetes not bound to proper role
+
+✅ Solution
+➤ Configure AWS credentials in Jenkins using AWS Credentials plugin
+➤ Create IAM user/role with ECR push, EKS describe permissions
+➤ Generate and configure kubeconfig for cluster: aws eks update-kubeconfig
+➤ Use aws ecr get-login-password before docker push in pipeline
+➤ Create Kubernetes service account with cluster-admin or specific RBAC permissions
+➤ Store kubeconfig in Jenkins credentials securely
+➤ Use IAM roles for service accounts (IRSA) for better security
+
+
+Scenario 7️⃣: Rolling Update Causing Downtime
+🚫 Problem
+➤ Application becomes unavailable during deployment
+➤ Users experience connection errors during updates
+➤ Old version pods terminate before new ones are ready
+➤ Database connections lost during rollout
+
+🌊 Root Causes
+➤ No readiness probe configured causing traffic to unready pods
+➤ maxUnavailable set too high in deployment strategy
+➤ Application not handling graceful shutdown
+➤ No PodDisruptionBudget configured
+➤ Insufficient replicas to maintain availability
+
+✅ Solution
+➤ Configure proper readiness probes to ensure pod is ready before receiving traffic
+➤ Set appropriate rolling update strategy: maxSurge: 1, maxUnavailable: 0
+➤ Implement graceful shutdown hook in Spring Boot applications
+➤ Create PodDisruptionBudget to ensure minimum available pods during updates
+➤ Run minimum 2-3 replicas for high availability
+➤ Use preStop lifecycle hooks to drain connections before termination
+➤ Test deployments in staging environment first
+
+
+Scenario 8️⃣: Persistent Volume Claim (PVC) Mounting Issues
+🚫 Problem
+➤ Pods stuck in ContainerCreating state
+➤ Error: "Unable to mount volumes" or "FailedMount"
+➤ File uploads not persisting after pod restart
+➤ Logs show permission denied errors
+
+🌊 Root Causes
+➤ Storage class not available or misconfigured
+➤ EBS CSI driver not installed on cluster
+➤ PVC requesting more storage than available
+➤ Volume in different availability zone than pod
+➤ Incorrect file system permissions
+
+✅ Solution
+➤ Install AWS EBS CSI driver as cluster add-on
+➤ Create proper storage class with EBS volume type (gp3 recommended)
+➤ Ensure PVC and pod are in same availability zone
+➤ Set appropriate access modes: ReadWriteOnce for EBS
+➤ Configure fsGroup in pod security context for proper permissions
+➤ Use dynamic provisioning instead of static PVs
+➤ For multi-AZ deployments, use EFS instead of EBS with EFS CSI driver
+
+
+Scenario 9️⃣: Environment Variable and Secret Mismatch
+🚫 Problem
+➤ Application using wrong database in production
+➤ Feature flags not working as expected
+➤ API keys showing as "null" or undefined
+➤ Services connecting to wrong endpoints
+
+🌊 Root Causes
+➤ ConfigMaps not updated after deployment
+➤ Wrong namespace selected when creating secrets
+➤ Environment variables not properly referenced in deployment
+➤ Secrets not base64 encoded correctly
+➤ ConfigMap mounted as volume but application reading from env vars
+
+✅ Solution
+➤ Use consistent naming convention for ConfigMaps across environments
+➤ Verify secrets exist in correct namespace: kubectl get secrets -n <namespace>
+➤ Reference ConfigMaps and Secrets properly in deployment using envFrom or env
+➤ Encode secrets correctly: echo -n 'password' | base64
+➤ Implement external-secrets operator to sync from AWS Secrets Manager automatically
+➤ Use different ConfigMaps for dev, staging, prod environments
+➤ Restart deployments after ConfigMap/Secret updates: kubectl rollout restart
+
+
+Scenario 1️⃣0️⃣: Kafka Consumer Lag and Message Loss
+🚫 Problem
+➤ Notification service not sending alerts
+➤ Messages piling up in Kafka topics
+➤ Duplicate notifications being sent
+➤ Consumer group rebalancing continuously
+
+🌊 Root Causes
+➤ Consumer pods crashing before committing offsets
+➤ Not enough consumer instances to handle message load
+➤ Network partition between Kafka and consumers
+➤ Consumer processing time exceeding session timeout
+➤ Auto-commit disabled but manual commit not implemented
+
+✅ Solution
+➤ Configure proper Kafka consumer properties: session timeout, heartbeat interval
+➤ Scale notification service pods based on partition count
+➤ Implement proper error handling and retry logic
+➤ Use idempotent message processing to handle duplicates
+➤ Monitor consumer lag metrics in Prometheus
+➤ Configure appropriate resource limits for consumer pods
+➤ Use Kafka consumer groups properly with unique group IDs
+➤ Implement dead letter queue for failed messages
+
+
+Scenario 1️⃣1️⃣: SSL/TLS Certificate Issues
+🚫 Problem
+➤ HTTPS not working on application domain
+➤ Browser showing "Not Secure" warning
+➤ Certificate expired errors
+➤ Certificate mismatch with domain name
+
+🌊 Root Causes
+➤ Certificate not properly configured in ingress
+➤ AWS ACM certificate not validated
+➤ Wrong certificate ARN used in ALB annotation
+➤ Certificate doesn't cover subdomain or wildcard
+➤ Certificate renewal not automated
+
+✅ Solution
+➤ Request certificate in AWS ACM for your domain
+➤ Validate certificate using DNS or email validation
+➤ Add certificate ARN annotation to ingress: alb.ingress.kubernetes.io/certificate-arn
+➤ Use wildcard certificates for multiple subdomains
+➤ Configure DNS records to point to ALB endpoint
+➤ Enable automatic certificate renewal in ACM
+➤ Use cert-manager for Let's Encrypt certificates in Kubernetes
+➤ Verify certificate is associated with correct load balancer listener
+
+
+Scenario 1️⃣2️⃣: Cross-Origin Resource Sharing (CORS) Errors
+🚫 Problem
+➤ Frontend cannot communicate with backend APIs
+➤ Browser console showing CORS policy errors
+➤ OPTIONS preflight requests failing
+➤ API calls work in Postman but not in browser
+
+🌊 Root Causes
+➤ CORS not configured in Spring Boot backend
+➤ API Gateway not forwarding CORS headers
+➤ Ingress controller stripping CORS headers
+➤ Wrong origin URL configured in CORS policy
+➤ Missing Access-Control headers in response
+
+✅ Solution
+➤ Configure CORS in Spring Boot using @CrossOrigin or WebMvcConfigurer
+➤ Allow specific origins, not wildcard "*" in production
+➤ Configure CORS in API Gateway or ingress annotations
+➤ Ensure OPTIONS method is allowed for preflight requests
+➤ Add proper CORS headers: Access-Control-Allow-Origin, Methods, Headers
+➤ Test CORS configuration using curl with Origin header
+➤ Use NGINX ingress CORS annotations if using NGINX controller
+
+
+Scenario 1️⃣3️⃣: WebSocket Connection Failures
+🚫 Problem
+➤ Real-time chat not working
+➤ WebSocket connections dropping frequently
+➤ Sticky session not working, users connecting to different pods
+➤ 101 Switching Protocols response not received
+
+🌊 Root Causes
+➤ Load balancer not configured for WebSocket support
+➤ Ingress timeout too short for long-lived connections
+➤ No sticky sessions causing connection to different pod on reconnect
+➤ WebSocket path not properly configured in ingress
+➤ Security groups blocking WebSocket traffic
+
+✅ Solution
+➤ Configure ALB target group with sticky sessions (session affinity)
+➤ Increase ingress timeout annotations for WebSocket paths
+➤ Use NGINX ingress with proper WebSocket annotations
+➤ Configure Spring Boot WebSocket endpoint properly
+➤ Use Redis for session storage across pods
+➤ Enable WebSocket support in API Gateway if using it
+➤ Test WebSocket endpoint using wscat tool
+➤ Monitor connection metrics and implement reconnection logic in frontend
+
+
+Scenario 1️⃣4️⃣: Database Migration Failures
+🚫 Problem
+➤ Schema changes not applied before new code deployment
+➤ Application crashes due to missing database columns
+➤ Migration scripts failing midway
+➤ Database locked during migration
+
+🌊 Root Causes
+➤ Migrations running as application startup instead of separate job
+➤ Multiple pods running migrations simultaneously
+➤ Migration scripts not idempotent
+➤ Database user lacks necessary permissions
+➤ Incompatible schema changes with zero-downtime deployment
+
+✅ Solution
+➤ Run Liquibase/Flyway migrations as Kubernetes Job before deployment
+➤ Use init containers for migrations with proper locking
+➤ Ensure migration scripts are idempotent (can run multiple times safely)
+➤ Grant proper database privileges to migration user
+➤ Use backward-compatible schema changes (add columns as nullable first)
+➤ Version control all migration scripts
+➤ Test migrations in staging environment first
+➤ Implement blue-green deployments for breaking schema changes
+➤ Use database transaction rollback for failed migrations
+
+
+Scenario 1️⃣5️⃣: Auto-Scaling Not Working Properly
+🚫 Problem
+➤ HPA not scaling pods despite high CPU/memory usage
+➤ Cluster autoscaler not adding nodes
+➤ Pods pending due to insufficient resources
+➤ Scaling happening too slowly during traffic spikes
+
+🌊 Root Causes
+➤ Metrics server not installed or not functioning
+➤ Resource requests not defined in pod spec (HPA requirement)
+➤ Scaling thresholds set incorrectly
+➤ Cluster autoscaler not configured with proper IAM permissions
+➤ Node group max size reached
+➤ PodDisruptionBudget preventing scale down
+
+✅ Solution
+➤ Install metrics-server: kubectl apply -f metrics-server.yaml
+➤ Define resource requests in all deployments (required for HPA)
+➤ Configure HPA with appropriate CPU/memory thresholds (e.g., 70%)
+➤ Attach IAM policy for autoscaling to cluster autoscaler
+➤ Increase maximum node count in node group configuration
+➤ Use custom metrics from CloudWatch or Prometheus for better scaling decisions
+➤ Configure scale-down delay and stabilization windows appropriately
+➤ Test scaling behavior with load testing tools like JMeter
+
+
+Scenario 1️⃣6️⃣: Jenkins Build Timeouts
+🚫 Problem
+➤ Jenkins pipeline failing with timeout errors
+➤ Maven/npm builds taking extremely long time
+➤ Docker build step hanging indefinitely
+➤ Pipeline stuck at deployment stage
+
+🌊 Root Causes
+➤ No timeout configured, causing indefinite waits
+➤ Network issues downloading dependencies
+➤ Insufficient resources on Jenkins agents
+➤ Large Docker image layers not cached
+➤ Deployment waiting for pod readiness indefinitely
+
+✅ Solution
+➤ Set appropriate timeout values in Jenkinsfile for each stage
+➤ Configure Maven/npm to use corporate repository mirrors or Artifactory
+➤ Increase Jenkins agent memory and CPU allocation
+➤ Use multi-stage Docker builds and layer caching
+➤ Implement healthcheck timeout in deployment wait steps
+➤ Use Jenkins declarative pipeline timeout directive
+➤ Configure retry logic for flaky network operations
+➤ Monitor Jenkins agent resource usage and scale appropriately
+
+
+Scenario 1️⃣7️⃣: Logging and Monitoring Gaps
+🚫 Problem
+➤ Cannot find application logs when debugging issues
+➤ No visibility into microservice performance
+➤ Unable to trace requests across services
+➤ Alerts not firing when issues occur
+
+🌊 Root Causes
+➤ Logs not being forwarded to CloudWatch
+➤ Fluentd/Fluent Bit not deployed or misconfigured
+➤ Application logging to wrong output (not stdout/stderr)
+➤ Prometheus not scraping application metrics
+➤ No alerting rules configured
+
+✅ Solution
+➤ Deploy Fluentd or Fluent Bit as DaemonSet on all nodes
+➤ Configure application to log to stdout/stderr (Docker/Kubernetes standard)
+➤ Use structured logging (JSON format) for better parsing
+➤ Expose /metrics endpoint in all services for Prometheus scraping
+➤ Add Prometheus annotations to pods for automatic discovery
+➤ Implement distributed tracing using AWS X-Ray or Jaeger
+➤ Create CloudWatch log groups for each microservice
+➤ Configure Prometheus alerting rules and Alertmanager
+➤ Set up Grafana dashboards for visualization
+➤ Implement centralized logging with proper log retention policies
+
+
+Scenario 1️⃣8️⃣: Git Conflicts in Deployment Manifests
+🚫 Problem
+➤ Multiple developers pushing changes causing merge conflicts
+➤ Production deployment using wrong image tag
+➤ Rolling back deployment accidentally deploys old version
+➤ ConfigMaps overwritten by automated pipeline
+
+🌊 Root Causes
+➤ Manual edits to deployment files in cluster vs Git
+➤ No GitOps workflow implemented
+➤ Image tags not properly managed
+➤ Multiple pipelines modifying same files simultaneously
+
+✅ Solution
+➤ Implement GitOps using ArgoCD or FluxCD
+➤ Use Git as single source of truth for all Kubernetes manifests
+➤ Never manually edit resources in cluster (use kubectl apply from Git)
+➤ Use semantic versioning for Docker image tags
+➤ Create separate Git branches for each environment
+➤ Implement pull request workflow with approvals
+➤ Use Kustomize or Helm for environment-specific configurations
+➤ Tag Git commits corresponding to production deployments
+➤ Implement automated rollback based on Git history
+
+
+Scenario 1️⃣9️⃣: Network Policy Blocking Legitimate Traffic
+🚫 Problem
+➤ Services cannot communicate despite being in same cluster
+➤ Database connections randomly failing
+➤ External API calls not working from pods
+➤ DNS ✅ resolution failing intermittently
+
+🌊 Root Causes
+➤ Restrictive network policies applied without proper testing
+➤ Network policies blocking kube-dns/CoreDNS traffic
+➤ Egress policies preventing external API access
+➤ Policy selectors not matching intended pods
+
+✅ Solution
+➤ Start with permissive policies and gradually restrict
+➤ Always allow DNS traffic to kube-system namespace in policies
+➤ Create separate network policies for ingress and egress
+➤ Use proper label selectors in policies matching pod labels
+➤ Test network connectivity after applying policies
+➤ Document network policy requirements for each microservice
+➤ Use network policy visualizers to understand impact
+➤ Implement default deny policies with explicit allow rules
+➤ Test using kubectl exec to verify connectivity between pods
+
+
+Scenario 2️⃣0️⃣: Disaster Recovery and Backup Failures
+🚫 Problem
+➤ Database backup not running as scheduled
+➤ Cannot restore from backup when needed
+➤ Kubernetes state not backed up
+➤ Configuration lost after cluster recreation
+
+🌊 Root Causes
+➤ RDS automated backups disabled or misconfigured
+➤ No backup ✅ solution for Kubernetes resources
+➤ Backup retention period too short
+➤ Restore procedures not tested or documented
+➤ Backup stored in same region as primary
+
+✅ Solution
+➤ Enable RDS automated backups with appropriate retention (7-30 days)
+➤ Configure manual snapshots before major changes
+➤ Use Velero for Kubernetes cluster backup and restore
+➤ Backup etcd snapshots regularly (EKS handles this automatically)
+➤ Store backups in different region for disaster recovery
+➤ Version control all Kubernetes manifests in Git
+➤ Export and backup ConfigMaps, Secrets regularly
+➤ Document and test restore procedures quarterly
+➤ Implement point-in-time recovery for RDS
+➤ Use AWS Backup for centralized backup management
+➤ Create runbooks for different disaster scenarios
+
+
+======================================
+🔷 Microservices Detailed Analysis
+======================================
+🔄 Services with their port numbers:
+➤ Eureka Server (8761) ─────────▶ Service Discovery
+➤ UserMS (8080) ─────────▶ Authentication
+➤ ProfileMS (9100) ─────────▶ Doctor & Patient Profiles
+➤ AppointmentMS (9200) ─────────▶ Appointments, Medical Records, Prescriptions
+➤ PharmacyMS (9300) ─────────▶ Medicine Inventory & Sales
+➤ MediaMS (9400) ─────────▶ File Storage
+➤ Gateway ─────────▶ JWT Validation & Routing
+
+
+🔄 Technology Stack
+Every technology used in your project:
+➤ Spring Boot 3.5.6/3.5.7
+➤ Spring Cloud 2025.0.0
+➤ Java 8
+➤ MySQL 8
+➤ JWT, BCrypt, OpenFeign, Eureka
+➤ React, Tailwind CSS (frontend)
+
+
+🔄 Complete Application Flows
+➤ Patient Registration ─────────▶ User creation → Profile creation → Database entries
+➤ Doctor Registration ─────────▶ Similar with doctor ─ specific fields
+➤ User Login ─────────▶ JWT generation with all claims
+➤ Appointment Booking ─────────▶ Verification → Scheduling → Database updates
+➤ Doctor Consultation ─────────▶ Medical record creation → Status updates
+➤ Prescription Creation ─────────▶ Prescription → Medicine linking → PharmacyMS reference
+➤ Pharmacy Medicine Management ─────────▶ Master catalog → Inventory batches
+➤ Pharmacy Sale Processing ─────────▶ Prescription linking → Stock reduction → Sale items
+➤ Medical Document Upload ─────────▶ File storage as BLOB → Retrieval
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Database Design: Relationships (one-to-many: Doctor to Appointments), normalization, indexes on frequent queries like patient history.
+Spring Boot Implementation: Security with JWT/Spring Security for RBAC, REST controllers with @PreAuthorize, scheduling via @Scheduled or Quartz.
+Challenges & ✅ Solutions: Discuss concurrency in bookings (optimistic locking with @Version), file uploads for reports (Spring MultipartFile to S3/minio), payment integration (Stripe/Razorpay webhooks).
+Code Walkthrough: Prepare to share GitHub repo; explain a complex service like BillingService with transaction management (@Transactional).
+Scalability: Microservices potential (separate Appointment and Patient services), caching (Redis for doctor availability), Docker deployment.
+
+
+Feature Revision Order (Day-by-Day)
+Today (High-impact core - 4-5 hours):
+
+👉 User Management + RBAC (30min): Login flows, @PreAuthorize, roles cascade to features
+
+👉 Patient Management (45min): Registration → Medical Records → File uploads
+
+👉 Appointment Scheduling (60min): Calendar API, slot conflicts, doctor availability—most likely grilled
+
+👉 Billing (45min): Invoice generation, payment webhooks, @Transactional dues calculation
+
+Tomorrow Morning (Money + Metrics - 3 hours):
+5. Reporting Dashboard (45min): Key metrics, filters, Chart.js queries
+6. Pharmacy + Lab (45min): Inventory triggers, prescription linking
+
+Tomorrow Afternoon (Polish - 2 hours):
+7. Notifications (30min): Email/SMS service, WebSocket chat
+8. Cross-cutting (60min): Error handling, validation, security across features
+
+Microservices Layer (30min Total)
+Only after features. Prepare one slide/diagram showing:

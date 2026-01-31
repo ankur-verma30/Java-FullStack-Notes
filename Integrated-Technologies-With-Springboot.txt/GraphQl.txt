@@ -1,0 +1,2525 @@
+###########################
+🔷 Introduction To GraphQL
+###########################
+GraphQL is a query language for your API, and a server-side runtime for executing queries using a type system you define for your data. The GraphQL specification was open-sourced in 2015 and has since been implemented in a variety of programming languages. GraphQL isn’t tied to any specific database or storage engine—it is backed by your existing code and data.
+
+
+🔄 Why GraphQL?
+🚫 Problem with REST: Imagine you need to display a user's profile with their posts and comments.
+
+With REST:
+🔗 GET /users/1           ─────────▶ Returns: id, name, email, age, address, phone, etc. (TOO MUCH DATA)
+🔗 GET /users/1/posts     ─────────▶ Returns: all post details (TOO MUCH DATA)
+🔗 GET /posts/1/comments  ─────────▶ Returns: all comments (TOO MUCH DATA)
+You need 3+ HTTP requests and get lots of unnecessary data (over-fetching).
+
+
+✅ Solution with GraphQL:
+query {
+  user(id: 1) {
+    name
+    email
+    posts {
+      title
+      comments {
+        text
+      }
+    }
+  }
+}
+👉 1 HTTP request, exact data you need. That's the power of GraphQL!
+
+
+🔄 CORE CONCEPTS
+1️⃣ Schema
+The schema is the heart of GraphQL. It's a contract that defines what data clients can request.
+
+✅ Example schema:
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  age: Int
+}
+
+type Query {
+  user(id: ID!): User
+  users: [User!]!
+}
+
+Reading this:
+✔️ User is an object type with fields
+✔️ ID! means non-null ID (required)
+✔️ String! means non-null string (required)
+✔️ Int means nullable integer (optional)
+✔️ [User!]! means non-null array of non-null Users
+✔️ Query defines what data can be fetched
+
+
+2️⃣ Scalar Types
+GraphQL has 5 built-in scalar types:
+type Example {
+  id: ID              # Unique identifier (serialized as String)
+  name: String        # Text data
+  age: Int            # 32-bit integer
+  price: Float        # Floating-point number
+  isActive: Boolean   # true or false
+}
+
+
+3️⃣ Type Modifiers
+field: String       # nullable string (can be null)
+field: String!      # non-null string (required, cannot be null)
+field: [String]     # nullable array of nullable strings
+field: [String!]    # nullable array of non-null strings
+field: [String]!    # non-null array of nullable strings
+field: [String!]!   # non-null array of non-null strings
+
+
+4️⃣ Object Types
+type Book {
+  id: ID!
+  title: String!
+  author: Author!      # Relationship to another type
+  publishedYear: Int!
+  isbn: String!
+}
+
+type Author {
+  id: ID!
+  name: String!
+  books: [Book!]!      # One author can have many books
+}
+
+
+5️⃣ Enums
+Enums are a special scalar that can only have specific values:
+enum BookGenre {
+  FICTION
+  NON_FICTION
+  SCIENCE_FICTION
+  MYSTERY
+  THRILLER
+}
+
+type Book {
+  title: String!
+  genre: BookGenre!    # Must be one of the enum values
+}
+
+
+6️⃣ Input Types
+Input types are used for passing complex objects to mutations:
+input CreateBookInput {
+  title: String!
+  authorId: ID!
+  publishedYear: Int!
+  genre: BookGenre!
+}
+
+type Mutation {
+  createBook(input: CreateBookInput!): Book!
+}
+👉 Input types CANNOT have relationships or circular references.
+
+
+7️⃣ Interfaces
+Interfaces define common fields that multiple types can implement:
+graphqlinterface Character {
+  id: ID!
+  name: String!
+}
+
+type Human implements Character {
+  id: ID!
+  name: String!
+  height: Float
+}
+
+type Droid implements Character {
+  id: ID!
+  name: String!
+  primaryFunction: String
+}
+
+
+🔄 OPERATIONS
+GraphQL has 3 types of operations:
+1️⃣ QUERY (Read Data)
+1️. Queries are used to fetch data (like GET in REST):
+🔗 Simple Query:
+query {
+  users {
+    id
+    name
+  }
+}
+
+🔗 Response:
+{
+  "data": {
+    "users": [
+      { "id": "1", "name": "John" },
+      { "id": "2", "name": "Jane" }
+    ]
+  }
+}
+
+2️. Query with Arguments:
+query {
+  user(id: 1) {
+    name
+    email
+  }
+}
+
+
+3️. Query with Variables (Recommended):
+query GetUser($userId: ID!) {
+  user(id: $userId) {
+    name
+    email
+  }
+}
+
+Variables (sent separately):
+json{
+  "userId": "1"
+}
+
+
+🔁 Why use variables?
+➤ Type safety
+➤ Reusability
+➤ Security (prevents injection)
+➤ Cleaner code
+
+
+2️⃣ MUTATION (Write Data)
+Mutations are used to create, update, or delete data (like POST, PUT, DELETE in REST):
+
+🔁 Create
+mutation {
+  createUser(name: "John", email: "john@example.com") {
+    id
+    name
+    email
+  }
+}
+
+🔁 With Variables
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    name
+  }
+}
+
+🔁 Variables
+json{
+  "input": {
+    "name": "John",
+    "email": "john@example.com"
+  }
+}
+
+🔁 Update
+mutation {
+  updateUser(id: 1, name: "John Updated") {
+    id
+    name
+  }
+}
+
+🔁 Delete
+mutation {
+  deleteUser(id: 1) {
+    success
+    message
+  }
+}
+
+
+3️⃣ SUBSCRIPTION (Real-time Data)
+Subscriptions are used for real-time updates (like WebSockets):
+subscription {
+  userCreated {
+    id
+    name
+  }
+}
+👉 When a new user is created, the subscriber receives the data immediately.
+
+
+🔄 ADVANCED QUERY FEATURES
+1️⃣ Aliases
+Fetch the same field multiple times with different arguments:
+query {
+  firstUser: user(id: 1) {
+    name
+  }
+  secondUser: user(id: 2) {
+    name
+  }
+}
+
+Response:
+{
+  "data": {
+    "firstUser": { "name": "John" },
+    "secondUser": { "name": "Jane" }
+  }
+}
+
+
+2️⃣ Fragments
+Reuse common field selections:
+fragment UserFields on User {
+  id
+  name
+  email
+}
+
+query {
+  user(id: 1) {
+    ...UserFields
+    age
+  }
+  
+  users {
+    ...UserFields
+  }
+}
+👉 This is especially useful for complex nested queries.
+
+
+3️⃣ Nested Queries
+GraphQL shines when fetching related data:
+query {
+  author(id: 1) {
+    name
+    books {
+      title
+      reviews {
+        rating
+        comment
+        reviewer {
+          name
+        }
+      }
+    }
+  }
+}
+
+This single query fetches:
+➤ Author details
+➤ All their books
+➤ All reviews for each book
+➤ Reviewer details for each review
+✔️ In REST, this would require 10+ HTTP requests!
+
+
+🔄 SPRING BOOT + GRAPHQL SETUP
+Now let's build a real application. We'll create a Book Management System.
+🔗 Maven Dependencies (pom.xml)
+xml<dependencies>
+    <!-- Spring Boot Web -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- Spring Boot GraphQL -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-graphql</artifactId>
+    </dependency>
+    
+    <!-- Spring Data JPA -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <!-- H2 Database -->
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+    </dependency>
+    
+    <!-- Lombok (reduces boilerplate) -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+    </dependency>
+    
+    <!-- Validation -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    
+    <!-- Extended Scalars (DateTime, etc.) -->
+    <dependency>
+        <groupId>com.graphql-java</groupId>
+        <artifactId>graphql-java-extended-scalars</artifactId>
+        <version>21.0</version>
+    </dependency>
+</dependencies>
+
+
+🔗 Application Properties
+properties# Server
+server.port=8080
+
+# GraphQL
+spring.graphql.graphiql.enabled=true
+spring.graphql.graphiql.path=/graphiql
+spring.graphql.path=/graphql
+
+# Schema
+spring.graphql.schema.locations=classpath:graphql/
+spring.graphql.schema.file-extensions=.graphqls,.graphql
+
+# Database
+spring.datasource.url=jdbc:h2:mem:bookdb
+spring.datasource.username=sa
+spring.datasource.password=
+
+# JPA
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+
+
+
+🔄 CREATING THE SCHEMA
+🔗 Create file: src/main/resources/graphql/schema.graphqls
+# Custom scalar for DateTime
+scalar DateTime
+
+# Enum for book genres
+enum BookGenre {
+    FICTION
+    NON_FICTION
+    SCIENCE_FICTION
+    MYSTERY
+    ROMANCE
+    THRILLER
+    BIOGRAPHY
+}
+
+# Author type
+type Author {
+    id: ID!
+    name: String!
+    email: String!
+    bio: String
+    birthYear: Int
+    books: [Book!]!
+    totalBooks: Int!
+    createdAt: DateTime!
+}
+
+# Book type
+type Book {
+    id: ID!
+    title: String!
+    isbn: String!
+    publishedYear: Int!
+    genre: BookGenre!
+    description: String
+    price: Float!
+    author: Author!
+    reviews: [Review!]!
+    averageRating: Float
+    createdAt: DateTime!
+}
+
+# Review type
+type Review {
+    id: ID!
+    rating: Int!
+    comment: String
+    reviewerName: String!
+    book: Book!
+    createdAt: DateTime!
+}
+
+# Input for creating author
+input CreateAuthorInput {
+    name: String!
+    email: String!
+    bio: String
+    birthYear: Int
+}
+
+# Input for updating author
+input UpdateAuthorInput {
+    name: String
+    email: String
+    bio: String
+    birthYear: Int
+}
+
+# Input for creating book
+input CreateBookInput {
+    title: String!
+    isbn: String!
+    publishedYear: Int!
+    genre: BookGenre!
+    description: String
+    price: Float!
+    authorId: ID!
+}
+
+# Input for updating book
+input UpdateBookInput {
+    title: String
+    isbn: String
+    publishedYear: Int
+    genre: BookGenre
+    description: String
+    price: Float
+}
+
+# Input for creating review
+input CreateReviewInput {
+    bookId: ID!
+    rating: Int!
+    comment: String
+    reviewerName: String!
+}
+
+# Filter for searching books
+input BookFilter {
+    genre: BookGenre
+    minPrice: Float
+    maxPrice: Float
+    minYear: Int
+    maxYear: Int
+    authorId: ID
+}
+
+# Pagination input
+input PaginationInput {
+    page: Int = 0
+    size: Int = 10
+}
+
+# Paginated book response
+type BookPage {
+    content: [Book!]!
+    totalElements: Int!
+    totalPages: Int!
+    currentPage: Int!
+    hasNext: Boolean!
+    hasPrevious: Boolean!
+}
+
+# Delete response
+type DeleteResponse {
+    success: Boolean!
+    message: String!
+}
+
+# QUERIES (Read operations)
+type Query {
+    # Author queries
+    author(id: ID!): Author
+    authors: [Author!]!
+    authorByEmail(email: String!): Author
+    
+    # Book queries
+    book(id: ID!): Book
+    books: [Book!]!
+    booksByAuthor(authorId: ID!): [Book!]!
+    booksByGenre(genre: BookGenre!): [Book!]!
+    searchBooks(filter: BookFilter!, pagination: PaginationInput): BookPage!
+    
+    # Review queries
+    review(id: ID!): Review
+    reviewsByBook(bookId: ID!): [Review!]!
+    
+    # Statistics
+    totalAuthors: Int!
+    totalBooks: Int!
+}
+
+# MUTATIONS (Write operations)
+type Mutation {
+    # Author mutations
+    createAuthor(input: CreateAuthorInput!): Author!
+    updateAuthor(id: ID!, input: UpdateAuthorInput!): Author!
+    deleteAuthor(id: ID!): DeleteResponse!
+    
+    # Book mutations
+    createBook(input: CreateBookInput!): Book!
+    updateBook(id: ID!, input: UpdateBookInput!): Book!
+    deleteBook(id: ID!): DeleteResponse!
+    
+    # Review mutations
+    createReview(input: CreateReviewInput!): Review!
+    deleteReview(id: ID!): DeleteResponse!
+}
+
+# SUBSCRIPTIONS (Real-time updates)
+type Subscription {
+    bookCreated: Book!
+    reviewAdded: Review!
+}
+Key Points:
+➤ The schema defines the entire API contract
+➤ Every type, field, and operation is specified here
+➤ Clients can introspect this schema to know what's available
+➤ The ! marker means non-null/required
+
+
+🔄 CREATING ENTITIES
+1️⃣ BookGenre Enum
+javapackage com.example.graphqldemo.entity;
+
+public enum BookGenre {
+    FICTION,
+    NON_FICTION,
+    SCIENCE_FICTION,
+    MYSTERY,
+    ROMANCE,
+    THRILLER,
+    BIOGRAPHY
+}
+
+
+2️⃣ Author Entity
+javapackage com.example.graphqldemo.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "authors")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Author {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String name;
+    
+    @Column(nullable = false, unique = true)
+    private String email;
+    
+    @Column(length = 1000)
+    private String bio;
+    
+    private Integer birthYear;
+    
+    // One-to-Many: One author has many books
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Book> books = new ArrayList<>();
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    // Helper method to maintain bidirectional relationship
+    public void addBook(Book book) {
+        books.add(book);
+        book.setAuthor(this);
+    }
+    
+    public void removeBook(Book book) {
+        books.remove(book);
+        book.setAuthor(null);
+    }
+}
+Annotations Explained:
+🔗 @Entity - Marks this as a JPA entity (database table)
+🔗 @Data - Lombok: generates getters, setters, toString, equals, hashCode
+🔗 @Builder - Lombok: provides builder pattern for object creation
+🔗 @NoArgsConstructor - Lombok: generates no-argument constructor (required by JPA)
+🔗 @AllArgsConstructor - Lombok: generates constructor with all fields
+🔗 @OneToMany - Defines one-to-many relationship with Book
+🔗 mappedBy = "author" - Refers to the 'author' field in Book entity
+🔗 cascade = CascadeType.ALL - Operations on Author cascade to Books
+🔗 orphanRemoval = true - If a book is removed from the list, delete it from DB
+
+
+3️⃣ Book Entity
+javapackage com.example.graphqldemo.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "books")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Book {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String title;
+    
+    @Column(nullable = false, unique = true)
+    private String isbn;
+    
+    @Column(nullable = false)
+    private Integer publishedYear;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BookGenre genre;
+    
+    @Column(length = 2000)
+    private String description;
+    
+    @Column(nullable = false)
+    private Double price;
+    
+    // Many-to-One: Many books belong to one author
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
+    
+    // One-to-Many: One book has many reviews
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    public void addReview(Review review) {
+        reviews.add(review);
+        review.setBook(this);
+    }
+    
+    public void removeReview(Review review) {
+        reviews.remove(review);
+        review.setBook(null);
+    }
+    
+    // Business logic: Calculate average rating
+    public Double getAverageRating() {
+        if (reviews.isEmpty()) {
+            return null;
+        }
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+}
+Key Points:
+🔗 @ManyToOne - Many books can have the same author
+🔗 fetch = FetchType.LAZY - Author is loaded only when accessed (not immediately)
+🔗 @JoinColumn - Specifies the foreign key column name
+🔗 @Enumerated(EnumType.STRING) - Store enum as string in DB (not integer)
+
+
+4️⃣ Review Entity
+javapackage com.example.graphqldemo.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "reviews")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Review {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private Integer rating;
+    
+    @Column(length = 1000)
+    private String comment;
+    
+    @Column(nullable = false)
+    private String reviewerName;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private Book book;
+    
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+}
+
+
+5️⃣ CREATING REPOSITORIES
+Repositories handle database operations. Spring Data JPA generates implementations automatically.
+
+1️⃣ AuthorRepository
+javapackage com.example.graphqldemo.repository;
+
+import com.example.graphqldemo.entity.Author;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+
+@Repository
+public interface AuthorRepository extends JpaRepository<Author, Long> {
+    
+    // Spring Data JPA automatically implements these methods
+    // based on method naming conventions
+    
+    Optional<Author> findByEmail(String email);
+    
+    boolean existsByEmail(String email);
+}
+
+What you get for free from JpaRepository:
+🔗 save(entity) - Insert or update
+🔗 findById(id) - Find by ID
+🔗 findAll() - Get all records
+🔗 deleteById(id) - Delete by ID
+🔗 count() - Count all records
+🔗 existsById(id) - Check if exists
+And many more...
+
+
+2️⃣ BookRepository
+javapackage com.example.graphqldemo.repository;
+
+import com.example.graphqldemo.entity.Book;
+import com.example.graphqldemo.entity.BookGenre;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface BookRepository extends JpaRepository<Book, Long>,
+                                       JpaSpecificationExecutor<Book> {
+    
+    List<Book> findByAuthorId(Long authorId);
+    
+    List<Book> findByGenre(BookGenre genre);
+    
+    Optional<Book> findByIsbn(String isbn);
+    
+    boolean existsByIsbn(String isbn);
+    
+    List<Book> findByPriceBetween(Double minPrice, Double maxPrice);
+    
+    // Custom JPQL query
+    @Query("SELECT b FROM Book b ORDER BY b.price DESC LIMIT 1")
+    Optional<Book> findMostExpensiveBook();
+    
+    @Query("SELECT b FROM Book b ORDER BY b.price ASC LIMIT 1")
+    Optional<Book> findCheapestBook();
+    
+    List<Book> findByTitleContainingIgnoreCase(String keyword);
+    
+    List<Book> findByPublishedYearGreaterThanEqual(Integer year);
+    
+    List<Book> findByAuthorIdAndGenre(Long authorId, BookGenre genre);
+}
+JpaSpecificationExecutor: Allows for complex dynamic queries using Specifications (we'll use this for filtering).
+
+
+3️⃣ ReviewRepository
+javapackage com.example.graphqldemo.repository;
+
+import com.example.graphqldemo.entity.Review;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+    
+    List<Review> findByBookId(Long bookId);
+    
+    List<Review> findByReviewerName(String reviewerName);
+    
+    List<Review> findByRatingGreaterThanEqual(Integer rating);
+    
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.book.id = :bookId")
+    Double getAverageRatingForBook(Long bookId);
+}
+
+
+6️⃣ CREATING DTOs (Data Transfer Objects)
+DTOs decouple the API layer from the database layer. They define exactly what data comes in and goes out.
+
+1️⃣ CreateAuthorInput
+javapackage com.example.graphqldemo.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class CreateAuthorInput {
+    
+    @NotBlank(message = "Author name is required")
+    private String name;
+    
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    private String email;
+    
+    private String bio;
+    
+    private Integer birthYear;
+}
+
+Validation Annotations:
+🔗 @NotBlank - Cannot be null, empty, or whitespace
+🔗 @Email - Must be valid email format
+These are validated automatically by Spring
+
+
+2️⃣ UpdateAuthorInput
+javapackage com.example.graphqldemo.dto;
+
+import jakarta.validation.constraints.Email;
+import lombok.Data;
+
+@Data
+public class UpdateAuthorInput {
+    // All fields optional for partial updates
+    private String name;
+    
+    @Email(message = "Email should be valid")
+    private String email;
+    
+    private String bio;
+    
+    private Integer birthYear;
+}
+
+
+3️⃣ CreateBookInput
+javapackage com.example.graphqldemo.dto;
+
+import com.example.graphqldemo.entity.BookGenre;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+@Data
+public class CreateBookInput {
+    
+    @NotBlank(message = "Title is required")
+    private String title;
+    
+    @NotBlank(message = "ISBN is required")
+    private String isbn;
+    
+    @NotNull(message = "Published year is required")
+    @Min(value = 1000, message = "Published year must be valid")
+    private Integer publishedYear;
+    
+    @NotNull(message = "Genre is required")
+    private BookGenre genre;
+    
+    private String description;
+    
+    @NotNull(message = "Price is required")
+    @Min(value = 0, message = "Price must be positive")
+    private Double price;
+    
+    @NotNull(message = "Author ID is required")
+    private Long authorId;
+}
+
+
+4️⃣ UpdateBookInput
+javapackage com.example.graphqldemo.dto;
+
+import com.example.graphqldemo.entity.BookGenre;
+import jakarta.validation.constraints.Min;
+import lombok.Data;
+
+@Data
+public class UpdateBookInput {
+    private String title;
+    private String isbn;
+    
+    @Min(value = 1000, message = "Published year must be valid")
+    private Integer publishedYear;
+    
+    private BookGenre genre;
+    private String description;
+    
+    @Min(value = 0, message = "Price must be positive")
+    private Double price;
+}
+
+
+5️⃣ CreateReviewInput
+javapackage com.example.graphqldemo.dto;
+
+import jakarta.validation.constraints.*;
+import lombok.Data;
+
+@Data
+public class CreateReviewInput {
+    
+    @NotNull(message = "Book ID is required")
+    private Long bookId;
+    
+    @NotNull(message = "Rating is required")
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating must be at most 5")
+    private Integer rating;
+    
+    private String comment;
+    
+    @NotBlank(message = "Reviewer name is required")
+    private String reviewerName;
+}
+
+
+6️⃣ BookFilter (for searching)
+javapackage com.example.graphqldemo.dto;
+
+import com.example.graphqldemo.entity.BookGenre;
+import lombok.Data;
+
+@Data
+public class BookFilter {
+    private BookGenre genre;
+    private Double minPrice;
+    private Double maxPrice;
+    private Integer minYear;
+    private Integer maxYear;
+    private Long authorId;
+}
+
+
+7️⃣ PaginationInput
+javapackage com.example.graphqldemo.dto;
+
+import lombok.Data;
+
+@Data
+public class PaginationInput {
+    private Integer page = 0;
+    private Integer size = 10;
+}
+
+
+8️⃣ BookPage (response)
+javapackage com.example.graphqldemo.dto;
+
+import com.example.graphqldemo.entity.Book;
+import lombok.*;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookPage {
+    private List<Book> content;
+    private Integer totalElements;
+    private Integer totalPages;
+    private Integer currentPage;
+    private Boolean hasNext;
+    private Boolean hasPrevious;
+}
+
+
+9️⃣ DeleteResponse
+javapackage com.example.graphqldemo.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class DeleteResponse {
+    private Boolean success;
+    private String message;
+    
+    public static DeleteResponse success(String message) {
+        return new DeleteResponse(true, message);
+    }
+    
+    public static DeleteResponse failure(String message) {
+        return new DeleteResponse(false, message);
+    }
+}
+
+
+🔄 CREATING SERVICES (Business Logic)
+Services contain business logic and orchestrate between controllers and repositories.
+
+1️⃣ AuthorService
+javapackage com.example.graphqldemo.service;
+
+import com.example.graphqldemo.dto.CreateAuthorInput;
+import com.example.graphqldemo.dto.UpdateAuthorInput;
+import com.example.graphqldemo.entity.Author;
+import com.example.graphqldemo.exception.ResourceAlreadyExistsException;
+import com.example.graphqldemo.exception.ResourceNotFoundException;
+import com.example.graphqldemo.repository.AuthorRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+public class AuthorService {
+    
+    private final AuthorRepository authorRepository;
+    
+    public List<Author> getAllAuthors() {
+        log.info("Fetching all authors");
+        return authorRepository.findAll();
+    }
+    
+    public Author getAuthorById(Long id) {
+        log.info("Fetching author with id: {}", id);
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Author not found with id: " + id));
+    }
+    
+    public Author getAuthorByEmail(String email) {
+        log.info("Fetching author with email: {}", email);
+        return authorRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Author not found with email: " + email));
+    }
+    
+    public Author createAuthor(CreateAuthorInput input) {
+        log.info("Creating new author with email: {}", input.getEmail());
+        
+        // Validate: Check if author already exists
+        if (authorRepository.existsByEmail(input.getEmail())) {
+            throw new ResourceAlreadyExistsException(
+                "Author already exists with email: " + input.getEmail());
+        }
+        
+        // Build and save
+        Author author = Author.builder()
+                .name(input.getName())
+                .email(input.getEmail())
+                .bio(input.getBio())
+                .birthYear(input.getBirthYear())
+                .build();
+        
+        return authorRepository.save(author);
+    }
+    
+    public Author updateAuthor(Long id, UpdateAuthorInput input) {
+        log.info("Updating author with id: {}", id);
+        
+        Author author = getAuthorById(id);
+        
+        // Update only provided fields (partial update)
+        if (input.getName() != null) {
+            author.setName(input.getName());
+        }
+        if (input.getEmail() != null) {
+            // Check if new email is already taken by another author
+            if (!author.getEmail().equals(input.getEmail()) && 
+                authorRepository.existsByEmail(input.getEmail())) {
+                throw new ResourceAlreadyExistsException(
+                    "Email already in use: " + input.getEmail());
+            }
+            author.setEmail(input.getEmail());
+        }
+        if (input.getBio() != null) {
+            author.setBio(input.getBio());
+        }
+        if (input.getBirthYear() != null) {
+            author.setBirthYear(input.getBirthYear());
+        }
+        
+        return authorRepository.save(author);
+    }
+    
+    public boolean deleteAuthor(Long id) {
+        log.info("Deleting author with id: {}", id);
+        
+        Author author = getAuthorById(id);
+        authorRepository.delete(author);
+        
+        return true;
+    }
+    
+    public long getTotalAuthors() {
+        return authorRepository.count();
+    }
+}
+Key Points:
+🔗 @Service - Marks this as a Spring service component
+🔗 @Transactional - All methods run in a transaction (rollback on error)
+🔗 @RequiredArgsConstructor - Lombok generates constructor for final fields (dependency injection)
+🔗 @Slf4j - Lombok provides logger instance
+🔗 Business logic includes validation, error handling, and data transformation
+
+2️⃣ BookService
+javapackage com.example.graphqldemo.service;
+
+import com.example.graphqldemo.dto.*;
+import com.example.graphqldemo.entity.Author;
+import com.example.graphqldemo.entity.Book;
+import com.example.graphqldemo.entity.BookGenre;
+import com.example.graphqldemo.exception.ResourceAlreadyExistsException;
+import com.example.graphqldemo.exception.ResourceNotFoundException;
+import com.example.graphqldemo.repository.BookRepository;
+import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+public class BookService {
+    
+    private final BookRepository bookRepository;
+    private final AuthorService authorService;
+    
+    public List<Book> getAllBooks() {
+        log.info("Fetching all books");
+        return bookRepository.findAll();
+    }
+    
+    public Book getBookById(Long id) {
+        log.info("Fetching book with id: {}", id);
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Book not found with id: " + id));
+    }
+    
+    public List<Book> getBooksByAuthor(Long authorId) {
+        log.info("Fetching books for author id: {}", authorId);
+        authorService.getAuthorById(authorId); // Verify author exists
+        return bookRepository.findByAuthorId(authorId);
+    }
+    
+    public List<Book> getBooksByGenre(BookGenre genre) {
+        log.info("Fetching books with genre: {}", genre);
+        return bookRepository.findByGenre(genre);
+    }
+    
+    public Book createBook(CreateBookInput input) {
+        log.info("Creating new book with ISBN: {}", input.getIsbn());
+        
+        if (bookRepository.existsByIsbn(input.getIsbn())) {
+            throw new ResourceAlreadyExistsException(
+                "Book already exists with ISBN: " + input.getIsbn());
+        }
+        
+        Author author = authorService.getAuthorById(input.getAuthorId());
+        
+        Book book = Book.builder()
+                .title(input.getTitle())
+                .isbn(input.getIsbn())
+                .publishedYear(input.getPublishedYear())
+                .genre(input.getGenre())
+                .description(input.getDescription())
+                .price(input.getPrice())
+                .author(author)
+                .build();
+        
+        return bookRepository.save(book);
+    }
+    
+    public Book updateBook(Long id, UpdateBookInput input) {
+        log.info("Updating book with id: {}", id);
+        
+        Book book = getBookById(id);
+        
+        if (input.getTitle() != null) {
+            book.setTitle(input.getTitle());
+        }
+        if (input.getIsbn() != null) {
+            if (!book.getIsbn().equals(input.getIsbn()) && 
+                bookRepository.existsByIsbn(input.getIsbn())) {
+                throw new ResourceAlreadyExistsException(
+                    "ISBN already in use: " + input.getIsbn());
+            }
+            book.setIsbn(input.getIsbn());
+        }
+        if (input.getPublishedYear() != null) {
+            book.setPublishedYear(input.getPublishedYear());
+        }
+        if (input.getGenre() != null) {
+            book.setGenre(input.getGenre());
+        }
+        if (input.getDescription() != null) {
+            book.setDescription(input.getDescription());
+        }
+        if (input.getPrice() != null) {
+            book.setPrice(input.getPrice());
+        }
+        
+        return bookRepository.save(book);
+    }
+    
+    public boolean deleteBook(Long id) {
+        log.info("Deleting book with id: {}", id);
+        Book book = getBookById(id);
+        bookRepository.delete(book);
+        return true;
+    }
+    
+    // Advanced: Search with filtering and pagination
+    public BookPage searchBooks(BookFilter filter, PaginationInput pagination) {
+        log.info("Searching books with filter: {}", filter);
+        
+        // Build dynamic query using Specifications
+        Specification<Book> spec = buildSpecification(filter);
+        
+        // Create pageable object with sorting
+        Pageable pageable = PageRequest.of(
+            pagination.getPage(),
+            pagination.getSize(),
+            Sort.by("createdAt").descending()
+        );
+        
+        // Execute query
+        Page<Book> page = bookRepository.findAll(spec, pageable);
+        
+        // Build response
+        return BookPage.builder()
+                .content(page.getContent())
+                .totalElements((int) page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
+                .build();
+    }
+    
+    // JPA Specification for dynamic filtering
+    private Specification<Book> buildSpecification(BookFilter filter) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            
+            if (filter.getGenre() != null) {
+                predicates.add(criteriaBuilder.equal(
+                    root.get("genre"), filter.getGenre()));
+            }
+            
+            if (filter.getMinPrice() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                    root.get("price"), filter.getMinPrice()));
+            }
+            
+            if (filter.getMaxPrice() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(
+                    root.get("price"), filter.getMaxPrice()));
+            }
+            
+            if (filter.getMinYear() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(
+                    root.get("publishedYear"), filter.getMinYear()));
+            }
+            
+            if (filter.getMaxYear() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(
+                    root.get("publishedYear"), filter.getMaxYear()));
+            }
+            
+            if (filter.getAuthorId() != null) {
+                predicates.add(criteriaBuilder.equal(
+                    root.get("author").get("id"), filter.getAuthorId()));
+            }
+            
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+    
+    public long getTotalBooks() {
+        return bookRepository.count();
+    }
+    
+    public Book getMostExpensiveBook() {
+        return bookRepository.findMostExpensiveBook().orElse(null);
+    }
+    
+    public Book getCheapestBook() {
+        return bookRepository.findCheapestBook().orElse(null);
+    }
+}
+
+JPA Specifications Explained:
+Specifications allow you to build dynamic queries programmatically. Instead of writing:
+if (genre != null && minPrice != null) {
+    return findByGenreAndPriceGreaterThan(genre, minPrice);
+} else if (genre != null) {
+    return findByGenre(genre);
+} // ... many combinations
+
+You build the query dynamically based on provided filters. This is much cleaner and more flexible.
+
+
+3️⃣ ReviewService
+package com.example.graphqldemo.service;
+
+import com.example.graphqldemo.dto.CreateReviewInput;
+import com.example.graphqldemo.entity.Book;
+import com.example.graphqldemo.entity.Review;
+import com.example.graphqldemo.exception.ResourceNotFoundException;
+import com.example.graphqldemo.repository.ReviewRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+public class ReviewService {
+    
+    private final ReviewRepository reviewRepository;
+    private final BookService bookService;
+    
+    public Review getReviewById(Long id) {
+        log.info("Fetching review with id: {}", id);
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Review not found with id: " + id));
+    }
+    
+    public List<Review> getReviewsByBook(Long bookId) {
+        log.info("Fetching reviews for book id: {}", bookId);
+        bookService.getBookById(bookId); // Verify book exists
+        return reviewRepository.findByBookId(bookId);
+    }
+    
+    public Review createReview(CreateReviewInput input) {
+        log.info("Creating new review for book id: {}", input.getBookId());
+        
+        Book book = bookService.getBookById(input.getBookId());
+        
+        Review review = Review.builder()
+                .rating(input.getRating())
+                .comment(input.getComment())
+                .reviewerName(input.getReviewerName())
+                .book(book)
+                .build();
+        
+        return reviewRepository.save(review);
+    }
+    
+    public boolean deleteReview(Long id) {
+        log.info("Deleting review with id: {}", id);
+        Review review = getReviewById(id);
+        reviewRepository.delete(review);
+        return true;
+    }
+}
+
+
+🔄 CREATING EXCEPTIONS
+Custom exceptions provide better error messages and handling.
+1️⃣ ResourceNotFoundException
+package com.example.graphqldemo.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+
+
+2️⃣ ResourceAlreadyExistsException
+javapackage com.example.graphqldemo.exception;
+
+public class ResourceAlreadyExistsException extends RuntimeException {
+    public ResourceAlreadyExistsException(String message) {
+        super(message);
+    }
+}
+
+
+3️⃣ GraphQLExceptionHandler
+This converts Java exceptions into GraphQL errors:
+package com.example.graphqldemo.exception;
+
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
+import graphql.schema.DataFetchingEnvironment;
+import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
+import org.springframework.graphql.execution.ErrorType;
+import org.springframework.stereotype.Component;
+
+@Component
+public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
+    
+    @Override
+    protected GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
+        
+        if (ex instanceof ResourceNotFoundException) {
+            return GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.NOT_FOUND)
+                    .message(ex.getMessage())
+                    .path(env.getExecutionStepInfo().getPath())
+                    .location(env.getField().getSourceLocation())
+                    .build();
+        }
+        
+        if (ex instanceof ResourceAlreadyExistsException) {
+            return GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.BAD_REQUEST)
+                    .message(ex.getMessage())
+                    .path(env.getExecutionStepInfo().getPath())
+                    .location(env.getField().getSourceLocation())
+                    .build();
+        }
+        
+        if (ex instanceof IllegalArgumentException) {
+            return GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.BAD_REQUEST)
+                    .message(ex.getMessage())
+                    .path(env.getExecutionStepInfo().getPath())
+                    .location(env.getField().getSourceLocation())
+                    .build();
+        }
+        
+        return null; // Let Spring handle other exceptions
+    }
+}
+
+
+GraphQL Error Format:
+When an error occurs, GraphQL returns:
+json{
+  "errors": [
+    {
+      "message": "Author not found with id: 999",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["author"],
+      "extensions": {
+        "classification": "NOT_FOUND"
+      }
+    }
+  ],
+  "data": {
+    "author": null
+  }
+}
+
+👉 Notice:
+🔗 Errors don't prevent partial data from being returned
+🔗 Error includes location in query
+🔗 Path shows where in the response the error occurred
+
+
+🔄 CREATING CONTROLLERS (GraphQL Resolvers)
+Controllers are called "Resolvers" in GraphQL. They resolve the actual values for fields.
+
+
+1️⃣ AuthorController
+javapackage com.example.graphqldemo.controller;
+
+import com.example.graphqldemo.dto.CreateAuthorInput;
+import com.example.graphqldemo.dto.DeleteResponse;
+import com.example.graphqldemo.dto.UpdateAuthorInput;
+import com.example.graphqldemo.entity.Author;
+import com.example.graphqldemo.service.AuthorService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.stereotype.Controller;
+import java.util.List;
+
+@Controller
+@RequiredArgsConstructor
+@Slf4j
+public class AuthorController {
+    
+    private final AuthorService authorService;
+    
+    // ========== QUERIES ==========
+    
+    @QueryMapping
+    public Author author(@Argument Long id) {
+        log.info("GraphQL Query: author(id: {})", id);
+        return authorService.getAuthorById(id);
+    }
+    
+    @QueryMapping
+    public List<Author> authors() {
+        log.info("GraphQL Query: authors");
+        return authorService.getAllAuthors();
+    }
+    
+    @QueryMapping
+    public Author authorByEmail(@Argument String email) {
+        log.info("GraphQL Query: authorByEmail(email: {})", email);
+        return authorService.getAuthorByEmail(email);
+    }
+    
+    // ========== MUTATIONS ==========
+    
+    @MutationMapping
+    public Author createAuthor(@Argument CreateAuthorInput input) {
+        log.info("GraphQL Mutation: createAuthor(name: {})", input.getName());
+        return authorService.createAuthor(input);
+    }
+    
+    @MutationMapping
+    public Author updateAuthor(@Argument Long id, @Argument UpdateAuthorInput input) {
+        log.info("GraphQL Mutation: updateAuthor(id: {})", id);
+        return authorService.updateAuthor(id, input);
+    }
+    
+    @MutationMapping
+    public DeleteResponse deleteAuthor(@Argument Long id) {
+        log.info("GraphQL Mutation: deleteAuthor(id: {})", id);
+        authorService.deleteAuthor(id);
+        return DeleteResponse.success("Author deleted successfully");
+    }
+    
+    // ========== FIELD RESOLVERS ==========
+    
+    @SchemaMapping(typeName = "Author", field = "totalBooks")
+    public Integer totalBooks(Author author) {
+        log.debug("Resolving totalBooks for author: {}", author.getId());
+        return author.getBooks().size();
+    }
+}
+
+Annotations Explained:
+🔗 @Controller - Marks this as a GraphQL controller
+🔗 @QueryMapping - Maps to a field in the Query type
+    ✔️ Method name must match the query name in schema (or use name parameter)
+
+🔗 @MutationMapping - Maps to a field in the Mutation type
+🔗 @Argument - Maps method parameter to GraphQL argument
+    ✔️ Parameter name must match argument name in schema
+
+🔗 @SchemaMapping - Maps to a field on a specific type
+    ✔️ Used for computed fields or custom resolution logic
+    ✔️ Called only when the client requests that field
+
+
+👉 How it works:
+When a client sends:
+graphqlquery {
+  author(id: 1) {
+    name
+    totalBooks
+  }
+}
+
+➤ Spring GraphQL calls author(Long id) method
+➤ It gets the Author entity
+➤ GraphQL automatically resolves name from the entity
+➤ When it needs totalBooks, it calls the @SchemaMapping method
+
+
+2️⃣ BookController
+javapackage com.example.graphqldemo.controller;
+
+import com.example.graphqldemo.dto.*;
+import com.example.graphqldemo.entity.Book;
+import com.example.graphqldemo.entity.BookGenre;
+import com.example.graphqldemo.service.BookService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.stereotype.Controller;
+import java.util.List;
+
+@Controller
+@RequiredArgsConstructor
+@Slf4j
+public class BookController {
+    
+    private final BookService bookService;
+    
+    @QueryMapping
+    public Book book(@Argument Long id) {
+        log.info("GraphQL Query: book(id: {})", id);
+        return bookService.getBookById(id);
+    }
+    
+    @QueryMapping
+    public List<Book> books() {
+        log.info("GraphQL Query: books");
+        return bookService.getAllBooks();
+    }
+    
+    @QueryMapping
+    public List<Book> booksByAuthor(@Argument Long authorId) {
+        log.info("GraphQL Query: booksByAuthor(authorId: {})", authorId);
+        return bookService.getBooksByAuthor(authorId);
+    }
+    
+    @QueryMapping
+    public List<Book> booksByGenre(@Argument BookGenre genre) {
+        log.info("GraphQL Query: booksByGenre(genre: {})", genre);
+        return bookService.getBooksByGenre(genre);
+    }
+    
+    @QueryMapping
+    public BookPage searchBooks(@Argument BookFilter filter, 
+                                @Argument PaginationInput pagination) {
+        log.info("GraphQL Query: searchBooks");
+        if (pagination == null) {
+            pagination = new PaginationInput();
+        }
+        return bookService.searchBooks(filter, pagination);
+    }
+    
+    @MutationMapping
+    public Book createBook(@Argument CreateBookInput input) {
+        log.info("GraphQL Mutation: createBook(title: {})", input.getTitle());
+        return bookService.createBook(input);
+    }
+    
+    @MutationMapping
+    public Book updateBook(@Argument Long id, @Argument UpdateBookInput input) {
+        log.info("GraphQL Mutation: updateBook(id: {})", id);
+        return bookService.updateBook(id, input);
+    }
+    
+    @MutationMapping
+    public DeleteResponse deleteBook(@Argument Long id) {
+        log.info("GraphQL Mutation: deleteBook(id: {})", id);
+        bookService.deleteBook(id);
+        return DeleteResponse.success("Book deleted successfully");
+    }
+    
+    @SchemaMapping(typeName = "Book", field = "averageRating")
+    public Double averageRating(Book book) {
+        log.debug("Resolving averageRating for book: {}", book.getId());
+        return book.getAverageRating();
+    }
+}
+
+
+3️⃣ ReviewController
+javapackage com.example.graphqldemo.controller;
+
+import com.example.graphqldemo.dto.CreateReviewInput;
+import com.example.graphqldemo.dto.DeleteResponse;
+import com.example.graphqldemo.entity.Review;
+import com.example.graphqldemo.service.ReviewService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
+import java.util.List;
+
+@Controller
+@RequiredArgsConstructor
+@Slf4j
+public class ReviewController {
+    
+    private final ReviewService reviewService;
+    
+    @QueryMapping
+    public Review review(@Argument Long id) {
+        log.info("GraphQL Query: review(id: {})", id);
+        return reviewService.getReviewById(id);
+    }
+    
+    @QueryMapping
+    public List<Review> reviewsByBook(@Argument Long bookId) {
+        log.info("GraphQL Query: reviewsByBook(bookId: {})", bookId);
+        return reviewService.getReviewsByBook(bookId);
+    }
+    
+    @MutationMapping
+    public Review createReview(@Argument CreateReviewInput input) {
+        log.info("GraphQL Mutation: createReview");
+        return reviewService.createReview(input);
+    }
+    
+    @MutationMapping
+    public DeleteResponse deleteReview(@Argument Long id) {
+        log.info("GraphQL Mutation: deleteReview(id: {})", id);
+        reviewService.deleteReview(id);
+        return DeleteResponse.success("Review deleted successfully");
+    }
+}
+
+
+4️⃣ StatisticsController
+javapackage com.example.graphqldemo.controller;
+
+import com.example.graphqldemo.entity.Book;
+import com.example.graphqldemo.service.AuthorService;
+import com.example.graphqldemo.service.BookService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
+
+@Controller
+@RequiredArgsConstructor
+@Slf4j
+public class StatisticsController {
+    
+    private final AuthorService authorService;
+    private final BookService bookService;
+    
+    @QueryMapping
+    public Integer totalAuthors() {
+        log.info("GraphQL Query: totalAuthors");
+        return (int) authorService.getTotalAuthors();
+    }
+    
+    @QueryMapping
+    public Integer totalBooks() {
+        log.info("GraphQL Query: totalBooks");
+        return (int) bookService.getTotalBooks();
+    }
+    
+    @QueryMapping
+    public Book mostExpensiveBook() {
+        log.info("GraphQL Query: mostExpensiveBook");
+        return bookService.getMostExpensiveBook();
+    }
+    
+    @QueryMapping
+    public Book cheapestBook() {
+        log.info("GraphQL Query: cheapestBook");
+        return bookService.getCheapestBook();
+    }
+}
+
+
+🔄 CONFIGURATION
+1️⃣ GraphQL Configuration
+package com.example.graphqldemo.config;
+
+import graphql.scalars.ExtendedScalars;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.graphql.execution.RuntimeWiringConfigurer;
+
+@Configuration
+public class GraphQLConfig {
+    
+    @Bean
+    public RuntimeWiringConfigurer runtimeWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder
+                .scalar(ExtendedScalars.DateTime);
+    }
+}
+
+What this does:
+➤ Registers the DateTime scalar type
+➤ Maps GraphQL DateTime to Java LocalDateTime
+➤ Without this, GraphQL wouldn't know how to handle DateTime fields
+
+
+2️⃣ Data Initializer (Sample Data)
+javapackage com.example.graphqldemo.config;
+
+import com.example.graphqldemo.entity.*;
+import com.example.graphqldemo.repository.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DataInitializer implements CommandLineRunner {
+    
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+    private final ReviewRepository reviewRepository;
+    
+    @Override
+    public void run(String... args) {
+        log.info("Initializing sample data...");
+        
+        // Create Authors
+        Author author1 = Author.builder()
+                .name("J.K. Rowling")
+                .email("jk.rowling@example.com")
+                .bio("British author, best known for Harry Potter")
+                .birthYear(1965)
+                .build();
+        
+        Author author2 = Author.builder()
+                .name("George R.R. Martin")
+                .email("grrm@example.com")
+                .bio("American novelist, creator of A Song of Ice and Fire")
+                .birthYear(1948)
+                .build();
+        
+        authorRepository.save(author1);
+        authorRepository.save(author2);
+        
+        // Create Books
+        Book book1 = Book.builder()
+                .title("Harry Potter and the Philosopher's Stone")
+                .isbn("978-0-7475-3269-9")
+                .publishedYear(1997)
+                .genre(BookGenre.FICTION)
+                .description("The first novel in the Harry Potter series")
+                .price(29.99)
+                .author(author1)
+                .build();
+        
+        Book book2 = Book.builder()
+                .title("A Game of Thrones")
+                .isbn("978-0-553-10354-0")
+                .publishedYear(1996)
+                .genre(BookGenre.FICTION)
+                .description("First novel in A Song of Ice and Fire")
+                .price(35.99)
+                .author(author2)
+                .build();
+        
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+        
+        // Create Reviews
+        Review review1 = Review.builder()
+                .rating(5)
+                .comment("Magical and captivating!")
+                .reviewerName("Alice")
+                .book(book1)
+                .build();
+        
+        Review review2 = Review.builder()
+                .rating(5)
+                .comment("Epic fantasy at its finest")
+                .reviewerName("Bob")
+                .book(book2)
+                .build();
+        
+        reviewRepository.save(review1);
+        reviewRepository.save(review2);
+        
+        log.info("Sample data initialized!");
+    }
+}
+
+
+🔄 MAIN APPLICATION CLASS
+javapackage com.example.graphqldemo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class GraphQLDemoApplication {
+    
+    public static void main(String[] args) {
+        SpringApplication.run(GraphQLDemoApplication.class, args);
+        
+        System.out.println("\n==============================================");
+        System.out.println("GraphQL Application Started!");
+        System.out.println("GraphiQL: http://localhost:8080/graphiql");
+        System.out.println("GraphQL Endpoint: http://localhost:8080/graphql");
+        System.out.println("==============================================\n");
+    }
+}
+
+🔄 RUNNING AND TESTING
+Step 1️⃣: Build and Run
+mvn clean install
+mvn spring-boot:run
+
+
+Step 2️⃣: Access GraphiQL
+Open browser: http://localhost:8080/graphiql
+
+
+Step 3️⃣: Try Queries
+🔗 Get all authors:
+query {
+  authors {
+    id
+    name
+    email
+    totalBooks
+  }
+}
+
+
+🔗 Get author with books:
+query {
+  author(id: 1) {
+    name
+    email
+    books {
+      title
+      price
+      genre
+    }
+  }
+}
+
+🔗 Search books:
+query {
+  searchBooks(
+    filter: {
+      genre: FICTION
+      minPrice: 20.0
+      maxPrice: 40.0
+    }
+    pagination: {
+      page: 0
+      size: 10
+    }
+  ) {
+    content {
+      title
+      price
+      author {
+        name
+      }
+    }
+    totalPages
+    currentPage
+    hasNext
+  }
+}
+
+🔗 Create author:
+mutation {
+  createAuthor(input: {
+    name: "Stephen King"
+    email: "king@example.com"
+    bio: "Master of horror"
+    birthYear: 1947
+  }) {
+    id
+    name
+    createdAt
+  }
+}
+
+🔗 Create book:
+mutation {
+  createBook(input: {
+    title: "The Shining"
+    isbn: "978-0-385-12167-5"
+    publishedYear: 1977
+    genre: THRILLER
+    description: "A horror masterpiece"
+    price: 27.99
+    authorId: 3
+  }) {
+    id
+    title
+    author {
+      name
+    }
+  }
+}
+
+🔗 Update book:
+mutation {
+  updateBook(id: 1, input: {
+    price: 24.99
+  }) {
+    id
+    title
+    price
+  }
+}
+
+🔗 Create review:
+mutation {
+  createReview(input: {
+    bookId: 1
+    rating: 5
+    comment: "Absolutely loved it!"
+    reviewerName: "John Doe"
+  }) {
+    id
+    rating
+    book {
+      title
+      averageRating
+    }
+  }
+}
+
+🔗 Delete operations:
+mutation {
+  deleteBook(id: 3) {
+    success
+    message
+  }
+}
+
+
+🔄 ADVANCED CONCEPTS
+🔗 The N+1 Problem
+Problem:
+query {
+  books {
+    title
+    author {
+      name
+    }
+  }
+}
+
+
+Without optimization:
+Query to get all books (1 query)
+Query for each book's author (N queries)
+Total: N+1 queries = BAD PERFORMANCE!
+
+Solution 1️⃣: Entity Graph
+@EntityGraph(attributePaths = {"author"})
+List<Book> findAll();
+👉 This tells JPA to fetch authors in the same query using a JOIN.
+
+
+Solution 2️⃣: DataLoader (Recommended for complex scenarios)
+DataLoader batches and caches requests:
+java@Bean
+public DataLoader<Long, Author> authorDataLoader(AuthorRepository repository) {
+    return DataLoader.newDataLoader(authorIds -> {
+        // Fetch all authors in one query
+        List<Author> authors = repository.findAllById(authorIds);
+        // Map to maintain order
+        Map<Long, Author> authorMap = authors.stream()
+            .collect(Collectors.toMap(Author::getId, a -> a));
+        // Return in same order as requested
+        return CompletableFuture.completedFuture(
+            authorIds.stream()
+                .map(authorMap::get)
+                .collect(Collectors.toList())
+        );
+    });
+}
+
+
+Then in resolver:
+@SchemaMapping
+public CompletableFuture<Author> author(Book book, DataLoader<Long, Author> authorLoader) {
+    return authorLoader.load(book.getAuthor().getId());
+}
+
+
+2️⃣ Pagination Best Practices
+Cursor-based pagination (for infinite scroll):
+type BookConnection {
+  edges: [BookEdge!]!
+  pageInfo: PageInfo!
+}
+
+type BookEdge {
+  node: Book!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Query {
+  books(first: Int, after: String): BookConnection!
+}
+This is more scalable than offset-based pagination.
+
+
+3️⃣ Authentication & Authorization
+Add JWT to your project:
+java@Component
+public class GraphQLAuthenticationInterceptor implements WebGraphQlInterceptor {
+    
+    @Override
+    public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
+        String token = request.getHeaders().getFirst("Authorization");
+        
+        if (token == null) {
+            throw new GraphQLException("Unauthorized");
+        }
+        
+        // Validate token and set authentication
+        return chain.next(request);
+    }
+}
+
+Protect queries:
+@QueryMapping
+@PreAuthorize("hasRole('ADMIN')")
+public List<Author> authors() {
+    return authorService.getAllAuthors();
+}
+
+
+4️⃣ Subscriptions (Real-time)
+🔗 Schema:
+graphqltype Subscription {
+  bookCreated: Book!
+}
+
+Publisher:
+🔗 @Service
+public class BookPublisher {
+    
+    private final Sinks.Many<Book> sink = Sinks.many().multicast().onBackpressureBuffer();
+    
+    public void publishBookCreated(Book book) {
+        sink.tryEmitNext(book);
+    }
+    
+    public Flux<Book> getPublisher() {
+        return sink.asFlux();
+    }
+}
+
+🔗 Resolver:
+@Controller
+public class BookSubscription {
+    
+    private final BookPublisher bookPublisher;
+    
+    @SubscriptionMapping
+    public Flux<Book> bookCreated() {
+        return bookPublisher.getPublisher();
+    }
+}
+
+
+In service, when creating book:
+public Book createBook(CreateBookInput input) {
+    Book book = // ... create book
+    Book saved = bookRepository.save(book);
+    bookPublisher.publishBookCreated(saved); // Notify subscribers
+    return saved;
+}
+
+Client subscription:
+graphqlsubscription {
+  bookCreated {
+    title
+    author {
+      name
+    }
+  }
+}
+
+
+5️⃣ Custom Directives
+Schema:
+directive @uppercase on FIELD_DEFINITION
+
+type Author {
+  name: String! @uppercase
+}
+
+
+Implementation:
+@Component
+public class UppercaseDirective implements SchemaDirectiveWiring {
+    
+    @Override
+    public GraphQLFieldDefinition onField(
+            SchemaDirectiveWiringEnvironment<GraphQLFieldDefinition> env) {
+        
+        GraphQLFieldDefinition field = env.getElement();
+        DataFetcher<?> originalFetcher = env.getCodeRegistry()
+                .getDataFetcher(env.getFieldsContainer(), field);
+        
+        DataFetcher<?> newFetcher = dataEnv -> {
+            Object result = originalFetcher.get(dataEnv);
+            if (result instanceof String) {
+                return ((String) result).toUpperCase();
+            }
+            return result;
+        };
+        
+        env.getCodeRegistry().dataFetcher(
+                env.getFieldsContainer(), field, newFetcher);
+        
+        return field;
+    }
+}
+
+
+6️⃣ Query Complexity Limits
+Prevent abuse by limiting query complexity:
+@Bean
+public RuntimeWiringConfigurer complexityConfigurer() {
+    return builder -> builder
+        .directiveWiring(new QueryComplexityInstrumentation(100));
+}
+👉 This prevents deeply nested or expensive queries.
+
+
+7️⃣ Caching
+Enable caching:
+@Configuration
+@EnableCaching
+public class CacheConfig {
+    
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("authors", "books");
+    }
+}
+
+In service:
+@Cacheable("authors")
+public Author getAuthorById(Long id) {
+    return authorRepository.findById(id)
+        .orElseThrow(...);
+}
+
+@CacheEvict(value = "authors", key = "#id")
+public Author updateAuthor(Long id, UpdateAuthorInput input) {
+    // ... update logic
+}
+
+
+🔄 PERFORMANCE OPTIMIZATION
+1️⃣ Projection
+Don't fetch unnecessary fields from database:
+public interface AuthorProjection {
+    Long getId();
+    String getName();
+    String getEmail();
+}
+
+// In repository
+List<AuthorProjection> findAllProjectedBy();
+2️⃣ Batch Loading
+Use @BatchMapping instead of @SchemaMapping:
+java@BatchMapping
+public Map<Book, Author> author(List<Book> books) {
+    Set<Long> authorIds = books.stream()
+        .map(b -> b.getAuthor().getId())
+        .collect(Collectors.toSet());
+    
+    List<Author> authors = authorRepository.findAllById(authorIds);
+    
+    Map<Long, Author> authorMap = authors.stream()
+        .collect(Collectors.toMap(Author::getId, a -> a));
+    
+    return books.stream()
+        .collect(Collectors.toMap(
+            book -> book,
+            book -> authorMap.get(book.getAuthor().getId())
+        ));
+}
+This batches all author fetches into a single query.
+
+
+3️⃣ Query Timeout
+propertiesspring.graphql.execution.timeout=5s
+17.4 Monitoring
+Add metrics:
+java@Component
+public class GraphQLMetrics implements Instrumentation {
+    
+    private final MeterRegistry meterRegistry;
+    
+    @Override
+    public InstrumentationContext<ExecutionResult> beginExecution(
+            InstrumentationExecutionParameters parameters) {
+        
+        Timer.Sample sample = Timer.start(meterRegistry);
+        
+        return new SimpleInstrumentationContext<>() {
+            @Override
+            public void onCompleted(ExecutionResult result, Throwable t) {
+                sample.stop(Timer.builder("graphql.query")
+                    .tag("operation", parameters.getOperation())
+                    .register(meterRegistry));
+            }
+        };
+    }
+}
+
+
+🔄 TESTING
+1️⃣ Unit Test for Service
+@ExtendWith(MockitoExtension.class)
+class AuthorServiceTest {
+    
+    @Mock
+    private AuthorRepository authorRepository;
+    
+    @InjectMocks
+    private AuthorService authorService;
+    
+    @Test
+    void shouldGetAuthorById() {
+        // Given
+        Author author = Author.builder()
+            .id(1L)
+            .name("Test Author")
+            .build();
+        
+        when(authorRepository.findById(1L))
+            .thenReturn(Optional.of(author));
+        
+        // When
+        Author result = authorService.getAuthorById(1L);
+        
+        // Then
+        assertNotNull(result);
+        assertEquals("Test Author", result.getName());
+        verify(authorRepository).findById(1L);
+    }
+    
+    @Test
+    void shouldThrowExceptionWhenAuthorNotFound() {
+        // Given
+        when(authorRepository.findById(999L))
+            .thenReturn(Optional.empty());
+        
+        // When & Then
+        assertThrows(ResourceNotFoundException.class, 
+            () -> authorService.getAuthorById(999L));
+    }
+}
+
+
+2️⃣ Integration Test for GraphQL
+@SpringBootTest
+@AutoConfigureGraphQlTester
+class AuthorControllerTest {
+    
+    @Autowired
+    private GraphQlTester graphQlTester;
+    
+    @Test
+    void shouldGetAllAuthors() {
+        String query = """
+            query {
+                authors {
+                    id
+                    name
+                    email
+                }
+            }
+            """;
+        
+        graphQlTester.document(query)
+            .execute()
+            .path("authors")
+            .entityList(Author.class)
+            .hasSize(2);
+    }
+    
+    @Test
+    void shouldCreateAuthor() {
+        String mutation = """
+            mutation {
+                createAuthor(input: {
+                    name: "New Author"
+                    email: "new@example.com"
+                }) {
+                    id
+                    name
+                }
+            }
+            """;
+        
+        graphQlTester.document(mutation)
+            .execute()
+            .path("createAuthor.name")
+            .entity(String.class)
+            .isEqualTo("New Author");
+    }
+}
+
+
+🔄 DEPLOYMENT
+1️⃣ Build for Production
+bashmvn clean package
+
+2️⃣ Run JAR
+bashjava -jar target/graphql-demo-1.0.0.jar
+
+3️⃣ Docker
+Dockerfile:
+dockerfileFROM openjdk:17-jdk-slim
+COPY target/graphql-demo-1.0.0.jar app.jar
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+
+Build:
+bashdocker build -t graphql-demo .
+docker run -p 8080:8080 graphql-demo
+
+4️⃣ Production Configuration
+application-prod.properties:
+# Disable GraphiQL in production
+spring.graphql.graphiql.enabled=false
+
+# Use real database
+spring.datasource.url=jdbc:postgresql://localhost:5432/bookdb
+spring.datasource.username=produser
+spring.datasource.password=${DB_PASSWORD}
+
+# Hibernate settings
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+
+# Logging
+logging.level.root=WARN
+logging.level.com.example.graphqldemo=INFO
+
+# Security
+server.ssl.enabled=true

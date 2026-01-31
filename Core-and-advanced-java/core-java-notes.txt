@@ -648,6 +648,7 @@ When a method is called, its variables go on the stack. When it returns, they’
 ###############################
 ➤ Garbage Collection is a process by which the Java Virtual Machine (JVM) automatically removes unused objects (objects that are no longer reachable) from memory to free up space and avoid memory leaks.
 ➤ Java developers don’t manually free memory (unlike in C/C++). Instead, the Garbage Collector (GC) handles it.
+➤ Modern JVMs (HotSpot) use Generational GC which splits the heap into Young, Old (Tenured), and Metaspace.
 
 🧩 Key Goals of GC:
 ➤ Reclaim memory used by unreachable objects
@@ -661,7 +662,92 @@ When a method is called, its variables go on the stack. When it returns, they’
 ➤ Only Heap memory is subject to GC.
 
 
+🔄 Heap Structure
+Before diving into GC phases, it’s important to know the Java Heap Structure:
+
+1️⃣ Young Generation (Eden + Survivor spaces)
+➤ Eden: Where new objects are allocated.
+➤ Survivor Spaces (S0, S1): Temporary storage for objects that survive Minor GC.
+
+2️⃣ Old Generation / Tenured
+➤ Stores objects that survived multiple Minor GCs.
+➤ Usually cleared during Major/Full GC.
+
+3️⃣ Metaspace (Permanent generation in older JDKs)
+➤ Stores class metadata, methods, and static variables.
+➤ Collected during Full GC if necessary.
+
+
+=================================
+🔷 Phases of Garbage Collection
+=================================
+Phase 1️⃣: Mark Phase
+➤ Objective: Identify reachable objects in memory.
+➤ How it works:
+	✔️ GC starts from GC Roots:
+	✔️ Local variables in stack frames.
+	✔️ Active threads.
+	✔️ Static variables.
+	✔️ JNI references.
+➤ Traverses the object graph from these roots.
+➤ Marks all objects that are reachable.
+➤ Outcome: Only unmarked objects are candidates for deletion.
+
+👉 JVM can use “Stop-the-world” during this phase for safety in some collectors, pausing application threads.
+
+
+Phase 2️⃣: Sweep Phase
+➤ Objective: Remove unreachable objects from memory.
+➤ How it works:
+	✔️ GC scans the heap.
+	✔️ Deallocates memory of unmarked objects.
+	✔️ Keeps marked objects intact.
+➤ Problem: Can lead to heap fragmentation, especially in old generation.
+✅ Minor GC in Young Generation automatically removes dead objects without significant fragmentation.
+
+
+Phase 3️⃣: Compact Phase (Optional)
+➤ Objective: Eliminate heap fragmentation caused by sweep.
+➤ How it works:
+	✔️ Moves all live objects to contiguous memory addresses.
+	✔️ Updates all references to these objects.
+➤ Note: Not all collectors perform compaction. For example:
+	✔️ Serial GC: Compacting is done.
+	✔️ CMS (Concurrent Mark-Sweep): Avoids compaction; uses free lists instead.
+	✔️ G1GC: Divides heap into regions and does incremental compaction.
+
+Generational GC Phases
+GC behavior differs between Young and Old generation:
+| Generation | GC Type            | Frequency     | Objects Collected                     |
+| ---------- | ------------------ | ------------- | ------------------------------------- |
+| Young      | Minor GC           | Frequent      | Short-lived objects (Eden & Survivor) |
+| Old        | Major GC / Full GC | Less frequent | Long-lived objects                    |
+| Metaspace  | Full GC            | Rare          | Class metadata                        |
+
+
+1️⃣ Young Generation GC (Minor GC)
+➤ Mark reachable objects in Eden.
+➤ Copy surviving objects to Survivor space (S0 → S1).
+➤ Unreachable objects are automatically discarded.
+👉 Performance: Fast, because most objects die young.
+
+Old Generation GC (Major/Full GC)
+➤ Mark live objects.
+➤ Sweep unreachable objects.
+➤ Compact memory (depends on collector).
+👉 Performance: Slower, may cause Stop-the-world pauses.
+
+
+🔄 GC Algorithms
+➤ Serial GC: Single-threaded, uses Mark → Sweep → Compact.
+➤ Parallel GC: Multi-threaded, uses same phases for faster Minor GC.
+➤ CMS (Concurrent Mark-Sweep): Concurrent marking, sweeping; avoids compacting to reduce pause.
+➤ G1GC (Garbage-First GC): Divides heap into regions, does incremental Mark → Sweep → Compact in mixed collections.
+
+
+===============================
 🔷 Object Lifecycle in Java
+===============================
 1️⃣ The object is created using new
 2️⃣ The reference variable holds the object
 3️⃣ Once the reference is lost or goes out of scope, the object becomes unreachable
