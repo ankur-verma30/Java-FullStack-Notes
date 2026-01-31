@@ -645,6 +645,409 @@ Content-Type: application/json
 {"message": "File uploaded successfully!"}
 
 
+===================
+🔷 API Versioning
+===================
+➤ API Versioning is a way to evolve your backend APIs without breaking existing clients (mobile apps, frontend, third-party consumers).
+➤ When you change response fields, rename endpoints, change validation rules, etc. → old clients may crash.
+➤ Versioning helps you support old + new clients together.
+
+
+🔄 Why API Versioning is Needed?
+✅ Real-world problems without versioning
+
+If you change an API like:
+🔗 Old: { "name": "Ankur" }
+🔗 New: { "fullName": "Ankur Verma" }
+
+Then:
+➤ Old frontend still expects name
+➤ It breaks immediately → production issue
+
+✅ Versioning gives backward compatibility
+So you can do:
+➤ v1 clients keep using /api/v1/users
+➤ v2 clients start using /api/v2/users
+👉 Both run parallel.
+
+
+🔄 What changes require versioning?
+Versioning is needed when you do breaking changes, like:
+
+🟠 Breaking changes (must version)
+➤ Rename a field (name → fullName)
+➤ Remove a field
+➤ Change data type (age: "22" → age: 22)
+➤ Change response structure
+➤ Change endpoint semantics (meaning)
+➤ Change authentication/authorization behavior
+➤ Change pagination style (offset → cursor)
+
+🟢 Non-breaking changes (no need to version)
+➤ Adding a new optional field
+➤ Adding a new endpoint
+➤ Adding new query parameter (optional)
+
+
+🔄 Types of API Versioning (Spring Boot supports all)
+1️⃣ URI Versioning
+✅ Example:
+/api/v1/users
+/api/v2/users
+
+Pros
+✅ Simple
+✅ Visible
+✅ Easy routing & debugging
+
+Cons
+❌ URL changes → not “pure REST” (but still industry standard)
+
+
+2️⃣ Request Parameter Versioning
+✅ Example:
+/api/users?version=1
+/api/users?version=2
+
+Pros
+✅ Same endpoint
+
+Cons
+❌ Harder caching
+❌ Less readable
+❌ Not popular in enterprise
+
+
+3️⃣ Header Versioning
+✅ Example:
+X-API-VERSION: 1
+X-API-VERSION: 2
+
+Pros
+✅ Clean URL
+✅ Good for internal APIs
+
+Cons
+❌ Harder for browser testing
+❌ Not visible easily
+
+
+4️⃣ Media Type / Accept Header Versioning
+✅ Example:
+Accept: application/vnd.company.app-v1+json
+Accept: application/vnd.company.app-v2+json
+
+Pros
+✅ Best REST purity
+✅ Used by big companies sometimes
+
+Cons
+❌ Overkill for most apps
+❌ Hard to maintain
+
+
+🔄 Best Versioning Strategy (Recommended)
+➤ For Spring Boot microservices + interview, best is: URI versioning
+➤ Because it’s simplest, scalable, and common.
+
+
+✅ Code Example:
+We will create:
+Book API v1
+Book API v2
+Same database/service layer
+Different DTOs(response formats)
+
+
+🔄 Project Structure
+com.example.book
+ ┣ controller
+ ┃   ┣ v1
+ ┃   ┃   ┗ BookControllerV1.java
+ ┃   ┣ v2
+ ┃   ┃   ┗ BookControllerV2.java
+ ┣ dto
+ ┃   ┣ v1
+ ┃   ┃   ┗ BookResponseV1.java
+ ┃   ┣ v2
+ ┃   ┃   ┗ BookResponseV2.java
+ ┣ service
+ ┃   ┗ BookService.java
+ ┣ entity
+ ┃   ┗ Book.java
+ ┗ repository
+     ┗ BookRepository.java
+👉 This is how real companies do it.
+
+
+🔗 Entity + Repository (Common for all versions)
+✅ Book.java
+package com.example.book.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "books")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    private Double price;
+}
+
+✅ BookRepository.java
+package com.example.book.repository;
+
+import com.example.book.entity.Book;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BookRepository extends JpaRepository<Book, Long> {
+}
+
+🔗 Service Layer (Common Business Logic)
+✅ BookService.java
+package com.example.book.service;
+
+import com.example.book.entity.Book;
+import com.example.book.repository.BookRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class BookService {
+
+    private final BookRepository bookRepository;
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public Book getBookById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+    }
+}
+
+🔗 DTOs for Versioning
+❓ Why DTOs matter in versioning?
+Never return Entity directly because:
+➤ you can’t safely evolve it
+➤ changes will break clients
+➤ So versioning is done mostly via DTO evolution.
+
+
+🔗 DTO v1 (Simple response)
+BookResponseV1.java
+package com.example.book.dto.v1;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class BookResponseV1 {
+    private Long id;
+    private String title;
+    private String author;
+}
+👉 In v1 we are NOT sending price.
+
+
+🔗 DTO v2 (Improved response)
+BookResponseV2.java
+package com.example.book.dto.v2;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class BookResponseV2 {
+    private Long id;
+    private String title;
+    private String author;
+    private Double price;
+    private String category; // new field introduced in v2
+}
+👉 v2 adds price + category.
+
+
+🔗 Controller Versioning (URI Versioning)
+✅ BookController v1
+/api/v1/books
+package com.example.book.controller.v1;
+
+import com.example.book.dto.v1.BookResponseV1;
+import com.example.book.entity.Book;
+import com.example.book.service.BookService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/books")
+@RequiredArgsConstructor
+public class BookControllerV1 {
+
+    private final BookService bookService;
+
+    @GetMapping
+    public List<BookResponseV1> getAllBooks() {
+        return bookService.getAllBooks()
+                .stream()
+                .map(this::mapToV1)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public BookResponseV1 getBookById(@PathVariable Long id) {
+        Book book = bookService.getBookById(id);
+        return mapToV1(book);
+    }
+
+    private BookResponseV1 mapToV1(Book book) {
+        return BookResponseV1.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .build();
+    }
+}
+
+🔗 BookController v2
+/api/v2/books
+package com.example.book.controller.v2;
+
+import com.example.book.dto.v2.BookResponseV2;
+import com.example.book.entity.Book;
+import com.example.book.service.BookService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v2/books")
+@RequiredArgsConstructor
+public class BookControllerV2 {
+
+    private final BookService bookService;
+
+    @GetMapping
+    public List<BookResponseV2> getAllBooks() {
+        return bookService.getAllBooks()
+                .stream()
+                .map(this::mapToV2)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public BookResponseV2 getBookById(@PathVariable Long id) {
+        Book book = bookService.getBookById(id);
+        return mapToV2(book);
+    }
+
+    private BookResponseV2 mapToV2(Book book) {
+        return BookResponseV2.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .price(book.getPrice())
+                .category("Fiction") // dummy example
+                .build();
+    }
+}
+
+
+🔄 Testing in Postman / Browser
+v1
+🔗 GET: http://localhost:8080/api/v1/books
+Response:[
+  { "id": 1, "title": "Atomic Habits", "author": "James Clear" }
+]
+
+v2
+🔗 GET: http://localhost:8080/api/v2/books
+Response:[
+  {
+    "id": 1,
+    "title": "Atomic Habits",
+    "author": "James Clear",
+    "price": 499.0,
+    "category": "Fiction"
+  }
+]
+
+
+🔄 Best Practices
+1️⃣ Keep versions stable
+➤ Once published, don’t break v1
+➤ Add changes in v2
+
+
+2️⃣ Deprecation strategy
+➤ Mark v1 as deprecated
+➤ Provide migration time
+➤ Remove after months
+
+✅Example:
+@Deprecated
+@GetMapping
+public List<BookResponseV1> getAllBooks() { ... }
+
+
+3️⃣ Use DTOs not Entities
+➤ Entity is internal, DTO is public contract.
+
+
+4️⃣ Don’t create too many versions
+➤ Usually companies maintain:
+    ✔️  current version
+    ✔️  1 old version
+
+
+🔄 Maintain version-specific documentation
+Swagger/OpenAPI per version helps a lot.
+
+
+🔄 Alternative: Header Versioning (Practical Example)
+Controller with headers:
+@RestController
+@RequestMapping("/api/books")
+public class BookHeaderVersionController {
+
+    @GetMapping(headers = "X-API-VERSION=1")
+    public String v1() {
+        return "Books API v1";
+    }
+
+    @GetMapping(headers = "X-API-VERSION=2")
+    public String v2() {
+        return "Books API v2";
+    }
+}
+
+
 ============================
 🔷 Rest Client Development
 ============================

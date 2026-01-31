@@ -4,7 +4,7 @@
 🔄 Pitch Deck
 Hi, I built a Hospital Management System to digitize and streamline hospital operations like user management, patient records, appointment scheduling, billing, and pharmacy workflows. The main goal of this project is to reduce manual work, avoid appointment conflicts, maintain accurate medical history, and improve overall hospital efficiency.
 
-The system supports role-based access control, where different roles such as admin, doctor, patient etc have different permissions. The Admin can create, update, and manage users like doctors, nurses, staff, and patients, and assign roles to ensure secure access. 
+The system supports role-based access control, where different roles such as admin, doctor, patient etc have different permissions. The Admin can create, update, and manage users like doctors, nurses, staff, and patients, and assign roles to ensure secure access.
 
 The Doctor module allows doctors to manage their schedules, view assigned appointments, and access patient medical records for diagnosis and treatment planning.
 
@@ -187,15 +187,15 @@ Hospital Management System will be deployed as containerized microservices on AW
 🔄 Microservices Architecture
 Based on your requirements, here's the microservice breakdown:
 Core Microservices
-➤ User Service - User management, authentication, authorization
-➤ Patient Service - Patient registration, medical records
-➤ Appointment Service - Scheduling, booking, availability management
-➤ Billing Service - Invoice generation, payment tracking
-➤ Pharmacy Service - Inventory, prescription management
-➤ Laboratory Service - Test management, results tracking
-➤ Notification Service - Email, SMS, Kafka-based notifications
-➤ Communication Service - WebSocket-based chat system
-➤ API Gateway - Single entry point, routing, rate limiting
+➤ User Service ─────────▶ User management, authentication, authorization
+➤ Patient Service ─────────▶ Patient registration, medical records
+➤ Appointment Service ─────────▶ Scheduling, booking, availability management
+➤ Billing Service ─────────▶ Invoice generation, payment tracking
+➤ Pharmacy Service ─────────▶ Inventory, prescription management
+➤ Laboratory Service ─────────▶ Test management, results tracking
+➤ Notification Service ─────────▶ Email, SMS, Kafka-based notifications
+➤ Communication Service ─────────▶ WebSocket-based chat system
+➤ API Gateway ─────────▶ Single entry point, routing, rate limiting
 
 Supporting Services
 ➤ Config Server - Centralized configuration management
