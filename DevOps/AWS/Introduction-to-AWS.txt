@@ -184,14 +184,14 @@ In AWS IAM terms:
 ➤ Avoid using broad policies like AdministratorAccess
 ➤ Prefer roles over users for services (EC2, Lambda, etc.)
 
-✅ Example: 
+✅ Example:
 Instead of this ❌
-"Action": "s3:*",
-"Resource": "*"
+Action: s3:*,
+Resource: *
 
 Do this ✅
-"Action": "s3:GetObject",
-"Resource": "arn:aws:s3:::my-bucket/*"
+Action: s3:GetObject,
+Resource: arn:aws:s3:::my-bucket/*
 
 Why it matters:
 🔒 Reduces security risk
@@ -230,7 +230,7 @@ Steps:
 
 2️⃣ Login via AWS CLI
 ✅ Used by:
-    ✔️ Developers 
+    ✔️ Developers
     ✔️ DevOps/ Automation
     ✔️ CI/CD
 
@@ -247,8 +247,8 @@ Steps:
     🔗 aws configure
 
 5️⃣ Enter:
-AWS Access Key ID: ********
-AWS Secret Access Key: ********
+AWS Access Key ID: 
+AWS Secret Access Key: 
 Default region: ap-south-1
 Default output format: json
 
@@ -313,7 +313,7 @@ Steps:
     ✔️ Lambda execution role
 
 ✅ No hardcoded secrets
-✅ Auto-rotation 
+✅ Auto-rotation
 
 
 2️⃣ IAM Groups
@@ -368,12 +368,12 @@ Defines permissions in JSON format.
 
 🔄 IAM Policy Structure (JSON)
 {
-  "Version": "2012-10-17",
-  "Statement": [
+  Version: 2012-10-17,
+  Statement: [
     {
-      "Effect": "Allow",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::my-bucket/*"
+      Effect: Allow,
+      Action: s3:GetObject,
+      Resource: arn:aws:s3:::my-bucket/*
     }
   ]
 }
@@ -450,150 +450,529 @@ Give developer read-only EC2 access
 #####################################
 🔷 AWS EC2(Elastic Compute Cloud)
 #####################################
-➤ EC2 (Elastic Compute Cloud) is an AWS service that provides scalable virtual servers (instances) in the cloud.
-➤ EC2 allows us to launch and manage virtual machines with full control over OS, compute, storage, and networking.
+🔄 EC2 Instance Lifecycle Management
 
-🔄 Why Use an EC2 Instance?
-❌ Problems with traditional servers
-➤ High upfront hardware cost
-➤ Fixed capacity
-➤ Manual scaling
-➤ Long setup time
-
-✅ EC2 Advantages
-➤ On-demand servers in minutes
-➤ Pay only for usage
-➤ Easy scaling
-➤ Global infrastructure
-➤ High availability
-🌊 We use EC2 when we need full control over the server, long-running applications, or custom runtime environments.
-
-🔄 Different Types of EC2 Instances
-1️⃣ General Purpose: Balanced CPU, memory, networking
-✅ Examples: t3, t4g, m5
-🌟 Use cases
-    ✔️ Web applications
-    ✔️ Backend APIs
-    ✔️ Dev/test
+1️⃣ Instance States
+➤ Pending ─────────▶ Instance is launching, initializing
+➤ Running ─────────▶ Instance is active and ready (billing starts)
+➤ Stopping ─────────▶ Graceful shutdown in progress
+➤ Stopped ─────────▶ Instance is shut down (no compute charges, only EBS storage billing)
+➤ Shutting-down ─────────▶ Instance is preparing for termination
+➤ Terminated ─────────▶ Instance is permanently deleted
 
 
-2️⃣ Compute Optimized: High CPU performance
-✅ Examples: c5, c6g
-🌟 Use cases
-    ✔️ CPU-intensive apps
-    ✔️ Game servers
-    ✔️ Data processing
+🔄 Key Operations
+1️⃣ Start/Stop
+➤ Preserves instance ID, private IP, and EBS volumes
+➤ Public IP changes (unless using Elastic IP)
+➤ No compute charges when stopped, only storage charges
+➤ Use for cost optimization in dev/test environments
+
+2️⃣ Reboot
+➤ Equivalent to OS reboot
+➤ Keeps both public and private IPs
+➤ No billing impact
+➤ Instance remains in running state
+
+3️⃣ Terminate
+➤ Permanent deletion of instance
+➤ By default, root EBS volume is deleted (configurable via DeleteOnTermination attribute)
+➤ Additional EBS volumes persist by default
+➤ Cannot recover after termination
 
 
-3️⃣ Memory Optimized: Large RAM
-✅ Examples: r5, x1
-🌟 Use cases
-    ✔️ In-memory databases
-    ✔️ Caching
-    ✔️ Big data analytics
+🟢 Scenario: Your manager asks you to reduce costs for development environment that runs 24/7
+Answer: Implement scheduled stop/start using EC2 instance scheduler. Stop instances at 7 PM, start at 8 AM on weekdays. This saves ~70% compute costs while retaining all configuration and data.
 
 
-4️⃣ Storage Optimized: High disk I/O
-✅ Examples: i3, d2
-🌟 Use cases
-    ✔️ Data warehousing
-    ✔️ Large datasets
+❓ Question: Why stop instead of terminate?
+Stop preserves your configuration, installed software, and data
+Cheaper than running 24/7 for dev/test environments
+Can restart with same private IP in VPC
 
 
-5️⃣ Accelerated Computing: GPU / ML workloads
-✅ Examples: p, g
-🌟 Use cases
-    ✔️ Machine learning
-    ✔️ Video processing
-─────────▶ Instance type defines hardware capacity, not software.
+🔄 EC2 Instance Types and Sizing
+Understanding Instance Naming Convention
+
+Example: t3.xlarge
+✔️ t = Instance family (General Purpose)
+✔️ 3 = Generation number
+✔️ xlarge = Size within the family
 
 
-🔄 How to Connect to an EC2 Instance?
-🌟 For Linux EC2 (SSH)
-⚡ Steps:
-1️⃣ Download .pem key file
-2️⃣ Set permission
-🔗 chmod 400 key.pem
-
-3️⃣ Connect
-🔗 ssh -i key.pem ec2-user@<public-ip>
-
-❓ Why key pair is needed?
-✅ Secure authentication instead of passwords
+🔄 Instance Sizes Progression
+nano ─────────▶ micro ─────────▶ small ─────────▶ medium ─────────▶ large ─────────▶ xlarge ─────────▶ 2xlarge ─────────▶ 4xlarge ─────────▶ 8xlarge ─────────▶ 16xlarge ─────────▶ 32xlarge
+Each size doubles vCPU and memory from previous size.
 
 
-🔄 How to Deploy an Application on EC2?
-✅ Example: Node.js / Java / React / Backend App
-🌟 Steps:
-1️⃣ Launch EC2
-2️⃣ Connect via SSH
-3️⃣ Install runtime
-🔗 sudo yum install nodejs -y
-
-4️⃣ Upload code (Git / SCP)
-🔗 git clone <repo-url>
-
-5️⃣ Install dependencies
-🔗 npm install
-
-6️⃣ Start application
-🔗 npm start
+❓ Question: Your Spring Boot application is experiencing CPU throttling. How would you diagnose and fix it?
+Answer:
+1️⃣ Check CloudWatch metric CPUCreditBalance - if declining to zero, instance is throttling
+2️⃣ Review CPUUtilization - if consistently above baseline, upgrade to unlimited mode or larger instance
+3️⃣ For T3, enable Unlimited mode (allows bursting beyond credits but charges extra) or upgrade to M5 instance type for consistent performance
+4️⃣ Optimize application code if CPU usage is inefficient
 
 
-🔄 How to Access the Application from Outside World?
-1️⃣ Public IP / Elastic IP
-➤ Assign public IP to EC2
-➤ Or use Elastic IP (static)
+🔄 EC2 Storage Fundamentals
+1️⃣ EBS (Elastic Block Store) Volumes
+➤ Network-attached block storage
+➤ Persists independently of EC2 instance
+➤ Attached to one EC2 instance at a time (except io2 multi-attach)
+➤ Limited to single Availability Zone
+➤ Encrypted at rest using KMS
 
-2️⃣ Security Group Configuration
-Allow inbound traffic:
-    ✔️ HTTP ─────────▶ Port 80
-    ✔️ HTTPS ─────────▶ Port 443
-    ✔️ App port ─────────▶ 3000 / 8080
-👉 Security Group acts as a firewall
 
-3️⃣ URL Access
-🔗 http://<public-ip>:<port>
+🔄 EBS Operations
+1️⃣ Volume Attachment/Detachment:
+➤ Attach volume to instance while running
+➤ Detach from stopped or running instance
+➤ One volume to one instance (except io2 multi-attach)
+➤ Volumes available within 1-2 minutes after attachment
 
-🔄 Common Issues
-⚡ App running but not accessible: Check Security Group inbound rules
 
-🔄 How EC2 Is Exposed Publicly (Production Setup)
-➤ Application Load Balancer
-➤ Auto Scaling Group
-➤ Multiple AZs
+2️⃣ Volume Modification (Elastic Volumes):
+➤ Increase size without downtime
+➤ Change volume type (gp2 ─────────▶ gp3)
+➤ Modify IOPS/throughput
+➤ Changes take effect immediately
+➤ OS-level extension required after resize
 
-🔄 What Are AWS Regions?
-A Region is a geographical area where AWS has data centers.
-✅ Examples
-✔️ us-east-1
-✔️ ap-south-1 (Mumbai)
 
-❓ Why regions exist
-➤ Low latency
-➤ Compliance
-➤ Fault isolation
+❓ Question: You need to increase EBS volume size from 100GB to 200GB on a running production instance. What steps would you take?
+➡ Answer:
+1️⃣ Take EBS snapshot first (backup)
+2️⃣ Modify volume size in EC2 console (no downtime)
+3️⃣ SSH into instance and verify OS sees new size: lsblk
+4️⃣ Extend partition: sudo growpart /dev/xvdf 1
+5️⃣ Extend filesystem: sudo resize2fs /dev/xvdf1 or sudo xfs_growfs /mount/path
+6️⃣ Verify new size: df -h
+7️⃣ No application restart needed, zero downtime
 
-🔄 What Are Availability Zones (AZs)?
-An Availability Zone is an isolated data center inside a region.
-✅ Example
-✔️ ap-south-1a
-✔️ ap-south-1b
-➤ Each region has multiple AZs
-➤ AZs are physically separate
-➤ Connected via high-speed network
 
-🔄 Region vs Availability Zone
-| Region           | Availability Zone        |
-| ---------------- | ------------------------ |
-| Geographic area  | Data center              |
-| Multiple AZs     | Inside one region        |
-| Used for latency | Used for fault tolerance |
+🔄 EBS Snapshots
+➤ Point-in-time backups of EBS volumes
+➤ Stored in S3 (managed by AWS, not visible in your S3 buckets)
+➤ Incremental backups (only changed blocks)
+➤ Can create volumes from snapshots in any AZ
 
-🔄 Why Multi-AZ is Important?
-➤ High availability
-➤ Fault tolerance
-➤ Disaster recovery
+How Incremental Snapshots Work:
+Day 1: Full snapshot (100 GB volume with 40 GB data) ─────────▶ Stores 40 GB
+Day 2: Only 5 GB changed ─────────▶ Stores only 5 GB
+Day 3: Only 3 GB changed ─────────▶ Stores only 3 GB
+
+Total storage: 40 + 5 + 3 = 48 GB (not 100 + 100 + 100)
+
+
+🔄 Real-World Backup Strategy:
+Production Database on EC2:
+
+Automated Snapshots:
+➤ Daily snapshots at 2 AM (low traffic)
+➤ Retain for 7 days
+➤ Weekly snapshot retained for 30 days
+➤ Monthly snapshot retained for 1 year
+
+Snapshot Lifecycle:
+➤ Use Data Lifecycle Manager (DLM) to automate
+➤ Tag-based policies
+➤ Automatic deletion of old snapshots
+
+
+❓ Question: Your production database volume failed. How do you recover using snapshots?
+1️⃣ Identify most recent snapshot before failure
+2️⃣ Create new EBS volume from snapshot in same AZ
+3️⃣ If instance is running, stop it
+4️⃣ Detach failed volume
+5️⃣ Attach new volume with same device name (e.g., /dev/xvdf)
+6️⃣ Start instance and verify data integrity
+7️⃣ Time to recover: ~10-15 minutes depending on volume size
+
+
+🔄 Instance Store - Ephemeral Storage
+➤ Physically attached storage (not network storage like EBS)
+➤ Temporary storage that persists only during instance lifetime
+➤ High IOPS and throughput (better than EBS)
+➤ No additional cost (included with instance)
+➤ Data lost when instance stops, terminates, or fails
+
+🔄 Characteristics:
+➤ Cannot be detached/attached
+➤ Cannot create snapshots
+➤ Size determined by instance type
+➤ Available only on specific instance types
+
+
+Use Cases for Java Applications:
+1️⃣ Temporary Processing: Large file processing in Spring Boot
+
+2️⃣ Caching Layer:
+Redis/Memcached on instance store:
+    ✔️ Cache data doesn't need persistence
+    ✔️ High-speed access
+    ✔️ If instance fails, cache rebuilds from database
+
+3️⃣ Build Artifacts
+CI/CD Pipeline:
+    ✔️ Clone repository to instance store
+    ✔️ Build Java application (Maven/Gradle)
+    ✔️ Fast compilation due to high I/O
+    ✔️ Upload final artifact to S3
+
+3️⃣ Buffer/Queue:
+Kafka/RabbitMQ:
+    ✔️ Use instance store for message buffering
+    ✔️ High throughput for message processing
+    ✔️ Replicate data across multiple instances for durability
+
+
+Anti-Patterns (Don't use Instance Store for):
+    ✔️ Database storage
+    ✔️ User-uploaded files
+    ✔️ Application logs you need to keep
+    ✔️ Any data you cannot afford to lose
+
+
+❓ Question: When would you choose Instance Store over EBS for a Java application?
+Answer: Use Instance Store when:
+1️⃣ Need very high IOPS (>64,000) for temporary data processing
+2️⃣ Data is ephemeral (caches, temporary files, build artifacts)
+3️⃣ Data is replicated elsewhere (clustered applications)
+4️⃣ Cost optimization for temporary storage
+👉 Never use for persistent data like databases or user uploads.
+
+
+🔄 EC2 Networking Fundamentals
+1️⃣ IP Addressing
+Private IP Address:
+➤ Assigned from VPC subnet CIDR range
+➤ Retained when instance is stopped/started
+➤ Retained when instance is rebooted
+➤ Used for internal communication within VPC
+➤ Cannot be changed after launch
+➤ Free, no additional charges
+
+Use cases:
+➤ Microservices communication
+➤ Database connections
+➤ Internal API calls
+➤ Communication between tiers (web ─────────▶ app ─────────▶ database)
+
+
+Public IP Address:
+➤ Assigned from AWS pool of public IPs
+➤ Dynamic - changes when instance is stopped/started
+➤ Retained only when instance is running or rebooted
+➤ Released when instance is stopped/terminated
+➤ Free when assigned at launch
+➤ Used for internet-facing communication
+
+When Public IP is assigned:
+➤ Auto-assign public IP enabled in subnet settings
+➤ Explicitly requested during launch
+➤ Cannot add public IP after instance launch
+
+Public IP Limitations:
+➤ Changes on stop/start (not suitable for production)
+➤ Cannot move to another instance
+➤ Lost on termination
+
+Elastic IP Address (EIP):
+➤ Static public IPv4 address
+➤ Allocated to your account
+➤ Can be associated/disassociated with instances
+➤ Persists across instance stop/start
+➤ Can move between instances instantly
+➤ Limited to 5 per region (can request increase)
+
+EIP Characteristics:
+➤ Cost: Free when associated with running instance
+➤ Cost: $0.005/hour when NOT associated (to prevent hoarding)
+➤ Instant failover: Detach from failed instance, attach to standby
+➤ Maps to private IP inside VPC
+
+Real-World EIP Usage:
+Scenario: Production API Server
+
+Without EIP:
+- Public IP: 54.123.45.67
+- Stop instance for maintenance
+- Start instance
+- New Public IP: 54.98.76.54
+- Problem: DNS records, client configurations need update
+
+With EIP:
+- EIP: 52.201.100.50
+- Associate with instance
+- Stop/start instance
+- Same EIP: 52.201.100.50
+- No DNS changes needed
+
+
+Commands:
+bash
+# Allocate Elastic IP
+aws ec2 allocate-address --domain vpc
+
+# Associate with instance
+aws ec2 associate-address --instance-id i-1234567890abcdef0 --allocation-id eipalloc-12345678
+
+# Disassociate
+aws ec2 disassociate-address --association-id eipassoc-12345678
+
+# Release (delete)
+aws ec2 release-address --allocation-id eipalloc-12345678
+
+
+Interview Question: Your production application uses EIP but you're getting unexpected charges. What could be the reason?
+
+Answer: EIPs cost $0.005/hour when NOT associated with a running instance. Reasons:
+1. EIP allocated but not associated
+2. EIP associated with stopped instance
+3. Multiple EIPs allocated but unused
+4. Solution: Release unused EIPs, ensure associated with running instances only
+
+
+2️⃣ Elastic Network Interfaces (ENI)
+➤ Virtual network card
+➤ Can attach/detach from EC2 instances
+➤ Tied to specific Availability Zone
+➤ Can have multiple private/public IPs
+➤ Persistent across instance start/stop/terminate
+
+🔄 ENI Association with EC2
+➤ Every EC2 instance must have at least 1 ENI (called the primary ENI).
+➤ ENI is attached to EC2 so the instance can:
+    ✔️  communicate inside VPC
+    ✔️  access internet (via IGW/NAT)
+    ✔️  connect to other services (RDS, ALB, etc.)
+
+👉 Key points
+➤ You can attach multiple ENIs to one EC2 (multi-network setup).
+➤ You can detach an ENI from one EC2 and attach it to another (useful for failover).
+➤ Security Groups are applied at ENI level.
+
+
+❓ Question: How would you implement a high-availability solution for a single EC2 instance running a critical Java application?
+Answer: Use Elastic Network Interface (ENI) failover:
+1️⃣ Create ENI with Elastic IP in same subnet as primary instance
+2️⃣ Attach ENI to primary instance
+3️⃣ Launch standby instance in same AZ
+4️⃣ Monitor primary instance health (CloudWatch, health check scripts)
+5️⃣ On failure, detach ENI from primary and attach to standby (~2 min)
+6️⃣ Clients automatically connect to standby (same IP)
+👉 Alternative: Use Auto Scaling Group with min=max=1 for automatic recovery
+
+
+3️⃣ Security Groups - Virtual Firewall
+➤ Virtual firewall at instance level
+➤ Controls inbound and outbound traffic
+➤ Stateful: Return traffic automatically allowed
+➤ Changes apply immediately
+➤ Default deny all inbound, allow all outbound
+
+
+🔄 Security Group Characteristics:
+Stateful Nature:
+Inbound Rule: Allow TCP port 8080 from 0.0.0.0/0
+
+✔️Client sends request: Client:45678 ─────────▶ Instance:8080 ✓ (Allowed by inbound rule)
+✔️Instance responds: Instance:8080 ─────────▶ Client:45678 ✓ (Automatically allowed, even without outbound rule)
+
+
+Allow Rules Only:
+➤ Cannot create deny rules
+➤ If no allow rule exists, traffic is denied by default
+➤ Explicit allow required for inbound
+➤ All outbound allowed by default (can restrict)
+
+Multiple Security Groups:
+➤ Attach up to 5 security groups per instance
+➤ Rules from all groups are aggregated
+➤ More permissive rule takes precedence
+
+Security Group Rules Structure:
+➤ Type: Protocol + Port range
+➤ Source (Inbound) / Destination (Outbound): IP range or Security Group
+Description: Human-readable description
+
+
+🔄 Security Group Referencing (Best Practice):
+Instead of using IP ranges, reference other security groups:
+❌ Bad Practice:
+Rule: Allow port 8080 from 10.0.1.0/24
+Problem: If you add instances in 10.0.2.0/24, need to update rule
+
+✅ Good Practice:
+Rule: Allow port 8080 from app-backend-sg
+Benefit: Any instance with app-backend-sg can connect, automatic scaling
+
+
+✅ Example: Microservices Architecture:
+Service A (Order Service):
+    ✔️ Security Group: order-service-sg
+    ✔️ Needs to call Service B
+
+Service B (Inventory Service):
+    ✔️ Security Group: inventory-service-sg
+    ✔️ Inbound rule: Allow 8080 from order-service-sg
+Service A can call Service B automatically
+Add more Service A instances ─────────▶ No security group changes needed
+
+
+Security Group Limits:
+➤- 60 inbound rules per security group
+➤ 60 outbound rules per security group
+➤ 5 security groups per network interface
+➤ Total: 300 rules per instance (60 × 5)
+
+
+🔄 Troubleshooting Security Groups
+Scenario 1️⃣: Cannot SSH into instance
+👉 Check:
+1️⃣ Security group has inbound rule for port 22
+2️⃣ Source IP matches your current IP
+3️⃣ Instance has public IP or you're connecting via private IP from within VPC
+4️⃣ Network ACL not blocking (different from security group)
+5️⃣ Route table has route to internet gateway
+
+
+Scenario 2️⃣: Application not accessible from internet
+👉 Check:
+1️⃣ Security group allows inbound on application port (8080)
+2️⃣ Application is actually running: netstat -tulpn | grep 8080
+3️⃣ Application bound to 0.0.0.0, not 127.0.0.1
+4️⃣ Instance has public IP
+
+
+Scenario 3️⃣: Instance cannot reach internet
+👉 Check:
+1️⃣ Outbound rules allow HTTPS (443) for package downloads
+2️⃣ Route table has route to internet gateway (0.0.0.0/0 ─────────▶ igw-xxx)
+3️⃣ Instance in public subnet or using NAT Gateway
+
+
+Security Best Practices:
+1️⃣ Principle of Least Privilege:
+❌ Bad: SSH (22) from 0.0.0.0/0 ❌
+✅ Good:  SSH (22) from bastion-sg ✓
+
+
+2️⃣ Use Security Group References:
+❌ Bad: MySQL (3306) from 10.0.0.0/16 ❌
+✅ Good: MySQL (3306) from app-backend-sg ✓
+
+
+3️⃣ Descriptive Names and Descriptions:
+❌ Bad:
+- sg-12345
+- Rule: Allow 8080 from sg-67890
+✅ Good:
+- prod-java-backend-sg
+- Rule: Spring Boot API from ALB (Description)
+
+
+🔄 Separate Security Groups by Tier:
+- web-tier-sg
+- app-tier-sg
+- db-tier-sg
+- cache-tier-sg
+
+
+🔄 Regular Audits:
+- Review rules quarterly
+- Remove unused security groups
+- Check for 0.0.0.0/0 inbound rules
+- Verify least privilege
+
+
+❓ Question: Your Spring Boot application on EC2 cannot connect to RDS MySQL database. Both are in the same VPC. How do you troubleshoot?
+Answer: Check in this order:
+1. Security Groups: RDS security group must allow inbound 3306 from EC2 security group (not IP range)
+2. Network ACLs: Check subnet NACLs allow traffic (usually default allow)
+3. Application Config: Verify JDBC URL uses correct endpoint
+4. Test Connectivity: From EC2, run telnet rds-endpoint 3306 to verify network connectivity
+5. RDS Status: Ensure RDS is in Available state
+6. Subnet Routing: Both in correct subnets with proper routing
+Most common issue: RDS security group not allowing inbound from EC2 security group.
+
+
+❓ Question: You launched 10 EC2 instances with User Data script, but 3 of them don't have the application running. How do you troubleshoot?
+Answer:
+1. SSH into failed instances
+2. Check User Data execution logs: tail -100 /var/log/cloud-init-output.log
+3. Check cloud-init status: cloud-init status
+4. Look for errors in logs: grep -i error /var/log/cloud-init-output.log
+5. Common issues:
+   - Network timeout downloading from S3 (IAM role missing)
+   - Package installation failed (repository issue)
+   - Application startup failed (configuration error)
+6. Fix: Create new launch template with corrected User Data, terminate failed instances, launch new ones
+7. Better approach: Use custom AMI with application pre-installed to avoid User Data complexity
+
+
+🔄 Amazon Machine Images (AMI)
+➤ Template for launching EC2 instances
+➤ Contains OS, application, configuration, and data
+➤ Region-specific (must copy to use in different region)
+➤ Can be public, private, or shared
+
+AMI Components:
+➤ Root volume snapshot (EBS or instance store)
+➤ Launch permissions (who can use it)
+➤ Block device mapping (which volumes to attach)
+
+Types of AMIs:
+1️⃣ AWS-Provided AMIs:
+➤ Amazon Linux 2023
+➤ Amazon Linux 2
+➤ Ubuntu, Red Hat, Windows Server
+➤ Maintained and updated by AWS
+
+2️⃣ Marketplace AMIs:
+➤ Pre-configured with third-party software
+➤ May include licensing costs
+➤ Examples: Jenkins, Docker, GitLab
+
+3️⃣ Custom AMIs:
+➤ Created by you from configured instances
+➤ Contains your applications and configurations
+➤ Reusable across instances
+
+
+🔄 AMI Benefits:
+1️⃣ Faster Launch Time:
+With User Data: 5-10 minutes to download and install everything
+With AMI: 1-2 minutes to launch (everything pre-installed)
+
+
+2️⃣ Consistency:
+User Data: Scripts might fail, dependencies might change
+AMI: Exact same configuration every time
+
+
+3️⃣ Version Control:
+myapp-v1.0-20240101
+myapp-v1.1-20240215
+myapp-v2.0-20240320
+👉 Easy rollback if new version has issues
+
+
+4️⃣ Disaster Recovery:
+Region A fails: Launch instances in Region B from copied AMI
+
+
+❓ Question: Your company wants to deploy a Java application across multiple regions with minimal launch time. What approach would you recommend?
+Answer:
+1. Create golden AMI with application pre-installed in primary region
+2. Test AMI thoroughly in staging environment
+3. Copy AMI to all target regions
+4. Use AMI in Auto Scaling Group launch templates
+5. Benefits:
+   - Consistent configuration across regions
+   - Fast launch time (1-2 min vs 5-10 min with User Data)
+   - Easy rollback (switch to previous AMI version)
+   - Disaster recovery ready
+6. Use User Data only for instance-specific configuration (environment variables, instance tagging)
 
 
 ##############################
@@ -707,11 +1086,11 @@ Steps:
 
 
 🔄 Public Route Table
-➤ Add route: 0.0.0.0/0 → Internet Gateway
+➤ Add route: 0.0.0.0/0 ─────────▶ Internet Gateway
 ➤ Associate with: Public Subnet
 
 🔄 Private Route Table
-➤ Add route: 0.0.0.0/0 → NAT Gateway
+➤ Add route: 0.0.0.0/0 ─────────▶ NAT Gateway
 ➤ Associate with: Private Subnet
 
 
@@ -745,9 +1124,9 @@ Steps:
 ➤ Configure Security Groups
 
 ✅ Real-World Example:: Web Application Architecture
-➤ Public Subnet → ALB, EC2
-➤ Private Subnet → RDS
-➤ NAT Gateway → Updates from private subnet
+➤ Public Subnet ─────────▶ ALB, EC2
+➤ Private Subnet ─────────▶ RDS
+➤ NAT Gateway ─────────▶ Updates from private subnet
 
 
 🔄 Common Traps
@@ -758,40 +1137,22 @@ Steps:
 ➤ NAT Gateway must be in public subnet
 
 
-############################
-🔷 Security Group and NACL
-############################
-Security Group = Virtual Firewall for Instances
-➤ Applied at EC2 instance level
-➤ Controls traffic inbound and outbound
-➤ Stateful → If inbound traffic is allowed, the response automatically allowed outbound
-
-🔁 Key Characteristics
-| Feature          | Security Group                                        |
-| ---------------- | ----------------------------------------------------- |
-| Scope            | **Instance-level**                                    |
-| Traffic control  | Inbound + Outbound                                    |
-| Stateful         | ✔️ Yes                                                 |
-| Allow/Deny       | **Only Allow** rules                                  |
-| Default Behavior | All inbound traffic **blocked**, outbound **allowed** |
-| Evaluation       | All rules checked, if one matches → allowed           |
-| Logging          | Supported via VPC Flow Logs                           |
-
-
+#####################################
 🔷 Network Access Control List(NACL)
+#####################################
 NACL = Firewall for Subnets
 ➤ Applied at Subnet level
 ➤ Controls inbound & outbound traffic for all resources inside the subnet
-➤ Stateless → Return traffic must be explicitly allowed
+➤ Stateless ─────────▶ Return traffic must be explicitly allowed
 
 
 🔁 Key Characteristics
 | Feature      | NACL                                      |
 | ------------ | ----------------------------------------- |
-| Scope        | **Subnet-level**                          |
+| Scope        | Subnet-level                          |
 | Stateful     | ❌ No                                     |
-| Allow/Deny   | Supports **Allow + Deny**                 |
-| Rule Order   | **Evaluated in order** (Lowest → Highest) |
+| Allow/Deny   | Supports Allow + Deny                 |
+| Rule Order   | Evaluated in order (Lowest ─────────▶ Highest) |
 | Default Rule | Allow everything (modifiable)             |
 | Logging      | Supported via VPC Flow Logs               |
 
@@ -807,9 +1168,9 @@ NACL = Firewall for Subnets
 🔁 Default Rules
 | Component      | Default Behavior                         |
 | -------------- | ---------------------------------------- |
-| Security Group | **Deny all inbound**, allow all outbound |
+| Security Group | Deny all inbound, allow all outbound |
 | NACL (default) | Allow all inbound and outbound           |
-❗Trap → Many mistakenly say NACL blocks everything by default
+❗Trap ─────────▶ Many mistakenly say NACL blocks everything by default
 
 
 🔁 Order of Operation
@@ -865,7 +1226,7 @@ We will configure:
 | --------------- | --------- | ------------ | ------------------------------ | ------------------------- |
 | HTTP            | Inbound   | 80           | 0.0.0.0/0                      | Public can access website |
 | HTTPS           | Inbound   | 443          | 0.0.0.0/0                      | Secure public access      |
-| SSH             | Inbound   | 22           | Your IP (e.g., 183.89.***.***) | Admin access only         |
+| SSH             | Inbound   | 22           | Your IP (e.g., 183.89.*.*) | Admin access only         |
 | Database Access | Outbound  | 3306 (MySQL) | DB SG                          | App to DB communication   |
 ⚡ Note: Outbound default is ALLOW ALL, often kept unchanged.
 
@@ -920,41 +1281,41 @@ It runs across AWS’s globally distributed edge locations — the same network 
 
 ❓ WHY the name Route “53”?
 ➤ 53 is the port number of DNS protocol (UDP/TCP port 53)
-➤ “Route” → network routing + traffic steering
+➤ “Route” ─────────▶ network routing + traffic steering
     ✔️ Clever naming rooted in fundamentals
 
 
 🔄 Core Components & Concepts
 | Component             | Role                                        |
 | --------------------- | ------------------------------------------- |
-| **Hosted Zone**       | Container for all DNS records of a domain   |
-| **DNS Records**       | Mapping of names → IPs / resources          |
-| **Authoritative DNS** | Route 53 answers officially for your domain |
-| **Health Checks**     | Remove unhealthy endpoints automatically    |
-| **Routing Policies**  | Intelligent traffic distribution logic      |
+| Hosted Zone       | Container for all DNS records of a domain   |
+| DNS Records       | Mapping of names ─────────▶ IPs / resources          |
+| Authoritative DNS | Route 53 answers officially for your domain |
+| Health Checks     | Remove unhealthy endpoints automatically    |
+| Routing Policies  | Intelligent traffic distribution logic      |
 
 
 🔑 Types of Hosted Zones
 | Type                    | Use                          |
 | ----------------------- | ---------------------------- |
-| **Public Hosted Zone**  | Domain available on Internet |
-| **Private Hosted Zone** | DNS restricted inside VPC    |
+| Public Hosted Zone  | Domain available on Internet |
+| Private Hosted Zone | DNS restricted inside VPC    |
 👉 Private DNS avoids exposing internal service IPs publicly.
 
 
 🔁 DNS Record Types Supported
 | Record                        | Purpose                                             |
 | ----------------------------- | --------------------------------------------------- |
-| **A**                         | Name → IPv4                                         |
-| **AAAA**                      | Name → IPv6                                         |
-| **CNAME**                     | Name → Another name                                 |
-| **MX**                        | Email routing                                       |
-| **TXT**                       | Verification, SPF, DKIM                             |
-| **NS**                        | Delegation to name servers                          |
-| **Alias** (Route 53-specific) | Map AWS services with automatic health + dynamic IP |
+| A                         | Name ─────────▶ IPv4                                         |
+| AAAA                      | Name ─────────▶ IPv6                                         |
+| CNAME                     | Name ─────────▶ Another name                                 |
+| MX                        | Email routing                                       |
+| TXT                       | Verification, SPF, DKIM                             |
+| NS                        | Delegation to name servers                          |
+| Alias (Route 53-specific) | Map AWS services with automatic health + dynamic IP |
 
 👉 Alias records automatically track changing cloud targets
-✅ Example: ALB DNS → never changes, but IPs change every minute
+✅ Example: ALB DNS ─────────▶ never changes, but IPs change every minute
 
 
 🔁 Route 53 as a Global Load Routing Engine
@@ -963,13 +1324,13 @@ Route 53 is not a load balancer, but decides where users go globally:
 Supported Routing Policies
 | Routing Type           | What it does               | Use Case                   |
 | ---------------------- | -------------------------- | -------------------------- |
-| **Simple**             | One record → One IP        | Basic websites             |
-| **Weighted**           | Split traffic %            | Blue/Green deploy          |
-| **Latency-based**      | Closest AWS region         | Global apps                |
-| **Geolocation**        | Based on user location     | Legal, GDPR                |
-| **Geo-proximity**      | Regional preference shift  | Regional migrations        |
-| **Failover**           | Primary + Secondary        | DR setups                  |
-| **Multi-value Answer** | Multiple healthy endpoints | Client-side load selection |
+| Simple             | One record ─────────▶ One IP        | Basic websites             |
+| Weighted           | Split traffic %            | Blue/Green deploy          |
+| Latency-based      | Closest AWS region         | Global apps                |
+| Geolocation        | Based on user location     | Legal, GDPR                |
+| Geo-proximity      | Regional preference shift  | Regional migrations        |
+| Failover           | Primary + Secondary        | DR setups                  |
+| Multi-value Answer | Multiple healthy endpoints | Client-side load selection |
 ✔️ Route 53 + Health Checks => Self-repairing DNS
 
 
@@ -982,7 +1343,7 @@ Monitors:
 
 If endpoint fails:
 ➤ Automatically removed from DNS responses
-→ User gets only healthy locations
+─────────▶ User gets only healthy locations
 
 Failure Detection Time:
 ➤ ~15–45 seconds depending on probing interval
@@ -1004,7 +1365,7 @@ TLD DNS (.com, .in, etc.)
 Route 53 Authoritative Name Servers
      │
      ▼
-Return IP → Browser connects to target
+Return IP ─────────▶ Browser connects to target
 ✔️ Route 53 sits at the authoritative layer
 
 
@@ -1015,7 +1376,7 @@ Return IP → Browser connects to target
 ➤ Result:
     ✔️ DNS request resolves at the closest edge location
     ✔️ Fast lookup + high resiliency
-👉 Even if entire region fails → DNS still responds from other edges
+👉 Even if entire region fails ─────────▶ DNS still responds from other edges
 
 
 ⚡Alias vs CNAME
@@ -1026,8 +1387,8 @@ Return IP → Browser connects to target
 | DNS Query cost           | Free    | Billed   |
 | Tracks AWS resource IPs  | ✔️ Yes | ❌ No    |
 ✅ Example:
-example.com → ALIAS to ALB
-www.example.com → CNAME to example.com
+example.com ─────────▶ ALIAS to ALB
+www.example.com ─────────▶ CNAME to example.com
 
 Alias supports AWS resources:
 ➤ CloudFront
@@ -1038,17 +1399,17 @@ Alias supports AWS resources:
 
 
 ✅ DNS + Load Balancer + VPC + Routing Example
-User → DNS Query → Route 53 (Latency Rule)
+User ─────────▶ DNS Query ─────────▶ Route 53 (Latency Rule)
          │
          ▼
 Closest Region ALB (Health OK?)
          │
          ▼
-Target EC2 or ECS Service → App
+Target EC2 or ECS Service ─────────▶ App
 
 
 If Region A goes down:
-Traffic shifts → Region B (Failover Rule)
+Traffic shifts ─────────▶ Region B (Failover Rule)
 
 ✔️ No downtime
 ✔️ No manual changes
@@ -1102,12 +1463,12 @@ S3 is an object storage system used to store unlimited data with extreme durabil
 🔁 S3’s Core Design Philosophy
 | Feature                    | What it means                             |
 | -------------------------- | ----------------------------------------- |
-| **Object Storage**         | Data stored as objects (not files/blocks) |
-| **Unlimited Scale**        | Infrastructure expands automatically      |
-| **11 9s Durability**       | 99.999999999% object survival             |
-| **Global Namespace**       | Bucket name must be unique per region     |
-| **High Availability**      | Data stored across ≥ 3 Availability Zones |
-| **Designed for 1000s TPS** | Parallelism built in                      |
+| Object Storage         | Data stored as objects (not files/blocks) |
+| Unlimited Scale        | Infrastructure expands automatically      |
+| 11 9s Durability       | 99.999999999% object survival             |
+| Global Namespace       | Bucket name must be unique per region     |
+| High Availability      | Data stored across ≥ 3 Availability Zones |
+| Designed for 1000s TPS | Parallelism built in                      |
 👉 S3 is a distributed system, not a file system.
 
 
@@ -1131,16 +1492,16 @@ Durability achieved by:
 ✔️ Background scans/repair
 
 Even if:
-➤ 1 complete AZ destroyed → data safe
-➤ Hardware failures → auto-replicated
+➤ 1 complete AZ destroyed ─────────▶ data safe
+➤ Hardware failures ─────────▶ auto-replicated
 
 
 🔁 Consistency Model
 | Operation              | Consistency           |
 | ---------------------- | --------------------- |
-| New Object PUT         | **Strong consistent** |
-| UPDATE existing object | **Strong**            |
-| DELETE                 | **Strong**            |
+| New Object PUT         | Strong consistent |
+| UPDATE existing object | Strong            |
+| DELETE                 | Strong            |
 👉 Older S3 was eventually consistent — now strong consistency for all operations.
 
 
@@ -1156,18 +1517,18 @@ us-east-1 (N. Virginia)
 🔁 Storage Classes (Cost vs Performance)
 | Class                    | Usage                                  | Cost    | AZ Redundancy |
 | ------------------------ | -------------------------------------- | ------- | ------------- |
-| **Standard**             | Frequent access                        | 💰💰    | Multi-AZ      |
-| **Standard-IA**          | Infrequent access                      | 💰      | Multi-AZ      |
-| **One-Zone-IA**          | Low-cost archive                       | 💵      | Single-AZ ❌   |
-| **Glacier Instant**      | Archive, Quick read                    | 💵      | Multi-AZ      |
-| **Glacier Flexible**     | Long archive                           | 💵↓     | Hours         |
-| **Glacier Deep Archive** | Lowest cost                            | 💵↓↓    | 12–48h        |
-| **Intelligent Tiering**  | Automatically moves data between tiers | Dynamic | Multi-AZ      |
+| Standard             | Frequent access                        | 💰💰    | Multi-AZ      |
+| Standard-IA          | Infrequent access                      | 💰      | Multi-AZ      |
+| One-Zone-IA          | Low-cost archive                       | 💵      | Single-AZ ❌   |
+| Glacier Instant      | Archive, Quick read                    | 💵      | Multi-AZ      |
+| Glacier Flexible     | Long archive                           | 💵↓     | Hours         |
+| Glacier Deep Archive | Lowest cost                            | 💵↓↓    | 12–48h        |
+| Intelligent Tiering  | Automatically moves data between tiers | Dynamic | Multi-AZ      |
 
 
 🔄 Lifecycle Policies
 Automate object transitions:
-    ✔️ From Standard → IA → Glacier → Delete
+    ✔️ From Standard ─────────▶ IA ─────────▶ Glacier ─────────▶ Delete
     ✔️ Based on age/time rules
 Useful for reducing cost automatically.
 
@@ -1176,17 +1537,17 @@ Useful for reducing cost automatically.
 S3 security = Layered
 | Layer                   | Controls                             |
 | ----------------------- | ------------------------------------ |
-| **Bucket Policy**       | Public/private rules at bucket level |
-| **IAM Policies**        | User/role permissions                |
-| **ACLs**                | Object-level legacy access control   |
-| **Block Public Access** | Prevent accidental exposure          |
+| Bucket Policy       | Public/private rules at bucket level |
+| IAM Policies        | User/role permissions                |
+| ACLs                | Object-level legacy access control   |
+| Block Public Access | Prevent accidental exposure          |
 👉 Security architecture rule: DO NOT make buckets public. Use signed URLs instead.
 
 🔐 Encryption (2 layers)
 | Type    | Where encrypted               | Example              |
 | ------- | ----------------------------- | -------------------- |
-| **SSE** | Server-side                   | SSE-S3 / SSE-KMS     |
-| **CSE** | Client encrypts before upload | Fully app-controlled |
+| SSE | Server-side                   | SSE-S3 / SSE-KMS     |
+| CSE | Client encrypts before upload | Fully app-controlled |
 
 ➤ SSE-KMS is most secure:
     ✔️ Keys managed by AWS KMS
@@ -1203,7 +1564,7 @@ S3 uses:
 
 S3 supports:
 ✔️ 100–350 MB/s per prefix
-✔️ Unlimited prefixes → near unlimited throughput
+✔️ Unlimited prefixes ─────────▶ near unlimited throughput
 
 
 🔁 Accessing S3
@@ -1257,7 +1618,7 @@ CloudFront recommended for:
 | System                  | Feature used                        |
 | ----------------------- | ----------------------------------- |
 | Data Lake Architecture  | S3 + Glue + Athena + Lake Formation |
-| Serverless Apps         | S3 → Lambda → DynamoDB              |
+| Serverless Apps         | S3 ─────────▶ Lambda ─────────▶ DynamoDB              |
 | CDN Content             | S3 + CloudFront                     |
 | Backups & Archives      | Lifecycle + Glacier                 |
 | Logging                 | S3 central storage                  |
@@ -1324,7 +1685,7 @@ It’s built on top of:
 
 
 AWS CLI Installation (Latest: v2) for Ubuntu 24.04
-🔗 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+🔗 curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip
 🔗 unzip awscliv2.zip
 🔗 sudo ./aws/install
 🔗 aws --version
@@ -1334,9 +1695,9 @@ AWS CLI Installation (Latest: v2) for Ubuntu 24.04
 AWS CLI signs every request with SigV4 cryptographic signatures using credentials:
 | Type                  | Where used                      |
 | --------------------- | ------------------------------- |
-| **Access Key ID**     | Public identifier               |
-| **Secret Access Key** | Private cryptographic signing   |
-| **Session Token**     | Temporary access (STS/IAM Role) |
+| Access Key ID     | Public identifier               |
+| Secret Access Key | Private cryptographic signing   |
+| Session Token     | Temporary access (STS/IAM Role) |
 Credentials NEVER appear in request body- only in signature headers.
 
 
@@ -1383,26 +1744,26 @@ etc., isolated from each other.
 ✅ Example: aws s3 ls
 
 🌟 Internal Flow:
-CLI → Credential Selection → API Endpoint → SigV4 → HTTPS → AWS Service API
+CLI ─────────▶ Credential Selection ─────────▶ API Endpoint ─────────▶ SigV4 ─────────▶ HTTPS ─────────▶ AWS Service API
 │
-└─ Receives JSON → Formats output
+└─ Receives JSON ─────────▶ Formats output
 
 🔁 Important Global CLI Parameters
 | Option              | Purpose                      |
 | ------------------- | ---------------------------- |
-| `--region`          | Override configured region   |
-| `--query`           | Filter output using JMESPath |
-| `--output`          | json, yaml, text, table      |
-| `--profile`         | Use specific profile         |
-| `--cli-auto-prompt` | Guided interactive mode      |
+| --region          | Override configured region   |
+| --query           | Filter output using JMESPath |
+| --output          | json, yaml, text, table      |
+| --profile         | Use specific profile         |
+| --cli-auto-prompt | Guided interactive mode      |
 
 
 🔁Output Filtering — JMESPath (Very powerful!)
 ✅ Example 1: list only instance IDs
-🔗 aws ec2 describe-instances --query "Reservations[*].Instances[*].InstanceId"
+🔗 aws ec2 describe-instances --query Reservations[*].Instances[*].InstanceId
 
 ✅ Example 2:Get S3 bucket names only:
-🔗 aws s3api list-buckets --query "Buckets[].Name"
+🔗 aws s3api list-buckets --query Buckets[].Name
 
 
 🔁 Pagination Issues
@@ -1436,8 +1797,8 @@ CLI → Credential Selection → API Endpoint → SigV4 → HTTPS → AWS Servic
 🔁 Scripting with AWS CLI
 ✅ Example: stop all running instances:
 🔗 aws ec2 describe-instances \
---filters "Name=instance-state-name,Values=running" \
---query "Reservations[*].Instances[*].InstanceId" --output text \
+--filters Name=instance-state-name,Values=running \
+--query Reservations[*].Instances[*].InstanceId --output text \
 | xargs -n 1 aws ec2 stop-instances --instance-ids
 
 Automating:
@@ -1502,11 +1863,11 @@ Unified API client
 🔁 Key Principles of IaC
 | Principle                    | Meaning                                                        |
 | ---------------------------- | -------------------------------------------------------------- |
-| **Declarative Definition**   | Define *what* resources are needed, not *how* to create them   |
-| **Idempotency**              | Running the same code again results in the same infrastructure |
-| **Version Control Friendly** | Git can track infrastructure changes                           |
-| **Automation**               | No manual creation of resources in AWS console                 |
-| **Consistency**              | Eliminates misconfiguration and human errors                   |
+| Declarative Definition   | Define *what* resources are needed, not *how* to create them   |
+| Idempotency              | Running the same code again results in the same infrastructure |
+| Version Control Friendly | Git can track infrastructure changes                           |
+| Automation               | No manual creation of resources in AWS console                 |
+| Consistency              | Eliminates misconfiguration and human errors                   |
 
 
 ❓ Why we need IaC?
@@ -1540,14 +1901,14 @@ Creates Stack (Infrastructure deployment)
 A CloudFormation template mainly consists of:
 | Section                      | Purpose                                   |
 | ---------------------------- | ----------------------------------------- |
-| **AWSTemplateFormatVersion** | Template version info (optional)          |
-| **Description**              | About the template                        |
-| **Metadata**                 | Additional info for internal logic        |
-| **Parameters**               | Inputs provided during deployment         |
-| **Mappings**                 | Region-based configurations               |
-| **Conditions**               | Create resources based on conditions      |
-| **Resources**                | 🔥 Actual AWS resources (Must have)       |
-| **Outputs**                  | Export important values (e.g., Public IP) |
+| AWSTemplateFormatVersion | Template version info (optional)          |
+| Description              | About the template                        |
+| Metadata                 | Additional info for internal logic        |
+| Parameters               | Inputs provided during deployment         |
+| Mappings                 | Region-based configurations               |
+| Conditions               | Create resources based on conditions      |
+| Resources                | 🔥 Actual AWS resources (Must have)       |
+| Outputs                  | Export important values (e.g., Public IP) |
 
 
 ✅Example — EC2 Deployment Template (YAML)
@@ -1577,7 +1938,7 @@ Resources:
 🔁 Deployment Steps
 Method 1️⃣ — AWS Management Console
 1️⃣ Go to CloudFormation
-2️⃣ Create Stack → Upload Template File
+2️⃣ Create Stack ─────────▶ Upload Template File
 3️⃣ Enter parameters (like KeyPair)
 4️⃣ Deploy
 
@@ -1591,11 +1952,11 @@ Method 2️⃣ — AWS CLI
 🔁 Stack Lifecycle
 | Stage                    | Meaning                       |
 | ------------------------ | ----------------------------- |
-| **CREATE_IN_PROGRESS**   | Deploying resources           |
-| **CREATE_COMPLETE**      | Deployed successfully         |
-| **UPDATE_IN_PROGRESS**   | Updating changes              |
-| **ROLLBACK_IN_PROGRESS** | Errors → revert to last state |
-| **DELETE_COMPLETE**      | All resources removed         |
+| CREATE_IN_PROGRESS   | Deploying resources           |
+| CREATE_COMPLETE      | Deployed successfully         |
+| UPDATE_IN_PROGRESS   | Updating changes              |
+| ROLLBACK_IN_PROGRESS | Errors ─────────▶ revert to last state |
+| DELETE_COMPLETE      | All resources removed         |
 
 
 🔁 Drift Detection 
@@ -1612,7 +1973,7 @@ CloudFormation detects if someone manually modified infrastructure outside CFT.
 
 🔁 StackSets (Multi-Region or Multi-Account)
 ➤ If a company runs multi-cloud architecture:
-    ✔️ Create once → deploy across multiple AWS accounts & regions
+    ✔️ Create once ─────────▶ deploy across multiple AWS accounts & regions
 
 ✅ Examples:
     ✔️ Deploy same VPC architecture to 10 regions
@@ -1672,9 +2033,9 @@ CloudFormation detects if someone manually modified infrastructure outside CFT.
 🔁 Authentication Options
 | Method                             | Best For                            |
 | ---------------------------------- | ----------------------------------- |
-| **IAM User HTTPS Git credentials** | Developers using HTTPS              |
-| **SSH Keys**                       | Secure local access                 |
-| **AWS CLI with IAM Role**          | CI/CD systems & automated workflows |
+| IAM User HTTPS Git credentials | Developers using HTTPS              |
+| SSH Keys                       | Secure local access                 |
+| AWS CLI with IAM Role          | CI/CD systems & automated workflows |
 
 
 🔁 Repository Internal Structure
@@ -1697,7 +2058,7 @@ Developer Pushes Code to CodeCommit
 🔄 CodePipeline Triggered
         │
         ▼
-🔨 CodeBuild → Build & Test → Create Artifact (.zip/.jar)
+🔨 CodeBuild ─────────▶ Build & Test ─────────▶ Create Artifact (.zip/.jar)
         │
         ▼
 📦 Store Artifact in S3/ ECR (for containers)
@@ -1718,15 +2079,15 @@ Types of automated tests executed in CodeBuild:
 | Integration Tests   | Verify interactions between modules |
 | Performance Testing | Load testing before production      |
 | Security Scans      | Find vulnerabilities                |
-👉 CodeBuild outputs a status → success/failure → pipeline continues or stops.
+👉 CodeBuild outputs a status ─────────▶ success/failure ─────────▶ pipeline continues or stops.
 
 
 🔁 Deployment Strategies Supported by AWS
 | Strategy            | Best For                     | Tools                      |
 | ------------------- | ---------------------------- | -------------------------- |
-| **Blue/Green**      | Zero downtime, critical apps | CodeDeploy + Load Balancer |
-| **Canary**          | Gradual rollout of risk      | Lambda deployments         |
-| **Rolling Updates** | Scale-out services           | ECS/Fargate/K8s            |
+| Blue/Green      | Zero downtime, critical apps | CodeDeploy + Load Balancer |
+| Canary          | Gradual rollout of risk      | Lambda deployments         |
+| Rolling Updates | Scale-out services           | ECS/Fargate/K8s            |
 
 
 Rollback strategies are automated if:
@@ -1745,12 +2106,12 @@ Rollback strategies are automated if:
 
 
 🔁 Real-World Use Case Example (Web App Deployment)
-Node.js App → CodeCommit
+Node.js App ─────────▶ CodeCommit
 Pipeline:
-  Stage 1: Source → CodeCommit
-  Stage 2: Build → CodeBuild (run tests)
-  Stage 3: Deploy → CodeDeploy to EC2 Fleet
-Monitoring → CloudWatch + Alarms
+  Stage 1: Source ─────────▶ CodeCommit
+  Stage 2: Build ─────────▶ CodeBuild (run tests)
+  Stage 3: Deploy ─────────▶ CodeDeploy to EC2 Fleet
+Monitoring ─────────▶ CloudWatch + Alarms
 
 🌟 Automatic:
     ✔️ Builds on code push
@@ -1769,8 +2130,8 @@ Monitoring → CloudWatch + Alarms
 🚫 Disadvantages of AWS CodeCommit
 ➤ Less popular than GitHub/GitLab (community support is smaller)
 ➤ UI is not as user-friendly as competitors
-➤ No public repositories → limits open-source collaboration
-➤ Region-specific repos → must handle region constraints
+➤ No public repositories ─────────▶ limits open-source collaboration
+➤ Region-specific repos ─────────▶ must handle region constraints
 ➤ Third-party tool integration weaker than GitHub/Lab
 
 
@@ -1794,7 +2155,7 @@ Developer Pushes Code to CodeCommit
 🔄 CodePipeline Triggered
         │
         ▼
-🔨 CodeBuild → Build & Test → Create Artifact (.zip/.jar)
+🔨 CodeBuild ─────────▶ Build & Test ─────────▶ Create Artifact (.zip/.jar)
         │
         ▼
 📦 Store Artifact in S3/ ECR (for containers)
@@ -1898,7 +2259,7 @@ AWS CodeBuild is a fully managed Continuous Integration (CI) service that:
 🔁 Why do we need CodeBuild?
 | Without CodeBuild                                     | With CodeBuild                                  |
 | ----------------------------------------------------- | ----------------------------------------------- |
-| Developer machines handle builds → slows productivity | CI server handles builds automatically          |
+| Developer machines handle builds ─────────▶ slows productivity | CI server handles builds automatically          |
 | Hard to scale large builds                            | Auto-scale, build several versions in parallel  |
 | Manual testing leads to delays                        | Automated testing ensures early issue detection |
 | On-prem build servers require maintenance             | Zero infrastructure to manage                   |
@@ -1906,10 +2267,10 @@ AWS CodeBuild is a fully managed Continuous Integration (CI) service that:
 
 
 🔁 Where does CodeBuild fit in CI/CD pipeline?
-Developer Pushes Code →
-  CodePipeline triggers →
-    CodeBuild builds & tests →
-      Output artifacts →
+Developer Pushes Code ─────────▶
+  CodePipeline triggers ─────────▶
+    CodeBuild builds & tests ─────────▶
+      Output artifacts ─────────▶
         CodeDeploy/AWS service deploys
 
 
@@ -1938,24 +2299,24 @@ phases:
       - npm run build
 artifacts:
   files:
-    - '**/*'
+    - '/*'
 
 
 3️⃣ Build Environment
 Configured using:
-    ✔️ OS → Amazon Linux, Ubuntu, Windows, Custom Docker image
-    ✔️ Runtime → Java, Python, Node.js, DotNet, Go, Docker-in-Docker
+    ✔️ OS ─────────▶ Amazon Linux, Ubuntu, Windows, Custom Docker image
+    ✔️ Runtime ─────────▶ Java, Python, Node.js, DotNet, Go, Docker-in-Docker
     ✔️ Custom Docker environment is major strength.
 
 
 🔁 Execution Flow
-Start Build →
-Load BuildSpec →
-Install Phase →
-Pre-Build Phase →
-Build Phase →
-Post-Build Phase →
-Upload Artifacts →
+Start Build ─────────▶
+Load BuildSpec ─────────▶
+Install Phase ─────────▶
+Pre-Build Phase ─────────▶
+Build Phase ─────────▶
+Post-Build Phase ─────────▶
+Upload Artifacts ─────────▶
 Result sent to CodePipeline (or S3)
 
 
@@ -2030,7 +2391,7 @@ Result sent to CodePipeline (or S3)
 | Use Case            | How CodeBuild helps                   |
 | ------------------- | ------------------------------------- |
 | Microservices       | Parallel builds for multiple repos    |
-| Containers          | Docker-in-Docker builds → push to ECR |
+| Containers          | Docker-in-Docker builds ─────────▶ push to ECR |
 | Serverless          | Build Lambda ZIP artifact             |
 | Test automation     | Run tests after every merge           |
 | Security compliance | Automated vulnerability scanning      |
@@ -2063,7 +2424,7 @@ It ensures that:
 🔁 Why Do We Need CodeDeploy?
 | Problem Without CodeDeploy     | CodeDeploy Solution                    |
 | ------------------------------ | -------------------------------------- |
-| Manual deployments → risky     | Automated & consistent                 |
+| Manual deployments ─────────▶ risky     | Automated & consistent                 |
 | Service downtime               | Blue/Green & Canary                    |
 | Hard rollback                  | Automatic rollback on failure          |
 | Multi-server update complexity | Coordinated deployment + health checks |
@@ -2073,17 +2434,17 @@ It ensures that:
 🔁 CodeDeploy Deployment Types
 | Deployment Type | Target Platform    | Use Case                                 |
 | --------------- | ------------------ | ---------------------------------------- |
-| **EC2/On-Prem** | Virtual machines   | Traditional apps, monolith, hybrid infra |
-| **AWS Lambda**  | Serverless         | Version + traffic shifting               |
-| **ECS/Fargate** | Containerized apps | Microservices & orchestrated workloads   |
+| EC2/On-Prem | Virtual machines   | Traditional apps, monolith, hybrid infra |
+| AWS Lambda  | Serverless         | Version + traffic shifting               |
+| ECS/Fargate | Containerized apps | Microservices & orchestrated workloads   |
 
 
 🔁 Deployment strategies
 | Strategy                      | Behavior                                            | Best For                                |
 | ----------------------------- | --------------------------------------------------- | --------------------------------------- |
-| **In-Place (Rolling update)** | Update servers 1-by-1 without replacement           | Stateful apps                           |
-| **Blue/Green Deployment**     | New environment created → switch traffic when ready | Zero downtime, safe rollout, reversible |
-| **Canary** *(Lambda/ECS)*     | Send small traffic % first → increase gradually     | Reducing release risk                   |
+| In-Place (Rolling update) | Update servers 1-by-1 without replacement           | Stateful apps                           |
+| Blue/Green Deployment     | New environment created ─────────▶ switch traffic when ready | Zero downtime, safe rollout, reversible |
+| Canary *(Lambda/ECS)*     | Send small traffic % first ─────────▶ increase gradually     | Reducing release risk                   |
 
 
 🔁 Blue/Green Deployment Flow (Example: EC2 + Load Balancer)
@@ -2096,18 +2457,18 @@ Deploy to NEW (Green)
 Health Checks OK?
           |
 Switch Traffic to Green ➜ Blue kept for rollback
-If failure → revert to old version automatically.
+If failure ─────────▶ revert to old version automatically.
 
 
 🔁 CodeDeploy Architecture Components
 | Component               | Purpose                                          |
 | ----------------------- | ------------------------------------------------ |
-| **Application**         | Logical unit for deployment                      |
-| **Deployment Group**    | Group of EC2/On-Prem instances                   |
-| **Agent**               | CodeDeploy daemon installed on instances         |
-| **AppSpec File**        | Deployment instructions (hooks + file locations) |
-| **Revision / Artifact** | Application package stored in S3 or GitHub       |
-| **Load Balancer**       | Traffic control for Blue/Green                   |
+| Application         | Logical unit for deployment                      |
+| Deployment Group    | Group of EC2/On-Prem instances                   |
+| Agent               | CodeDeploy daemon installed on instances         |
+| AppSpec File        | Deployment instructions (hooks + file locations) |
+| Revision / Artifact | Application package stored in S3 or GitHub       |
+| Load Balancer       | Traffic control for Blue/Green                   |
 
 
 🔁 AppSpec File — The Core of CodeDeploy
@@ -2132,7 +2493,7 @@ hooks:
   ValidateService:
     - location: scripts/health_check.sh
 
-👉 Each hook runs in order → helps ensure safe deployment.
+👉 Each hook runs in order ─────────▶ helps ensure safe deployment.
 
 
 🔁 For Lambda AppSpec
@@ -2165,9 +2526,9 @@ Resources:
 🔁 Supported Artifact Sources
 | Storage         | Support         |
 | --------------- | ----------------|
-| **Amazon S3**   | ✔️ Recommended |
-| **GitHub Repo** | ✔️             |
-| **Bitbucket**   | ✔️ Via webhook |
+| Amazon S3   | ✔️ Recommended |
+| GitHub Repo | ✔️             |
+| Bitbucket   | ✔️ Via webhook |
 
 Artifacts typically include:
     ✔️ application code
@@ -2228,35 +2589,35 @@ It helps you:
 🔁 Major Components
 | Component                           | Purpose                                                                                 |
 | ----------------------------------- | --------------------------------------------------------------------------------------- |
-| **CloudWatch Metrics**              | Numeric data points for system performance (CPU, memory, requests count, latency, etc.) |
-| **CloudWatch Logs**                 | Collect logs from applications, Lambda, ECS, EC2, RDS, etc.                             |
-| **CloudWatch Alarms**               | Trigger notifications/actions when thresholds are breached (e.g., auto-scale EC2)       |
-| **CloudWatch Events / EventBridge** | Respond to state changes & scheduled tasks (e.g., start/stop EC2 every night)           |
-| **CloudWatch Dashboards**           | Custom visual monitoring panels                                                         |
-| **CloudWatch Synthetics**           | Monitor APIs and endpoints using canaries                                               |
-| **CloudWatch Contributor Insights** | Analyzes high-traffic logs (e.g. top users, IPs causing spikes)                         |
+| CloudWatch Metrics              | Numeric data points for system performance (CPU, memory, requests count, latency, etc.) |
+| CloudWatch Logs                 | Collect logs from applications, Lambda, ECS, EC2, RDS, etc.                             |
+| CloudWatch Alarms               | Trigger notifications/actions when thresholds are breached (e.g., auto-scale EC2)       |
+| CloudWatch Events / EventBridge | Respond to state changes & scheduled tasks (e.g., start/stop EC2 every night)           |
+| CloudWatch Dashboards           | Custom visual monitoring panels                                                         |
+| CloudWatch Synthetics           | Monitor APIs and endpoints using canaries                                               |
+| CloudWatch Contributor Insights | Analyzes high-traffic logs (e.g. top users, IPs causing spikes)                         |
 
 
 🔁 How it works
-AWS Resources → CloudWatch Metrics/Logs → Store & Analyze → Alarms → Trigger SNS/Auto Scaling/Lambda
+AWS Resources ─────────▶ CloudWatch Metrics/Logs ─────────▶ Store & Analyze ─────────▶ Alarms ─────────▶ Trigger SNS/Auto Scaling/Lambda
 
 
 🔁 Common Use Cases
 ➤ System Monitoring (CPU, RAM, I/O, Network)
 ➤ Application Log Analysis
 ➤ Auto-scaling based on performance
-➤ Trigger alerts via SNS → Email / Slack
+➤ Trigger alerts via SNS ─────────▶ Email / Slack
 ➤ Cost monitoring through AWS Billing Alarms
 ➤ Detect errors in Lambda, ECS, or API Gateway
 ➤ Scheduling tasks using EventBridge rules
 
 
 ✅ CloudWatch Integration Example
-➤ EC2 Monitoring → CPU Utilization alarms
-➤ Auto Scaling → scale up/down based on traffic
-➤ Lambda → function failure alarms
-➤ RDS → DB connections & storage monitoring
-➤ API Gateway → latency & error rate alerts
+➤ EC2 Monitoring ─────────▶ CPU Utilization alarms
+➤ Auto Scaling ─────────▶ scale up/down based on traffic
+➤ Lambda ─────────▶ function failure alarms
+➤ RDS ─────────▶ DB connections & storage monitoring
+➤ API Gateway ─────────▶ latency & error rate alerts
 
 
 🔁 Benefits
@@ -2282,8 +2643,8 @@ Lambda is an event-driven, serverless compute service that automatically:
 ➤ Charges only for compute time used (ms basis)
 
 🔁 Key Features
-➤ No server management → AWS manages everything
-➤ Automatic scaling → runs from 0 to millions of requests
+➤ No server management ─────────▶ AWS manages everything
+➤ Automatic scaling ─────────▶ runs from 0 to millions of requests
 ➤ Pay-as-you-use pricing model
 ➤ Supports multiple runtimes: Node.js, Python, Java, Go, .NET, Ruby
 ➤ Triggers on events
@@ -2322,9 +2683,9 @@ Event Source (S3, API Gateway, CloudWatch, DynamoDB, SNS etc.)
 🔁 Lambda Invocation Types
 | Type                     | Behavior                              |
 | ------------------------ | ------------------------------------- |
-| **Synchronous**          | Immediate response (e.g. API Gateway) |
-| **Asynchronous**         | Retries if fails (e.g. S3 events)     |
-| **Event Source Mapping** | Streams polling (DynamoDB, Kinesis)   |
+| Synchronous          | Immediate response (e.g. API Gateway) |
+| Asynchronous         | Retries if fails (e.g. S3 events)     |
+| Event Source Mapping | Streams polling (DynamoDB, Kinesis)   |
 
 
 🔁 Use Cases
@@ -2388,20 +2749,20 @@ Without a CDN:
 With CloudFront:
     ✔️ Frequently accessed content stored closer to users
     ✔️ Reduces load on origin
-    ✔️ Faster response → improved UX + SEO
+    ✔️ Faster response ─────────▶ improved UX + SEO
     ✔️ Cheaper distribution with caching and compression
 
 
 🔁 Core Concepts
 | Concept                  | Meaning                                                                       |
 | ------------------------ | ----------------------------------------------------------------------------- |
-| **Edge Locations**       | Small data centers near users where content is cached                         |
-| **Regional Edge Caches** | Larger caches that sit between Edge and Origin                                |
-| **Origin**               | Where authoritative content resides (S3, EC2, ALB, API Gateway, even on-prem) |
-| **Distribution**         | The CloudFront configuration for delivering content                           |
-| **Cache Behavior**       | URL path rules for caching, TTL, security, headers, compression               |
-| **TTL (Time To Live)**   | How long content stays cached at edge nodes                                   |
-| **Invalidation**         | Forcefully removing outdated cached objects                                   |
+| Edge Locations       | Small data centers near users where content is cached                         |
+| Regional Edge Caches | Larger caches that sit between Edge and Origin                                |
+| Origin               | Where authoritative content resides (S3, EC2, ALB, API Gateway, even on-prem) |
+| Distribution         | The CloudFront configuration for delivering content                           |
+| Cache Behavior       | URL path rules for caching, TTL, security, headers, compression               |
+| TTL (Time To Live)   | How long content stays cached at edge nodes                                   |
+| Invalidation         | Forcefully removing outdated cached objects                                   |
 
 
 🔁 Supported Origins
@@ -2415,24 +2776,24 @@ With CloudFront:
 | Feature                          | Purpose                                    |
 | -------------------------------- | ------------------------------------------ |
 | SSL/TLS + HTTPS                  | Secure data delivery                       |
-| **AWS WAF** Integration          | Protect from DDoS, SQLi, XSS               |
-| **Shield (DDoS Protection)**     | Network-level attack protection            |
-| **Signed URLs & Signed Cookies** | Restrict access to paid or private content |
-| **Origin Access Control (OAC)**  | Secure private S3 content (replaces OAI)   |
+| AWS WAF Integration          | Protect from DDoS, SQLi, XSS               |
+| Shield (DDoS Protection)     | Network-level attack protection            |
+| Signed URLs & Signed Cookies | Restrict access to paid or private content |
+| Origin Access Control (OAC)  | Secure private S3 content (replaces OAI)   |
 
 
 🔁 Performance Features
 | Optimizations                           | Benefits                              |
 | --------------------------------------- | ------------------------------------- |
-| **Caching + Compression (GZIP/Brotli)** | Faster delivery, lower cost           |
-| **HTTP/2 & HTTP/3 support**             | Modern protocol speed-ups             |
-| **Field-Level Encryption**              | Extra encryption for sensitive data   |
-| **Lambda@Edge / CloudFront Functions**  | Logic at the edge → ultra-low latency |
+| Caching + Compression (GZIP/Brotli) | Faster delivery, lower cost           |
+| HTTP/2 & HTTP/3 support             | Modern protocol speed-ups             |
+| Field-Level Encryption              | Extra encryption for sensitive data   |
+| Lambda@Edge / CloudFront Functions  | Logic at the edge ─────────▶ ultra-low latency |
 Example: rewrite URLs, A/B testing, authentication, geolocation routing
 
 
 🔁 Architecture Example
-Static website hosted on S3 → Cached via CloudFront → Global Users
+Static website hosted on S3 ─────────▶ Cached via CloudFront ─────────▶ Global Users
 
 Client (Browser)
      ↓
@@ -2445,15 +2806,15 @@ Origin Server (S3/EC2)
 
 🔁 Cache Invalidation Example
 Used when content is updated:
-/*  → invalidate entire site (costly)
-"/images/logo.png" → single file
+/*  ─────────▶ invalidate entire site (costly)
+/images/logo.png ─────────▶ single file
 
 
 🔁 How CloudFront Works
 1️⃣ User requests https://cdn.example.com/image.png
 2️⃣ CloudFront checks nearest Edge cache
-3️⃣ If cache hit → serve instantly
-4️⃣ If cache miss → request from origin
+3️⃣ If cache hit ─────────▶ serve instantly
+4️⃣ If cache miss ─────────▶ request from origin
 5️⃣ Cache stored at Edge for next requests (based on TTL)
 👉 Total latency dramatically reduced especially for global traffic
 
@@ -2499,17 +2860,17 @@ It works seamlessly with:
 | Fully Managed Registry      | No need to host your own Docker registry  |
 | IAM Authentication          | Secure access control                     |
 | Highly Available & Scalable | Built on AWS regional infrastructure      |
-| Lifecycle Policies          | Auto-remove old images → save cost        |
+| Lifecycle Policies          | Auto-remove old images ─────────▶ save cost        |
 | Image Scanning              | Finds vulnerabilities (Security scanning) |
 | Encryption                  | Images encrypted at rest (KMS)            |
-Unlike Docker Hub → NO rate limits, no reliance on public internet.
+Unlike Docker Hub ─────────▶ NO rate limits, no reliance on public internet.
 
 
 🔁 ECR Key Components
 | Component            | Description                                         |
 | -------------------- | --------------------------------------------------- |
 | Repository           | Storage for Docker images                           |
-| Image Tags           | Versioned references (e.g., `v1`, `prod`, `latest`) |
+| Image Tags           | Versioned references (e.g., v1, prod, latest) |
 | Lifecycle Policies   | Auto-delete unused images                           |
 | Scan                 | CVE security checks on push                         |
 | Cross-Account Access | Share images with another AWS Account               |
@@ -2555,11 +2916,11 @@ docker push <AWS_Account_ID>.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest
 🔁 ECR + ECS/EKS Integration
 | Service              | Deployment Benefit               |
 | -------------------- | -------------------------------- |
-| **ECS (Fargate)**    | Pull and run images serverlessly |
-| **EKS (Kubernetes)** | Fully private, high security     |
-| **Lambda**           | Deploy containerized functions   |
+| ECS (Fargate)    | Pull and run images serverlessly |
+| EKS (Kubernetes) | Fully private, high security     |
+| Lambda           | Deploy containerized functions   |
 Example ECS task definition:
-"image": "<AWS_Account_ID>.dkr.ecr.region.amazonaws.com/myapp:latest"
+image: <AWS_Account_ID>.dkr.ecr.region.amazonaws.com/myapp:latest
 
 
 🔁 Security & IAM Best Practices
@@ -2573,7 +2934,7 @@ Example ECS task definition:
 
 🔁 Real-World DevOps Use Case
 1️⃣ CI/CD Pipeline:
-CodeCommit/GitHub → CodeBuild builds Docker → Push to ECR → CodeDeploy → ECS/EKS deployment
+CodeCommit/GitHub ─────────▶ CodeBuild builds Docker ─────────▶ Push to ECR ─────────▶ CodeDeploy ─────────▶ ECS/EKS deployment
 
 
 2️⃣ Hybrid Cloud:
@@ -2582,7 +2943,7 @@ On-premise Kubernetes cluster pulls images securely using IAM roles anywhere wit
 
 🔁 Monitoring & Logging
 ➤ CloudWatch logs provide registry performance metrics
-➤ CloudTrail records image push/pull activity → auditing & governance
+➤ CloudTrail records image push/pull activity ─────────▶ auditing & governance
 
 
 🔁 Public ECR vs Private ECR
@@ -2596,7 +2957,7 @@ On-premise Kubernetes cluster pulls images securely using IAM roles anywhere wit
 🔁 Limitations
 ➤ Cannot host non-container artifacts (not like Nexus/S3)
 ➤ Public containers still incur data transfer charges
-➤ Regional service → cross-region replication must be configured manually
+➤ Regional service ─────────▶ cross-region replication must be configured manually
 
 
 
@@ -2623,19 +2984,19 @@ ECS solved:
 🔁 ECS Core Components
 | Component           | Purpose                                                             |
 | ------------------- | ------------------------------------------------------------------- |
-| **Task Definition** | Blueprint of the application (image, CPU/RAM, ports, env variables) |
-| **Task**            | Running instance of Task Definition (like a Pod in K8s)             |
-| **Service**         | Ensures tasks stay running (auto-restart, scaling)                  |
-| **Cluster**         | Collection of compute resources (EC2 or Fargate)                    |
-| **Container Agent** | Manages containers on EC2 nodes                                     |
-| **Launch Types**    | EC2 Launch / Fargate Launch                                         |
+| Task Definition | Blueprint of the application (image, CPU/RAM, ports, env variables) |
+| Task            | Running instance of Task Definition (like a Pod in K8s)             |
+| Service         | Ensures tasks stay running (auto-restart, scaling)                  |
+| Cluster         | Collection of compute resources (EC2 or Fargate)                    |
+| Container Agent | Manages containers on EC2 nodes                                     |
+| Launch Types    | EC2 Launch / Fargate Launch                                         |
 
 
 🔁 ECS Launch Types
 | Launch Type | Description              | When to Use                          |
 | ----------- | ------------------------ | ------------------------------------ |
-| **EC2**     | You manage instances     | Cost optimization + customization    |
-| **Fargate** | Fully serverless compute | Zero Ops, auto-scaling microservices |
+| EC2     | You manage instances     | Cost optimization + customization    |
+| Fargate | Fully serverless compute | Zero Ops, auto-scaling microservices |
 👉 Fargate = AWS manages everything
 👉 EC2 = You choose instance types, scaling, patching
 
@@ -2647,8 +3008,8 @@ ECS solved:
 
 
 🔁 ECS Architecture Example
-➤ ECR → ECS Fargate → ALB → Internet
-➤ Clients → ALB → ECS Service → Tasks (Containers) → ECR images → Data Stores
+➤ ECR ─────────▶ ECS Fargate ─────────▶ ALB ─────────▶ Internet
+➤ Clients ─────────▶ ALB ─────────▶ ECS Service ─────────▶ Tasks (Containers) ─────────▶ ECR images ─────────▶ Data Stores
 
 
 🔁 ECS Deployment Types (Important)
@@ -2665,7 +3026,7 @@ ECS solved:
 
 
 🔁 ECS vs EKS vs Kubernetes (Clear Comparison)
-| Feature        | **ECS**                   | **EKS**                       | **Kubernetes (Self-Hosted)** |
+| Feature        | ECS                   | EKS                       | Kubernetes (Self-Hosted) |
 | -------------- | ------------------------- | ----------------------------- | ---------------------------- |
 | Type           | AWS Proprietary           | Managed Kubernetes            | Open-source Kubernetes       |
 | Complexity     | Simple                    | High                          | Very High                    |
@@ -2681,9 +3042,9 @@ ECS solved:
 🔁 Quick Professional Insight
 | When to choose?     | Choose If…                                                         |
 | ------------------- | ------------------------------------------------------------------ |
-| **ECS**             | You are fully on AWS & want fast operational simplicity            |
-| **EKS**             | You need Kubernetes compatibility & want multi-cloud portability   |
-| **Self-Hosted K8s** | You have advanced DevOps team & custom infrastructure requirements |
+| ECS             | You are fully on AWS & want fast operational simplicity            |
+| EKS             | You need Kubernetes compatibility & want multi-cloud portability   |
+| Self-Hosted K8s | You have advanced DevOps team & custom infrastructure requirements |
 
 
 🔁 Real-World Examples
@@ -2734,7 +3095,7 @@ Purpose:
     ✔️ Support auto-scaling + blue/green deployments
 
 ✅ Example:
-Service = "Backend-API"
+Service = Backend-API
 Desired Count = 5 running tasks always
 👉 Service = Kubernetes Deployment equivalent.
 
@@ -2744,7 +3105,7 @@ Desired Count = 5 running tasks always
 ➤ Created from a Task Definition
 
 ✅ Example:
-5 replica tasks running in a service → 5 containers of same workload
+5 replica tasks running in a service ─────────▶ 5 containers of same workload
 👉 Task = Kubernetes Pod equivalent.
 
 
@@ -2775,23 +3136,23 @@ Task with 2 containers:
 
 🔁 Supporting Components
 🔐 IAM Roles & Policies
-➤ Task Role → permissions for the app inside container
+➤ Task Role ─────────▶ permissions for the app inside container
 (e.g., access DynamoDB)
-➤ Execution Role → allow ECS to pull images & push logs
+➤ Execution Role ─────────▶ allow ECS to pull images & push logs
 
 
 🔁 Networking Models
 | Mode       | Used in     | Notes                           |
 | ---------- | ----------- | ------------------------------- |
-| **awsvpc** | Fargate/EC2 | Each task gets its own ENI + IP |
+| awsvpc | Fargate/EC2 | Each task gets its own ENI + IP |
 | bridge     | EC2 only    | NAT mapping                     |
 | host       | EC2 only    | Host networking                 |
 👉 awsvpc = highest network isolation, microservice-friendly.
 
 
 🔁 Load Balancing
-➤ Application Load Balancer (ALB) → HTTP/HTTPS routing
-➤ Network Load Balancer (NLB) → TCP/UDP traffic
+➤ Application Load Balancer (ALB) ─────────▶ HTTP/HTTPS routing
+➤ Network Load Balancer (NLB) ─────────▶ TCP/UDP traffic
 
 Used with:
 ✔️ Service discovery
@@ -2842,9 +3203,9 @@ Storing secrets in:
 🔄 Core AWS Secret Management Services
 | Service                                 | Purpose                                  | Best For                                  |
 | --------------------------------------- | ---------------------------------------- | ----------------------------------------- |
-| **AWS Secrets Manager**                 | Securely store, rotate, retrieve secrets | Databases, API keys, Production workloads |
-| **AWS Systems Manager Parameter Store** | Store config + some secrets              | App configuration, non-critical secrets   |
-| **AWS KMS (Key Management Service)**    | Manage encryption keys                   | Data encryption, secure signing           |
+| AWS Secrets Manager                 | Securely store, rotate, retrieve secrets | Databases, API keys, Production workloads |
+| AWS Systems Manager Parameter Store | Store config + some secrets              | App configuration, non-critical secrets   |
+| AWS KMS (Key Management Service)    | Manage encryption keys                   | Data encryption, secure signing           |
 
 
 1️⃣ AWS Secrets Manager (Best for Production)
@@ -2857,13 +3218,13 @@ Storing secrets in:
 
 
 🔄 How it works:
-App → AWS SDK → Secrets Manager → Secret (Encrypted w/ KMS)
+App ─────────▶ AWS SDK ─────────▶ Secrets Manager ─────────▶ Secret (Encrypted w/ KMS)
 
 ✅ Example JSON Secret:
 {
-  "username": "admin",
-  "password": "Afe9*jdL!",
-  "host": "db.example.us-east-1.rds.amazonaws.com"
+  username: admin,
+  password: Afe9*jdL!,
+  host: db.example.us-east-1.rds.amazonaws.com
 }
 
 
@@ -2878,8 +3239,8 @@ App → AWS SDK → Secrets Manager → Secret (Encrypted w/ KMS)
 Two tier options:
 | Tier         | Purpose                                   | Cost |
 | ------------ | ----------------------------------------- | ---- |
-| **Standard** | Small configs, simple secrets             | Free |
-| **Advanced** | Bigger payloads, rotation, change history | Paid |
+| Standard | Small configs, simple secrets             | Free |
+| Advanced | Bigger payloads, rotation, change history | Paid |
 
 
 Supports:
@@ -2900,7 +3261,7 @@ Used by:
     ✔️ RDS
     ✔️ CloudWatch Logs
     ✔️ DynamoDB
-👉 Encrypts data keys → Envelope encryption mechanism
+👉 Encrypts data keys ─────────▶ Envelope encryption mechanism
 
 
 🔀 Choosing the Right Service
@@ -2918,7 +3279,7 @@ ECS Task / EKS Pod
 Secrets Manager
       ↓ (KMS Encryption)
 Secure DB Authentication
-No secrets injected into container images → Zero leakage risk
+No secrets injected into container images ─────────▶ Zero leakage risk
 
 
 🔄 IAM Access Control
@@ -2929,11 +3290,11 @@ IAM principles enforce:
 
 ✅ Example IAM policy:
 {
-  "Effect": "Allow",
-  "Action": [
-    "secretsmanager:GetSecretValue"
+  Effect: Allow,
+  Action: [
+    secretsmanager:GetSecretValue
   ],
-  "Resource": "arn:aws:secretsmanager:us-east-1:1234567890:secret:ProdDBSecret-*"
+  Resource: arn:aws:secretsmanager:us-east-1:1234567890:secret:ProdDBSecret-*
 }
 
 
@@ -2951,9 +3312,9 @@ With AWS:
 🔄 Monitoring & Auditing
 | Log Source     | What is Tracked              |
 | -------------- | ---------------------------- |
-| **CloudTrail** | Who accessed which secret    |
-| **CloudWatch** | Metrics on rotation failures |
-| **Config**     | Compliance & drift tracking  |
+| CloudTrail | Who accessed which secret    |
+| CloudWatch | Metrics on rotation failures |
+| Config     | Compliance & drift tracking  |
 
 
 🔄 Common Pitfalls & Anti-Patterns
@@ -2971,7 +3332,7 @@ With AWS:
 ➤ Never expose secrets to logs or container images
 ➤ Enforce automatic rotation wherever possible
 ➤ Use resource-based access policies for cross-account access
-➤ Use Private VPC Endpoints → No public internet dependency
+➤ Use Private VPC Endpoints ─────────▶ No public internet dependency
 ➤ For multi-env: prefix secrets like
     /dev/app/db/pass
     /prod/app/db/pass
@@ -2992,11 +3353,11 @@ AWS Config is a continuous monitoring and compliance evaluation service that tra
 🔄 Key Concepts
 | Component                  | Meaning                                                    |
 | -------------------------- | ---------------------------------------------------------- |
-| **Configuration Recorder** | Collects configuration data for selected resource types    |
-| **Delivery Channel**       | Sends configuration snapshots to S3 + notifications to SNS |
-| **Config Rules**           | Policies to check compliance — AWS Managed or Custom       |
-| **Resource Timeline**      | Shows full history of configuration states & changes       |
-| **Remediation**            | Auto-fix non-compliance using SSM automation               |
+| Configuration Recorder | Collects configuration data for selected resource types    |
+| Delivery Channel       | Sends configuration snapshots to S3 + notifications to SNS |
+| Config Rules           | Policies to check compliance — AWS Managed or Custom       |
+| Resource Timeline      | Shows full history of configuration states & changes       |
+| Remediation            | Auto-fix non-compliance using SSM automation               |
 
 
 🔄 How Compliance Evaluation Works
@@ -3059,9 +3420,9 @@ Load Balancer = Distributes incoming traffic across multiple targets to improve:
 🔄 AWS provides 3 major types
 | Load Balancer                       | Layer   | Best for                            | Protocols             | Main Features                                          |
 | ----------------------------------- | ------- | ----------------------------------- | --------------------- | ------------------------------------------------------ |
-| **ALB** (Application Load Balancer) | Layer 7 | HTTP/HTTPS traffic, microservices   | HTTP/HTTPS/WebSockets | URL-based routing, host-based routing, serverless apps |
-| **NLB** (Network Load Balancer)     | Layer 4 | High-performance, ultra-low latency | TCP/UDP/TLS           | Handles millions of requests/sec, static IP            |
-| **GWLB** (Gateway Load Balancer)    | Layer 3 | Security appliances deployment      | GENEVE                | IPS/IDS, Firewalls, Traffic inspection                 |
+| ALB (Application Load Balancer) | Layer 7 | HTTP/HTTPS traffic, microservices   | HTTP/HTTPS/WebSockets | URL-based routing, host-based routing, serverless apps |
+| NLB (Network Load Balancer)     | Layer 4 | High-performance, ultra-low latency | TCP/UDP/TLS           | Handles millions of requests/sec, static IP            |
+| GWLB (Gateway Load Balancer)    | Layer 3 | Security appliances deployment      | GENEVE                | IPS/IDS, Firewalls, Traffic inspection                 |
 
 
 1️⃣ Application Load Balancer (ALB)
@@ -3082,9 +3443,9 @@ Load Balancer = Distributes incoming traffic across multiple targets to improve:
 🔁 Request Routing Capabilities
 | Routing Type  | Example                           |
 | ------------- | --------------------------------- |
-| Host-based    | `auth.example.com` ➜ Auth service |
-| Path-based    | `/images/*` ➜ S3 / image service  |
-| Query/Headers | `/products?category=mobiles`      |
+| Host-based    | auth.example.com ➜ Auth service |
+| Path-based    | /images/* ➜ S3 / image service  |
+| Query/Headers | /products?category=mobiles      |
 
 
 🔁 Security
@@ -3138,7 +3499,7 @@ Load Balancer = Distributes incoming traffic across multiple targets to improve:
 
 🔁 Traffic forwarding mechanism
 ➤ Uses GENEVE encapsulation
-    → Packets are tunneled without modifying their content
+    ─────────▶ Packets are tunneled without modifying their content
 
 ➤ Meaning:
     ✔️ You can inspect traffic without breaking it
@@ -3157,13 +3518,13 @@ Load Balancer = Distributes incoming traffic across multiple targets to improve:
 🔁 Choosing the Right Load Balancer
 | Requirement                                     | Best Option |
 | ----------------------------------------------- | ----------- |
-| HTTP routing based on path or domain names      | **ALB**     |
-| WebSockets, gRPC, authentication                | **ALB**     |
-| Very high throughput + low latency              | **NLB**     |
-| TCP/UDP traffic like databases, gaming servers  | **NLB**     |
-| Static IP requirement                           | **NLB**     |
-| Inline traffic inspection + security appliances | **GWLB**    |
-| Serverless (Lambda) backend                     | **ALB**     |
+| HTTP routing based on path or domain names      | ALB     |
+| WebSockets, gRPC, authentication                | ALB     |
+| Very high throughput + low latency              | NLB     |
+| TCP/UDP traffic like databases, gaming servers  | NLB     |
+| Static IP requirement                           | NLB     |
+| Inline traffic inspection + security appliances | GWLB    |
+| Serverless (Lambda) backend                     | ALB     |
 
 
 🔁 Real-World Use Cases
@@ -3212,13 +3573,13 @@ These represent different approaches organizations use to move workloads from on
 🔁 7 Migration Strategies 
 | Strategy                         | Complexity | Cost           | Time     | When to Choose               |
 | -------------------------------- | ---------- | -------------- | -------- | ---------------------------- |
-| **Rehost (Lift & Shift)**        | Low        | Medium         | Fast     | Quick cloud adoption         |
-| **Replatform (Lift & Optimize)** | Medium     | Medium         | Moderate | Minor cloud upgrades         |
-| **Repurchase (Drop & Shop)**     | Medium     | Subscription   | Fast     | Switch to SaaS               |
-| **Refactor / Re-architect**      | High       | High           | Slow     | Modernization + cloud native |
-| **Retire**                       | Very Low   | Saves cost     | Fast     | Remove unused apps           |
-| **Retain (Revisit / Hybrid)**    | Very Low   | None initially | N/A      | Some apps remain on-prem     |
-| **Relocate (VM Migration)**      | Low/Medium | Low/Medium     | Fast     | Migrate VMs as-is to AWS     |
+| Rehost (Lift & Shift)        | Low        | Medium         | Fast     | Quick cloud adoption         |
+| Replatform (Lift & Optimize) | Medium     | Medium         | Moderate | Minor cloud upgrades         |
+| Repurchase (Drop & Shop)     | Medium     | Subscription   | Fast     | Switch to SaaS               |
+| Refactor / Re-architect      | High       | High           | Slow     | Modernization + cloud native |
+| Retire                       | Very Low   | Saves cost     | Fast     | Remove unused apps           |
+| Retain (Revisit / Hybrid)    | Very Low   | None initially | N/A      | Some apps remain on-prem     |
+| Relocate (VM Migration)      | Low/Medium | Low/Medium     | Fast     | Migrate VMs as-is to AWS     |
 
 
 1️⃣ Rehost — Lift and Shift
@@ -3248,7 +3609,7 @@ Application architecture remains the same.
 
 
 2️⃣ Replatform — Lift & Optimize
-Minor cloud optimizations → without changing application core code.
+Minor cloud optimizations ─────────▶ without changing application core code.
 
 🔄 Common Optimization Examples
 | Before             | After                    |
@@ -3315,7 +3676,7 @@ Identify resources that are:
     ✔️ Unused
     ✔️ Obsolete
     ✔️ No longer needed
-    ✔️ Then → Remove them entirely
+    ✔️ Then ─────────▶ Remove them entirely
 
 ⭐ Benefits
 ➤ Cost reduction
@@ -3340,8 +3701,8 @@ Often because:
 
 
 7️⃣ Relocate — VM Migration at Scale
-Move entire VM clusters as is → without application redesign
-(like VMware VMs → VMware Cloud on AWS)
+Move entire VM clusters as is ─────────▶ without application redesign
+(like VMware VMs ─────────▶ VMware Cloud on AWS)
 
 Tools Used
 ➤ AWS Application Migration Service (MGN)
@@ -3424,8 +3785,8 @@ A 3-tier application architecture is a classic multi-layered design that separat
 
 
 Networking:
-    ✔️ Web Tier → Public Subnet (internet-facing)
-    ✔️ App + DB Tier → Private Subnets (internal only)
+    ✔️ Web Tier ─────────▶ Public Subnet (internet-facing)
+    ✔️ App + DB Tier ─────────▶ Private Subnets (internal only)
 
 Security:
     ✔️ Security Groups + NACLs enforce Zero-Trust Communication
@@ -3436,10 +3797,10 @@ Security:
 🔄 Components Used:
 | Component                               | Purpose                          |
 | --------------------------------------- | -------------------------------- |
-| **Route 53**                            | DNS Mapping → domain → ALB       |
-| **Application Load Balancer**           | Smart routing, https termination |
-| **EC2 / ECS Fargate / S3 + CloudFront** | Hosts website UI                 |
-| **Public Subnet**                       | Internet access allowed          |
+| Route 53                            | DNS Mapping ─────────▶ domain ─────────▶ ALB       |
+| Application Load Balancer           | Smart routing, https termination |
+| EC2 / ECS Fargate / S3 + CloudFront | Hosts website UI                 |
+| Public Subnet                       | Internet access allowed          |
 
 
 🔄 Responsibilities:
@@ -3479,7 +3840,7 @@ Resides in Private Subnet, not accessible directly from internet
 ✔️ Options:
 | AWS Service                                 | Purpose                                 |
 | ------------------------------------------- | --------------------------------------- |
-| **RDS (MySQL/PostgreSQL/Oracle/SQ Server)** | Transactional DB                        |
+| RDS (MySQL/PostgreSQL/Oracle/SQ Server) | Transactional DB                        |
 | DynamoDB                                    | Serverless NoSQL                        |
 | ElastiCache Redis/Memcached                 | Cache for performance                   |
 | S3                                          | Object storage (images, files, backups) |
@@ -3499,8 +3860,8 @@ Resides in Private Subnet, not accessible directly from internet
 🔄 VPC & Networking Setup — Full Flow
 | Layer    | Subnet Type      | Routing                                        |
 | -------- | ---------------- | ---------------------------------------------- |
-| Web Tier | Public Subnets   | Route to **Internet Gateway**                  |
-| App Tier | Private Subnets  | Route to **NAT Gateway** for outbound internet |
+| Web Tier | Public Subnets   | Route to Internet Gateway                  |
+| App Tier | Private Subnets  | Route to NAT Gateway for outbound internet |
 | DB Tier  | Private Isolated | No internet access                             |
 
 
@@ -3540,7 +3901,7 @@ Automated blue-green deployments supported via ELB.
 | Web & App Tier | Auto Scaling Groups    |
 | DB Tier        | Read Replicas          |
 | S3             | Automatically scalable |
-Elastic Load Balancer distributes load across multiple AZs → fault tolerance.
+Elastic Load Balancer distributes load across multiple AZs ─────────▶ fault tolerance.
 
 
 🔄 Performance Techniques

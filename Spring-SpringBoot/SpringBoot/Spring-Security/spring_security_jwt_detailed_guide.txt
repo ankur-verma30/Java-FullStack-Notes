@@ -1,0 +1,3854 @@
+=====================
+🔷 JWT + SpringBoot
+=====================
+JWT (JSON Web Token) is a compact, URL-safe way to represent claims (user data or permissions) between two parties — typically client and server — in a secure and stateless way.
+
+➤ JWT is a string-based token.
+➤ It’s digitally signed using Hash-based Message Authentication Code(HMAC) (symmetric) or RSA (asymmetric) algorithms.
+➤ It helps the server authenticate and authorize users without maintaining sessions.
+
+
+2️⃣ Structure of a JWT
+A JWT has 3 parts, separated by dots (.):
+🔗 xxxxx.yyyyy.zzzzz
+
+➤ Header ─────────▶ metadata
+➤ Payload ─────────▶ actual user data
+➤ Signature ─────────▶ to verify integrity
+
+✅ Example:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.      ─────────▶ Header (Base64)
+eyJzdWIiOiJhbmF1ciIsImlhdCI6MTY3NDAxMzM1NSwiZXhwIjoxNjc0MDEzNjU1fQ.  ─────────▶ Payload (Base64)
+OHkHac4ZsnbnT7dbDLyJo4sP0wvZ6Oey_cwe5UB0kX8  ─────────▶ Signature
+
+3️⃣ What’s Inside?
+➤ Header (JSON)
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+➤ Payload (JSON)
+{
+  "sub": "ankur",
+  "role": "ADMIN",
+  "iat": 1731018800,
+  "exp": 1731022400
+}
+| Field  | Meaning                   |
+| ------ | ------------------------- |
+| `sub`  | Subject (user identifier) |
+| `role` | User’s role               |
+| `iat`  | Issued at (timestamp)     |
+| `exp`  | Expiration time           |
+
+➤ Signature
+👉 Created by signing the header + payload using a secret key:
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  secret
+)
+
+
+4️⃣ Why Use JWT?
+| Feature          | Explanation                                           |
+| ---------------  | ----------------------------------------------------- |
+| ✅ Stateless     | Server doesn’t store sessions; token carries all info |
+| ✅ Scalable      | Ideal for microservices and distributed systems       |
+| ✅ Secure        | Signed (and optionally encrypted)                     |
+| ✅ Interoperable | JSON-based, used across languages                     |
+
+🔄 JWT Flow in Spring Boot
+Here’s how JWT authentication works inside SpringBoot:
+
+     +------------+         +-----------------+
+     |   Client   |  --->   |  /login (Auth)  |
+     +------------+         +-----------------+
+             |                      |
+             |   POST credentials   |
+             |--------------------->|
+             |                      |
+             |   JWT issued         |
+             |<---------------------|
+             |                      |
+             |   Send JWT in Header |
+             |--------------------->|
+             |   Access /api/...    |
+             |                      |
+👉 Steps:
+➤ User sends username/password to /authenticate endpoint.
+➤ Server validates credentials.
+➤ Server creates a JWT token signed with a secret key.
+➤ Token is sent back to client.
+➤ For every next request ─────────▶ client includes JWT in the Authorization header:
+    🔗 Authorization: Bearer <token>
+➤ Server verifies signature ─────────▶ grants access.
+
+
+✅ Why we need Refresh Token Mechanism?
+JWT access tokens are usually:
+➤ Stateless
+➤ Fast
+➤ Used in every request
+
+
+But if we make them long-lived, then:
+❌ If stolen → attacker can access for a long time
+So we keep them short-lived (like 10–15 min).
+Now the problem is: ➡️ User will get logged out every 15 minutes.
+
+So we use:
+✅ Refresh token (long-lived, like 7 days)
+to generate new access tokens without forcing login again.
+
+
+🔄 Ideal Token Strategy
+✅ Access Token
+➤ Lifetime: 15 minutes
+➤ Stored: in memory (React state)
+➤ Sent: in Authorization: Bearer <token>
+
+✅ Refresh Token
+➤ Lifetime: 7 days
+➤ Stored: httpOnly cookie (BEST) or DB
+➤ Used: only on /refresh endpoint
+
+
+🔄 Flow: Login → Access Token + Refresh Token
+Step 2️⃣: User logs in
+Server generates:
+    ✔️ Access Token (15 min)
+    ✔️ Refresh Token (7 days)
+
+Server returns:
+    ✔️ Access token in response body
+    ✔️ Refresh token as httpOnly cookie
+
+✅ Example response:
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR..."
+}
+Cookie: Set-Cookie: refreshToken=abcxyz; HttpOnly; Secure; SameSite=Strict;
+
+
+🔄 Why Refresh Token should be in httpOnly cookie?
+Because if you store refresh token in:
+❌ localStorage / sessionStorage
+Then:
+    ✔️ XSS attack can steal it
+    ✔️ attacker can refresh forever
+
+✅ httpOnly cookie
+    ✔️ JavaScript cannot read it
+    ✔️ So even if XSS happens: refresh token is protected
+
+
+🔁 Refresh Flow (Auto access token renewal)
+Step 2️⃣: Access token expires
+➤ Client gets: ➡️ 401 Unauthorized
+➤ Now client calls: ✅ POST /auth/refresh
+➤ Browser automatically sends refresh cookie.
+➤ Server verifies refresh token and returns a new access token.
+
+
+🔄 Core Security Feature: Refresh Token Rotation
+❌ Problem without rotation: If refresh token is stolen once → attacker can use it repeatedly for 7 days
+
+✅ Solution: Rotate refresh token on every refresh call
+So every refresh does this:
+➤ Old refresh token becomes invalid
+➤ New refresh token is issued
+➤ Stored back in cookie
+
+
+🔁 Replay (Reuse) Attack Detection in JWT
+➤ An attacker steals a valid JWT
+➤ Reuses the same token again and again
+➤ Server accepts it because the token is still valid & signed
+👉 JWT itself cannot stop reuse by default
+
+
+🛡️ How reuse (replay) is detected / prevented in JWT
+1️⃣ Short Token Expiry (exp)
+➤ Token is valid only for a small time
+➤ Even if stolen, attacker gets very little time
+{
+  "exp": 1700000000
+}
+✅ Most common
+❌ Still reusable until expiry
+
+
+2️⃣ JWT ID (jti) + Server Tracking ✅ Best way
+➤ Each token gets a unique ID
+➤ Server stores used jti
+➤ If same jti appears again → reject
+
+{
+  "jti": "abc-123"
+}
+Flow:
+    ✔️ First request → jti saved
+    ✔️ Second request with same token → ❌ blocked
+✔ Proper replay detection
+❌ Requires server-side storage (Redis/DB)
+
+
+3️⃣ One-Time Tokens (for critical actions)
+Token is invalidated after first use
+Used for:
+    ✔️ Password reset
+    ✔️ Email verification
+    ✔️ Payments
+
+
+4️⃣ Audience (aud) & Issuer (iss) Validation
+Token valid only for:
+➤ Specific service (aud)
+➤ Specific auth server (iss)
+{
+  "iss": "auth-service",
+  "aud": "order-service"
+}
+✔ Limits misuse across services
+❌ Doesn’t stop same-service reuse
+
+
+5️⃣ Token Binding
+Token tied to:
+    ✔️ Device
+    ✔️ IP
+    ✔️ TLS session
+✔ Hard to reuse elsewhere
+
+
+================
+🔷 TLS Session
+================
+A TLS session is a secure communication channel created between a client (browser/app) and a server after they complete a TLS handshake.
+
+👉 Once the session is established:
+    ✔️ Data is encrypted
+    ✔️ Data is tamper-proof
+    ✔️ Both sides trust each other
+
+
+🧱 What happens in a TLS session?
+1️⃣ TLS Handshake
+➤ Client says: “I want a secure connection”
+➤ Server sends:
+    ✔️ SSL certificate
+
+
+Public key
+➤ Keys are exchanged
+➤ Both agree on:
+    ✔️ Encryption algorithm
+    ✔️ Session keys
+
+
+2️⃣ Session Key Created
+➤ A symmetric key is generated
+➤ Used for fast encryption/decryption
+👉 RSA / ECDHE is used only for key exchange, not for data transfer
+
+
+3️⃣ Secure Communication
+➤ All HTTP data becomes HTTPS
+➤ Requests & responses are encrypted
+
+
+🔁 TLS Session Reuse (Session Resumption)
+To avoid handshake every time:
+➤ Session ID or Session Ticket is reused
+➤ Faster connection
+➤ Less CPU usage
+
+
+🔄 TLS Session vs JWT
+| TLS Session              | JWT                    |
+| ------------------------ | ---------------------- |
+| Transport-level security | Application-level auth |
+| Secures data in transit  | Proves user identity   |
+| Managed by TLS layer     | Managed by app         |
+| Short-lived connection   | Stateless token        |
+
+
+🔐 TLS Session in JWT Replay Protection
+➤ Token can be bound to TLS session
+➤ If token is reused from another session → ❌ rejected
+✅ Example:
+    ✔️ JWT includes TLS session hash
+    ✔️ Server compares it per request
+
+✔ Very secure
+❌ Complex, rarely used
+
+
+
+🔄 Secure Refresh Token Storage (Database)
+Why store refresh tokens in DB?
+JWT access tokens are stateless, but refresh tokens should be stateful for security.
+So server can:
+    ✔️ revoke tokens on logout
+    ✔️ detect reuse
+    ✔️ rotate safely
+
+
+🔄 Refresh Endpoint Logic
+/auth/refresh
+When request comes:
+1️⃣ Extract refresh token from cookie
+2️⃣ Verify signature + expiry
+3️⃣ Find token in DB (by hash)
+4️⃣ Check:
+➤ revoked? → reject
+➤ expired? → reject
+
+
+5️⃣ Rotate token:
+➤ mark old as revoked
+➤ create new refresh token in same family
+➤ issue new access token
+
+
+6️⃣ Return access token + set new refresh cookie
+
+
+🔒 Extra Security Hardening
+1️⃣ Use Secure Cookie flags
+Always set refresh cookie as:
+➤ HttpOnly
+➤ Secure (only HTTPS)
+➤ SameSite=Strict or Lax
+✅ Example: Set-Cookie: refreshToken=...; HttpOnly; Secure; SameSite=Strict;
+
+2️⃣ CSRF Protection (important when using cookies)
+Because cookies auto-send in every request, attacker can try CSRF.
+Fix:
+➤ Use SameSite=Strict
+➤ Or implement CSRF token for refresh endpoint
+
+
+3️⃣ Short expiry access tokens
+Even if access token leaks, attacker only gets: max 15 minutes access
+
+
+4️⃣ Logout should revoke refresh token
+Logout should:
+➤ delete refresh cookie
+➤ revoke refresh token in DB
+
+
+5️⃣ Device/session based tokens
+➤ If user logs in on multiple devices, store refresh tokens per device.
+➤ So you can revoke a single device session.
+
+
+
+🔄 Common Traps / Mistakes
+❌ Storing refresh token in localStorage
+→ XSS steals it
+
+❌ No rotation
+→ stolen refresh token works for full 7 days
+
+❌ Not hashing refresh tokens in DB
+→ DB leak gives attacker valid refresh tokens
+
+❌ Refresh endpoint without CSRF protection
+→ CSRF can refresh silently
+
+❌ Same refresh token for all devices
+→ can’t manage per-device logout
+
+
+
+==========================================================
+🔷 Detailed Version of JWT+Spring Security in SpringBoot
+==========================================================
+=====================================
+🔷 AUTHENTICATION vs AUTHORIZATION
+=====================================
+1️⃣ Authentication (Who are you?):
+➤ Process of verifying user identity
+➤ Login with username/password
+➤ Checking JWT token validity
+➤ Verifying API key
+✅ Example: User proves they are "john" by providing correct password
+
+
+2️⃣ Authorization (What can you do?):
+➤ Process of verifying permissions
+➤ Checking if user can access resource
+➤ Role-based access control
+➤ Example: "john" is authenticated, but can he delete users? (needs ADMIN role)
+
+Real-World Analogy:
+➤ Authentication = Showing ID card at building entrance
+➤ Authorization = Using ID card to access specific floors
+
+Spring Security handles BOTH:
+➤ Authentication ─────────▶ Through AuthenticationManager
+➤ Authorization ─────────▶ Through AuthorizationFilter and @PreAuthorize
+
+
+
+==============================
+🔷 CORE SECURITY COMPONENTS
+==============================
+Spring Security operates through a chain of filters that intercept every HTTP
+request. Understanding this architecture is crucial for debugging and
+implementing custom security logic.
+
+KEY COMPONENTS:
+➤ Component 1️⃣ SecurityFilterChain
+➤ Role ─────────▶ Main configuration defining security rules
+➤ Configuration Location ─────────▶ SecurityConfig class
+➤ What it defines:
+    ✔️ Which URLs are public vs protected
+    ✔️ Session management policy (stateless for JWT)
+    ✔️ Custom filters to add
+    ✔️ CSRF configuration
+    ✔️ CORS settings
+Think of it as: The main security rulebook
+
+
+Component 2️⃣ AuthenticationManager
+➤ Role ─────────▶ Coordinates authentication process
+➤ Responsibility ─────────▶ Delegates to one or more AuthenticationProvider
+    ✔️ Interface with single method ─────────▶ authenticate()
+    ✔️ Not a bean by default ─────────▶ Must be exposed as @Bean
+    ✔️ Used in ─────────▶ Controllers for manual authentication
+    ✔️ Returns fully authenticated Authentication object
+    ✔️ Throws exception if authentication fails
+Think of it as: Manager who assigns authentication tasks
+
+
+Component 3️⃣ AuthenticationProvider
+Role: Performs actual authentication
+Default: DaoAuthenticationProvider (database authentication)
+What it does:
+  1️⃣ Receives authentication request
+  2️⃣ Loads user via UserDetailsService
+  3️⃣ Compares passwords via PasswordEncoder
+  4️⃣ Returns authenticated token or throws exception
+Think of it as: Security guard who actually checks credentials
+
+
+Component 4️⃣ UserDetailsService
+Role ─────────▶ Loads user from database
+Interface method ─────────▶ loadUserByUsername(String username)
+Returns ─────────▶ UserDetails object
+You implement this to load users from your database
+Called during authentication process
+Your implementation ─────────▶ CustomUserDetailsService
+
+What UserDetails contains:
+    ✔️ Username
+    ✔️ Password (hashed)
+    ✔️ Authorities (roles/permissions)
+    ✔️ Account status flags (locked, expired, etc.)
+Think of it as: Database accessor for user information
+
+
+🔗 Code Snippet:
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        if (!username.equals("admin")) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return User.builder()
+                .username("admin")
+                .password("{noop}password")
+                .roles("ADMIN")
+                .build();
+    }
+}
+
+
+
+Component 5️⃣ PasswordEncoder
+➤ Encode passwords before storing in database
+➤ Verifies plain password against encoded password
+➤ Role: Hash and verify passwords securely
+➤ Recommended: BCryptPasswordEncoder
+➤ Why BCrypt:
+    ✔️ Automatic salt generation
+    ✔️ Adaptive hashing (configurable cost)
+    ✔️ One-way function (cannot reverse)
+    ✔️ Industry standard
+
+➤ Never use:
+    ✔️ Plain text (no security)
+    ✔️ MD5 (broken, fast to crack)
+    ✔️ SHA-256 alone (too fast, no salt)
+➤ Think of it as: Password security specialist
+
+
+Component 6️⃣ SecurityContext & SecurityContextHolde
+➤ SecurityContext ─────────▶ Interface holding Authentication object for current thread
+➤ SecurityContextHolder ─────────▶ Stores SecurityContext using ThreadLocal and provides access to SecurityContext
+➤ Storage ─────────▶ ThreadLocal(each thread has its own)
+➤ Available throughout request processing
+➤ Access via ─────────▶ SecurityContextHolder.getContext().getAuthentication()
+
+Usage:
+Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+String username = auth.getName();
+👉 Think of it as: Thread-local storage for "who is logged in right now"
+
+
+Component 7️⃣ Authentication Object
+➤ Role: Represents authenticated user
+➤ States:
+    ✔️ Unauthenticated: Before validation
+    ✔️ Authenticated: After successful validation
+
+➤ Contents:
+    ✔️ Principal: Usually UserDetails object
+    ✔️ Credentials: Password (cleared after authentication for security)
+    ✔️ Authorities: Roles and permissions
+    ✔️ Details: Additional info (IP, session, etc.)
+
+Think of it as: User's digital identity card
+
+
+===================================
+🔷 HOW THESE COMPONENTS INTERACT
+===================================
+REQUEST FLOW THROUGH COMPONENTS:
+
+1️⃣ HTTP Request arrives at server
+
+2️⃣ SecurityFilterChain intercepts request
+   ↓ Checks if URL is public or protected
+   ↓ If protected, authentication required
+
+3️⃣ JWT Authentication Filter (your custom filter)
+   ↓ Extracts JWT from Authorization header
+   ↓ Validates JWT signature and expiration
+   ↓ If valid, proceeds to step 4
+
+4️⃣ Extract username from JWT
+   ↓ Username stored in token payload
+
+5️⃣ UserDetailsService loads user from database
+   ↓ SELECT * FROM users WHERE username = ?
+   ↓ Returns UserDetails with roles
+
+6️⃣ Create Authentication object
+   ↓ Principal = UserDetails
+   ↓ Authorities = User roles
+
+7️⃣ Store in SecurityContext
+   ↓ SecurityContextHolder.getContext().setAuthentication(auth)
+   ↓ Now available throughout request
+
+8️⃣ Request reaches Controller
+   ↓ @PreAuthorize checks permissions
+   ↓ If authorized, method executes
+
+9️⃣ Response returned
+   ↓ SecurityContext cleared
+   ↓ Ready for next request
+
+
+================================================================================
+SECTION 2: COMPLETE JWT AUTHENTICATION FLOW
+================================================================================
+========
+🔷 JWT
+========
+➤ JWT (JSON Web Token) is a compact, self-contained way to securely transmit
+information between parties as a JSON object.
+➤ It's digitally signed, so the information can be verified and trusted.
+
+JWT STRUCTURE: HEADER.PAYLOAD.SIGNATURE
+
+✅ Example JWT:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+
+Part 1️⃣: HEADER (Base64URL encoded)
+{
+  "alg": "HS256",    // Algorithm used for signing (HMAC SHA-256)
+  "typ": "JWT"       // Token type
+}
+Purpose: Specifies how token is signed
+
+
+Part 2: PAYLOAD (Base64URL encoded) - The Claims
+{
+  
+  "sub": "John Doe",            // Subject (username)
+  "roles": ["USER", "ADMIN"],    // Custom claim - user roles
+  "iat": 1516239022,             // Issued At timestamp
+  "exp": 1516242622              // Expiration timestamp
+}
+
+Standard Claims:
+    ✔️ sub: Subject (user identifier)
+    ✔️ iss: Issuer (who created token)
+    ✔️ aud: Audience (who token is for)
+    ✔️ exp: Expiration time
+    ✔️ nbf: Not before (token not valid before this time)
+    ✔️ iat: Issued at
+    ✔️ jti: JWT ID (unique identifier)
+
+Custom Claims:
+    ✔️ roles: User roles
+    ✔️ permissions: User permissions
+    ✔️ Any other data you want
+
+IMPORTANT: Payload is NOT encrypted, only encoded!
+Anyone can decode Base64 and read payload.
+Never store sensitive data (passwords, credit cards, SSN).
+
+Part 3: SIGNATURE
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  SECRET_KEY
+)
+
+Purpose:
+    ✔️ Verifies token hasn't been tampered with
+    ✔️ Only server with secret key can create valid signature
+    ✔️ If payload changed, signature won't match
+
+Security:
+    ✔️ Secret key MUST be kept secret
+    ✔️ Store in environment variable, not code
+    ✔️ Use 256-bit random key
+    ✔️ Rotate keys periodically
+
+
+IMPORTANT NOTES:
+    ✔️ Header and Payload are Base64URL encoded (NOT encrypted!)
+    ✔️ Anyone can decode and read them
+    ✔️ The signature ensures the token hasn't been tampered with
+    ✔️ Never put sensitive data (passwords, SSN) in JWT payload
+    ✔️ If someone modifies payload, signature verification will fail
+
+
+===============================
+🔷 WHY USE JWT FOR REST APIs?
+===============================
+ADVANTAGES:
+1️⃣ STATELESS:
+   Traditional: Server stores session in memory/database
+   JWT: Server doesn't store anything, token contains all info
+   
+   Benefits:
+   - Horizontal scaling easy (no session sync needed)
+   - Works across multiple servers
+   - Perfect for microservices
+
+2️⃣ SELF-CONTAINED:
+   Token contains user information and roles
+   No need to query database on every request
+   
+   Performance:
+   - Faster than session-based auth
+   - Reduces database load
+
+3️⃣ CROSS-DOMAIN:
+   Works across different domains
+   API can be separate from frontend
+   
+   Example:
+   - Frontend: app.example.com
+   - Backend API: api.example.com
+   - JWT works seamlessly
+
+4️⃣ MOBILE-FRIENDLY:
+   No cookies needed
+   Works perfectly with mobile apps
+   Simple to implement in iOS/Android
+
+5️⃣ MICROSERVICES:
+   Single token works across all services
+   No session sharing needed
+   Each service can validate independently
+
+
+❌ DISADVANTAGES:
+1️⃣ Cannot Invalidate:
+   Once issued, valid until expiration
+   Solution: Token blacklisting or short expiration
+
+2. Size:
+   JWT larger than session ID
+   Sent with every request
+   Solution: Keep payload small, use short-lived tokens
+
+3. Security:
+   If stolen, attacker can use until expiration
+   Solution: Short expiration + HTTPS + secure storage
+
+
+========================================
+🔷 JWT vs SESSION-BASED AUTHENTICATION
+========================================
+1️⃣ SESSION-BASED:
+How it works:
+1. User logs in
+2. Server creates session, stores in memory/database
+3. Server sends session ID to client in cookie
+4. Client sends cookie with each request
+5. Server looks up session to identify user
+
+Storage: Server-side (memory, Redis, database)
+Scalability: Difficult (need session sharing/sticky sessions)
+Invalidation: Easy (delete session from server)
+
+
+JWT-BASED:
+How it works:
+1. User logs in
+2. Server creates JWT, signs it
+3. Server sends JWT to client
+4. Client stores JWT, sends in Authorization header
+5. Server validates signature, no database lookup needed
+
+Storage: Client-side (localStorage, memory)
+Scalability: Easy (no server-side state)
+Invalidation: Difficult (need blacklisting or short expiration)
+
+
+🔄 WHEN TO USE EACH:
+Use JWT when:
+    ✔️ Building REST API
+    ✔️ Need horizontal scaling
+    ✔️ Microservices architecture
+    ✔️ Mobile apps
+    ✔️ Cross-domain authentication
+
+Use Sessions when:
+    ✔️ Traditional web application
+    ✔️ Need instant logout
+    ✔️ Real-time invalidation important
+    ✔️ Monolithic architecture
+
+
+================================================================================
+PART 3: COMPLETE AUTHENTICATION FLOWS
+================================================================================
+
+3.1 USER REGISTRATION FLOW (DETAILED)
+-------------------------------------
+
+Step 1: Client sends registration request
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+Step 2: Request reaches AuthenticationController
+Method: register(@RequestBody RegisterRequest request)
+
+Step 3: Input Validation
+- Username not empty, 3-20 characters
+- Email valid format
+- Password minimum 8 characters, complexity requirements
+- Check username not already taken
+- Check email not already registered
+
+Code:
+if (userRepository.existsByUsername(request.getUsername())) {
+    throw new UsernameAlreadyExistsException();
+}
+if (userRepository.existsByEmail(request.getEmail())) {
+    throw new EmailAlreadyExistsException();
+}
+
+
+Step 4: Password Hashing
+String hashedPassword = passwordEncoder.encode(request.getPassword());
+
+What happens:
+- BCrypt generates random salt (16 bytes)
+- Combines password + salt
+- Hashes with bcrypt algorithm (2^10 rounds by default)
+- Result: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+  
+Format breakdown:
+- $2a: Algorithm version
+- $10: Cost factor (2^10 = 1024 rounds)
+- Next 22 chars: Salt (Base64 encoded)
+- Remaining chars: Hash
+
+Original password: "SecurePass123!"
+After BCrypt: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+
+Important: Same password hashed twice = different results (different salts)!
+
+Step 5: Assign Default Role
+Role userRole = roleRepository.findByName("ROLE_USER")
+    .orElseThrow(() -> new RuntimeException("Role not found"));
+user.getRoles().add(userRole);
+
+Step 6: Save User to Database
+User savedUser = userRepository.save(user);
+
+SQL executed:
+INSERT INTO users (id, username, email, password, first_name, last_name, created_at)
+VALUES (UUID(), 'john_doe', 'john@example.com', '$2a$10$...', 'John', 'Doe', NOW());
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES ((SELECT id FROM users WHERE username = 'john_doe'), 
+        (SELECT id FROM roles WHERE name = 'ROLE_USER'));
+
+Step 7: Generate JWT Tokens
+UserDetails userDetails = userDetailsService.loadUserByUsername(
+    savedUser.getUsername()
+);
+String accessToken = jwtService.generateToken(userDetails);
+String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+Access Token Generation:
+1. Create claims map with roles
+2. Set subject (username)
+3. Set issued at timestamp
+4. Set expiration (now + 15 minutes)
+5. Sign with HMAC SHA256 and secret key
+6. Encode and concatenate: header.payload.signature
+
+Refresh Token Generation:
+- Similar to access token
+- Longer expiration (7 days)
+- May include less information
+- Stored in database for revocation
+
+Step 8: Response Sent to Client
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "expiresIn": 900000,
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "username": "john_doe",
+    "email": "john@example.com",
+    "roles": ["ROLE_USER"]
+  }
+}
+
+Step 9: Client stores tokens
+localStorage.setItem('accessToken', response.data.accessToken);
+localStorage.setItem('refreshToken', response.data.refreshToken);
+// Or use sessionStorage for tab-specific storage
+// Or httpOnly cookies for maximum security
+
+
+Step 10: User is logged in!
+No need for separate login after registration.
+Client can immediately make authenticated requests.
+
+
+PHASE 1: USER LOGIN (AUTHENTICATION)
+-------------------------------------
+Step 1: Client sends login request
+POST /api/auth/login
+Content-Type: application/json
+Origin: http://localhost:3000
+
+{
+  "username": "john_doe",
+  "password": "SecurePass123!"
+}
+
+Step 2: Request enters Spring Framework
+- DispatcherServlet receives request
+- Maps to AuthenticationController.login()
+
+Step 3: Spring Security Filter Chain activates
+Filters execute in order:
+1. SecurityContextPersistenceFilter
+2. CorsFilter (allows localhost:3000)
+3. CsrfFilter (DISABLED for JWT)
+4. JwtAuthenticationFilter (SKIPPED - no token yet)
+5. ...other filters...
+6. Request reaches controller
+
+Step 4: AuthenticationController.login() method executes
+@PostMapping("/login")
+public ResponseEntity<AuthenticationResponse> login(
+        @RequestBody AuthenticationRequest request) {
+    
+    // This is where authentication magic happens:
+    authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+            request.getUsername(),  // "john_doe"
+            request.getPassword()   // "SecurePass123!"
+        )
+    );
+}
+
+Step 5: UsernamePasswordAuthenticationToken created
+State: UNAUTHENTICATED
+
+Contents:
+- Principal: "john_doe" (just a string at this point)
+- Credentials: "SecurePass123!" (plaintext password)
+- Authorities: null (no roles yet)
+- Authenticated: false
+
+This token is like a request: "Please authenticate this user"
+
+Step 6: AuthenticationManager.authenticate() called
+Type: ProviderManager (default implementation)
+
+What it does:
+1. Loops through registered AuthenticationProviders
+2. Finds provider that supports UsernamePasswordAuthenticationToken
+3. In our case: DaoAuthenticationProvider
+4. Delegates authentication to that provider
+
+Step 7: DaoAuthenticationProvider processes authentication
+
+Sub-step 7.1: Load user from database
+Calls: UserDetailsService.loadUserByUsername("john_doe")
+
+Our implementation (CustomUserDetailsService):
+@Override
+public UserDetails loadUserByUsername(String username) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException(
+            "User not found: " + username
+        ));
+    
+    return org.springframework.security.core.userdetails.User
+        .builder()
+        .username(user.getUsername())
+        .password(user.getPassword())
+        .authorities(getAuthorities(user.getRoles()))
+        .build();
+}
+
+Database query executed:
+SELECT u.*, r.name as role_name
+FROM users u
+LEFT JOIN user_roles ur ON u.id = ur.user_id
+LEFT JOIN roles r ON ur.role_id = r.id
+WHERE u.username = 'john_doe';
+
+Result:
+username: john_doe
+password: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+roles: ROLE_USER, ROLE_ADMIN
+
+UserDetails object created:
+- username: "john_doe"
+- password: "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"
+- authorities: [SimpleGrantedAuthority("ROLE_USER"), SimpleGrantedAuthority("ROLE_ADMIN")]
+- accountNonExpired: true
+- accountNonLocked: true
+- credentialsNonExpired: true
+- enabled: true
+
+Sub-step 7.2: Password verification
+boolean matches = passwordEncoder.matches(
+    "SecurePass123!",  // Raw password from request
+    "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"  // Hashed from DB
+);
+
+BCrypt verification process:
+1. Extract salt from stored hash
+   Salt: N9qo8uLOickgx2ZMRZoMye (embedded in hash)
+
+2. Hash provided password with same salt and cost factor
+   Input: "SecurePass123!" + salt
+   Output: New hash
+
+3. Compare new hash with stored hash
+   If match: return true
+   If different: return false
+
+Time taken: ~100-300ms (intentionally slow to prevent brute force)
+
+Sub-step 7.3: Decision - Success or Failure?
+
+SUCCESS PATH (passwords match):
+// DaoAuthenticationProvider creates authenticated token
+Authentication authenticatedToken = new UsernamePasswordAuthenticationToken(
+    userDetails,                     // Principal
+    null,                            // Credentials (cleared)
+    userDetails.getAuthorities()     // Authorities
+);
+// This token is marked as AUTHENTICATED
+
+return authenticatedToken;
+
+FAILURE PATH (passwords don't match):
+throw new BadCredentialsException("Bad credentials");
+
+
+Step 8: Authentication result returns to controller
+
+SUCCESS PATH:
+// authenticationManager.authenticate() completes successfully
+// No exception thrown, authentication succeeded
+
+UserDetails userDetails = userDetailsService.loadUserByUsername(
+    request.getUsername()
+);
+
+Wait, why load user AGAIN?
+- AuthenticationManager authenticated but doesn't return UserDetails
+- We need UserDetails to generate JWT
+- Alternative: We could modify to return authenticated token and extract UserDetails
+
+Step 9: Generate JWT Access Token
+String accessToken = jwtService.generateToken(userDetails);
+
+Inside generateToken():
+
+Step 9.1: Create claims map
+Map<String, Object> claims = new HashMap<>();
+claims.put("roles", userDetails.getAuthorities()
+    .stream()
+    .map(GrantedAuthority::getAuthority)
+    .collect(Collectors.toList()));
+
+Result:
+claims = {
+  "roles": ["ROLE_USER", "ROLE_ADMIN"]
+}
+
+Step 9.2: Build JWT
+```java
+Date now = new Date();
+Date expiryDate = new Date(now.getTime() + 900000);  // 15 minutes
+
+return Jwts.builder()
+    .setClaims(claims)
+    .setSubject("john_doe")
+    .setIssuedAt(now)
+    .setExpiration(expiryDate)
+    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+    .compact();
+```
+
+Step 9.3: JWT Creation Process
+
+a) Create header:
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+
+b) Create payload:
+```json
+{
+  "roles": ["ROLE_USER", "ROLE_ADMIN"],
+  "sub": "john_doe",
+  "iat": 1709856123,
+  "exp": 1709857023
+}
+```
+
+c) Encode header and payload to Base64URL:
+header_base64 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+payload_base64 = "eyJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0FETUlOIl0sInN1YiI6ImpvaG4iLCJpYXQiOjE3MDk4NTYxMjMsImV4cCI6MTcwOTg1NzAyM30"
+
+d) Create signature:
+```
+signature_input = header_base64 + "." + payload_base64
+secret_key = "your-256-bit-secret-key"
+
+signature = HMACSHA256(signature_input, secret_key)
+signature_base64 = Base64URLEncode(signature)
+```
+
+e) Concatenate all parts:
+```
+jwt = header_base64 + "." + payload_base64 + "." + signature_base64
+```
+
+Final JWT:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiLCJST0xFX0FETUlOIl0sInN1YiI6ImpvaG4iLCJpYXQiOjE3MDk4NTYxMjMsImV4cCI6MTcwOTg1NzAyM30.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+Step 10: Generate Refresh Token
+```java
+String refreshToken = jwtService.generateRefreshToken(userDetails);
+```
+
+Similar to access token but:
+- Longer expiration (7 days = 604800000 ms)
+- May not include roles (smaller payload)
+- Should be stored in database for revocation
+
+Step 11: Create response object
+```java
+return ResponseEntity.ok(AuthenticationResponse.builder()
+    .accessToken(accessToken)
+    .refreshToken(refreshToken)
+    .tokenType("Bearer")
+    .expiresIn(900000)
+    .build());
+```
+
+Response sent to client:
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "expiresIn": 900000
+}
+
+Step 12: Client stores tokens
+```javascript
+// In React/Angular/Vue frontend:
+localStorage.setItem('accessToken', response.data.accessToken);
+localStorage.setItem('refreshToken', response.data.refreshToken);
+
+// Set default header for future requests:
+axios.defaults.headers.common['Authorization'] = 
+    `Bearer ${response.data.accessToken}`;
+
+// Redirect to dashboard
+navigate('/dashboard');
+```
+
+FAILURE PATH (from Step 7):
+```java
+catch (BadCredentialsException e) {
+    throw new ResponseStatusException(
+        HttpStatus.UNAUTHORIZED,
+        "Invalid username or password"
+    );
+}
+```
+
+Response:
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid username or password",
+  "path": "/api/auth/login"
+}
+
+Client handles error:
+```javascript
+catch (error) {
+  if (error.response.status === 401) {
+    setError("Invalid username or password");
+    setPassword('');  // Clear password field
+  }
+}
+
+
+PHASE 2: ACCESSING PROTECTED RESOURCE
+--------------------------------------
+
+
+Step 1: User clicks "View Profile" in application
+Client needs to fetch user profile data
+
+Step 2: Frontend makes API request
+```javascript
+const accessToken = localStorage.getItem('accessToken');
+
+axios.get('http://localhost:8080/api/users/profile', {
+  headers: {
+    'Authorization': `Bearer ${accessToken}`
+  }
+})
+```
+
+HTTP Request:
+GET /api/users/profile HTTP/1.1
+Host: localhost:8080
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Accept: application/json
+Content-Type: application/json
+
+Step 3: Request enters Spring Application
+- Tomcat receives HTTP request
+- DispatcherServlet intercepts
+- Spring Security Filter Chain activates
+
+Step 4: Filter Chain Processing Begins
+
+Filter 1: SecurityContextPersistenceFilter
+- Checks if SecurityContext exists in session
+- For JWT: No session, SecurityContext is empty
+- Continues to next filter
+
+Filter 2: HeaderWriterFilter
+- Adds security headers to response:
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+- Continues to next filter
+
+Filter 3: CorsFilter
+- Checks Origin header
+- If cross-origin request, validates against CORS configuration
+- Our config allows localhost:3000
+- Adds CORS headers to response
+- Continues to next filter
+
+Filter 4: CsrfFilter
+- DISABLED in our config (.csrf().disable())
+- SKIPPED
+- Continues to next filter
+
+Filter 5: LogoutFilter
+- Checks if request is to /logout
+- Not our case (/api/users/profile)
+- SKIPPED
+- Continues to next filter
+
+Filter 6: **JwtAuthenticationFilter** (OUR CUSTOM FILTER)
+THIS IS WHERE JWT AUTHENTICATION HAPPENS!
+
+Detailed execution of doFilterInternal():
+
+Sub-step 6.1: Extract Authorization header
+```java
+final String authHeader = request.getHeader("Authorization");
+```
+
+authHeader = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+Sub-step 6.2: Validate header format
+```java
+if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    filterChain.doFilter(request, response);
+    return;
+}
+```
+
+Checks:
+- Header exists? ✓
+- Starts with "Bearer "? ✓
+- Continues processing
+
+Sub-step 6.3: Extract JWT token
+```java
+jwt = authHeader.substring(7);  // Remove "Bearer " prefix
+```
+
+jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+Sub-step 6.4: Extract username from token
+```java
+username = jwtService.extractUsername(jwt);
+```
+
+Inside extractUsername():
+```java
+return extractClaim(jwt, Claims::getSubject);
+```
+
+Inside extractClaim():
+```java
+final Claims claims = extractAllClaims(token);
+return claimsResolver.apply(claims);
+```
+
+Inside extractAllClaims():
+```java
+return Jwts.parserBuilder()
+    .setSigningKey(getSignInKey())
+    .build()
+    .parseClaimsJws(token)
+    .getBody();
+```
+
+What happens here:
+
+a) Token split into parts:
+   header = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+   payload = "eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiam9obiIsImlhdCI6MTcwOTg1NjEyMywiZXhwIjoxNzA5ODU3MDIzfQ"
+   signature = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+b) Verify signature:
+   - Recompute signature using secret key
+   - Expected signature = HMACSHA256(header + "." + payload, SECRET_KEY)
+   - Compare with provided signature
+   - If mismatch: throw SignatureException
+
+c) Decode payload:
+   ```json
+   {
+     "roles": ["ROLE_USER", "ROLE_ADMIN"],
+     "sub": "john_doe",
+     "iat": 1709856123,
+     "exp": 1709857023
+   }
+   ```
+
+d) Check expiration:
+   - Current time: 1709856500
+   - Expiration: 1709857023
+   - 1709856500 < 1709857023 ✓ (not expired)
+
+e) Extract subject:
+   username = "john_doe"
+
+Sub-step 6.5: Check if user already authenticated
+```java
+if (username != null && 
+    SecurityContextHolder.getContext().getAuthentication() == null) {
+    // Proceed with authentication
+}
+```
+
+Checks:
+- Username extracted successfully? ✓
+- SecurityContext empty? ✓ (new request, not authenticated yet)
+- Continue
+
+Sub-step 6.6: Load user from database
+```java
+UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+```
+
+Database query:
+SELECT u.id, u.username, u.password, r.name as role_name
+FROM users u
+LEFT JOIN user_roles ur ON u.id = ur.user_id
+LEFT JOIN roles r ON ur.role_id = r.id
+WHERE u.username = 'john_doe';
+
+Result:
+UserDetails {
+  username: "john_doe",
+  password: "$2a$10$...",
+  authorities: [ROLE_USER, ROLE_ADMIN],
+  accountNonExpired: true,
+  accountNonLocked: true,
+  credentialsNonExpired: true,
+  enabled: true
+}
+
+Why load from database if username in token?
+- Token doesn't contain password (needed for UserDetails)
+- User might be deleted after token issued
+- User roles might have changed
+- Need full UserDetails for authorization
+
+Optimization: Cache UserDetails in Redis for 5 minutes
+
+Sub-step 6.7: Validate token
+```java
+if (jwtService.validateToken(jwt, userDetails)) {
+    // Token is valid
+}
+```
+
+Inside validateToken():
+```java
+final String tokenUsername = extractUsername(token);
+final Date expiration = extractExpiration(token);
+
+return tokenUsername.equals(userDetails.getUsername()) 
+    && expiration.after(new Date());
+```
+
+Checks:
+1. Username in token matches loaded user: "john_doe" == "john_doe" ✓
+2. Token not expired: exp (1709857023) > now (1709856500) ✓
+
+Both checks pass, token is valid!
+
+Sub-step 6.8: Create Authentication object
+```java
+UsernamePasswordAuthenticationToken authToken = 
+    new UsernamePasswordAuthenticationToken(
+        userDetails,
+        null,
+        userDetails.getAuthorities()
+    );
+```
+
+Created Authentication object:
+- Principal: UserDetails (john_doe with roles)
+- Credentials: null (password not needed, already authenticated)
+- Authorities: [ROLE_USER, ROLE_ADMIN]
+- Authenticated: true (constructor with 3 args marks as authenticated)
+
+Sub-step 6.9: Add request details
+```java
+authToken.setDetails(
+    new WebAuthenticationDetailsSource().buildDetails(request)
+);
+```
+
+Adds:
+- Remote IP address: 192.168.1.100
+- Session ID: null (stateless)
+
+Sub-step 6.10: Store in SecurityContext
+```java
+SecurityContextHolder.getContext().setAuthentication(authToken);
+```
+
+What happens:
+- ThreadLocal variable set with authToken
+- All code in this thread can now access authentication
+- Available in controllers, services, anywhere
+
+Sub-step 6.11: Continue filter chain
+```java
+filterChain.doFilter(request, response);
+```
+
+Filter 7: UsernamePasswordAuthenticationFilter
+- Handles form-based login
+- Not applicable, SKIPPED
+- User already authenticated via JWT
+
+Filter 8: AnonymousAuthenticationFilter
+- Creates anonymous authentication if user not authenticated
+- User IS authenticated, SKIPPED
+
+Filter 9: SessionManagementFilter
+- Manages sessions
+- STATELESS policy, SKIPPED
+
+Filter 10: ExceptionTranslationFilter
+- Wraps remaining filters
+- Catches AuthenticationException and AccessDeniedException
+- Converts to appropriate HTTP response
+
+Filter 11: AuthorizationFilter (FINAL FILTER)
+- Checks if user authorized to access endpoint
+- Looks at @PreAuthorize annotation
+- Our endpoint: No @PreAuthorize, only @Authenticated required
+- User is authenticated ✓
+- AUTHORIZED, proceed to controller
+
+Step 5: Request reaches Controller
+```java
+@GetMapping("/profile")
+public ResponseEntity<UserDTO> getCurrentUserProfile(
+        Authentication authentication) {
+    String username = authentication.getName();
+    UserDTO user = userService.getUserByUsername(username);
+    return ResponseEntity.ok(user);
+}
+```
+
+Spring injects Authentication parameter:
+- Retrieves from SecurityContextHolder.getContext().getAuthentication()
+- authentication.getName() = "john_doe"
+
+Step 6: Service layer processes request
+```java
+public UserDTO getUserByUsername(String username) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new UserNotFoundException());
+    
+    return UserDTO.builder()
+        .id(user.getId())
+        .username(user.getUsername())
+        .email(user.getEmail())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .roles(user.getRoles().stream()
+            .map(Role::getName)
+            .collect(Collectors.toList()))
+        .build();
+}
+```
+
+Database query:
+SELECT * FROM users WHERE username = 'john_doe';
+
+Result mapped to UserDTO (no password included!)
+
+Step 7: Response created
+```java
+return ResponseEntity.ok(user);
+```
+
+HTTP Response:
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "username": "john_doe",
+  "email": "john@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "roles": ["ROLE_USER", "ROLE_ADMIN"]
+}
+
+Step 8: Filter chain unwinds
+- Response passes back through filters in reverse
+- SecurityContextPersistenceFilter clears SecurityContext
+- ThreadLocal cleaned up
+
+Step 9: Response sent to client
+Client receives JSON response
+React component renders user profile
+
+COMPLETE FLOW TIME:
+Total: ~50-100ms
+- JWT validation: 5ms
+- Database query: 20ms
+- Service processing: 10ms
+- Response serialization: 5ms
+
+
+
+
+
+
+================================================================================
+SECTION 3: CODE IMPLEMENTATION WITH DETAILED EXPLANATION
+================================================================================
+
+3.1 SECURITY CONFIGURATION CLASS
+---------------------------------
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity  // Enables @PreAuthorize, @Secured annotations
+public class SecurityConfig {
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthFilter;
+    
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) 
+            throws Exception {
+        
+        http
+            // DISABLE CSRF - Not needed for stateless JWT APIs
+            // CSRF protects against attacks where malicious sites make 
+            // requests on behalf of authenticated users
+            // JWT in Authorization header is not vulnerable to CSRF
+            // because browsers don't automatically send custom headers
+            .csrf(csrf -> csrf.disable())
+            
+            // CONFIGURE AUTHORIZATION RULES
+            .authorizeHttpRequests(auth -> auth
+                // PUBLIC ENDPOINTS - No authentication required
+                .requestMatchers(
+                    "/api/auth/**",      // Login, register endpoints
+                    "/api/public/**",    // Public content
+                    "/swagger-ui/**",    // API documentation
+                    "/v3/api-docs/**"    // OpenAPI specs
+                ).permitAll()
+                
+                // ALL OTHER REQUESTS - Authentication required
+                .anyRequest().authenticated()
+            )
+            
+            // SESSION MANAGEMENT - Make it stateless
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // STATELESS means:
+                // - No HttpSession created or used
+                // - No JSESSIONID cookie sent
+                // - Each request is independent
+                // - Authentication must be provided in each request
+            )
+            
+            // ADD CUSTOM JWT FILTER
+            // Position it BEFORE UsernamePasswordAuthenticationFilter
+            // This ensures JWT validation happens before standard auth
+            .authenticationProvider(authenticationProvider)
+            .addFilterBefore(
+                jwtAuthFilter, 
+                UsernamePasswordAuthenticationFilter.class
+            );
+        
+        return http.build();
+    }
+
+    // PASSWORD ENCODER BEAN
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // BCryptPasswordEncoder uses bcrypt hashing algorithm
+        // Automatically generates salt for each password
+        // Highly secure and slow (intentionally) to prevent brute force
+        // Work factor of 10 means 2^10 iterations (1024)
+        return new BCryptPasswordEncoder();
+    }
+
+    // AUTHENTICATION MANAGER BEAN
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        // Spring Security provides this configuration automatically
+        // Contains the default authentication manager
+        return config.getAuthenticationManager();
+    }
+
+    // AUTHENTICATION PROVIDER BEAN
+    @Bean
+    public AuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+        
+        // DaoAuthenticationProvider uses DAO (Database) to authenticate
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        
+        // Set custom UserDetailsService to load users from database
+        provider.setUserDetailsService(userDetailsService);
+        
+        // Set password encoder to verify passwords
+        provider.setPasswordEncoder(passwordEncoder);
+        
+        return provider;
+    }
+}
+
+EXPLANATION OF KEY CONCEPTS:
+
+1. @EnableWebSecurity
+   - Enables Spring Security's web security support
+   - Registers SecurityFilterChain bean
+   - Sets up default security configuration
+
+2. @EnableMethodSecurity
+   - Enables method-level security annotations
+   - Allows @PreAuthorize, @PostAuthorize, @Secured
+   - Uses AspectJ proxy to intercept method calls
+
+3. SecurityFilterChain
+   - Replaces old WebSecurityConfigurerAdapter (deprecated)
+   - Defines security rules as a bean
+   - Applied to all HTTP requests
+
+4. CSRF (Cross-Site Request Forgery)
+   - Attack where malicious site makes request on behalf of user
+   - Not needed for stateless APIs using JWT in header
+   - Required for cookie-based authentication
+
+5. SessionCreationPolicy.STATELESS
+   - No HttpSession created or used
+   - No session cookie (JSESSIONID)
+   - Every request must contain authentication
+   - Perfect for REST APIs and microservices
+
+
+3.2 JWT SERVICE - TOKEN GENERATION & VALIDATION
+------------------------------------------------
+
+@Service
+public class JwtService {
+
+    // SECRET KEY - Should be at least 256 bits (32 bytes)
+    // NEVER hardcode in production! Use environment variables
+    // This key is used to sign and verify JWT tokens
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+    
+    // TOKEN EXPIRATION TIME in milliseconds
+    // 86400000 ms = 24 hours
+    @Value("${jwt.expiration}")
+    private long JWT_EXPIRATION;
+
+    /**
+     * GENERATE JWT TOKEN
+     * Creates a new JWT token for authenticated user
+     */
+    public String generateToken(UserDetails userDetails) {
+        // Create claims (payload data)
+        Map<String, Object> claims = new HashMap<>();
+        
+        // Add user roles to claims
+        // This allows us to check permissions without database query
+        claims.put("roles", userDetails.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)  // Get role name
+            .collect(Collectors.toList()));
+        
+        // Create and return token
+        return createToken(claims, userDetails.getUsername());
+    }
+
+    /**
+     * CREATE TOKEN - Internal method to build JWT
+     */
+    private String createToken(
+            Map<String, Object> claims, 
+            String subject) {
+        
+        return Jwts.builder()
+            // Set custom claims (roles, etc.)
+            .setClaims(claims)
+            
+            // Set subject (usually username or user ID)
+            .setSubject(subject)
+            
+            // Set issued at timestamp
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            
+            // Set expiration timestamp
+            .setExpiration(new Date(
+                System.currentTimeMillis() + JWT_EXPIRATION))
+            
+            // Sign with secret key and HS256 algorithm
+            // HS256 = HMAC-SHA256
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            
+            // Build and return token string
+            .compact();
+    }
+
+    /**
+     * GET SIGNING KEY
+     * Converts secret string to Key object for signing
+     */
+    private Key getSigningKey() {
+        // Decode secret from Base64
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        
+        // Create HMAC key for signing
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    /**
+     * EXTRACT USERNAME from token
+     * Main method used by filter to get user from token
+     */
+    public String extractUsername(String token) {
+        // Extract "sub" claim which contains username
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    /**
+     * EXTRACT EXPIRATION date from token
+     */
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    /**
+     * EXTRACT SPECIFIC CLAIM from token
+     * Generic method to extract any claim using function
+     */
+    public <T> T extractClaim(
+            String token, 
+            Function<Claims, T> claimsResolver) {
+        
+        // Parse token and extract all claims
+        final Claims claims = extractAllClaims(token);
+        
+        // Apply resolver function to get specific claim
+        return claimsResolver.apply(claims);
+    }
+
+    /**
+     * EXTRACT ALL CLAIMS from token
+     * Parses and validates token, returns all claims
+     */
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+            // Set signing key for verification
+            .setSigningKey(getSigningKey())
+            
+            // Build parser
+            .build()
+            
+            // Parse token - this validates signature!
+            // If signature is invalid, throws SignatureException
+            .parseClaimsJws(token)
+            
+            // Get claims from body
+            .getBody();
+    }
+
+    /**
+     * CHECK IF TOKEN IS EXPIRED
+     */
+    private Boolean isTokenExpired(String token) {
+        Date expiration = extractExpiration(token);
+        return expiration.before(new Date());
+    }
+
+    /**
+     * VALIDATE TOKEN
+     * Checks if token is valid for given user
+     */
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        // Extract username from token
+        final String username = extractUsername(token);
+        
+        // Token is valid if:
+        // 1. Username matches the UserDetails username
+        // 2. Token is not expired
+        return (username.equals(userDetails.getUsername()) 
+                && !isTokenExpired(token));
+    }
+
+    /**
+     * GENERATE REFRESH TOKEN
+     * Longer-lived token for getting new access tokens
+     */
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        
+        // Refresh token has longer expiration (7 days)
+        return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(userDetails.getUsername())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(
+                System.currentTimeMillis() + 604800000))  // 7 days
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
+}
+
+DETAILED EXPLANATION:
+
+1. TOKEN GENERATION FLOW:
+   generateToken() → createToken() → Jwts.builder()
+   
+   a) Create claims map with user roles
+   b) Set subject (username)
+   c) Set issued at timestamp (iat)
+   d) Set expiration timestamp (exp)
+   e) Sign with secret key using HMAC-SHA256
+   f) Compact to string: header.payload.signature
+
+2. TOKEN VALIDATION FLOW:
+   validateToken() → extractUsername() → extractAllClaims()
+   
+   a) Parse token using parserBuilder
+   b) Verify signature with secret key
+   c) Extract claims from body
+   d) Check if username matches
+   e) Check if token is not expired
+
+3. SECURITY CONSIDERATIONS:
+   - Secret key must be strong (256+ bits)
+   - Store secret in environment variables
+   - Use HTTPS to transmit tokens
+   - Set reasonable expiration times
+   - Don't store sensitive data in payload
+
+
+3.3 JWT AUTHENTICATION FILTER
+------------------------------
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private JwtService jwtService;
+    
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    /**
+     * MAIN FILTER METHOD
+     * Executed once per request to validate JWT
+     */
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        
+        // STEP 1: Extract Authorization header
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        final String username;
+        
+        // STEP 2: Check if Authorization header exists and is valid format
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            // No token present, continue filter chain
+            // This allows public endpoints to work
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        // STEP 3: Extract JWT token (remove "Bearer " prefix)
+        jwt = authHeader.substring(7);
+        
+        try {
+            // STEP 4: Extract username from JWT
+            username = jwtService.extractUsername(jwt);
+            
+            // STEP 5: Check if user is not already authenticated
+            // SecurityContextHolder.getContext().getAuthentication() returns null
+            // if user is not authenticated
+            if (username != null && 
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+                
+                // STEP 6: Load user details from database
+                UserDetails userDetails = 
+                    userDetailsService.loadUserByUsername(username);
+                
+                // STEP 7: Validate token
+                if (jwtService.validateToken(jwt, userDetails)) {
+                    
+                    // STEP 8: Create authentication token
+                    UsernamePasswordAuthenticationToken authToken = 
+                        new UsernamePasswordAuthenticationToken(
+                            userDetails,           // Principal (user)
+                            null,                  // Credentials (not needed)
+                            userDetails.getAuthorities()  // Roles/permissions
+                        );
+                    
+                    // STEP 9: Add request details
+                    authToken.setDetails(
+                        new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
+                    );
+                    
+                    // STEP 10: Set authentication in SecurityContext
+                    SecurityContextHolder.getContext()
+                        .setAuthentication(authToken);
+                }
+            }
+        } catch (ExpiredJwtException e) {
+            // Token has expired
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token has expired");
+            return;
+        } catch (SignatureException e) {
+            // Token signature is invalid
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid token signature");
+            return;
+        } catch (Exception e) {
+            // Other token-related errors
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid token");
+            return;
+        }
+        
+        // STEP 11: Continue filter chain
+        // Request will now reach the controller with authenticated user
+        filterChain.doFilter(request, response);
+    }
+}
+
+WHY EXTEND OncePerRequestFilter?
+
+- Ensures filter executes exactly once per request
+- Handles async requests correctly
+- Prevents duplicate execution in error scenarios
+- Built-in support for async dispatch
+
+FILTER EXECUTION FLOW:
+
+1. Every request passes through this filter
+2. Filter checks for Authorization header
+3. If present, extracts and validates JWT
+4. If valid, sets authentication in SecurityContext
+5. Request continues to next filter/controller
+6. If invalid, returns 401 Unauthorized
+
+KEY POINTS:
+
+a) Filter runs BEFORE controller
+   - Authentication is set before controller executes
+   - Controller can access authenticated user
+
+b) Filter is stateless
+   - No state stored between requests
+   - Each request validated independently
+
+c) Filter is reusable
+   - Works with any controller
+   - No need to add authentication code in controllers
+
+d) Error handling
+   - Catches JWT exceptions
+   - Returns appropriate HTTP status codes
+   - Prevents stack traces from leaking
+
+
+3.4 USER DETAILS SERVICE IMPLEMENTATION
+----------------------------------------
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    /**
+     * LOAD USER BY USERNAME
+     * Called during authentication to load user from database
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) 
+            throws UsernameNotFoundException {
+        
+        // STEP 1: Query database for user
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException(
+                "User not found with username: " + username));
+        
+        // STEP 2: Convert User entity to Spring Security UserDetails
+        return org.springframework.security.core.userdetails.User.builder()
+            .username(user.getUsername())
+            .password(user.getPassword())  // Should be BCrypt hashed
+            .authorities(getAuthorities(user.getRoles()))
+            .accountExpired(false)
+            .accountLocked(false)
+            .credentialsExpired(false)
+            .disabled(!user.isActive())
+            .build();
+    }
+
+    /**
+     * CONVERT ROLES TO AUTHORITIES
+     * Spring Security uses GrantedAuthority for permissions
+     */
+    private Collection<? extends GrantedAuthority> getAuthorities(
+            Set<Role> roles) {
+        
+        return roles.stream()
+            .map(role -> new SimpleGrantedAuthority(
+                "ROLE_" + role.getName()))  // Add ROLE_ prefix
+            .collect(Collectors.toList());
+    }
+}
+
+EXPLANATION:
+
+1. UserDetailsService Interface:
+   - Single method: loadUserByUsername()
+   - Returns UserDetails object
+   - Throws UsernameNotFoundException if user not found
+
+2. UserDetails Object:
+   - Contains user information
+   - username, password, authorities
+   - Account status flags (locked, expired, etc.)
+
+3. Authority Naming:
+   - Spring Security expects "ROLE_" prefix
+   - Example: "ROLE_ADMIN", "ROLE_USER"
+   - Used in @PreAuthorize("hasRole('ADMIN')")
+
+4. Database Query:
+   - Uses JPA repository to find user
+   - Typically joins with roles table
+   - Returns user with associated roles
+
+
+3.5 AUTHENTICATION CONTROLLER
+------------------------------
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthenticationController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    
+    @Autowired
+    private JwtService jwtService;
+    
+    @Autowired
+    private UserDetailsService userDetailsService;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    /**
+     * LOGIN ENDPOINT
+     * Authenticates user and returns JWT token
+     */
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(
+            @RequestBody AuthenticationRequest request) {
+        
+        try {
+            // STEP 1: Authenticate user
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getUsername(),
+                    request.getPassword()
+                )
+            );
+            
+            // STEP 2: If authentication successful, load user details
+            UserDetails userDetails = 
+                userDetailsService.loadUserByUsername(request.getUsername());
+            
+            // STEP 3: Generate JWT token
+            String accessToken = jwtService.generateToken(userDetails);
+            
+            // STEP 4: Generate refresh token (optional)
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            
+            // STEP 5: Build response
+            AuthenticationResponse response = AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(86400)  // 24 hours in seconds
+                .username(userDetails.getUsername())
+                .roles(userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()))
+                .build();
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (BadCredentialsException e) {
+            // Wrong username or password
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(AuthenticationResponse.builder()
+                    .error("Invalid username or password")
+                    .build());
+        } catch (DisabledException e) {
+            // Account is disabled
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(AuthenticationResponse.builder()
+                    .error("Account is disabled")
+                    .build());
+        }
+    }
+
+    /**
+     * REGISTER ENDPOINT
+     * Creates new user account
+     */
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(
+            @RequestBody RegisterRequest request) {
+        
+        // STEP 1: Check if username already exists
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(RegisterResponse.builder()
+                    .success(false)
+                    .message("Username already exists")
+                    .build());
+        }
+        
+        // STEP 2: Create new user
+        User user = new User();
+        user.setUsername(request.getUsername());
+        
+        // STEP 3: Hash password with BCrypt
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        
+        // STEP 4: Set default role
+        Role userRole = roleRepository.findByName("USER")
+            .orElseThrow(() -> new RuntimeException("Role not found"));
+        user.setRoles(Set.of(userRole));
+        
+        user.setActive(true);
+        
+        // STEP 5: Save user to database
+        userRepository.save(user);
+        
+        // STEP 6: Return response
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(RegisterResponse.builder()
+                .success(true)
+                .message("User registered successfully")
+                .username(user.getUsername())
+                .build());
+    }
+
+    /**
+     * REFRESH TOKEN ENDPOINT
+     * Issues new access token using refresh token
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthenticationResponse> refreshToken(
+            @RequestBody RefreshTokenRequest request) {
+        
+        try {
+            // STEP 1: Extract username from refresh token
+            String username = jwtService.extractUsername(
+                request.getRefreshToken());
+            
+            // STEP 2: Load user details
+            UserDetails userDetails = 
+                userDetailsService.loadUserByUsername(username);
+            
+            // STEP 3: Validate refresh token
+            if (jwtService.validateToken(
+                    request.getRefreshToken(), userDetails)) {
+                
+                // STEP 4: Generate new access token
+                String accessToken = jwtService.generateToken(userDetails);
+                
+                // STEP 5: Return new token
+                return ResponseEntity.ok(
+                    AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .tokenType("Bearer")
+                        .expiresIn(86400)
+                        .build()
+                );
+            }
+            
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(AuthenticationResponse.builder()
+                    .error("Invalid refresh token")
+                    .build());
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(AuthenticationResponse.builder()
+                    .error("Invalid refresh token")
+                    .build());
+        }
+    }
+
+    /**
+     * LOGOUT ENDPOINT
+     * Blacklists current token
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logout(
+            @RequestHeader("Authorization") String authHeader) {
+        
+        try {
+            // Extract token
+            String token = authHeader.substring(7);
+            
+            // Add to blacklist (requires Redis implementation)
+            tokenBlacklistService.blacklistToken(token);
+            
+            return ResponseEntity.ok(
+                LogoutResponse.builder()
+                    .success(true)
+                    .message("Logged out successfully")
+                    .build()
+            );
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(LogoutResponse.builder()
+                    .success(false)
+                    .message("Logout failed")
+                    .build());
+        }
+    }
+}
+
+// REQUEST/RESPONSE DTOs
+
+@Data
+@Builder
+public class AuthenticationRequest {
+    private String username;
+    private String password;
+}
+
+@Data
+@Builder
+public class AuthenticationResponse {
+    private String accessToken;
+    private String refreshToken;
+    private String tokenType;
+    private Integer expiresIn;
+    private String username;
+    private List<String> roles;
+    private String error;
+}
+
+@Data
+@Builder
+public class RegisterRequest {
+    private String username;
+    private String password;
+    private String email;
+}
+
+@Data
+@Builder
+public class RegisterResponse {
+    private boolean success;
+    private String message;
+    private String username;
+}
+
+CONTROLLER EXPLANATION:
+
+1. /login Endpoint:
+   - Receives username and password
+   - Authenticates using AuthenticationManager
+   - Generates JWT token if successful
+   - Returns token in response
+   - Client stores token for future requests
+
+2. /register Endpoint:
+   - Creates new user account
+   - Hashes password with BCrypt
+   - Assigns default USER role
+   - Saves to database
+   - Returns success response
+
+3. /refresh Endpoint:
+   - Validates refresh token
+   - Issues new access token
+   - Allows users to stay logged in
+   - Avoids frequent logins
+
+4. /logout Endpoint:
+   - Blacklists current token
+   - Prevents token reuse
+   - Requires Redis for blacklist storage
+
+
+3.6 PROTECTED RESOURCE CONTROLLER
+----------------------------------
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    /**
+     * GET CURRENT USER PROFILE
+     * Accessible by any authenticated user
+     */
+    @GetMapping("/profile")
+    public ResponseEntity<UserDTO> getCurrentUserProfile(
+            Authentication authentication) {
+        
+        // Get username from SecurityContext
+        String username = authentication.getName();
+        
+        // Fetch user details
+        UserDTO user = userService.getUserByUsername(username);
+        
+        return ResponseEntity.ok(user);
+    }
+
+    /**
+     * GET ALL USERS
+     * Accessible only by ADMIN role
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<UserDTO> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * GET USER BY ID
+     * Accessible by ADMIN or the user themselves
+     */
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    /**
+     * UPDATE USER PROFILE
+     * User can only update their own profile
+     */
+    @PreAuthorize("authentication.name == #request.username")
+    @PutMapping("/profile")
+    public ResponseEntity<UserDTO> updateProfile(
+            @RequestBody UpdateProfileRequest request,
+            Authentication authentication) {
+        
+        String username = authentication.getName();
+        UserDTO updated = userService.updateProfile(username, request);
+        
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * DELETE USER
+     * Only ADMIN can delete users
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * GET USER ROLES
+     * Accessible by authenticated user for their own roles
+     */
+    @GetMapping("/me/roles")
+    public ResponseEntity<List<String>> getMyRoles(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        List<String> roles = userDetails.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(roles);
+    }
+}
+
+AUTHORIZATION ANNOTATIONS EXPLAINED:
+
+1. @PreAuthorize:
+   - Evaluates SpEL expression before method execution
+   - Returns boolean - true allows access, false denies
+   - Can access method parameters (#id, #request)
+   - Can access authentication object
+
+2. Common @PreAuthorize Expressions:
+   - hasRole('ADMIN') - User has ADMIN role
+   - hasAnyRole('ADMIN', 'MANAGER') - Has any of these roles
+   - hasAuthority('WRITE_PRIVILEGE') - Has specific authority
+   - #id == authentication.principal.id - Compare with user ID
+   - authentication.name == #username - Compare with username
+
+3. @AuthenticationPrincipal:
+   - Injects authenticated UserDetails into method parameter
+   - Convenient way to access current user
+   - No need to call SecurityContextHolder
+
+
+================================================================================
+SECTION 4: REQUEST FLOW DIAGRAMS
+================================================================================
+
+4.1 COMPLETE LOGIN FLOW WITH JWT
+---------------------------------
+
+CLIENT                  CONTROLLER                  SERVICE LAYER             DATABASE
+  |                          |                            |                        |
+  |--- POST /api/auth/login -------------------------------->                      |
+  |    {username, password}  |                            |                        |
+  |                          |                            |                        |
+  |                          |--- authenticate() --------->|                        |
+  |                          |                            |                        |
+  |                          |                     AuthenticationManager           |
+  |                          |                            |                        |
+  |                          |                            |--- loadUserByUsername ->|
+  |                          |                            |                        |
+  |                          |                            |<-------- User + Roles --|
+  |                          |                            |                        |
+  |                          |                     Verify Password                 |
+  |                          |                     (BCrypt comparison)             |
+  |                          |                            |                        |
+  |                          |<---- Authentication -------|                        |
+  |                          |                            |                        |
+  |                          |--- generateToken() ------->|                        |
+  |                          |                            |                        |
+  |                          |                     Create JWT:                     |
+  |                          |                     - Add claims (roles)            |
+  |                          |                     - Set expiration                |
+  |                          |                     - Sign with secret              |
+  |                          |                            |                        |
+  |                          |<------ JWT Token ----------|                        |
+  |                          |                            |                        |
+  |<--- 200 OK ---------------|                            |                        |
+  |    {token: "eyJ...",                                                            |
+  |     type: "Bearer"}                                                             |
+  |                                                                                 |
+  |=== CLIENT STORES TOKEN IN LOCAL STORAGE OR MEMORY ===========================|
+
+
+4.2 ACCESSING PROTECTED RESOURCE FLOW
+--------------------------------------
+
+CLIENT                FILTER CHAIN              CONTROLLER              SERVICE           DB
+  |                         |                         |                      |              |
+  |--- GET /api/users/profile ----------------------->|                      |              |
+  |    Authorization: Bearer eyJ...                   |                      |              |
+  |                         |                         |                      |              |
+  |                 JwtAuthenticationFilter           |                      |              |
+  |                         |                         |                      |              |
+  |                   Extract token                   |                      |              |
+  |                   Verify signature                |                      |              |
+  |                   Check expiration                |                      |              |
+  |                   Extract username                |                      |              |
+  |                         |                         |                      |              |
+  |                         |--- loadUserByUsername --------------------->  |              |
+  |                         |                         |                      |              |
+  |                         |                         |                      |--- query --->|
+  |                         |                         |                      |              |
+  |                         |                         |                      |<-- User + ---|
+  |                         |                         |                      |    Roles     |
+  |                         |<----- UserDetails ------|                      |              |
+  |                         |                         |                      |              |
+  |                   Create Authentication           |                      |              |
+  |                   Set in SecurityContext          |                      |              |
+  |                         |                         |                      |              |
+  |                         |--- Continue filter chain --->                 |              |
+  |                         |                         |                      |              |
+  |                         |                   Check @PreAuthorize          |              |
+  |                         |                   Verify user roles            |              |
+  |                         |                         |                      |              |
+  |                         |                   Execute method               |              |
+  |                         |                         |                      |              |
+  |                         |                         |--- getUserProfile() ---------->     |
+  |                         |                         |                      |              |
+  |                         |                         |<----- UserDTO -------|              |
+  |                         |                         |                      |              |
+  |<--- 200 OK -------------|                         |                      |              |
+  |    {user data}          |                         |                      |              |
+
+
+4.3 TOKEN REFRESH FLOW
+-----------------------
+
+CLIENT                  CONTROLLER              JWT SERVICE            DATABASE
+  |                          |                         |                    |
+  |--- POST /api/auth/refresh --------------------->  |                    |
+  |    {refreshToken: "xyz"} |                         |                    |
+  |                          |                         |                    |
+  |                          |--- validateToken() ---->|                    |
+  |                          |                         |                    |
+  |                          |                   Extract username           |
+  |                          |                   Verify signature           |
+  |                          |                   Check expiration           |
+  |                          |                         |                    |
+  |                          |--- loadUserByUsername ----------->           |
+  |                          |                         |                    |
+  |                          |                         |--- query user ---->|
+  |                          |                         |                    |
+  |                          |                         |<--- User + Roles --|
+  |                          |                         |                    |
+  |                          |<---- UserDetails -------|                    |
+  |                          |                         |                    |
+  |                          |--- generateToken() ---->|                    |
+  |                          |                         |                    |
+  |                          |                   Create new JWT             |
+  |                          |                         |                    |
+  |                          |<--- new access token ---|                    |
+  |                          |                         |                    |
+  |<--- 200 OK ---------------|                         |                    |
+  |    {accessToken: "new"}  |                         |                    |
+  |                          |                         |                    |
+
+
+4.4 LOGOUT FLOW WITH TOKEN BLACKLISTING
+----------------------------------------
+
+CLIENT              CONTROLLER         BLACKLIST SERVICE        REDIS
+  |                      |                     |                   |
+  |--- POST /api/auth/logout ------>          |                   |
+  |    Authorization: Bearer token   |        |                   |
+  |                      |                     |                   |
+  |                      |--- blacklistToken() ------->           |
+  |                      |                     |                   |
+  |                      |               Extract expiration       |
+  |                      |               Calculate TTL            |
+  |                      |                     |                   |
+  |                      |                     |--- SET key/value ->|
+  |                      |                     |    with TTL       |
+  |                      |                     |                   |
+  |                      |                     |<--- OK ------------|
+  |                      |                     |                   |
+  |                      |<--- Success --------|                   |
+  |                      |                     |                   |
+  |<--- 200 OK ----------|                     |                   |
+  |    {message: "Logged out"}                |                   |
+  |                      |                     |                   |
+  |                      |                     |                   |
+  |=== SUBSEQUENT REQUEST WITH BLACKLISTED TOKEN ===============|
+  |                      |                     |                   |
+  |--- GET /api/users/profile -------> Filter                     |
+  |    Authorization: Bearer token   |        |                   |
+  |                      |                     |                   |
+  |                Filter checks blacklist --------------->       |
+  |                      |                     |                   |
+  |                      |                     |--- GET key ------>|
+  |                      |                     |                   |
+  |                      |                     |<--- Found --------|
+  |                      |                     |                   |
+  |                Token is blacklisted!       |                   |
+  |                      |                     |                   |
+  |<--- 401 Unauthorized |                     |                   |
+  |    {error: "Token revoked"}                |                   |
+
+
+================================================================================
+SECTION 5: SECURITY FILTER CHAIN
+================================================================================
+
+5.1 SPRING SECURITY FILTER CHAIN ORDER
+---------------------------------------
+
+Spring Security uses 15+ filters that process requests in a specific order.
+Understanding this order is crucial for adding custom filters correctly.
+
+COMPLETE FILTER CHAIN (In Order):
+
+1. ForceEagerSessionCreationFilter
+   - Forces session creation if configured
+   - Rarely used in stateless APIs
+
+2. ChannelProcessingFilter
+   - Ensures requests use correct protocol (HTTP/HTTPS)
+   - Redirects to HTTPS if configured
+
+3. SecurityContextPersistenceFilter
+   - Loads SecurityContext from repository (usually HttpSession)
+   - In stateless mode, this does nothing
+   - Saves context after request completes
+
+4. ConcurrentSessionFilter
+   - Handles concurrent session control
+   - Checks if session has expired
+   - Not used in stateless JWT authentication
+
+5. WebAsyncManagerIntegrationFilter
+   - Integrates SecurityContext with async processing
+   - Ensures SecurityContext available in async threads
+
+6. HeaderWriterFilter
+   - Adds security headers to response
+   - Examples: X-Frame-Options, X-XSS-Protection, HSTS
+
+7. CorsFilter
+   - Handles CORS (Cross-Origin Resource Sharing)
+   - Processes preflight OPTIONS requests
+   - Adds CORS headers to response
+
+8. CsrfFilter
+   - Validates CSRF token for state-changing requests
+   - Disabled for stateless JWT APIs
+   - Required for cookie-based authentication
+
+9. LogoutFilter
+   - Handles logout requests
+   - Clears SecurityContext
+   - Invalidates session
+
+10. UsernamePasswordAuthenticationFilter
+    - Processes form login submissions
+    - Handles POST to /login
+    - Not used in JWT authentication
+    - YOUR JwtAuthenticationFilter RUNS BEFORE THIS
+
+11. RequestCacheAwareFilter
+    - Restores original request after authentication
+    - Used with form login redirect flow
+
+12. SecurityContextHolderAwareRequestFilter
+    - Wraps request with Spring Security methods
+    - Enables request.isUserInRole(), getUserPrincipal()
+
+13. AnonymousAuthenticationFilter
+    - Creates anonymous authentication if none exists
+    - Allows checking if user is anonymous vs authenticated
+
+14. SessionManagementFilter
+    - Handles session fixation protection
+    - Manages concurrent sessions
+    - Not used in stateless mode
+
+15. ExceptionTranslationFilter
+    - Handles security exceptions
+    - Returns 401 for AuthenticationException
+    - Returns 403 for AccessDeniedException
+
+16. AuthorizationFilter (formerly FilterSecurityInterceptor)
+    - Performs final authorization check
+    - Evaluates @PreAuthorize, @Secured annotations
+    - Checks SecurityFilterChain rules
+    - Last filter before controller
+
+
+YOUR JWT FILTER POSITION:
+
+.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+This means JwtAuthenticationFilter runs at position 9.5 (before filter 10).
+
+WHY THIS POSITION?
+- Runs after CORS and CSRF filters
+- Runs before form login filter
+- Early enough to set authentication for downstream filters
+- Late enough that security headers are already added
+
+
+5.2 CUSTOM FILTER POSITIONING OPTIONS
+--------------------------------------
+
+You can position custom filters using:
+
+a) addFilterBefore(filter, beforeThisFilter.class)
+   - Adds your filter before specified filter
+   - Example: addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
+b) addFilterAfter(filter, afterThisFilter.class)
+   - Adds your filter after specified filter
+   - Example: addFilterAfter(rateLimitFilter, CorsFilter.class)
+
+c) addFilterAt(filter, atThisPosition.class)
+   - Replaces existing filter
+   - Use carefully - can break security
+   - Example: addFilterAt(customAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+
+5.3 FILTER CHAIN DEBUGGING
+---------------------------
+
+To see all filters in your chain:
+
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    // ... configuration
+    
+    // Enable filter chain debug logging
+    http.securityMatcher("/**");
+    
+    return http.build();
+}
+
+In application.properties:
+logging.level.org.springframework.security=DEBUG
+
+This will log all filters and their order on application startup.
+
+
+================================================================================
+SECTION 6: ADVANCED SCENARIOS
+================================================================================
+
+6.1 IMPLEMENTING REFRESH TOKEN WITH DATABASE STORAGE
+----------------------------------------------------
+
+REFRESH TOKEN ENTITY:
+
+@Entity
+@Table(name = "refresh_tokens")
+public class RefreshToken {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true)
+    private String token;
+    
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+    
+    @Column(nullable = false)
+    private Instant expiryDate;
+    
+    // Getters and setters
+}
+
+REFRESH TOKEN SERVICE:
+
+@Service
+public class RefreshTokenService {
+    
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    private static final long REFRESH_TOKEN_VALIDITY = 604800000; // 7 days
+
+    public RefreshToken createRefreshToken(String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        
+        // Delete old refresh token if exists
+        refreshTokenRepository.findByUser(user)
+            .ifPresent(refreshTokenRepository::delete);
+        
+        // Create new refresh token
+        RefreshToken refreshToken = RefreshToken.builder()
+            .user(user)
+            .token(UUID.randomUUID().toString())
+            .expiryDate(Instant.now().plusMillis(REFRESH_TOKEN_VALIDITY))
+            .build();
+        
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+    public RefreshToken verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.delete(token);
+            throw new TokenRefreshException("Refresh token expired. Please login again.");
+        }
+        return token;
+    }
+
+    public Optional<RefreshToken> findByToken(String token) {
+        return refreshTokenRepository.findByToken(token);
+    }
+
+    public void deleteByUser(User user) {
+        refreshTokenRepository.findByUser(user)
+            .ifPresent(refreshTokenRepository::delete);
+    }
+}
+
+REFRESH TOKEN FLOW:
+
+1. Login: Generate both access token and refresh token
+   - Access token expires in 15-30 minutes
+   - Refresh token expires in 7 days
+   - Store refresh token in database
+
+2. Access token expires: Client calls /refresh endpoint
+   - Sends refresh token
+   - Server validates refresh token
+   - Issues new access token
+   - Returns new token to client
+
+3. Refresh token expires: User must login again
+   - Cannot refresh anymore
+   - Full authentication required
+
+
+6.2 TOKEN BLACKLISTING FOR LOGOUT
+----------------------------------
+
+PROBLEM: JWT tokens are stateless and can't be invalidated before expiration.
+
+SOLUTION: Maintain a blacklist of revoked tokens in Redis.
+
+TOKEN BLACKLIST SERVICE:
+
+@Service
+public class TokenBlacklistService {
+    
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+    
+    @Autowired
+    private JwtService jwtService;
+
+    /**
+     * Add token to blacklist
+     * TTL matches token expiration
+     */
+    public void blacklistToken(String token) {
+        try {
+            // Extract expiration date
+            Date expiration = jwtService.extractExpiration(token);
+            
+            // Calculate time until expiration
+            long ttl = expiration.getTime() - System.currentTimeMillis();
+            
+            if (ttl > 0) {
+                // Store in Redis with TTL
+                redisTemplate.opsForValue().set(
+                    "blacklist:" + token,
+                    "revoked",
+                    ttl,
+                    TimeUnit.MILLISECONDS
+                );
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to blacklist token", e);
+        }
+    }
+
+    /**
+     * Check if token is blacklisted
+     */
+    public boolean isBlacklisted(String token) {
+        try {
+            String value = redisTemplate.opsForValue()
+                .get("blacklist:" + token);
+            return value != null;
+        } catch (Exception e) {
+            // If Redis is down, deny access for safety
+            return true;
+        }
+    }
+}
+
+UPDATED JWT FILTER WITH BLACKLIST CHECK:
+
+@Override
+protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain) throws ServletException, IOException {
+    
+    final String authHeader = request.getHeader("Authorization");
+    
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        filterChain.doFilter(request, response);
+        return;
+    }
+    
+    final String jwt = authHeader.substring(7);
+    
+    // CHECK BLACKLIST FIRST
+    if (tokenBlacklistService.isBlacklisted(jwt)) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("Token has been revoked");
+        return;
+    }
+    
+    // Continue with normal JWT validation...
+    try {
+        String username = jwtService.extractUsername(jwt);
+        
+        if (username != null && 
+            SecurityContextHolder.getContext().getAuthentication() == null) {
+            
+            UserDetails userDetails = 
+                userDetailsService.loadUserByUsername(username);
+            
+            if (jwtService.validateToken(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = 
+                    new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                
+                authToken.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request));
+                
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+    } catch (Exception e) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("Invalid token");
+        return;
+    }
+    
+    filterChain.doFilter(request, response);
+}
+
+
+6.3 ROLE-BASED ACCESS CONTROL (RBAC)
+-------------------------------------
+
+DATABASE SCHEMA:
+
+users
+  - id (PK)
+  - username
+  - password
+  - active
+
+roles
+  - id (PK)
+  - name (ADMIN, USER, MANAGER)
+
+user_roles (join table)
+  - user_id (FK)
+  - role_id (FK)
+
+permissions
+  - id (PK)
+  - name (READ_PRIVILEGE, WRITE_PRIVILEGE, DELETE_PRIVILEGE)
+
+role_permissions (join table)
+  - role_id (FK)
+  - permission_id (FK)
+
+
+USER ENTITY WITH ROLES:
+
+@Entity
+@Table(name = "users")
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String username;
+    
+    @Column(nullable = false)
+    private String password;
+    
+    @Column(nullable = false)
+    private boolean active = true;
+    
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+    
+    // Getters and setters
+}
+
+ROLE ENTITY WITH PERMISSIONS:
+
+@Entity
+@Table(name = "roles")
+public class Role {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String name;  // ROLE_ADMIN, ROLE_USER, ROLE_MANAGER
+    
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "role_permissions",
+        joinColumns = @JoinColumn(name = "role_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions = new HashSet<>();
+    
+    // Getters and setters
+}
+
+PERMISSION ENTITY:
+
+@Entity
+@Table(name = "permissions")
+public class Permission {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String name;  // READ_PRIVILEGE, WRITE_PRIVILEGE, DELETE_PRIVILEGE
+    
+    // Getters and setters
+}
+
+USING PERMISSIONS IN CONTROLLERS:
+
+@RestController
+@RequestMapping("/api/documents")
+public class DocumentController {
+    
+    // Check for specific permission
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+    @GetMapping
+    public List<Document> getAllDocuments() {
+        return documentService.getAllDocuments();
+    }
+    
+    // Check for multiple permissions (OR)
+    @PreAuthorize("hasAnyAuthority('WRITE_PRIVILEGE', 'ADMIN_PRIVILEGE')")
+    @PostMapping
+    public Document createDocument(@RequestBody Document document) {
+        return documentService.createDocument(document);
+    }
+    
+    // Check for role AND permission
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('DELETE_PRIVILEGE')")
+    @DeleteMapping("/{id}")
+    public void deleteDocument(@PathVariable Long id) {
+        documentService.deleteDocument(id);
+    }
+    
+    // Complex permission check
+    @PreAuthorize("hasRole('ADMIN') or " +
+                  "(hasRole('MANAGER') and #document.department == authentication.principal.department)")
+    @PutMapping("/{id}")
+    public Document updateDocument(
+            @PathVariable Long id,
+            @RequestBody Document document) {
+        return documentService.updateDocument(id, document);
+    }
+}
+
+
+6.4 CONCURRENT SESSION CONTROL
+-------------------------------
+
+LIMIT USERS TO SINGLE SESSION:
+
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    http
+        .sessionManagement(session -> session
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(true)  // Prevent new login
+            // OR
+            .maxSessionsPreventsLogin(false) // Expire old session
+            .sessionRegistry(sessionRegistry())
+        );
+    
+    return http.build();
+}
+
+@Bean
+public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+}
+
+FOR JWT/STATELESS AUTHENTICATION:
+
+@Service
+public class SessionControlService {
+    
+    @Autowired
+    private RedisTemplate<String, Set<String>> redisTemplate;
+    
+    private static final int MAX_SESSIONS = 1;
+
+    public void registerSession(String username, String token) {
+        String key = "user:sessions:" + username;
+        Set<String> sessions = redisTemplate.opsForValue().get(key);
+        
+        if (sessions == null) {
+            sessions = new HashSet<>();
+        }
+        
+        // If max sessions reached, invalidate oldest
+        if (sessions.size() >= MAX_SESSIONS) {
+            String oldestToken = sessions.iterator().next();
+            tokenBlacklistService.blacklistToken(oldestToken);
+            sessions.remove(oldestToken);
+        }
+        
+        sessions.add(token);
+        redisTemplate.opsForValue().set(key, sessions, 24, TimeUnit.HOURS);
+    }
+}
+
+
+6.5 RATE LIMITING PER USER
+---------------------------
+
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private RedisTemplate<String, Integer> redisTemplate;
+    
+    private static final int MAX_REQUESTS_PER_MINUTE = 100;
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        
+        // Get username from SecurityContext
+        Authentication auth = SecurityContextHolder.getContext()
+            .getAuthentication();
+        
+        if (auth != null && auth.isAuthenticated()) {
+            String username = auth.getName();
+            String key = "rate:limit:" + username + ":" + 
+                getCurrentMinute();
+            
+            // Increment counter
+            Integer count = redisTemplate.opsForValue().increment(key);
+            
+            if (count == 1) {
+                // Set expiration on first request
+                redisTemplate.expire(key, 1, TimeUnit.MINUTES);
+            }
+            
+            if (count > MAX_REQUESTS_PER_MINUTE) {
+                response.setStatus(429);  // Too Many Requests
+                response.getWriter().write("Rate limit exceeded");
+                return;
+            }
+        }
+        
+        filterChain.doFilter(request, response);
+    }
+    
+    private long getCurrentMinute() {
+        return System.currentTimeMillis() / 60000;
+    }
+}
+
+Add to SecurityConfig:
+
+.addFilterAfter(rateLimitFilter, JwtAuthenticationFilter.class)
+
+
+================================================================================
+SECTION 7: COMMON ISSUES AND SOLUTIONS
+================================================================================
+
+7.1 ISSUE: JWT TOKEN TOO LARGE
+-------------------------------
+
+PROBLEM: Token size exceeds header size limit (8KB typical limit).
+
+CAUSE: Too much data in payload (roles, permissions, user details).
+
+SOLUTION 1: Minimize payload
+- Include only essential data (user ID, username)
+- Store roles/permissions in database
+- Load from DB on each request
+
+SOLUTION 2: Use token reference
+- Store actual data in Redis
+- Token contains only reference ID
+- Filter looks up data from Redis
+
+Example:
+@Service
+public class JwtService {
+    public String generateToken(UserDetails userDetails) {
+        // Generate session ID
+        String sessionId = UUID.randomUUID().toString();
+        
+        // Store user details in Redis
+        redisTemplate.opsForValue().set(
+            "session:" + sessionId,
+            userDetails,
+            24,
+            TimeUnit.HOURS
+        );
+        
+        // Create minimal token with session ID
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sessionId", sessionId);
+        
+        return createToken(claims, userDetails.getUsername());
+    }
+}
+
+
+7.2 ISSUE: CORS ERRORS WITH JWT
+--------------------------------
+
+PROBLEM: Browser blocks requests due to CORS policy.
+
+SOLUTION: Configure CORS properly
+
+@Configuration
+public class CorsConfig {
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // Allow specific origins
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "https://your-frontend-domain.com"
+        ));
+        
+        // Allow specific methods
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+        
+        // Allow specific headers
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "Accept"
+        ));
+        
+        // Allow credentials (cookies, authorization headers)
+        configuration.setAllowCredentials(true);
+        
+        // Cache preflight for 1 hour
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = 
+            new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        
+        return source;
+    }
+}
+
+In SecurityConfig:
+
+http.cors(cors -> cors
+    .configurationSource(corsConfigurationSource()));
+
+
+7.3 ISSUE: SECURITY CONTEXT NOT AVAILABLE IN @ASYNC METHODS
+------------------------------------------------------------
+
+PROBLEM: SecurityContext is ThreadLocal, not available in async threads.
+
+SOLUTION 1: Configure SecurityContext strategy
+
+@Configuration
+@EnableAsync
+public class AsyncConfig {
+    
+    @Bean
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("async-");
+        
+        // Wrap with SecurityContext decorator
+        executor.setTaskDecorator(new SecurityContextTaskDecorator());
+        
+        executor.initialize();
+        return executor;
+    }
+}
+
+SecurityContextTaskDecorator:
+
+public class SecurityContextTaskDecorator implements TaskDecorator {
+    
+    @Override
+    public Runnable decorate(Runnable runnable) {
+        // Get current SecurityContext
+        SecurityContext context = SecurityContextHolder.getContext();
+        
+        return () -> {
+            try {
+                // Set SecurityContext in async thread
+                SecurityContextHolder.setContext(context);
+                runnable.run();
+            } finally {
+                // Clear SecurityContext
+                SecurityContextHolder.clearContext();
+            }
+        };
+    }
+}
+
+SOLUTION 2: Use DelegatingSecurityContextExecutor
+
+ExecutorService executor = Executors.newFixedThreadPool(5);
+DelegatingSecurityContextExecutor delegatingExecutor = 
+    new DelegatingSecurityContextExecutor(executor);
+
+delegatingExecutor.execute(() -> {
+    // SecurityContext is available here
+    Authentication auth = SecurityContextHolder.getContext()
+        .getAuthentication();
+});
+
+
+7.4 ISSUE: PASSWORD NOT MATCHING DURING LOGIN
+----------------------------------------------
+
+PROBLEM: Login fails even with correct password.
+
+COMMON CAUSES:
+
+1. Password not BCrypt encoded in database
+   - Check: Password should start with $2a$ or $2b$
+   - Solution: Use passwordEncoder.encode() when saving
+
+2. Password encoded multiple times
+   - Check: Password shouldn't have multiple $2a$ prefixes
+   - Solution: Encode only once during registration
+
+3. Wrong password encoder used
+   - Check: Using same encoder for encoding and validation
+   - Solution: Use BCryptPasswordEncoder consistently
+
+4. Whitespace in password
+   - Check: Trim password before encoding
+   - Solution: request.getPassword().trim()
+
+DEBUGGING:
+
+@Service
+public class AuthService {
+    
+    public void register(RegisterRequest request) {
+        // Log original password (ONLY IN DEVELOPMENT!)
+        System.out.println("Original password: " + request.getPassword());
+        
+        // Encode password
+        String encoded = passwordEncoder.encode(request.getPassword());
+        System.out.println("Encoded password: " + encoded);
+        
+        // Save user
+        user.setPassword(encoded);
+        userRepository.save(user);
+    }
+    
+    public void login(LoginRequest request) {
+        // Load user from database
+        User user = userRepository.findByUsername(request.getUsername());
+        
+        // Log stored password
+        System.out.println("Stored password: " + user.getPassword());
+        
+        // Check if passwords match
+        boolean matches = passwordEncoder.matches(
+            request.getPassword(),
+            user.getPassword()
+        );
+        System.out.println("Passwords match: " + matches);
+    }
+}
+
+
+7.5 ISSUE: 401 UNAUTHORIZED EVEN WITH VALID TOKEN
+--------------------------------------------------
+
+PROBLEM: Valid JWT token returns 401.
+
+DEBUGGING CHECKLIST:
+
+1. Check if filter is registered
+   - Enable debug logging
+   - Check filter chain in logs
+
+2. Check token format
+   - Must be: "Bearer <token>"
+   - Not: "Bearer<token>" (missing space)
+
+3. Check token expiration
+   - Print extracted expiration date
+   - Compare with current time
+
+4. Check secret key
+   - Same key used for signing and validation
+   - Check environment variable loaded correctly
+
+5. Check user exists in database
+   - UserDetailsService might throw exception
+
+6. Check JWT library version
+   - io.jsonwebtoken:jjwt-api:0.11.5 or higher
+
+DEBUGGING FILTER:
+
+@Override
+protected void doFilterInternal(...) {
+    System.out.println("=== JWT Filter Debug ===");
+    System.out.println("Authorization header: " + authHeader);
+    
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        String jwt = authHeader.substring(7);
+        System.out.println("Extracted token: " + jwt);
+        
+        try {
+            String username = jwtService.extractUsername(jwt);
+            System.out.println("Extracted username: " + username);
+            
+            UserDetails userDetails = 
+                userDetailsService.loadUserByUsername(username);
+            System.out.println("User found: " + userDetails.getUsername());
+            
+            boolean valid = jwtService.validateToken(jwt, userDetails);
+            System.out.println("Token valid: " + valid);
+            
+            if (valid) {
+                // Set authentication
+                System.out.println("Authentication set successfully");
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    filterChain.doFilter(request, response);
+}
+
+
+7.6 ISSUE: CANNOT ACCESS AUTHENTICATION IN CONTROLLER
+------------------------------------------------------
+
+PROBLEM: SecurityContext is empty in controller.
+
+SOLUTION 1: Inject Authentication parameter
+
+@GetMapping("/profile")
+public ResponseEntity<UserDTO> getProfile(Authentication authentication) {
+    if (authentication == null) {
+        return ResponseEntity.status(401).build();
+    }
+    
+    String username = authentication.getName();
+    return ResponseEntity.ok(userService.getByUsername(username));
+}
+
+SOLUTION 2: Use @AuthenticationPrincipal
+
+@GetMapping("/profile")
+public ResponseEntity<UserDTO> getProfile(
+        @AuthenticationPrincipal UserDetails userDetails) {
+    
+    String username = userDetails.getUsername();
+    return ResponseEntity.ok(userService.getByUsername(username));
+}
+
+SOLUTION 3: Get from SecurityContextHolder
+
+@GetMapping("/profile")
+public ResponseEntity<UserDTO> getProfile() {
+    Authentication auth = SecurityContextHolder.getContext()
+        .getAuthentication();
+    
+    if (auth == null || !auth.isAuthenticated()) {
+        return ResponseEntity.status(401).build();
+    }
+    
+    String username = auth.getName();
+    return ResponseEntity.ok(userService.getByUsername(username));
+}
+
+
+================================================================================
+SECTION 8: PRODUCTION BEST PRACTICES
+================================================================================
+
+8.1 SECURITY BEST PRACTICES
+----------------------------
+
+1. USE HTTPS IN PRODUCTION
+   - Never send JWT over HTTP
+   - Use TLS 1.2 or higher
+   - Implement HSTS header
+
+2. STRONG SECRET KEY
+   - Minimum 256 bits (32 bytes)
+   - Use cryptographically random generation
+   - Store in environment variables or secrets manager
+   - Rotate periodically
+
+Example secret generation:
+import java.security.SecureRandom;
+import java.util.Base64;
+
+SecureRandom random = new SecureRandom();
+byte[] bytes = new byte[32];
+random.nextBytes(bytes);
+String secret = Base64.getEncoder().encodeToString(bytes);
+
+3. PASSWORD SECURITY
+   - Use BCrypt with strength 10-12
+   - Never log passwords
+   - Implement password complexity rules
+   - Implement account lockout after failed attempts
+
+4. TOKEN EXPIRATION
+   - Access token: 15-30 minutes
+   - Refresh token: 7 days
+   - Never use tokens that don't expire
+
+5. IMPLEMENT RATE LIMITING
+   - Prevent brute force attacks
+   - Limit login attempts
+   - Limit API calls per user
+
+6. INPUT VALIDATION
+   - Validate all user inputs
+   - Sanitize data before database storage
+   - Use @Valid annotation with constraints
+
+7. SECURITY HEADERS
+   - X-Frame-Options: DENY
+   - X-Content-Type-Options: nosniff
+   - X-XSS-Protection: 1; mode=block
+   - Content-Security-Policy
+   - Strict-Transport-Security
+
+Add headers in SecurityConfig:
+
+http.headers(headers -> headers
+    .frameOptions(frameOptions -> frameOptions.deny())
+    .xssProtection(xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+    .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
+);
+
+8. AUDIT LOGGING
+   - Log all authentication attempts
+   - Log authorization failures
+   - Log token generation
+   - Include IP address, timestamp, user agent
+
+@Aspect
+@Component
+public class SecurityAuditAspect {
+    
+    @AfterReturning(
+        pointcut = "execution(* com.example.AuthenticationController.login(..))",
+        returning = "result"
+    )
+    public void logLogin(JoinPoint joinPoint, Object result) {
+        Object[] args = joinPoint.getArgs();
+        AuthenticationRequest request = (AuthenticationRequest) args[0];
+        
+        log.info("Login attempt - Username: {}, Success: {}, IP: {}",
+            request.getUsername(),
+            result != null,
+            getClientIp()
+        );
+    }
+}
+
+9. DEPENDENCY UPDATES
+   - Keep Spring Security up to date
+   - Monitor security advisories
+   - Use dependency scanning tools
+
+10. PRINCIPLE OF LEAST PRIVILEGE
+    - Give users minimum required permissions
+    - Review and audit user roles regularly
+    - Implement role hierarchies
+
+
+8.2 PERFORMANCE OPTIMIZATION
+-----------------------------
+
+1. CACHE USER DETAILS
+   - Reduce database queries
+   - Use Redis or Caffeine cache
+
+@Service
+public class CachedUserDetailsService implements UserDetailsService {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Cacheable(value = "users", key = "#username")
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        // Database query only on cache miss
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException(username));
+        
+        return buildUserDetails(user);
+    }
+    
+    @CacheEvict(value = "users", key = "#username")
+    public void evictUserCache(String username) {
+        // Called when user updated
+    }
+}
+
+2. DATABASE OPTIMIZATION
+   - Index username column
+   - Use EAGER fetch for roles if always needed
+   - Use connection pooling (HikariCP)
+
+3. JWT OPTIMIZATION
+   - Keep payload small
+   - Don't include unnecessary claims
+   - Use efficient signing algorithm (HS256)
+
+4. ASYNC PROCESSING
+   - Use @Async for non-critical operations
+   - Send emails asynchronously
+   - Log audit entries asynchronously
+
+
+8.4 MONITORING AND ALERTING
+----------------------------
+
+1. METRICS TO MONITOR
+   - Authentication success/failure rate
+   - Token generation rate
+   - Average response time
+   - Number of active users
+   - Failed login attempts per IP
+   - Token validation failures
+
+2. IMPLEMENT ACTUATOR METRICS
+
+@Component
+public class SecurityMetrics {
+    
+    private final Counter loginAttempts;
+    private final Counter loginFailures;
+    private final Counter tokenGenerations;
+    
+    public SecurityMetrics(MeterRegistry registry) {
+        this.loginAttempts = Counter.builder("security.login.attempts")
+            .description("Total login attempts")
+            .register(registry);
+        
+        this.loginFailures = Counter.builder("security.login.failures")
+            .description("Failed login attempts")
+            .register(registry);
+        
+        this.tokenGenerations = Counter.builder("security.token.generations")
+            .description("JWT tokens generated")
+            .register(registry);
+    }
+    
+    public void recordLoginAttempt() {
+        loginAttempts.increment();
+    }
+    
+    public void recordLoginFailure() {
+        loginFailures.increment();
+    }
+    
+    public void recordTokenGeneration() {
+        tokenGenerations.increment();
+    }
+}
+
+3. ALERTING RULES
+   - Alert on high failure rate (>10% of attempts)
+   - Alert on brute force patterns
+   - Alert on token validation failures spike
+   - Alert on unauthorized access attempts
+
+
+8.5 CONFIGURATION FILES
+------------------------
+
+application.yml (Production):
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        show_sql: false
+  
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+    timeout: 60000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 1800000  # 30 minutes
+  refresh-expiration: 604800000  # 7 days
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 10MB
+    max-history: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+
+================================================================================
+SECTION 9: COMPLETE IMPLEMENTATION CHECKLIST
+================================================================================
+
+STEP-BY-STEP IMPLEMENTATION GUIDE:
+
+□ 1. Add Dependencies (pom.xml)
+   - spring-boot-starter-security
+   - spring-boot-starter-web
+   - spring-boot-starter-data-jpa
+   - io.jsonwebtoken:jjwt-api
+   - io.jsonwebtoken:jjwt-impl
+   - io.jsonwebtoken:jjwt-jackson
+
+□ 2. Create Database Entities
+   - User entity with username, password
+   - Role entity with name
+   - User-Role join table
+
+□ 3. Create Repositories
+   - UserRepository with findByUsername()
+   - RoleRepository with findByName()
+
+□ 4. Implement UserDetailsService
+   - CustomUserDetailsService
+   - loadUserByUsername() method
+   - Convert User to UserDetails
+
+□ 5. Create JWT Service
+   - generateToken() method
+   - validateToken() method
+   - extractUsername() method
+   - All helper methods
+
+□ 6. Create JWT Filter
+   - Extend OncePerRequestFilter
+   - Extract token from header
+   - Validate token
+   - Set SecurityContext
+
+□ 7. Create Security Configuration
+   - SecurityFilterChain bean
+   - PasswordEncoder bean
+   - AuthenticationManager bean
+   - Configure public/private endpoints
+   - Add JWT filter
+
+□ 8. Create Authentication Controller
+   - /login endpoint
+   - /register endpoint
+   - /refresh endpoint (optional)
+   - /logout endpoint (optional)
+
+□ 9. Create Protected Controllers
+   - Add @PreAuthorize annotations
+   - Implement business logic
+
+□ 10. Testing
+   - Test login with valid credentials
+   - Test login with invalid credentials
+   - Test accessing protected resources
+   - Test role-based access control
+
+□ 11. Add Advanced Features (Optional)
+   - Refresh token mechanism
+   - Token blacklisting
+   - Rate limiting
+   - Audit logging
+
+□ 12. Production Preparation
+   - Environment variables for secrets
+   - HTTPS configuration
+   - Security headers
+   - Monitoring setup
+

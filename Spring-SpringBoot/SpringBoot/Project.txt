@@ -20,6 +20,214 @@ Additionally, I built Pharmacy Management with inventory tracking, low-stock and
 Currently, Laboratory Management and Reporting/Analytics dashboards are under development, and the next step is to integrate test workflows and generate operational insights like revenue and appointment trends.
 
 
+=====================================
+🔷 Services and Modules used in HMS
+=====================================
+1️⃣ User Management Service ─────────▶ 8081
+2️⃣ Profile Management Service ─────────▶ 8082
+3️⃣ Pharmacy Management Service ─────────▶ 8083
+4️⃣ Appointment Management Service ─────────▶ 8084
+5️⃣ Billing Management Service ───────────▶ 8085
+6️⃣ Pharmacy Management Service ───────────▶ 8086
+7️⃣ Laboratory Management Service ───────────▶ 8087
+8️⃣ Report Management Service ───────────────▶ 8088
+9️⃣ Notification Management Service ───────────▶ 8089
+1️⃣0️⃣ API Gateway ─────────▶ 8080
+1️⃣1️⃣ Eureka Server (Service Discovery) ───────────▶ 8761
+1️⃣2️⃣ Spring Cloud Config Server ───────────────▶ 8888
+
+
+=====================================
+🔷 Tech Stack used While Building HMS
+=====================================
+1️⃣ Java 17
+2️⃣ Spring Boot
+3️⃣ Spring Cloud
+4️⃣ Spring Security
+5️⃣ MySQL
+6️⃣ Kafka
+7️⃣ MongoDB
+8️⃣ Redis
+9️⃣ AWS
+1️⃣0️⃣ Docker
+1️⃣1️⃣ Kubernetes
+1️⃣2️⃣ Jenkins
+1️⃣3️⃣ React.js
+1️⃣4️⃣ Tailwind CSS
+1️⃣5️⃣ UI Libararies(Mantine + Primereact+ react-icons)
+
+
+===========================
+🔷 Working of Each Module
+===========================
+=======================================
+1️⃣ Service Discovery (Netflix Eureka)
+=======================================
+➤ Imagine you have 10 services running. Each one is on a different server, possibly a different port. How does Service A know where Service B is? In the past, you would hardcode IP addresses. But in a cloud environment, servers come and go — their IPs change constantly.
+➤ Eureka solves this. It is a registry — think of it as a phone book for your services. When a service starts up, it "registers" itself with Eureka, saying "Hey, I am the Appointment Service, and you can reach me at this address." When another service needs to call the Appointment Service, it asks Eureka for the current address.
+
+➤ We set eureka.client.register-with-eureka=false because the Eureka SERVER itself should not register as a client in its own registry. 
+➤ Same for fetch-registry — the server does not need to fetch a list from itself.
+
+🔗 Application.properties
+server.port=8761
+
+# The Eureka server should NOT register itself as a client
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+
+# Pretty dashboard UI
+eureka.server.enable-self-preservation=true
+spring.application.name=eureka-server
+
+
+❓ How does Eureka handle service discovery in cloud environments where service instances have dynamic IP addresses and ports?
+When services run on cloud (Docker/K8s/EC2), their IP + port can change anytime due to scaling, restart, redeploy, etc.
+So hardcoding IPs is impossible.
+
+✅ How Eureka finds services even with changing IP/ports
+1️⃣ Each service registers itself to Eureka (Service Registration)
+When a microservice starts, it automatically sends its current details to Eureka:
+    ✔️ Service name (ex: PAYMENT-SERVICE)
+    ✔️ Current IP address (ex: 10.0.2.15)
+    ✔️ Current port (ex: 8083)
+
+So Eureka stores: PAYMENT-SERVICE -> 10.0.2.15:8083
+Even if it changes later, it will re-register with the new IP/port.
+
+2️⃣ Eureka uses Heartbeats to keep list updated
+Every service sends a heartbeat like:
+✅ “I am alive” every ~30 seconds.
+
+➤ If Eureka stops receiving heartbeat, it marks that instance as DOWN and removes it from the registry.
+➤ So dead services don’t stay in the list.
+
+
+3️⃣ Client services don’t call IPs, they call service name
+✅ Example: ORDER-SERVICE does NOT call: ❌ http://10.0.2.15:8083/pay
+➤ Instead it calls: ✅ http://PAYMENT-SERVICE/pay
+➤ Then Eureka + LoadBalancer resolves it to a real instance IP/port.
+
+
+4️⃣ Service Discovery happens at runtime (dynamic lookup)
+When ORDER-SERVICE wants to call PAYMENT-SERVICE, it asks Eureka:
+“Give me all running instances of PAYMENT-SERVICE”
+Eureka responds with a list:
+10.0.2.15:8083
+10.0.2.20:8083
+10.0.2.25:8083
+➤ Then client picks one instance (load balancing).
+
+
+🔁 What if IP/port changes?
+✅ Example:
+➤ Old instance: PAYMENT-SERVICE -> 10.0.2.15:8083
+➤ Service restarts and gets new IP/port: PAYMENT-SERVICE -> 10.0.3.99:9091
+➤ It registers again, Eureka updates the registry.
+➤ So other services automatically start calling the new address.
+
+
+🔄 Where does eureka runs in cloud
+EKS (Kubernetes)
+➤ Eureka runs as a K8s Deployment + Service
+➤ Similar to any microservice deployment
+
+
+=================================
+2️⃣ Spring Cloud Config Server
+=================================
+➤ Right now, each service has its own application.properties file with database URLs, API keys, port numbers, etc.
+➤ If you need to change the database password, you have to go into each service and update it manually. That is painful and error-prone.
+➤ It is a central place where ALL configuration for ALL services lives. And here is the best part: that configuration is stored in a GitHub repository.
+➤ So you can version-control your configs, see who changed what, and roll back if something breaks.
+
+
+🔄 Working of Spring Cloud Config Server
+1️⃣ Config files for every service live in a GitHub repository.
+2️⃣ The Config Server connects to that GitHub repo.
+3️⃣ When a service starts up, instead of reading its local application.properties, it asks the Config Server: "Give me my config."
+4️⃣ The Config Server fetches the config from GitHub and returns it.
+5️⃣ If you change the config in GitHub, services can be refreshed without restarting.
+
+
+🔗 Config Server -> application.properties
+server.port=8888
+spring.application.name=config-server
+
+# Point to YOUR GitHub repo that has all the config files
+spring.cloud.config.server.git.uri=https://github.com/YOUR_USERNAME/hospital-config-repo.git
+
+# If the repo is private, add authentication
+# spring.cloud.config.server.git.username=your-github-username
+# spring.cloud.config.server.git.password=your-github-token
+How Client Services Connect to Config Server
+# In EACH service's application.properties (bootstrap config)
+spring.application.name=user-service
+
+# Tell this service to fetch its config from the Config Server
+spring.config.import=optional:configserver:http://localhost:8888
+
+# This tells Config Server which profile (environment) to use
+spring.profiles.active=dev
+
+
+🔄 Config repo should look like:
+hospital-config-repo/
+  user-service-dev.properties
+  user-service-staging.properties
+  user-service-prod.properties
+
+  appointment-service-dev.properties
+  appointment-service-staging.properties
+  appointment-service-prod.properties
+
+
+=================================
+3️⃣ Spring Cloud Gateway
+=================================
+➤ The API Gateway is the single entry point for ALL client requests.
+➤ Instead of the frontend knowing the URL of every single service, it just talks to the Gateway. The Gateway figures out where to send each request.
+
+
+🔄 What Does It Do?
+➤ Routing ─────────▶ Forwards requests to the correct microservice based on the URL path.
+➤ Authentication ─────────▶ Checks if the user is logged in before letting the request through.
+➤ Rate Limiting ─────────▶ Prevents abuse by limiting how many requests a user can make per second.
+➤ Load Balancing ─────────▶ If multiple instances of a service are running, it distributes requests evenly.
+
+
+🔗 application.properties — Route Configuration
+➤ Each route says: "If the URL starts with /api/users, forward it to the user-service."
+➤ The "lb://" prefix means "use load balancing" — Spring Cloud automatically finds the service address from Eureka.
+
+spring.cloud.gateway.routes[0].id=user-service
+spring.cloud.gateway.routes[0].uri=lb://user-service
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/users
+
+
+
+🔗 Gateway -> application.properties
+server.port=8080
+spring.application.name=gateway
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka
+spring.cloud.gateway.discovery.locator.enabled=true
+
+
+1️⃣ Deploy Spring Cloud Gateway as a separate service
+Gateway runs like any other Spring Boot app:
+    ✔️ Docker container OR jar
+    ✔️ port: 8080 (example)
+
+2️⃣ Put an AWS Application Load Balancer (ALB) in front
+ALB gives you:
+    ✔️ Static DNS
+    ✔️ HTTPS termination (SSL)
+    ✔️ Health checks
+    ✔️ Load balancing if you run multiple gateway instances
+👉 Flow becomes: Client → ALB → Spring Cloud Gateway → Microservices
+
+
+
 🔄 🚫 Problems Faced While Building HMS
 1️⃣ Role-Based Access Control (RBAC) Complexity
 ➤ Deciding who can access what (Admin vs Doctor vs Patient vs Staff)
@@ -100,6 +308,7 @@ Track:
 ➤ Prescription refill reminders
 ➤ Emergency notifications (optional)
 👉 Improves patient experience + reduces missed appointments.
+
 
 
 
@@ -1033,29 +1242,6 @@ Scenario 2️⃣0️⃣: Disaster Recovery and Backup Failures
 ➤ Create runbooks for different disaster scenarios
 
 
-======================================
-🔷 Microservices Detailed Analysis
-======================================
-🔄 Services with their port numbers:
-➤ Eureka Server (8761) ─────────▶ Service Discovery
-➤ UserMS (8080) ─────────▶ Authentication
-➤ ProfileMS (9100) ─────────▶ Doctor & Patient Profiles
-➤ AppointmentMS (9200) ─────────▶ Appointments, Medical Records, Prescriptions
-➤ PharmacyMS (9300) ─────────▶ Medicine Inventory & Sales
-➤ MediaMS (9400) ─────────▶ File Storage
-➤ Gateway ─────────▶ JWT Validation & Routing
-
-
-🔄 Technology Stack
-Every technology used in your project:
-➤ Spring Boot 3.5.6/3.5.7
-➤ Spring Cloud 2025.0.0
-➤ Java 8
-➤ MySQL 8
-➤ JWT, BCrypt, OpenFeign, Eureka
-➤ React, Tailwind CSS (frontend)
-
-
 🔄 Complete Application Flows
 ➤ Patient Registration ─────────▶ User creation → Profile creation → Database entries
 ➤ Doctor Registration ─────────▶ Similar with doctor ─ specific fields
@@ -1068,10 +1254,16 @@ Every technology used in your project:
 ➤ Medical Document Upload ─────────▶ File storage as BLOB → Retrieval
 
 
+🔄 Why I chose SQL (Relational DB) for HMS?
+1️⃣ HMS data is highly relational: Patient ↔ Doctor ↔ Appointment ↔ Billing ↔ Reports → needs joins and proper relationships.
 
+2️⃣ Strong consistency is critical (ACID): medical records and billing cannot allow partial/incorrect updates.
 
+3️⃣ Constraints + integrity: foreign keys, unique constraints, and validations keep data clean and reliable.
 
+4️⃣ Complex reporting queries: daily appointments, patient history, revenue, department stats are easier and faster in SQL.
 
+5️⃣ Transactions are necessary: booking + payment + invoice updates must happen atomically.
 
 
 

@@ -801,9 +801,7 @@ public class Book {
     private Long id;
 
     private String title;
-
     private String author;
-
     private Double price;
 }
 
@@ -1046,6 +1044,94 @@ public class BookHeaderVersionController {
         return "Books API v2";
     }
 }
+
+
+=============================
+🔷 REST API best practices
+=============================
+1️⃣ Use proper HTTP methods
+
+2️⃣ Use clear & consistent resource-based URLs
+✅ Good:
+    ✔️ /api/v1/users
+    ✔️ /api/v1/users/{id}
+    ✔️ /api/v1/users/{id}/appointments
+
+❌ Bad:
+    ✔️ /getUsers
+    ✔️ /createUserNow
+
+
+3️⃣ Use correct HTTP status codes
+
+4️⃣ Always validate input (server-side)
+➤ Validate required fields
+➤ Validate formats (email, phone)
+➤ Validate ranges (age, salary)
+➤ Reject extra/unknown fields if needed
+
+5️⃣ Standardize your API response format
+✅ Example:
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": { }
+}
+
+For errors:
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": [
+    { "field": "email", "reason": "Invalid format" }
+  ]
+}
+
+6️⃣ Version your APIs
+➤ Use: /api/v1/...
+➤ So future breaking changes go into: /api/v2/...
+
+7️⃣ Secure the API properly
+➤ Use HTTPS
+➤ Use JWT / OAuth2
+➤ Never expose sensitive fields (password, OTP)
+➤ Store passwords with bcrypt
+➤ Add role-based access control (Admin/Doctor/Patient)
+
+8️⃣ Pagination, filtering, sorting for lists
+Example:
+    🔗 /users?page=1&limit=20
+    🔗 /appointments?doctorId=12&status=CONFIRMED
+    🔗 /users?sortBy=createdAt&order=desc
+
+9️⃣ Avoid heavy payloads (optimize responses)
+➤ Return only required fields
+➤ Use DTOs (response models)
+➤ Support query like: ?fields=id,name,email
+
+1️⃣0️⃣ Handle errors globally (consistent)
+Use global exception handling so all errors are clean + predictable.
+
+1️⃣1️⃣ Use proper naming conventions
+➤ JSON keys in camelCase
+➤ Consistent field names: createdAt, updatedAt
+
+1️⃣2️⃣ Make APIs idempotent where needed
+➤ PUT should be idempotent (same request = same result)
+➤ Avoid duplicate resource creation on retries
+
+1️⃣3️⃣ Logging + Monitoring
+➤ Log request id / user id
+➤ Track failures (4xx/5xx)
+➤ Use correlation IDs for debugging microservices
+
+1️⃣4️⃣ Rate limiting + throttling
+Protect from abuse: 100 requests/minute per user/IP
+
+1️⃣5️⃣ Write good API documentation
+Use:
+    ✔️ Swagger / OpenAPI
+    ✔️ Provide sample request/response
 
 
 ============================

@@ -792,7 +792,7 @@ public class C {
 	public static void main(String[] args) {
 	  C c1 = new C();
 	  c1.test();
-	}	
+	}
 	public void test() {
 	      System.out.println(100);
 	      return;
@@ -811,7 +811,7 @@ public class C {
 	public static void main(String[] args) {}
 	public int test1() {} ────────────────▶ Error
   	public int test2() {
-		return 100; 
+		return 100;
 		System.out.println(300); ────────────────▶ Unreachable code error
 	}
 }
@@ -856,7 +856,7 @@ public class C {
 	  C c1 = new C();
 	  c1.test("mike",100,200,300);
 	}
-	public void test(String y,int... x) { 
+	public void test(String y,int... x) {
 		System.out.println(x[0]);// Output :100
 		System.out.println(x[1]);// Output :200
 		System.out.println(x[2]);// Output :300
@@ -872,7 +872,7 @@ public class C {
 	public static void main(String[] args) {
 	    C.test1();// Output :599
     	int x =  C.test2();
-	    System.out.println(x);// Output :100  
+	    System.out.println(x);// Output :100
 	}
 	public static void test1() {
 		System.out.println(599);
@@ -880,11 +880,11 @@ public class C {
  	public static int test2() {
 		return 100;
 	}
-}  
+}
 
 
 ########################
-🔷 Java Reflection API 
+🔷 Java Reflection API
 ########################
 ➤ Reflection API in Java = Mechanism to inspect and manipulate classes, methods, fields, and constructors at runtime.
 ➤ Part of java.lang.reflect package.

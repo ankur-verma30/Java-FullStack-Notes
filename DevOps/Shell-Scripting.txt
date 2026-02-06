@@ -1,4 +1,4 @@
-🔷 Linux Commands 
+🔷 Linux Commands
 1️⃣ free — Check RAM (Memory) Usage
 Displays information about system memory — total, used, and free RAM & swap.
 

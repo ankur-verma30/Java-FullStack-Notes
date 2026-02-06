@@ -33,7 +33,7 @@ In project we will develop serveral classes. All those classes we can catergoriz
         👉 It should have a public no-argument constructor.
         👉 Properties should be private with public getters and setters.
         👉 It should be serializable (implements Serializable interface).
-        ⚡ Notes: 
+        ⚡ Notes:
             1️⃣ All Java Beans are POJOs but all POJOs are not Java Beans.
             2️⃣ Bean classes are used to write business logic and to store and retrieve data.
 
@@ -145,10 +145,10 @@ public class Application {
 }
 ➤ It is enterpoint for boot application execution
 ➤ @SpringBootApplication annotation is equal to 3 annotations:
-    ✔️ @SpringBootConfiguration
+    ✔️ @Configuration
     ✔️ @EnableAutoConfiguration
     ✔️ @ComponentScan
-➤ SpringBoot start class will act as a configuration class because of the @SpringBootConfiguration annotation.
+➤ SpringBoot start class will act as a configuration class because of the @Configuration annotation.
 ➤ @EnableAutoConfiguration annotation tells SpringBoot to auto-configure beans based on classpath dependencies.
 ➤ @ComponentScan annotation scans the package (and sub-packages) of the class for components (@Component, @Service, @Repository, @Controller, etc.).
 
@@ -1476,14 +1476,13 @@ public void transferMoney() {
 ✔️ Cleaner & more professional enterprise-level code
 
 
-🔄 Key AOP Terminologies 
+🔄 Key AOP Terminologies
 🌟 Aspect
 A module/class that contains cross-cutting logic.
 
 @Aspect
 @Component
-public class LoggingAspect {
-}
+public class LoggingAspect {}
 
 🌟 Join Point
 A point during program execution where advice can be applied.
@@ -1855,7 +1854,7 @@ It can be applied at:
 1️⃣ Rollback Rules
 ➤ By default, rolls back on unchecked exceptions (RuntimeException, Error).
 ➤ Checked exceptions don’t trigger rollback unless configured.
-
+    
 @Transactional(rollbackFor = Exception.class)
 public void doWork() { ... }
 
@@ -1917,10 +1916,10 @@ public void doWork() { ... }
 🔄 Isolation Levels vs Problems
 | Isolation Level      | Dirty Read    | Non-Repeatable Read  | Phantom Read   |
 | -------------------- | -----------   | -------------------  | ------------   |
-| READ UNCOMMITTED | ❌ Possible  | ❌ Possible          | ❌ Possible   |
-| READ COMMITTED   | ✅ Prevented | ❌ Possible          | ❌ Possible   |
-| REPEATABLE READ  | ✅ Prevented | ✅ Prevented         | ❌ Possible   |
-| SERIALIZABLE     | ✅ Prevented | ✅ Prevented         | ✅ Prevented  |
+| READ UNCOMMITTED     | ❌ Possible  | ❌ Possible          | ❌ Possible   |
+| READ COMMITTED       | ✅ Prevented | ❌ Possible          | ❌ Possible   |
+| REPEATABLE READ      | ✅ Prevented | ✅ Prevented         | ❌ Possible   |
+| SERIALIZABLE         | ✅ Prevented | ✅ Prevented         | ✅ Prevented  |
 
 
 🔄 How Each Isolation Level Works
@@ -2908,7 +2907,7 @@ Client
 | Access to Controller info | ❌                               | ✅               |
 | Can modify ModelAndView   | ❌                               | ✅               |
 | Configuration             | web.xml / FilterRegistrationBean | WebMvcConfigurer  |
-| Framework dependent       | ❌                               | ✅              |
+| Framework dependent       | ❌                               | ✅               |
 
 
 🔄 Filter vs Interceptor vs AOP
