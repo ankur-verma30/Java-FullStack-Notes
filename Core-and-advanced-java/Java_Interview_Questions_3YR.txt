@@ -63,7 +63,7 @@ class B extends A {
     @Override
     void foo() {
         System.out.println("B foo() called");
-        System.out.println("message length = " + message.length()); 
+        System.out.println("message length = " + message.length());
         // 💥 message is null here -> NullPointerException
     }
 }

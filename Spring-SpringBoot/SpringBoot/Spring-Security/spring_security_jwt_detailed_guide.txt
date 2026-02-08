@@ -572,8 +572,7 @@ information between parties as a JSON object.
 
 JWT STRUCTURE: HEADER.PAYLOAD.SIGNATURE
 
-✅ Example JWT:
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+✅ Example JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 
 Part 1️⃣: HEADER (Base64URL encoded)
@@ -586,7 +585,7 @@ Purpose: Specifies how token is signed
 
 Part 2: PAYLOAD (Base64URL encoded) - The Claims
 {
-  
+
   "sub": "John Doe",            // Subject (username)
   "roles": ["USER", "ADMIN"],    // Custom claim - user roles
   "iat": 1516239022,             // Issued At timestamp
@@ -635,6 +634,17 @@ IMPORTANT NOTES:
     ✔️ The signature ensures the token hasn't been tampered with
     ✔️ Never put sensitive data (passwords, SSN) in JWT payload
     ✔️ If someone modifies payload, signature verification will fail
+
+
+=========================
+🔷 Encoded vs Encrypted
+=========================
+| Aspect        | **Encoded**                                 | **Encrypted**                                |
+| ------------- | ------------------------------------------- | -------------------------------------------- |
+| Purpose       | To **represent data** in a different format | To **protect data** from unauthorized access |
+| Reversibility | Easily reversible using the encoding scheme | Reversible only with a **key**               |
+| Security      | Not secure; anyone can decode               | Secure; requires key to decrypt              |
+| Examples      | Base64, URL encoding, HTML encoding         | AES, RSA, DES                                |
 
 
 ===============================

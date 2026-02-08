@@ -15,11 +15,11 @@ Methods (Behavior) – Functions/actions
 ➤ Key OOP principles supported: Abstraction, Encapsulation, Inheritance, Polymorphism.
 
 2️⃣ Platform Independent
-➤ Java code → compiled to bytecode → runs on JVM, not on OS.
+➤ Java code ─────────▶ compiled to bytecode ─────────▶ runs on JVM, not on OS.
 ➤ “Write Once, Run Anywhere (WORA)” using JVM architecture.
 
 3️⃣ Secure
-➤ No explicit pointers → prevents memory corruption.
+➤ No explicit pointers ─────────▶ prevents memory corruption.
 ➤ Bytecode verification, sandboxing, and Security Manager protect against malicious code.
 ➤ Strong support for cryptography, secure classloading, JVM-level security.
 
@@ -128,7 +128,7 @@ When you buy medicine:
 ➤ In code: Only useful functions/data are shown to the user.
 
 
-3️⃣ Inheritance — Generic → Specific Medicines
+3️⃣ Inheritance — Generic ─────────▶ Specific Medicines
 Suppose there is a general class Medicine
 	✔️ Name
 	✔️ Price
@@ -160,16 +160,18 @@ At different times and for different people:
 ➤ JVM is an abstract machine that provides a runtime environment to execute Java bytecode.
 
 ⚡Responsibilities:
-✔️ Converts bytecode → machine code using JIT (Just-In-Time compiler).
+✔️ Converts bytecode ─────────▶ machine code using JIT (Just-In-Time compiler).
 ✔️ Provides platform independence (“Write Once, Run Anywhere”).
 ✔️ Manages memory (heap, stack, method area, GC).
 ✔️ Ensures security via bytecode verification.
 🔧 Key Point: JVM is platform-dependent (different implementations for Windows/Linux/Mac), but bytecode is platform-independent.
 
 ➡️ Insight:
-Many confuse JVM = Java compiler → Wrong! Compiler (javac) converts Java code → bytecode; JVM executes that bytecode.
+Many confuse JVM = Java compiler ─────────▶ Wrong! Compiler (javac) converts Java code ─────────▶ bytecode; JVM executes that bytecode.
 
+===========================================
 🔷 Java Compilation and Execution Process
+===========================================
 🔗 Compile Time
 ➤ This is the phase where source code is checked and translated into bytecode.
 ➤ Java source files (.java) are compiled by the Java Compiler (javac).
@@ -203,14 +205,14 @@ Many confuse JVM = Java compiler → Wrong! Compiler (javac) converts Java code 
 [Native Machine Code]
              |
              v
-[CPU Executes Code → Output]
+[CPU Executes Code ─────────▶ Output]
 
 The JVM uses both an interpreter and a JIT (Just-In-Time) compiler because it’s designed to balance fast startup with high runtime performance.
 
 1️⃣ Roles of Each
 Interpreter
 ➤ Reads bytecode line by line and executes it directly.
-➤ Advantage: Immediate execution → fast startup.
+➤ Advantage: Immediate execution ─────────▶ fast startup.
 ➤ Disadvantage: Slower in the long run because every instruction has to be interpreted again and again.
 
 JIT Compiler
@@ -221,19 +223,19 @@ JIT Compiler
 
 2️⃣ Why JVM Combines Them
 If the JVM only used:
-➤ Interpreter only → Quick startup but poor long-term performance.
-➤ JIT only → Very slow startup (needs to compile everything first).
+➤ Interpreter only ─────────▶ Quick startup but poor long-term performance.
+➤ JIT only ─────────▶ Very slow startup (needs to compile everything first).
 
 By combining:
-➤ Start with the interpreter → get the program running instantly.
-➤ Monitor execution → detect methods/loops used often.
-➤ Switch to JIT for those hot parts → gain native-speed execution.
+➤ Start with the interpreter ─────────▶ get the program running instantly.
+➤ Monitor execution ─────────▶ detect methods/loops used often.
+➤ Switch to JIT for those hot parts ─────────▶ gain native-speed execution.
 
 This is called adaptive optimization.
 
 3️⃣ Real-Life Analogy
-➤ Interpreter = You read a speech word-by-word from paper → you can start immediately, but it’s slow if you have to repeat it.
-➤ JIT = You memorize the speech (compile to native) → takes time initially, but then you can say it much faster.
+➤ Interpreter = You read a speech word-by-word from paper ─────────▶ you can start immediately, but it’s slow if you have to repeat it.
+➤ JIT = You memorize the speech (compile to native) ─────────▶ takes time initially, but then you can say it much faster.
 ➤ JVM = First read it from the paper, and for parts you repeat often, memorize them.
 
 4️⃣ Execution Flow in JVM
@@ -278,7 +280,7 @@ Includes:
 🔧 Key Point: JRE does not include development tools (compiler, debugger). It’s only for running Java programs.
 
 ➡️ Trap:
-If asked, “Can you run Java code with just JRE?” → Yes, if you already have compiled bytecode. But you cannot compile .java files with JRE.
+If asked, “Can you run Java code with just JRE?” ─────────▶ Yes, if you already have compiled bytecode. But you cannot compile .java files with JRE.
 
 
 3️⃣ JDK (Java Development Kit)
@@ -286,7 +288,7 @@ If asked, “Can you run Java code with just JRE?” → Yes, if you already hav
 
 Includes:
 ✔️ JRE (which has JVM + libraries)
-✔️ Development tools → javac (compiler), jdb (debugger), javadoc, jar, etc.
+✔️ Development tools ─────────▶ javac (compiler), jdb (debugger), javadoc, jar, etc.
 🔧 Key Point: JDK is for developers; JRE is for users.
 
 ➡️ Trap:
@@ -295,14 +297,14 @@ Answer: No. JDK = JRE + Development Tools. JVM is just part of JRE.
 
 
 🔄 Hierarchy Diagram
-JDK 
- └── JRE 
+JDK
+ └── JRE
       └── JVM
 
 🔄 One-Liner for Revision
-➤ JVM → Runs bytecode.
-➤ JRE → JVM + Libraries (to run Java apps).
-➤ JDK → JRE + Tools (to develop Java apps).
+➤ JVM ─────────▶ Runs bytecode.
+➤ JRE ─────────▶ JVM + Libraries (to run Java apps).
+➤ JDK ─────────▶ JRE + Tools (to develop Java apps).
 
 
 ###########
@@ -359,7 +361,7 @@ It’s the starting point of any Java program, and each keyword has a specific p
 ➤ It is an array of Strings, which means you can pass values when running the program:
 
 java MyProgram Hello World
-Then args[0] = "Hello", args[1] = "World"  
+Then args[0] = "Hello", args[1] = "World"
 
 
 ❓ Why Use Command-Line Arguments? (Use Cases)
@@ -396,7 +398,7 @@ java CommandLineCalculator 10 20
 Output:
 Sum = 30
 
-🚫 Trap 
+🚫 Trap
 Can we pass primitive values as command-line arguments?
 No, command-line arguments are always String types. You need to manually parse them using Integer.parseInt(), Double.parseDouble(), etc.
 
@@ -408,7 +410,7 @@ public static void main(String[] args)
 ################
 🔷 new keyword
 ################
-➤ The new keyword in Java is used to create objects (instances) of a class. 
+➤ The new keyword in Java is used to create objects (instances) of a class.
 ➤ Using the new keyword, we send a request to the class to create an object
 ➤ Once the object is created, the new keyword will retrieve the object's address and store it in a reference variable.
 
@@ -459,6 +461,54 @@ A static variable is a class-level variable.
 ➤ If you don’t initialize a static variable, Java automatically assigns a default value based on its data type.
 ➤ We should create static variables inside a class but outside a method with the static keyword
 
+
+🔄 Advantages of Static Variables
+1️⃣ Memory efficient
+	✔️ Only one copy exists per class
+	✔️ Shared across all objects
+
+2️⃣ Data sharing
+	✔️ Useful when a value must be common for all instances
+	✅ Example: count, interestRate, companyName
+
+3️⃣ Easy access
+	✔️ Can be accessed without creating an object
+	✔️ ClassName.staticVar
+
+4️⃣ Good for constants
+	✔️ Often used with static final
+	✅ Example: public static final int MAX_SIZE = 100;
+
+5️⃣ Faster access
+	✔️ Resolved at class loading time
+	✔️ No object reference required
+
+
+❌ Disadvantages of Static Variables
+1️⃣ Breaks OOP principles
+	✔️ Global state → poor encapsulation
+	✔️ Harder to control access
+
+2️⃣ Memory lives till class unloading
+	✔️ Not garbage collected with objects
+	✔️ Can cause memory leaks in long-running apps
+
+3️⃣ Not thread-safe by default
+	✔️ Shared across threads
+	✔️ Requires synchronization
+
+4️⃣ Harder to test
+	✔️ State persists across test cases
+	✔️ Leads to flaky tests
+
+5️⃣ Tight coupling
+	✔️ Changes affect all users
+	✔️ Reduces flexibility and extensibility
+
+6️⃣ Not suitable for instance-specific data
+	✔️ Cannot store object-specific state
+
+
 🔄 To access a static variable, we will use the following options:
 1️⃣ ClassName.variableName
 public class Main {
@@ -472,7 +522,7 @@ public class Main {
 class A {
     static int x = 10;
     void show() {
-        System.out.println(x); 
+        System.out.println(x);
     }
 }
 You can directly use x without the class name only when:
@@ -517,25 +567,27 @@ Outside the class, you need to use either:
 
 🔁 Bonus Tip:
 A a1 = null;
-System.out.println(a1.x); // Still works!
+System.out.println(a1.x); ─────────▶ Still works!
 
 ✅Example:
 public class A {
 	static int x=10 ;
 	public static void main(String[] args) {
-		System.out.println(A.x);// Output :10
-		System.out.println(x);// Output :10
+		System.out.println(A.x); ─────────▶ Output :10
+		System.out.println(x); ─────────▶ Output :10
     
 		//Wrong
 		A a1 = new A();
-		System.out.println(a1.x);//A.x, but will give the Output:10
-                A.x = 30;
-		System.out.println(A.x); //Ouput :30 
+		System.out.println(a1.x); ─────────▶ A.x, but will give the Output:10
+        A.x = 30;
+		System.out.println(A.x);  ─────────▶ Ouput :30
   }
 }
 
 
+===============================
 🔷 Types of variables in Java
+===============================
 1️⃣ Local Variable
 ➤ Local variables should be created inside methods
 ➤ We should use local variables within the created method only
@@ -543,20 +595,21 @@ public class A {
   
 ✅Example:
 public class A {
-	static int y=10;
+		public static int y=10;
 	public static void main(String[] args) {
 		int x = 100;
 		System.out.println(x);
-    		System.out.println(A.y);// Output :10
+    	System.out.println(A.y); ─────────▶  Output :10
 		A a1 = new A();
-         	a1.test();
-    		System.out.println(y);//Output: 10
+        a1.test();
+    	System.out.println(y); ─────────▶ Output: 10
 	}
+
 	public void test() {
         int z=100;
-	System.out.println(x);	//❌ Error because it is not present in this method
-        System.out.println(z); //✅ Correct
-        System.out.println(A.y);	//✅ Correct because y is a static variable
+		System.out.println(x);	 ─────────▶ ❌ Error because it is not present in this method
+        System.out.println(z);  ─────────▶ ✅ Correct
+        System.out.println(A.y);	 ─────────▶ ✅ Correct because y is a static variable
 	}
 }
 
@@ -578,13 +631,6 @@ The actual issue is:
 
 
 2️⃣ Static variable
-➤ It’s not mandatory to initialize the static variable.
-➤ If you don’t initialize, Java provides default values:
-	✔️ 0 → numeric types (int, long, double, etc.)
-	✔️ false → boolean
-	✔️ null → reference types
-
-
 🔄 Storage of Stack Variables
 ➤ In Java, memory is divided into different areas managed by the JVM (Java Virtual Machine):
 ➤ Heap ─────────▶ For objects.
@@ -593,8 +639,8 @@ The actual issue is:
 	✔️ Class metadata (name, methods, fields)
 	✔️ Static variables
 	✔️ Constant pool
-➤ PC Register → Keeps track of execution in threads.
-➤ Native Method Stack → For native (C/C++) calls.
+➤ PC Register ─────────▶ Keeps track of execution in threads.
+➤ Native Method Stack ─────────▶ For native (C/C++) calls.
 
 
 3️⃣ Non-static variable/instance variable
@@ -620,7 +666,9 @@ public class A {
 }
 
 
+===========================================
 🧱 Stack Memory – LIFO (Last In First Out)
+===========================================
 ➤ Stores:
 	✔️ Method calls,
 	✔️ local variables,
@@ -629,8 +677,7 @@ public class A {
 ➤ Operates in LIFO (Last-In, First-Out) order, where the last is the first one to return.
 ➤ Faster but limited in size.
 
-✅ Example:
-When a method is called, its variables go on the stack. When it returns, they’re removed.
+✅ Example: When a method is called, its variables go on the stack. When it returns, they’re removed.
 
 
 ################
@@ -639,8 +686,20 @@ When a method is called, its variables go on the stack. When it returns, they’
 ➤ Used to store objects/instance variables.
 ➤ Every time you do new ClassName(), it creates an object in the heap.
 ➤ Objects stay in memory until they're no longer referenced.
-
 ⚡ Note: All reference variables (in the stack) point to objects in the heap.
+
+🔄 Java Heap Structure
+1️⃣ Young Generation (Eden + Survivor spaces)
+➤ Eden: Where new objects are allocated.
+➤ Survivor Spaces (S0, S1): Temporary storage for objects that survive Minor GC.
+
+2️⃣ Old Generation / Tenured
+➤ Stores objects that survived multiple Minor GCs.
+➤ Usually cleared during Major/Full GC.
+
+3️⃣ Metaspace (Permanent generation in older JDKs)
+➤ Stores class metadata, methods, and static variables.
+➤ Collected during Full GC if necessary.
 
 
 ###############################
@@ -662,29 +721,13 @@ When a method is called, its variables go on the stack. When it returns, they’
 ➤ Only Heap memory is subject to GC.
 
 
-🔄 Heap Structure
-Before diving into GC phases, it’s important to know the Java Heap Structure:
-
-1️⃣ Young Generation (Eden + Survivor spaces)
-➤ Eden: Where new objects are allocated.
-➤ Survivor Spaces (S0, S1): Temporary storage for objects that survive Minor GC.
-
-2️⃣ Old Generation / Tenured
-➤ Stores objects that survived multiple Minor GCs.
-➤ Usually cleared during Major/Full GC.
-
-3️⃣ Metaspace (Permanent generation in older JDKs)
-➤ Stores class metadata, methods, and static variables.
-➤ Collected during Full GC if necessary.
-
-
 =================================
 🔷 Phases of Garbage Collection
 =================================
 Phase 1️⃣: Mark Phase
 ➤ Objective: Identify reachable objects in memory.
 ➤ How it works:
-	✔️ GC starts from GC Roots:
+	 GC starts from GC Roots:
 	✔️ Local variables in stack frames.
 	✔️ Active threads.
 	✔️ Static variables.
@@ -716,7 +759,8 @@ Phase 3️⃣: Compact Phase (Optional)
 	✔️ CMS (Concurrent Mark-Sweep): Avoids compaction; uses free lists instead.
 	✔️ G1GC: Divides heap into regions and does incremental compaction.
 
-Generational GC Phases
+
+🔄 Generational GC Phases
 GC behavior differs between Young and Old generation:
 | Generation | GC Type            | Frequency     | Objects Collected                     |
 | ---------- | ------------------ | ------------- | ------------------------------------- |
@@ -727,7 +771,7 @@ GC behavior differs between Young and Old generation:
 
 1️⃣ Young Generation GC (Minor GC)
 ➤ Mark reachable objects in Eden.
-➤ Copy surviving objects to Survivor space (S0 → S1).
+➤ Copy surviving objects to Survivor space (S0 ─────────▶ S1).
 ➤ Unreachable objects are automatically discarded.
 👉 Performance: Fast, because most objects die young.
 
@@ -739,10 +783,10 @@ Old Generation GC (Major/Full GC)
 
 
 🔄 GC Algorithms
-➤ Serial GC: Single-threaded, uses Mark → Sweep → Compact.
+➤ Serial GC: Single-threaded, uses Mark ─────────▶ Sweep ─────────▶ Compact.
 ➤ Parallel GC: Multi-threaded, uses same phases for faster Minor GC.
 ➤ CMS (Concurrent Mark-Sweep): Concurrent marking, sweeping; avoids compacting to reduce pause.
-➤ G1GC (Garbage-First GC): Divides heap into regions, does incremental Mark → Sweep → Compact in mixed collections.
+➤ G1GC (Garbage-First GC): Divides heap into regions, does incremental Mark ─────────▶ Sweep ─────────▶ Compact in mixed collections.
 
 
 ===============================
@@ -900,12 +944,12 @@ public class C {
 
 🔄 Use Cases of Reflection
 👉 Frameworks (Spring, Hibernate) use reflection to create and inject objects without new.
-👉 Dependency Injection (DI) → like assigning engine into Car dynamically.
-👉 Testing tools (JUnit, Mockito) → access private methods/fields.
-👉 Serialization libraries (Jackson, Gson) → inspect fields and methods.
-👉 Plugins / Runtime loading → load classes dynamically.
+👉 Dependency Injection (DI) ─────────▶ like assigning engine into Car dynamically.
+👉 Testing tools (JUnit, Mockito) ─────────▶ access private methods/fields.
+👉 Serialization libraries (Jackson, Gson) ─────────▶ inspect fields and methods.
+👉 Plugins / Runtime loading ─────────▶ load classes dynamically.
 
-✅Example: 
+✅Example:
 import in.ankur.reflection.Car;
 import in.ankur.reflection.PetrolEngine;
 import java.lang.reflect.Field;
@@ -923,7 +967,7 @@ public class Main {
         ➤ Gets a reference to the private field engine.
         Field engineField = clazz.getDeclaredField("engine");
 
-        ➤ Bypasses Java’s access modifier restrictions (private → accessible).
+        ➤ Bypasses Java’s access modifier restrictions (private ─────────▶ accessible).
         engineField.setAccessible(true);  // break encapsulation
 
         ➤ Injects a PetrolEngine object into Car’s private engine field.
@@ -936,7 +980,7 @@ public class Main {
 
 
 ###################
-🔷 Java Data Types 
+🔷 Java Data Types
 ###################
 Java data types are divided into 2 main categories:
 
@@ -989,13 +1033,13 @@ All reference types default to null.
 Creating a String object with new String("literal") always creates two distinct String instances: one in the heap (the actual object referenced by your variable) and one in the String Constant Pool (the literal itself).
 ​
 🔄 Object Creation Process
-When executing String s1 = new String("Hello");, Java first checks the String pool for "Hello". 
-Since it's a literal, JVM creates it in the pool if absent, then new String() allocates a separate copy in heap memory, referencing the pool's char array internally. 
+When executing String s1 = new String("Hello");, Java first checks the String pool for "Hello".
+Since it's a literal, JVM creates it in the pool if absent, then new String() allocates a separate copy in heap memory, referencing the pool's char array internally.
 The variable s1 points to the heap object, not the pool one, so s1 == "Hello" returns false despite identical content.
 ​
 ✅ Memory Layout Example
 String pool: ["Hello"] ← Literal created first
-Heap: [String object → references pool's "Hello"] ← new String() object
+Heap: [String object ─────────▶ references pool's "Hello"] ← new String() object
 A second String s2 = new String("Hello"); creates another heap object (total 3 Strings: 1 pool + 2 heap), proving new bypasses pooling. Use intern() on heap objects to return pool reference and save memory.
 ​
 ❓ Why two objects?
@@ -1008,8 +1052,9 @@ System.out.println(s1 == s2);       // false (different objects)
 System.out.println(s1.intern() == s2); // true (both pool refs)
 
 
-🔄 A new type was introduced in Java version 10
-🟢 var type
+=============================
+🟢 var type(Java version 10)
+=============================
 ➤ This was introduced in Java version 10
 ➤ It is a dynamic datatype concept. Depending on the value stored inside the variable, the datatype is allocated to it internally.
 
@@ -1065,30 +1110,31 @@ public class C {
 
 🔄 Key Concepts
 1. Boxing (Manual Conversion) Depreciated
-Converting primitive → object
+Converting primitive ─────────▶ object
 int a = 10;
 Integer i = new Integer(a); //Boxing
 
 2. Unboxing (Manual Conversion)
-Converting object → primitive
+Converting object ─────────▶ primitive
 Integer i = new Integer(10);
 int a = i.intValue(); //Unboxing
 
 3. Autoboxing- Mostly Used
-The compiler automatically converts a primitive → wrapper object
+The compiler automatically converts a primitive ─────────▶ wrapper object
 int x = 5;
 Integer obj = x;  //Autoboxing
 
 4. Auto-unboxing
-The compiler automatically converts wrapper → primitive
+The compiler automatically converts wrapper ─────────▶ primitive
 Integer y = 100;
 int value = y;  //Auto-unboxing
 
+
 🔄 Commonly Used Wrapper Class Methods
-Integer.parseInt(String) → Converts string to int
-Double.parseDouble(String) → Converts string to double
-Character.isDigit(char) → Checks if the char is a digit
-Boolean.valueOf(String) → Converts string to Boolean object
+Integer.parseInt(String) ─────────▶ Converts string to int
+Double.parseDouble(String) ─────────▶ Converts string to double
+Character.isDigit(char) ─────────▶ Checks if the char is a digit
+Boolean.valueOf(String) ─────────▶ Converts string to Boolean object
 
 ✅ Code Examples
 public class WrapperExample1 {
@@ -1103,7 +1149,8 @@ public class WrapperExample1 {
     }
 }
 
-🔸 Conceptual Trick Questions
+
+🔄 Trick Questions
 ❓ What will happen here?
 Integer a = 128;
 Integer b = 128;
@@ -1121,26 +1168,29 @@ Integer b = 128;
 ➤ When you assign a value in this range to an Integer, Java reuses the same object from the cache.
 ➤ For values outside this range (like 128), new Integer objects are created.
 So here:
-a → new Integer(128)  
-b → new Integer(128)  
+a ─────────▶ new Integer(128)
+b ─────────▶ new Integer(128)
 (two different objects in memory)
 
 🔄.equals() 🆚 ==
-== → compares references (memory addresses) for objects.
-➤ Since a and b are different objects, a == b → false.
-➤ .equals() → in the Integer class is overridden to compare the actual int values.
-➤ Both a and b hold the same value (128), so a.equals(b) → true.
+== ─────────▶ compares references (memory addresses) for objects.
+➤ Since a and b are different objects, a == b ─────────▶ false.
+➤ .equals() ─────────▶ in the Integer class is overridden to compare the actual int values.
+➤ Both a and b hold the same value (128), so a.equals(b) ─────────▶ true.
 
-🔸 Deep Understanding
+
+🔄 Deep Understanding
 ❓ Difference between parseInt() and valueOf()?
  parseInt() returns a primitive int
  valueOf() returns an Integer object
 
+
 ❓ Can you override methods in wrapper classes?
 ❌ No, they are final classes
 
+
 ❓ What is the default value of Integer vs int?
- int → 0, Integer → null
+ int ─────────▶ 0, Integer ─────────▶ null
 
 
 ########################
@@ -1161,7 +1211,7 @@ public class C {
 	}
 	public static void main(String[] args) {
 		C c1 = new C();
-	}	
+	}
 }
 ⚡ Note: Method, Variable name can be the same as the class name
 
@@ -1210,6 +1260,7 @@ class Student {
     }
 }
 
+
 2️⃣ Call One Constructor from Another (Constructor Chaining)
 Use this() to call another constructor within the same class.
 ✅ Example:
@@ -1225,6 +1276,7 @@ class Student {
     }
 }
 
+
 3️⃣ Pass the Current Object as an Argument
 ✅ Example:
 class Student {
@@ -1237,6 +1289,7 @@ class Helper {
         System.out.println("Student object: " + s);
     }
 }
+
 
 4️⃣ Return Current Object
 Useful in method chaining.
@@ -1262,6 +1315,7 @@ class Person {
         p1.setName("Ankur").setAge(22).show();
     }
 }
+
 
 5️⃣ Access Instance Methods and Variables
 You can use this to call other instance methods or access fields within the class explicitly.
@@ -1302,7 +1356,7 @@ public class A {
 }
 
 ❌ We cannot use this keyword inside a "static method"
-✅ Example: 
+✅ Example:
 public class A {
 	int x=10;
 	public static void main(String[] args) {
@@ -1311,7 +1365,7 @@ public class A {
 	}
 	public static void test() {
 		System.out.println(this);// Error
-		System.out.println(this.x);// Error 
+		System.out.println(this.x);// Error
 	}
 }
 
@@ -1327,7 +1381,7 @@ public class A {
 	}
 	public static void main(String[] args) {
 	   A a1 = new A(100);
-	}	
+	}
 }
 
 ➤ While calling a constructor using this() keyword, ensure calling is done from another constructor only
@@ -1344,7 +1398,7 @@ public class A {
 	}
 	public void test() {
 		this();//Error, we cannot call the constructor from a method
-	}	
+	}
 }
 
 ✅ Example 2:
@@ -1357,7 +1411,7 @@ public class A {
 	}
 	public static void main(String[] args) {
 	   A a1 = new A();
-	}	
+	}
 }
 
 ➤ While calling a constructor using this() keyword, ensure it is always the first statement inside another constructor
@@ -1372,7 +1426,7 @@ public class A {
 	}
 	public static void main(String[] args) {
 	   A a1 = new A();
-	}	
+	}
 }
 
 ✅ Example 2:
@@ -1387,13 +1441,13 @@ public class A {
 	}
 	public static void main(String[] args) {
 	   A a1 = new A();//Step 1
-	}	
+	}
 }
 
 ✅ Types of Constructor Chaining
 ➤ When we call one constructor from another constructor, it will form a chain-like flow structure. This is called constructor chaining.
 
-1️⃣ Within the Same Class → Use this().
+1️⃣ Within the Same Class ─────────▶ Use this().
 You can use this() to call another constructor in the same class.
 ✅ Example:
 class Student {
@@ -1419,11 +1473,11 @@ class Student {
     }
 }
 ▶️ Output:
-The parameterized constructor called  
-The default constructor is called 
+The parameterized constructor called
+The default constructor is called
 
 
-2️⃣ From Subclass to Superclass → Use super()
+2️⃣ From Subclass to Superclass ─────────▶ Use super()
 You can call a constructor from the parent class using super().
 ✅ Example:
 class Person {
@@ -1440,8 +1494,8 @@ class Student extends Person {
 }
 
 ⚠️ Rules of Constructor Chaining
-✅ Only one constructor can be called using this() or super()	
-✅ Must be the first statement in the constructor	
+✅ Only one constructor can be called using this() or super()
+✅ Must be the first statement in the constructor
 ❌ Cannot mix this() and super() in the same constructor
 
 
@@ -1524,7 +1578,10 @@ public class B {
 	}
 }
 
-🔷 Object-Oriented Programming 
+f
+=================================
+🔷 Object-Oriented Programming
+=================================
 1️⃣ Inheritance
 2️⃣ Polymorphism
 3️⃣ Encapsulation
@@ -1532,7 +1589,7 @@ public class B {
 
 
 ################
-🌟 Inheritance
+🔷 Inheritance
 ################
 ✔️ Inheritance is one of the core pillars of Object-Oriented Programming (OOP).
 ✔️ It allows a class (subclass) to inherit fields and methods from another class (superclass).
@@ -1607,7 +1664,7 @@ When a child class has more than one parent class, it is called multiple inherit
 
 ❗Diamond Problem in Java (Multiple Inheritance Problem)
 ➤ The Diamond Problem occurs in multiple inheritance when a class inherits from two classes that have a common superclass, leading to ambiguity about which method to inherit.
-➤ Suppose we inherit a method from A->B->D,  and the same method is inherited from A->C->D, then confusion arises from which parent class method is inherited by the child class D. This is called as DIAMOND PROBLEM. Hence, in Java, classes do not support multiple inheritance.
+➤ Suppose we inherit a method from A->B->D,  and the same method is inherited from A->C->D, then confusion arises from which parent class method is inherited by the child class D. This is called as DIAMOND PROBLEM. Hence, in Java, classes do not support multiple inheritance via classes.
 
 Note: We can do multiple inheritance on an interface.
 
@@ -1619,7 +1676,7 @@ package app_java_1;
 public class B{}
 
 package app_java_1;
-public class C extends A, B{ ❌Error	
+public class C extends A, B{ ❌Error
 }
 
 
@@ -1633,16 +1690,23 @@ public class C extends A, B{ ❌Error
 | Subclass in Other Package     |     ✅   | ✅ (via inheritance only)   |            ❌            |     ❌     |
 | Non-Subclass in Other Package |     ✅   |              ❌             |            ❌            |     ❌     |
 
-1️⃣ private: When a variable/method is made private, then we can access it in the same class but not outside the class
-2️⃣ default: A variable/method with a default access specifier can work only inside the same class or the same package, but cannot be accessed in a different package
-3️⃣ protected: We can access variables/methods in the same class/same package, and inside different packages only when inheritance is done
-4️⃣ public: When we make a variable/method public, then we can access that in the same class/the same package/different package
+
+======================
+🔷 Access Specifiers
+======================
+1️⃣ private ─────────▶ When a variable/method is made private, then we can access it in the same class but not outside the class
+2️⃣ default ─────────▶ A variable/method with a default access specifier can work only inside the same class or the same package, but cannot be accessed in a different package
+3️⃣ protected ─────────▶ We can access variables/methods in the same class/same package, and inside different packages only when inheritance is done
+4️⃣ public ─────────▶ When we make a variable/method public, then we can access that in the same class/the same package/different package
 
 
+=====================================
 🔷 Access Specifier on Constructors
+=====================================
 ❓ Can we inherit the Constructor?
-No, constructors cannot be inherited in Java.
-Even though a subclass gets access to all public and protected members of the superclass, constructors are not part of inheritance.
+➤ No, constructors cannot be inherited in Java.
+➤ Even though a subclass gets access to all public and protected members of the superclass, constructors are not part of inheritance.
+
 
 ❓ Why Are Constructors Not Inherited?
 1️⃣ Constructors are not members
@@ -1652,13 +1716,13 @@ Constructors are not inherited because they are not class members, such as metho
 A constructor is tightly bound to its class name.
 
 3️⃣ Subclass should define how it initializes its members
-A subclass may have new fields or different logic for initialization.
-Therefore, it requires a constructor to control its initialization.
+➤ A subclass may have new fields or different logic for initialization.
+➤ Therefore, it requires a constructor to control its initialization.
 
 4️⃣ Java automatically provides a default constructor
-If you don't define any constructors, Java will insert a default no-arg constructor.
-But this doesn't mean the superclass constructor is inherited — it's just that Java calls the superclass constructor from the subclass constructor.
-They are special blocks used to initialize objects of a specific class.
+➤ If you don't define any constructors, Java will insert a default no-arg constructor.
+➤ But this doesn't mean the superclass constructor is inherited — it's just that Java calls the superclass constructor from the subclass constructor.
+➤ They are special blocks used to initialize objects of a specific class.
 
 
 🔐 Private Constructor in Java
@@ -1704,16 +1768,16 @@ public class C {
 ✅ Example 2:
 package p1;
 public class A {
-	private A() {}	
+	private A() {}
 }
 
 package p1;
-public class B extends A{ ─────────▶Error❌	
+public class B extends A{ ─────────▶Error❌
 }
 
 package p2;
 import p1.A;
-public class C extends A{ ─────────▶Error❌	
+public class C extends A{ ─────────▶Error❌
 }
 
 
@@ -1761,7 +1825,7 @@ public class B extends A {}
 
 package p2;
 import p1.A;
-public class C extends A{//-->Error	
+public class C extends A{//-->Error
 }
 
 
@@ -1828,11 +1892,11 @@ Default (no modifier)			class ClassName {}				Visible to classes within the same
 
 
 🔄 Java's Design Philosophy
-✅ 1. Top-level classes must be accessible to the JVM & compiler
+1️⃣ Top-level classes must be accessible to the JVM & compiler
 ➤ If you declare a class as private or protected, no other class can access it, not even the class loader or main method (in another file).
 ➤ That breaks the point of having it at the top level — it becomes useless.
 
-✅ 2. Protected and private only make sense in class hierarchies
+2️⃣ Protected and private only make sense in class hierarchies
 ➤ Protected is meaningful only within inheritance (i.e., subclass access).
 ➤ Private is meaningful only within the enclosing class.
 ➤ For a top-level class, there is no enclosing class, so these modifiers make no logical sense.
@@ -1872,9 +1936,11 @@ public class C {
 	}
 }
 
-🔄 Polymorphism
-Two types of polymorphism:
 
+=================
+🔷 Polymorphism
+=================
+Two types of polymorphism:
 1️⃣ Method Overriding (Run-time polymorphism):
 ➤ Overriding occurs when a subclass provides a specific implementation of a method that is already defined in its superclass.
 ➤ It is used to achieve Run-time Polymorphism.
@@ -1921,12 +1987,12 @@ public class PlatinumAccount extends GoldAccount {
 ➤ Introduced in Java 5, annotations are metadata that provide information to the compiler or runtime environment.
 ➤ They do not directly affect program logic but can instruct the compiler or tools to perform specific actions.
 
- Common Use: @Override
+🔗 Common Annotation: @Override
 ➤ @Override is used to indicate that a method is intended to override a method in the superclass.
 ➤ It helps the compiler catch errors if the method does not override anything (e.g., due to a typo or mismatch in method signature).
 
 package p1;
-	public class GoldAccount {	
+	public class GoldAccount {
 		public void rateOfInterest() {
 			System.out.println("nill");
 		}
@@ -1937,7 +2003,7 @@ public class PlatinumAccount extends GoldAccount {
 	@Override
 	public void rateOfInterests() { ─────────▶ ❌ Error because method name mismatch
 		System.out.println("6% PA");
-	}	
+	}
 }
 
 ❗Access Specifier should be the same, or can it be different during Overriding?
@@ -1953,7 +2019,7 @@ public class GoldAccount {
 
 package p1;
 public class PlatinumAccount extends GoldAccount {
-👉 // ─────────▶ No Error Because the default scope is increased to public	
+👉 // ─────────▶ No Error Because the default scope is increased to public
 	@Override
 	public void rateOfInterest() {
 		System.out.println("6% PA");
@@ -1994,20 +2060,20 @@ public class PlatinumAccount extends GoldAccount {
 	}
 }
 
+
 ❓ Are Static Members Inherited in Java?
 ✅ Technically, static members are inherited — but they are not polymorphic, and they do not behave like instance members in inheritance.
 
-🔥 Common Misconception:❌ "Static members cannot be inherited." But that's not entirely accurate.
+🔗 Common Misconception:❌ "Static members cannot be inherited." But that's not entirely accurate.
+1️⃣ What Happens:
+	✔️ Static members belong to the class, not to objects.
+	✔️ They are class-level members, not instance-level.
+	✔️ So they are shared across the inheritance hierarchy.
+	✔️ So yes, static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
 
-✅ What Happens:
-1. Static members belong to the class, not to objects.
-They are class-level members, not instance-level.
-So they are shared across the inheritance hierarchy.
-So yes, static members are accessible in the subclass, but they are not inherited in the object-oriented sense (no polymorphism).
 
 ⚠️ Why Static Members Are Not "Truly" Inherited:
 1️⃣ They don’t participate in runtime polymorphism
-
 class A {
     static void show() {
         System.out.println("A");
@@ -2022,7 +2088,7 @@ class B extends A {
 
 public class Main {
     public static void main(String[] args) {
-        A obj = new B();// Upcasting 
+        A obj = new B();// Upcasting
         obj.show(); // Output: A (not B)
     }
 }
@@ -2065,7 +2131,7 @@ public class PlatinumAccount extends GoldAccount {
 1️⃣ Static Methods and Variables Are Not Polymorphic. Even though PlatinumAccount inherits from GoldAccount, calling PlatinumAccount.rateOfInterest();
 It is resolved at compile time based on the class name, not the object type.
 
-2️⃣ Since PlatinumAccount does not override the method (it doesn’t define its rateOfInterest()), calling: PlatinumAccount.rateOfInterest(); 
+2️⃣ Since PlatinumAccount does not override the method (it doesn’t define its rateOfInterest()), calling: PlatinumAccount.rateOfInterest();
 is effectively the same as: GoldAccount.rateOfInterest();
 
 3️⃣ The same logic applies to the static variable x: PlatinumAccount.x; ─────────▶ resolves to GoldAccount.x (100)
@@ -2133,6 +2199,7 @@ public class B {
 }
 ➤ If you make a method final, then overriding is not allowed, but inheritance is allowed
 
+
 🔒 Why Use final on a Method?
 1️⃣ You want to prevent subclasses from changing the logic of a method.
 2️⃣ You're building secure or stable base classes (e.g., Java API classes like String, Integer, etc.)
@@ -2145,7 +2212,7 @@ A final class:
 ✅ Can have final methods too.
 👉 But since the class itself cannot be inherited: No methods inside it — final or not — can ever be overridden.
 
-✅ Example 1: 
+✅ Example 1:
 package p1;
 
 public class A {
@@ -2158,6 +2225,7 @@ public class A {
 		System.out.println(y);
 	}
 }
+
 
 ✅ Example 2:
 package p1;
@@ -2176,13 +2244,15 @@ public class B extends A{
 	}
 }
 
+
 ✅ Example 3:
 package p1;
 final public class A {}
 
 package p1;
-public class B extends A{ ─────────▶ ❌ Error because we cannot inherit final class	
+public class B extends A{ ─────────▶ ❌ Error because we cannot inherit final class
 }
+
 
 ❓ What Happens When a Reference Variable is marked final?
 final Student s = new Student();
@@ -2285,7 +2355,9 @@ public final class Student {
     }
 }
 
+================
 🔷 Inner Class
+================
 An inner class is a class declared inside another class.
 
 ❓ Why Inner Class?
@@ -2317,6 +2389,7 @@ class Outer {
     }
 }
 
+
 2️⃣ Static Inner Class
 ➤ Declared as static
 ➤ Does NOT need outer class object
@@ -2338,6 +2411,7 @@ class Outer {
     }
 }
 
+
 3️⃣ Local Inner Class
 ➤ Class declared inside a method
 ➤ Scope restricted only to method
@@ -2356,6 +2430,7 @@ class Outer {
         new Inner().show();
     }
 }
+
 
 4️⃣ Anonymous Inner Class
 ➤ Class without a name
@@ -2377,7 +2452,9 @@ class Test {
 }
 
 
+====================
 🔷 Inner Interface
+====================
 An interface declared inside a class or interface.
 
 🔁 Rules
@@ -2399,7 +2476,9 @@ class Test implements Outer.Inner {
 }
 
 
+====================
 🔷 Anonymous Class
+====================
 A class created without a name, used to provide instant implementation.
 
 👉 Used for:
@@ -2469,7 +2548,7 @@ Complete Abstraction (Java 7)
 ➤ No Object creation
 
 
-❗ Drawback of Inheritance – Tightly Coupled Programming
+❌ Drawback of Inheritance – Tightly Coupled Programming
 ➤ When two or more classes are highly dependent on each other's implementation, they are said to be tightly coupled.
 ➤ In such a setup, changing one class often requires changes in the other, reducing flexibility, maintainability, and scalability.
 
@@ -2487,6 +2566,7 @@ Complete Abstraction (Java 7)
 	  ✔️ Over time, inherited code becomes fragile.
 	  ✔️ Multiple levels of inheritance (deep hierarchy) make debugging and updates difficult.
  
+
 ✅ Example 1:
 package p1;
 
@@ -2574,18 +2654,19 @@ public class MainCalc {
 	}
 }
 
-🧠 Interview Questions:
-❓ Question 1️⃣. Could this have been done with an abstract class?
+🧠 Questions:
+1️⃣ Could this have been done with an abstract class?
 ✅ Yes — abstract classes allow incomplete methods and inheritance.
 But the real reason for using an interface here is that you're defining pure behavior (what calculators must do), not common implementation logic.
 So:
-Interface → for capabilities
-Abstract class → for partial implementation + common state
+Interface ─────────▶ for capabilities
+Abstract class ─────────▶ for partial implementation + common state
 
-❓ Question 2️⃣. Biggest advantage of using an interface instead of an Abstract Class?
+
+2️⃣ Biggest advantage of using an interface instead of an Abstract Class?
 ✅ Loose coupling and flexibility.
-Interfaces let you add new types of calculators later without changing the existing hierarchy.
-Also, Java allows multiple interfaces, but only single inheritance with abstract classes.
+➤ Interfaces let you add new types of calculators later without changing the existing hierarchy.
+➤ Also, Java allows multiple interfaces, but only single inheritance with abstract classes.
 
 
 🔄 Advantages of Interfaces in Java
@@ -2675,7 +2756,7 @@ package p1;
 public class C extends B implements A {
 	@Override
 	public void test2() {
-		System.out.println("From test2");		
+		System.out.println("From test2");
 	}
 	public static void main(String[] args) {
 		C c1 = new C();
@@ -2708,7 +2789,7 @@ class C implements A, B {
 
 🧠It will not compile. Why ??
 ✔️ Because both interfaces A and B define a default void show() method.
-✔️ When C implements both, Java doesn’t know which one to inherit → 🔺 Diamond Problem (method ambiguity).
+✔️ When C implements both, Java doesn’t know which one to inherit ─────────▶ Diamond Problem (method ambiguity).
 
 ✅ Fix in Class C:
 class C implements A, B {
@@ -2730,7 +2811,7 @@ Java’s philosophy:
 ➤ If a class implements multiple interfaces that define the same default method, there’s an ambiguity (diamond problem).
 ➤ To resolve it, Java allows calling specific interface’s default implementation using:
 
-✅Example: 
+✅Example:
 interface A {
     default void show() {
         System.out.println("A's show");
@@ -2780,6 +2861,7 @@ class C extends A, B {
 ➤ That’s why Java forbids multiple inheritance of classes entirely
 ➤ So there’s no syntax like A.super.show() with classes, because Java never allows a class to inherit from two classes in the first place.
 
+
 🔄 Core Difference
 ➤ Interfaces ─────────▶ only method declarations (and optional default methods). No state (except static/final constants). Ambiguities are easy to resolve with InterfaceName.super.method().
 ➤ Classes ─────────▶ can have full state (fields, constructors, method implementations). Resolving conflicts here is way more complex and risky ─────────▶ so Java designers disallowed multiple class inheritance.
@@ -2787,7 +2869,7 @@ class C extends A, B {
 ❓ Can I develop an incomplete static method in an interface?
 We cannot inherit static methods & override, hence incomplete static methods are not allowed in an interface.
 
-Example:
+✅ Example:
 package p1;
 public interface A {
 	public static void test2();//❌ Error
@@ -2819,7 +2901,7 @@ public class B implements A {
 	@Override
 	public void test2() {
 		System.out.println("From Overrided test2");
-	}	
+	}
 	@Override
 	public void test1() { //we can override the method
 		System.out.println("From Overrided Test1");
@@ -2873,18 +2955,18 @@ class C implements A, B {
 ➤ Can have multiple default or static methods (complete methods).
 ➤ It enables lambda expressions and functional programming in Java.
 
-🔸 Key Points:
+🔄 Key Points:
 ➤ A functional interface must contain only one abstract method.
 ➤ You can add any number of default or static methods (they're considered complete methods).
 ➤ If the interface inherits more than one abstract method (from multiple interfaces), it no longer remains a functional interface, and the compiler throws an error.
 ➤ Use @FunctionalInterface annotation to enforce the rule at compile-time.
 
-✅ Example 1:
+✅ Example 1️⃣:
 @FunctionalInterface
 public interface A {//❌ Error Because it cannot have a ZERO incomplete method
 }
 
-✅ Example 2:
+✅ Example 2️⃣:
 @FunctionalInterface
 public interface A {
 	public void test1();
@@ -2956,7 +3038,7 @@ Output:❌ Error because we are inheriting 2 methods to a functional interface
 ✅ Example 7:
 package p1;
 public interface A {
-	public void test1();	
+	public void test1();
 }
 
 package p1;
@@ -2966,6 +3048,7 @@ public interface B extends A{
 }
 Output:❌ Error because we are inheriting 1 method from a functional interface, and a functional interface has 1 method, which totals to 2 methods in an interface
 
+
 🔄Lambda Expression:
 A Lambda Expression is a short block of code that:
 ➤ Takes in parameters
@@ -2973,7 +3056,7 @@ A Lambda Expression is a short block of code that:
 ➤ Can be used in place of anonymous classes
 ➤ Requires a functional interface to work
 
-🔸 Key Points:
+🔄 Key Points:
 ➤ Introduced in Java 8 ─────────▶  Part of Java’s functional programming enhancements.
 ➤ Reduces Code Length ─────────▶ Allows writing concise code by eliminating boilerplate like anonymous class syntax.
 ➤ Works With Functional Interfaces ─────────▶ Lambda expressions can only be used where a functional interface (i.e., one abstract method) is expected.
@@ -3003,6 +3086,7 @@ interface MyOperation {
 MyOperation op = () -> System.out.println("Hello");
 op.perform();
 
+
 ❓ Why does this work without new?
 ✔️ Yes — a lambda expression automatically creates an instance of the functional interface.
 🔧 But technically: It’s not creating an anonymous class; it creates a synthetic implementation of the interface using invokedynamic bytecode — more lightweight and efficient than anonymous inner classes.
@@ -3023,7 +3107,7 @@ But the lambda version is shorter, cleaner, and faster.
 package p1;
 @FunctionalInterface
 public interface A {
-	public void test1();	
+	public void test1();
 }
 package p1;
 public class B{
@@ -3101,15 +3185,17 @@ STATIC LOG: Hello from static method
 ❓ Can private interface methods be accessed outside the interface?
 ❌ No, only accessible within the interface for reuse by default/static methods.
 
+
 ❓ Can we override private interface methods?
 ❌ No, private methods cannot be inherited or overridden.
+
 
 ❓ Are private methods mandatory in interfaces?
 ❌ No, they are optional—use them to clean up repeated logic.
 
 
 =====================
-🔷 Marker interface 
+🔷 Marker interface
 =====================
 ➤ An empty interface is called a marker interface
 ➤ Purpose: To mark a class as having a specific property so that JVM or frameworks can handle it differently at runtime.
@@ -3138,6 +3224,7 @@ abstract class Shape {
     }
 }
 
+
 2️⃣ Can Have Both Static and Non-Static Members
 You can define:
 ➤ Static variables and methods
@@ -3151,9 +3238,9 @@ abstract class Demo {
     }
 }
 
+
 3️⃣ Static Methods Must Be Complete
-You cannot define abstract static methods.
-➤ Because static methods belong to the class, and abstract methods must be overridden, this contradicts the purpose.
+You cannot define abstract static methods, because static methods belong to the class, and abstract methods must be overridden, this contradicts the purpose.
 
 abstract class Test {
     // abstract static void display(); ❌ Not allowed
@@ -3161,6 +3248,7 @@ abstract class Test {
         System.out.println("Static method");
     }
 }
+
 
 4️⃣ Can Have main() Method
 ➤ An abstract class can contain the main() method and be used as the entry point of a Java program.
@@ -3171,6 +3259,7 @@ abstract class Launcher {
     }
 }
 
+
 5️⃣ ❌ Cannot Instantiate an Abstract Class
 ➤ You cannot create an object of an abstract class directly.
 ➤ It may contain incomplete methods, so Java doesn’t allow creating an object of something that’s not fully defined.
@@ -3179,6 +3268,7 @@ abstract class Animal {
     abstract void makeSound();
 }
 // Animal a = new Animal(); // ─────────▶ ❌ Compile-time error
+
 
 6️⃣ Does Not Support Multiple Inheritance with Classes
 ➤ Java does not allow multiple inheritance with classes (i.e., a class cannot extend more than one class, abstract or not).
@@ -3440,7 +3530,7 @@ public class A {
 		System.out.println(j);// Output: 0
 		System.out.println(k);//Output: 13
 		System.out.println(l);// Output: 33
-	} 
+	}
 }
    ✔️ Pre-Increment: Increment the value of the variable in the same step
 ✅ Example 1:
@@ -3448,7 +3538,7 @@ package p1;
 
 public class A {
 	public static void main(String[] args) {
-		int i=10;		
+		int i=10;
 		int j = ++i;
 		int k=10;
 		int l=++k + ++k + ++k;
@@ -3456,7 +3546,7 @@ public class A {
 		System.out.println(j);// Output: 11
 		System.out.println(k);// Output: 13
 		System.out.println(l);// Output: 36
-	} 	
+	}
 }
 2️⃣ Decrement Operator
    ✔️ Post Decrement: Here we decrement the value of i by 1 when we next time see the same variable:
@@ -3467,9 +3557,9 @@ package p1;
 public class A {
     public static void main(String[] args) {
         int a = 10;
-        int b = a-- + a--; 
+        int b = a-- + a--;
 	int x = 10;
-        int y = x-- + x++ + x-- + x--; 
+        int y = x-- + x++ + x-- + x--;
         System.out.println(a); //Output: 8
         System.out.println(b); //Output: 19
         System.out.println(x); //Output: 8
@@ -3483,11 +3573,11 @@ package p1;
 
 public class A {
 	public static void main(String[] args) {
-		int i=10;		
+		int i=10;
 		int j = --i + --i;
 		System.out.println(i);
 		System.out.println(j);
-	} 
+	}
 }
 
 ✅ Type Casting of Data Types in Java
@@ -3535,7 +3625,7 @@ long j=(long)i; ─────────▶ No error
 Because type casting in Java is not only about memory size, but also about type compatibility and precision:
 
 
-❗ float → long is narrowing because:
+❗ float ─────────▶ long is narrowing because:
 ➤ You are going from floating-point to integer, which involves:
 ➤ Loss of precision (decimal part is truncated)
 ➤ Potential data loss if the value is too large
@@ -3577,13 +3667,13 @@ public class A {
 java.lang.NumberFormatException: For input string: "10.3dasdsd"
 Welcome
 
+
 ======================
 🔷 Class upcasting
 ======================
 ➤ Here we store the child class object address into the parent class reference variable, so that the reference variable becomes reusable
 
 ✅ Example 1️⃣: Reusing a reference variable
-
 public class A {}
 public class B extends A{}
 
@@ -3615,7 +3705,7 @@ public class C extends A{
 	    void display() {
 	        System.out.println("Inside class C");
 	    }
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 		A a1 = new B();
 		a1.display();    // Calls B's version ─────────▶ "Inside class B"
 		a1 = new C();
@@ -3665,7 +3755,7 @@ public class A {}
 
 public class B extends A{}
 
-public class C extends A{	 
+public class C extends A{
 	public static void main(String[] args) {
 				
 	  A a1 = new B();
@@ -3739,6 +3829,7 @@ public class DowncastingDemo {
 ➤ Using upcasting, we can access only parent class members, you cannot access child class members
 ➤ After upcasting to access child class members, we have to perform downcasting
 
+
 ===================
 🔷 Arrays in Java
 ===================
@@ -3759,10 +3850,12 @@ public class DowncastingDemo {
 	✔️ Inherit methods from the Object class
 	✔️ Have properties like .length to determine their size
 
+
 🔄 Arrays Start With Index Zero
 ➤ Array indexing in Java is zero-based.
 ➤ The first element is accessed with index 0, the second with 1, and so on.
 ➤ So, for an array of size n, the last valid index is n-1.
+
 
 🔄 To Store and Read Values We Use: start_address + index × memory_size
 ➤ Internally, the array elements are stored sequentially in memory.
@@ -3770,6 +3863,7 @@ public class DowncastingDemo {
 
 🔗 Address = Base Address + (Index×Size of Each Element)
 ➤ This allows direct access to any element using its index in constant time O(1), which makes arrays efficient for random access.
+
 
 🔄 Memory Allocation Happens in Sequence (Contiguous Allocation)
 ➤ When an array is created, Java allocates a block of continuous memory locations to store its elements.
@@ -3798,7 +3892,7 @@ public class A {
 	public static void main(String[] args) {
 		int[] age = new int[40];
 		System.out.println(age.length);// Output :40
-	} 
+	}
 }
 
 
@@ -3849,13 +3943,13 @@ Your ans is true
 package p1;
 import java.util.Scanner;
 public class A {
-	public static void main(String[] args) {	
+	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter your name:");
 		String name = scan.nextLine(); //Can read Multiple String words
 		System.out.println(name);
 		scan.close();
-	} 	
+	}
 }
 ⚠️ Note:
 ➤ Always close the scanner with sc.close() to free system resources.
@@ -3971,7 +4065,7 @@ public class SIBTutorial {
 		System.out.println("The value of i "+i);
 		i=20;
 		j=10;//❌ cannot initialize instance variable inside SIB
-		System.out.println("The value of i "+i);	
+		System.out.println("The value of i "+i);
 	}
 	static {
 		System.out.println("Static Initialization Block-2 called");
@@ -4007,7 +4101,7 @@ public class A {
 	}
 }
 
-✅ Output 
+✅ Output
 IIB
 Constructor of A called
 SIB
@@ -4059,12 +4153,12 @@ public class A {
 public class B extends A {
 	public static void main(String[] args) {
 		B b1=new B();
-		b1.test();	
+		b1.test();
 	}
 	public void test() {
 		super.display();
 		System.out.println(super.x);
-		System.out.println(super.y);	
+		System.out.println(super.y);
 	}
 }
 
@@ -4164,7 +4258,7 @@ public class A {
 		for (int i = 0; i < 4; i++) { //0 to 3
 			System.out.println(i);
 		}
-	} 
+	}
 }
 
 🔄 break keyword
@@ -4197,7 +4291,7 @@ public class A {
 			}
 		}
 		scan.close();
-	} 
+	}
 }
 
 2️⃣ while loop
@@ -4210,7 +4304,7 @@ public class A {
 			System.out.println(i);
 			i++;
 		}
-	}	
+	}
 }
 
 ✅ Example 2:
@@ -4251,7 +4345,7 @@ public class A {
 			System.out.println(i);
 			i++;
 		}while(i<3);
-	}	
+	}
 }
 
 ✅ Example 2:
@@ -4263,10 +4357,10 @@ public class A {
 			System.out.println(i);
 			i++;
 		}while(i<3);
-	}	
+	}
 }
 
-4️⃣ for each loop - 
+4️⃣ for each loop
 ➤ Works only with a data structure
 ➤ Can only read the value of the data structure one by one
 ➤ The loop will run until all values are read in the given data structure
@@ -4518,8 +4612,8 @@ boolean created = f.mkdir();
 ❌ No. It will return false if the parent directory is missing.
 
 ❓ What’s the difference between mkdir() and mkdirs()?
-➤ mkdir() → Creates only the last directory if the parent exists
-➤ mkdirs() → Creates entire directory hierarchy if needed
+➤ mkdir() ─────────▶ Creates only the last directory if the parent exists
+➤ mkdirs() ─────────▶ Creates entire directory hierarchy if needed
 
 ✅ Example 1️⃣:
 If you want to create nested directories like G:\\april\\p2\\test\\demo, use:
@@ -4538,7 +4632,7 @@ public class A {
 }
 
 
-🔄 Deleting Folders Using delete() 
+🔄 Deleting Folders Using delete()
 🔍 Syntax
 File f = new File("path_to_folder");
 boolean result = f.delete();
@@ -4838,7 +4932,7 @@ Creates a new file if it doesn’t exist.
 ➤ Saves written content and closes the stream.
 ➤ Must be called to avoid data loss or resource leakage.
 
-❓ "What happens if the file does not exist?" → FileWriter will create it only if the directory structure already exists; otherwise, it will throw a FileNotFoundException.
+❓ "What happens if the file does not exist?" ─────────▶ FileWriter will create it only if the directory structure already exists; otherwise, it will throw a FileNotFoundException.
 
 
 ✅ Example 1️⃣ – Overwriting a file
@@ -5020,9 +5114,10 @@ public class User implements Serializable {
 ➤ transient: tells JVM to skip this field during serialization
 ➤ The password field will be null when deserialized
 
+
 🔐 transient Keyword
-Prevents sensitive data (e.g., password, OTP) from being persisted
-Prevents circular references or unnecessarily heavy objects from being serialized
+➤ Prevents sensitive data (e.g., password, OTP) from being persisted
+➤ Prevents circular references or unnecessarily heavy objects from being serialized
 
 Syntax: transient DataType fieldName;
 
@@ -5113,7 +5208,7 @@ But the auto-generated value is not consistent across:
 ➤ Popular Databases: MySQL, PostgreSQL, Oracle, SQL Server, MongoDB, Derby, h2Database
 ➤ Install MySQL Database
 🔗 Download from here: https://dev.mysql.com/downloads/windows/installer/8.0.html
-➤  When you download MySQL Workbench, you will get the following: 
+➤  When you download MySQL Workbench, you will get the following:
 	✔️ IDE - To Write SQL Query (SQL query is used to interact with the database)
 	✔️ MySQL Server
 
@@ -5123,7 +5218,7 @@ Installation Doc: https://www.prowesstics.com/blogs/mysql-workbench-installation
 ✔️ Create psaDB connection
 ✔️ Create Database: Create Database psaDB
 ✔️ Connect to Database: use psaDB
-✔️ Create Table Student: 
+✔️ Create Table Student:
 Create table student(
 	name varchar(45),
     email varchar(128),
@@ -5149,7 +5244,7 @@ import java.sql.Statement;
 public class A {
 	public static void main(String[] args) {
 		try {
-//Connect to database - use psaDB (SQL)		
+//Connect to database - use psaDB (SQL)
 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/psadb1","root","test");
 
 //Write & execute SQl query
@@ -5219,7 +5314,7 @@ public class D {
 				System.out.println(result.getString(1));
 				System.out.println(result.getString(2));
 				System.out.println(result.getString(3));
-			}		
+			}
 			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -5280,23 +5375,23 @@ public class CustomExceptionDemo {
 ➤ Don’t overuse — prefer standard exceptions when they fit.
 
 🧠 Tips & Traps
-| ❓ Question                                                    | ✅ Good Answer                                                 |
-| ------------------------------------------------------         | -------------------------------------------------------------   |
-| Should I extend `Throwable` directly?                  		 | ❌ No, use `Exception` or `RuntimeException`.                  |
-| Can I throw a custom exception without the `throws` keyword?   | ✅ Yes, but only if it extends `RuntimeException` (unchecked). |
-| Why create custom exceptions?                          		 | To handle specific business logic and improve code clarity.     |
-| Can custom exceptions have multiple constructors?      	     | ✅ Yes, just like any class (with message, cause, etc.).       |
+| ❓ Question                                                  | ✅ Good Answer                                                 |
+| ------------------------------------------------------       | -------------------------------------------------------------   |
+| Should I extend `Throwable` directly?                  	   | ❌ No, use `Exception` or `RuntimeException`.                  |
+| Can I throw a custom exception without the `throws` keyword? | ✅ Yes, but only if it extends `RuntimeException` (unchecked). |
+| Why create custom exceptions?                          	   | To handle specific business logic and improve code clarity.     |
+| Can custom exceptions have multiple constructors?      	   | ✅ Yes, just like any class (with message, cause, etc.).       |
 
 
 🆚 Difference between throw and throws in Java
-| Feature                  | `throw`                                       | `throws`                                                |
-| ------------------------ | --------------------------------------------- | ------------------------------------------------------- |
-| Purpose              	   | Used to explicitly throw an exception         | Used to declare exceptions a method might throw         |
-| Location             	   | Inside method or block                        | In method signature                                     |
-| Number of Exceptions     | Can throw only one exception at a time        | Can declare multiple exceptions separated by commas 	 |
-| Type                     | Followed by an object of `Throwable` type     | Followed by one or more **exception class names       	 |
-| Usage                    | Used for triggering exception                 | Used for declaring exception handling responsibility    |
-| Syntax                   | `throw new ExceptionType("msg");`             | `public void method() throws IOException`               |
+| Feature                  | `throw`                                   | `throws`                                                |
+| ------------------------ | ----------------------------------------- | ------------------------------------------------------- |
+| Purpose              	   | Used to explicitly throw an exception     | Used to declare exceptions a method might throw         |
+| Location             	   | Inside method or block                    | In method signature                                     |
+| Number of Exceptions     | Can throw only one exception at a time    | Can declare multiple exceptions separated by commas 	 |
+| Type                     | Followed by an object of `Throwable` type | Followed by one or more exception class names       	 |
+| Usage                    | Used for triggering exception             | Used for declaring exception handling responsibility    |
+| Syntax                   | `throw new ExceptionType("msg");`         | `public void method() throws IOException`               |
 
 ✅ Syntax and Example
 🔄 throw keyword example (used inside method)
@@ -5337,16 +5432,17 @@ public class ThrowsExample {
 ➤ Use throws to inform the caller method to handle the exception.
 
 ⚠️ Common Traps
-| ❓ Trap Question                                               | ✅ Correct  Clarification                                                 |
-| Can we use `throw` without creating exception object?          | ❌ No, `throw` must be followed by a `Throwable` object.                  |
-| Can we write `throws` inside method body?                      | ❌ No, `throws` is only used in method signature**.                       |
-| Can we throw multiple exceptions with `throw`?                 | ❌ No, only one exception object at a time.                               |
+| ❓ Trap Question                                                  | ✅ Correct  Clarification                                                 |
+| Can we use `throw` without creating exception object?             | ❌ No, `throw` must be followed by a `Throwable` object.                  |
+| Can we write `throws` inside method body?                         | ❌ No, `throws` is only used in method signature**.                       |
+| Can we throw multiple exceptions with `throw`?                    | ❌ No, only one exception object at a time.                               |
 | What happens if method declares throws but doesn't actually throw?| ✅ That’s allowed — declaration is just a promise, not a requirement.  |
 
 ✅ Best Practices
 ➤ Use throws for checked exceptions that you don’t want to handle in the method.
 ➤ Use throw for custom exception logic or early exits.
 ➤ Always handle checked exceptions using try-catch or declare them using throws.
+
 
 🔄 Multi-catch blocks:
 ➤ We can create multiple catch blocks.
@@ -5373,6 +5469,7 @@ public class E {
 	}
 }
 
+
 🔄 Finally block in Java
 ➤ This is an  extension of try try-catch block
 ➤ The code that we write in the finally block will run 100%, regardless of the exception
@@ -5387,7 +5484,7 @@ public class E {
 			e.printStackTrace();
 		}finally {
 			System.out.println("Finally");//Output: Finally
-		}	
+		}
 	}
 }
 
@@ -5469,6 +5566,7 @@ public class Test {
 }
 ✅ Output is: 3
 
+
 ❓ Why does finally override the return in try?
 ➤ Because the finally block is always executed, and if it contains a return, it overrides any previous return values, even from try or catch.
 ➤ So even though try says return 1, and there's no exception, the finally block's return 3 overrides it.
@@ -5482,7 +5580,7 @@ finally {
     System.out.println("Cleaning up");
 }
 Then the output would be:
-Cleaning up 	----> Output from finally  
+Cleaning up 	----> Output from finally
 1 				----> returned output from try-catch block
 
 ✅ Example 2:
@@ -5502,19 +5600,22 @@ A
 B
 
 And what if you remove the catch block — will it still print B? Why or why not?
-✅ Output:B  
+✅ Output:B
 Exception in thread "main" java.lang.ArithmeticException: / by zero.
 ✔️ Finally runs.
 Even when there's no catch, the finally block executes before the exception is thrown back to the JVM.
+
 
 🔄 final Keyword:
 ➤ final makes variable constant
 ➤ final prevents overriding
 ➤ final on class stops inheritance
 
+
 🔄 finally:
 ➤ This is an extension of a try-catch block.
 ➤ The code that we write in the finally block will run 100%, regardless of the exception.
+
 
 🔄 finalize():
 ➤ This is a method inside the Object class, and here, the Garbage collection logic is implemented.
