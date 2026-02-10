@@ -1,0 +1,1688 @@
+===============================================================================
+SECTION 1: REACT FUNDAMENTALS & BASICS (Questions 1-50)
+===============================================================================
+
+❓ Q1. What is React?
+✔️ Answer ─────────▶ React is a JavaScript library for building user interfaces, developed by Facebook.
+It focuses on building component-based UIs using a declarative approach.
+React uses a virtual DOM for efficient updates and follows a unidirectional data flow pattern.
+
+
+❓ Q2. What are the main features of React?
+✔️ Answer ─────────▶ Key features include: Virtual DOM for performance optimization, Component-based architecture for reusability, JSX syntax for writing HTML in JavaScript, One-way data binding, Server-side rendering(SSR) support, Rich ecosystem with hooks and context API, and Strong community support.
+
+
+❓ Q3. What is JSX?
+✔️ Answer ─────────▶ JSX (JavaScript XML) is a syntax extension for JavaScript that allows you to write HTML-like code within JavaScript.
+It makes React code more readable and expressive.
+JSX is transpiled to React.createElement() calls by Babel before running in the browser.
+
+
+❓ Q4. Why can't browsers read JSX directly?
+✔️ Answer ─────────▶ Browsers can only understand JavaScript.
+JSX is not valid JavaScript syntax, so it needs to be transformed into regular JavaScript using transpilers like Babel before browsers can execute it.
+
+
+❓ Q5. What is the Virtual DOM?
+✔️ Answer ─────────▶ Virtual DOM is a lightweight JavaScript representation of the actual DOM.
+React maintains this virtual copy and when state changes, it creates a new virtual DOM, compares it with the previous one (diffing), and updates only the changed parts in the real DOM (reconciliation).
+
+
+❓ Q6. What are React components?
+✔️ Answer ─────────▶ Components are independent, reusable pieces of UI that accept inputs (props) and return React elements describing what should appear on screen. They can be functional (using functions) or class-based (using ES6 classes).
+
+
+❓ Q7. What is the difference between functional and class components?
+✔️ Answer ─────────▶ Functional components are simple JavaScript functions that return JSX.
+Class components are ES6 classes extending React.Component.
+Before hooks, functional components couldn't use state or lifecycle methods.
+With hooks (useState, useEffect), functional components can do everything class components can.
+
+
+❓ Q8. What are Props in React?
+✔️ Answer ─────────▶ Props (properties) are read-only inputs passed from parent to child components.
+They allow data flow down the component tree.
+Props are immutable and help make components reusable by accepting different data.
+
+
+❓ Q9. What is State in React?
+✔️ Answer ─────────▶ State is a built-in object that stores component-specific data that can change over time.
+Unlike props, state is managed within the component and can be updated using setState (class) or useState hook (functional).
+State changes trigger re-renders.
+
+
+❓ Q10. What is the difference between State and Props?
+✔️ Answer ─────────▶ Props are passed from parent to child and are immutable.
+State is managed within the component and is mutable.
+Props are used for component configuration while state is used for data that changes over time.
+You cannot change props but you can change state.
+
+
+❓ Q11. Can you modify props in a component?
+✔️ Answer ─────────▶ No, props are read-only and immutable.
+Attempting to modify props directly will cause errors.
+If you need to change data based on props, use state or derive values in render/return.
+
+
+❓ Q12. What are Pure Components?
+✔️ Answer ─────────▶ Pure Components are components that implement shouldComponentUpdate with a shallow prop and state comparison.
+They only re-render when props or state actually change, improving performance by preventing unnecessary renders.
+
+
+❓ Q13. What is the significance of keys in React lists?
+✔️ Answer ─────────▶ Keys help React identify which items have changed, been added, or removed in lists.
+They should be stable, unique identifiers (not array indices).
+Keys improve performance during reconciliation and maintain component state correctly during re-renders.
+
+
+❓ Q14. Why should we not use index as keys?
+✔️ Answer ─────────▶ Using index as keys can cause issues when the list order changes.
+It can lead to incorrect component updates, state persistence problems, and performance issues.
+Keys should be stable and unique to the data, not the position.
+
+
+❓ Q15. What is React Router?
+✔️ Answer ─────────▶ React Router is a standard library for routing in React applications.
+It enables navigation between different components/views, maintains browser history, and provides features like nested routing, route parameters, and programmatic navigation.
+
+
+❓ Q16. What are controlled components?
+✔️ Answer ─────────▶ Controlled components are form elements whose value is controlled by React state.
+The component's state becomes the single source of truth, and changes are handled through event handlers that update state, which then updates the input value.
+
+
+❓ Q17. What are uncontrolled components?
+✔️ Answer ─────────▶ Uncontrolled components store their own state internally in the DOM.
+You access values using refs instead of event handlers.
+They're useful for simple forms or integrating with non-React code, but offer less control than controlled components.
+
+
+❓ Q18. What is the difference between controlled and uncontrolled components?
+✔️ Answer ─────────▶ Controlled components have their value managed by React state, providing more control and validation.
+Uncontrolled components manage their own state in the DOM and are accessed via refs.
+Controlled components are preferred for forms requiring validation or dynamic behavior.
+
+
+❓ Q19. What are refs in React?
+✔️ Answer ─────────▶ Refs provide a way to access DOM nodes or React elements directly.
+Created using React.createRef() or useRef hook, they're useful for managing focus, triggering animations, integrating with third-party libraries, or accessing DOM measurements.
+
+
+❓ Q20. When should you use refs?
+✔️ Answer ─────────▶ Use refs for: Managing focus/text selection, Triggering imperative animations, Integrating with third-party DOM libraries, Accessing DOM measurements, Storing mutable values that don't trigger re-renders.
+Avoid refs for anything that can be done declaratively.
+
+
+❓ Q21. What is the significance of render() in React?
+✔️ Answer ─────────▶ The render() method in class components is required and returns the JSX to be displayed.
+It should be pure (no side effects), returning the same output for the same props/state.
+In functional components, the function body itself acts as render.
+
+
+❓ Q22. What is reconciliation in React?
+✔️ Answer ─────────▶ Reconciliation is the process React uses to update the DOM efficiently.
+When state/props change, React creates a new Virtual DOM tree, compares it with the previous one (diffing), identifies changes, and updates only the necessary parts of the real DOM.
+
+
+❓ Q23. What is the significance of constructor in React?
+✔️ Answer ─────────▶ Constructor is called before component mounting.
+It's used for: Initializing state, Binding event handlers, Setting up instance properties.
+If you don't initialize state or bind methods, you don't need a constructor.
+Always call super(props) first.
+
+
+❓ Q24. What is mounting in React?
+✔️ Answer ─────────▶ Mounting is the phase when a component is created and inserted into the DOM.
+The lifecycle order is: constructor → getDerivedStateFromProps → render → componentDidMount.
+This is when initial setup, API calls, and subscriptions typically occur.
+
+
+❓ Q25. What is unmounting in React?
+✔️ Answer ─────────▶ Unmounting occurs when a component is removed from the DOM.
+The componentWillUnmount lifecycle method (or useEffect cleanup) is called for cleanup tasks like canceling timers, unsubscribing from events, or canceling network requests.
+
+
+❓ Q26. What are synthetic events in React?
+✔️ Answer ─────────▶ Synthetic events are React's cross-browser wrapper around native browser events.
+They provide consistent API across different browsers, automatic event delegation for performance, and pooling for memory efficiency.
+They normalize event behavior.
+
+
+❓ Q27. What is event delegation in React?
+✔️ Answer ─────────▶ React uses event delegation by attaching a single event listener at the root level rather than individual listeners on each element.
+This improves performance, especially with many elements.
+Events bubble up to the root where React handles them.
+
+
+❓ Q28. How does React handle events differently from HTML?
+✔️ Answer ─────────▶ React events use camelCase (onClick vs onclick), pass functions rather than strings, cannot return false to prevent default (must call preventDefault explicitly), use synthetic events for cross-browser compatibility, and implement event delegation at the root.
+
+
+❌ Q29. What is the purpose of super(props) in constructor?
+✔️ Answer ─────────▶ super(props) calls the parent class (React.Component) constructor and makes this.props available in the constructor.
+Without it, this.props would be undefined in the constructor, though it's available in other methods.
+It's required when using a constructor.
+
+
+❌ Q30. What happens if you don't call super(props)?
+✔️ Answer ─────────▶ The component will still work in most methods, but this.props will be undefined in the constructor.
+This can cause bugs if you try to access props during initialization.
+It's a best practice to always call super(props).
+
+
+❓ Q31. What is the children prop?
+✔️ Answer ─────────▶ The children prop contains the content between component opening and closing tags.
+It allows components to accept and render arbitrary child elements, enabling composition patterns.
+Accessed via props.children, it can be a single element, array, or function.
+
+
+❓ Q32. What is component composition?
+✔️ Answer ─────────▶ Composition is building complex UIs by combining simpler components.
+Instead of inheritance, React recommends composition for code reuse.
+Components can contain other components, accept children, or use render props for flexible, reusable designs.
+
+
+❓ Q33. Why is inheritance not recommended in React?
+✔️ Answer ─────────▶ React favors composition over inheritance because: Composition is more flexible, Components should be simple and focused, Props and children provide sufficient customization.
+Inheritance creates tight coupling, Composition makes testing easier, and the React team hasn't found use cases where inheritance is better.
+
+
+❓ Q34. What are fragments in React?
+✔️ Answer ─────────▶ Fragments let you group multiple children without adding extra nodes to the DOM.
+Use <React.Fragment> or short syntax <>.
+They're useful when you need to return multiple elements but don't want wrapper divs affecting layout/styling.
+
+
+❓ Q35. What is the short syntax for fragments?
+✔️ Answer ─────────▶ The short syntax is <> and </>.
+It's cleaner than <React.Fragment> but doesn't support keys or attributes.
+Use the full syntax when you need to add keys to fragment children in lists.
+
+
+❓ Q36. What is StrictMode in React?
+✔️ Answer ─────────▶ StrictMode is a development tool that activates additional checks and warnings for components within it.
+It helps identify potential problems like unsafe lifecycles, legacy APIs, deprecated features, unexpected side effects, and enables future-ready code practices.
+
+
+❓ Q37. Does StrictMode affect production builds?
+✔️ Answer ─────────▶ No, StrictMode has no impact on production builds.
+It only runs checks and warnings in development mode, causing some lifecycle methods to be called twice to detect side effects.
+It's completely removed in production.
+
+
+❓ Q38. What are React Developer Tools?
+✔️ Answer ─────────▶ React Developer Tools is a browser extension for Chrome/Firefox that helps inspect React component hierarchies, view props and state, track
+performance, identify component updates, profile rendering behavior, and debug React applications efficiently.
+
+
+❓ Q39. What is the difference between createElement and cloneElement?
+✔️ Answer ─────────▶ createElement creates a new React element from a type, props, and children.
+cloneElement clones an existing element and optionally modifies its props or children.
+cloneElement preserves the original element's ref and key.
+
+
+❓ Q40. What is the React top-level API?
+✔️ Answer ─────────▶ React top-level API includes methods available on the React object: createElement, cloneElement, createContext, Fragment, createRef, forwardRef, lazy, Suspense, memo, Component, PureComponent, and StrictMode.
+These are the building blocks for React applications.
+
+
+❓ Q41. What is defaultProps?
+✔️ Answer ─────────▶ defaultProps is a property that defines default values for props.
+If a prop is not passed, the default value is used.
+It's useful for making props optional with sensible defaults, improving component reusability and reducing prop-passing boilerplate.
+
+
+❓ Q42. What is propTypes?
+✔️ Answer ─────────▶ propTypes is a type-checking mechanism for component props.
+It validates that props have correct types and warns in development if validation fails.
+Though deprecated in favor of TypeScript, it's still useful for runtime prop validation in JavaScript projects.
+
+
+❓ Q43. How do you set default values for props?
+✔️ Answer ─────────▶ Use defaultProps for class components or default parameters for functional components.
+For functional components, you can also destructure props with default values: function MyComponent({ name = 'Guest' }).
+This ensures props have values even when not passed.
+
+
+❓ Q44. What is the displayName property?
+✔️ Answer ─────────▶ displayName is a string property used for debugging messages in React DevTools.
+It's automatically inferred from function/class names but can be explicitly set for HOCs, dynamic components, or when using minification that mangles names.
+
+
+❓ Q45. What are error boundaries?
+✔️ Answer ─────────▶ Error boundaries are components that catch JavaScript errors anywhere in their child component tree, log errors, and display fallback UI instead of crashing the app.
+They catch errors during rendering, lifecycle methods, and constructors, but not in event handlers or async code.
+
+
+❓ Q46. Which lifecycle method is used for error boundaries?
+✔️ Answer ─────────▶ Error boundaries use getDerivedStateFromError (to update state) and componentDidCatch (to log error info).
+getDerivedStateFromError is called during render phase, while componentDidCatch is called during commit phase, allowing side effects.
+
+
+❓ Q47. What errors do error boundaries not catch?
+✔️ Answer ─────────▶ Error boundaries don't catch: Event handlers (use try-catch), Asynchronous code (setTimeout, promises), Server-side rendering errors, Errors in the error boundary itself.
+For event handlers, wrap code in try-catch manually.
+
+
+❓ Q48. What is the difference between Element and Component?
+✔️ Answer ─────────▶ An Element is a plain object describing a component instance or DOM node.
+A Component is a function or class that accepts props and returns elements.
+Elements are what components return.
+Elements are immutable, components can have state and logic.
+
+
+❓ Q49. What is React.memo()?
+✔️ Answer ─────────▶ React.memo() is a higher-order component that memoizes functional components, preventing re-renders if props haven't changed.
+It performs shallow comparison by default but accepts a custom comparison function.
+It's similar to PureComponent for functional components.
+
+
+❓ Q50. When should you use React.memo()?
+✔️ Answer ─────────▶ Use React.memo() when: Component renders often with same props, Component is expensive to render, Props are simple values or stable references, Parent re-renders frequently.
+Don't overuse it as memoization has overhead and may not always improve performance.
+
+
+===============================================================================
+SECTION 2: REACT HOOKS (❓ Questions 51-125)
+===============================================================================
+
+❓ Q51. What are React Hooks?
+✔️ Answer ─────────▶ Hooks are functions that let you use state and other React features in functional components without writing classes. Introduced in React 16.8, they enable stateful logic reuse, cleaner code, and better code organization by separating concerns.
+
+❓ Q52. What are the rules of hooks?
+✔️ Answer ─────────▶ Two main rules: 1) Only call hooks at the top level (not inside loops, conditions, or nested functions) to ensure consistent hook call order. 2) Only call hooks from React functional components or custom hooks, not regular JavaScript functions.
+
+❓ Q53. Why must hooks be called at the top level?
+✔️ Answer ─────────▶ React relies on the order of hook calls to maintain state correctly. If hooks are called conditionally, the order might change between renders, causing bugs with wrong state being returned or errors. Consistent order ensures state persistence.
+
+❓ Q54. What is useState hook?
+✔️ Answer ─────────▶ useState is a hook that adds state to functional components. It returns an array with current state value and an updater function. Takes initial state as argument (value or function). Updater can accept new value or update function receiving previous state.
+
+❓ Q55. How does useState differ from setState in class components?
+✔️ Answer ─────────▶ useState doesn't merge updates automatically (setState does). Each useState call manages independent state slice. useState updater replaces state, not merges. useState can be called multiple times for different state variables. Both trigger re-renders.
+
+❓ Q56. What is useEffect hook?
+✔️ Answer ─────────▶ useEffect performs side effects in functional components. It runs after render (by default) and can clean up before next effect or unmounting. Replaces componentDidMount, componentDidUpdate, and componentWillUnmount. Takes effect function and optional dependency array.
+
+❓ Q57. What is the purpose of the dependency array in useEffect?
+✔️ Answer ─────────▶ The dependency array controls when the effect runs. Empty array [] runs once on mount. Array with values runs when those values change. No array runs after every render. It optimizes performance by skipping unnecessary effect executions.
+
+❓ Q58. What happens if you omit the dependency array in useEffect?
+✔️ Answer ─────────▶ The effect runs after every render, which can cause performance issues and infinite loops if the effect updates state. Always specify dependencies to control when effects run, or use empty array for mount-only effects.
+
+❓ Q59. How do you clean up in useEffect?
+✔️ Answer ─────────▶ Return a cleanup function from useEffect. It runs before the component unmounts and before running the effect again (if dependencies changed). Use it to cancel subscriptions, clear timers, abort requests, or clean up event listeners.
+
+❓ Q60. What is useContext hook?
+✔️ Answer ─────────▶ useContext accepts a context object and returns its current value. It subscribes to context changes and re-renders when context value updates. Provides cleaner syntax than Context.Consumer and enables using context in functional components easily.
+
+❓ Q61. What is useReducer hook?
+✔️ Answer ─────────▶ useReducer is an alternative to useState for complex state logic. It accepts a reducer function (state, action) => newState and initial state. Returns current state and dispatch function. Useful when state updates depend on previous state or involve multiple sub-values.
+
+❓ Q62. When should you use useReducer instead of useState?
+✔️ Answer ─────────▶ Use useReducer when: State logic is complex, Next state depends on previous state, Multiple state values are updated together, State updates follow patterns (actions), Testing state logic separately is beneficial, or Managing state for multiple related values.
+
+❓ Q63. What is useMemo hook?
+✔️ Answer ─────────▶ useMemo memoizes expensive computations, recomputing only when dependencies change. Returns a memoized value, not a function. Optimizes performance by avoiding recalculation on every render. Takes a function and dependency array.
+
+❓ Q64. What is the difference between useMemo and useCallback?
+✔️ Answer ─────────▶ useMemo memoizes values (computation results), while useCallback memoizes functions. useMemo runs the function and caches result, useCallback caches the function itself. Use useMemo for expensive calculations, useCallback for passing stable callbacks to child components.
+
+❓ Q65. What is useCallback hook?
+✔️ Answer ─────────▶ useCallback returns a memoized callback function that only changes when dependencies change. Prevents creating new function instances on every render, useful for passing callbacks to optimized child components using React.memo to prevent unnecessary re-renders.
+
+❓ Q66. When should you use useCallback?
+✔️ Answer ─────────▶ Use useCallback when: Passing callbacks to memoized child components, Dependencies in other hooks reference the callback, Callback is expensive to create, Function identity matters (e.g., useEffect dependency). Don't overuse as memoization has overhead.
+
+❓ Q67. What is useRef hook?
+✔️ Answer ─────────▶ useRef creates a mutable ref object whose .current property persists across renders without causing re-renders when changed. Used for: Accessing DOM nodes, Storing mutable values, Keeping references to previous values, Storing timeouts/intervals.
+
+❓ Q68. What's the difference between useRef and useState?
+✔️ Answer ─────────▶ useRef doesn't trigger re-renders when .current changes; useState does. useRef returns same object reference across renders; useState may create new references. useRef is for values that don't affect rendering; useState is for values that do.
+
+❓ Q69. What is useLayoutEffect hook?
+✔️ Answer ─────────▶ useLayoutEffect is identical to useEffect but fires synchronously after all DOM mutations, before browser paint. Use it when you need to measure DOM, make DOM changes that should be visible immediately, or prevent visual flicker. Blocks visual updates.
+
+❓ Q70. What's the difference between useEffect and useLayoutEffect?
+✔️ Answer ─────────▶ useEffect runs asynchronously after paint (non-blocking). useLayoutEffect runs synchronously before paint (blocking). useLayoutEffect is useful for DOM measurements or preventing visual flicker. useEffect is for most side effects. Prefer useEffect unless you have visual issues.
+
+❓ Q71. What is useImperativeHandle hook?
+✔️ Answer ─────────▶ useImperativeHandle customizes the instance value exposed to parent components when using forwardRef. It lets you control what ref methods/properties are accessible to parents, encapsulating implementation details and exposing only necessary APIs.
+
+❓ Q72. What is useDebugValue hook?
+✔️ Answer ─────────▶ useDebugValue displays a label for custom hooks in React DevTools. It helps debugging by showing custom hook state. Takes a value and optional formatting function. Only affects development tools, not production behavior. Use it in custom hooks for better debugging experience.
+
+❓ Q73. Can you create custom hooks?
+✔️ Answer ─────────▶ Yes, custom hooks are JavaScript functions starting with "use" that can call other hooks. They let you extract component logic into reusable functions, share stateful logic between components, and organize code better. Follow the rules of hooks.
+
+❓ Q74. What are the benefits of custom hooks?
+✔️ Answer ─────────▶ Benefits include: Reusable stateful logic without HOCs or render props, Cleaner component code, Better code organization by concern, Easier testing of logic in isolation, Sharing non-visual logic across components, and Composition of multiple hooks.
+
+❓ Q75. Can hooks be conditional?
+✔️ Answer ─────────▶ No, hooks cannot be called conditionally (inside if statements, loops). They must be called in the same order every render. For conditional logic, put conditions inside hooks. This ensures React tracks hook state correctly across renders.
+
+❓ Q76. What happens if you call hooks conditionally?
+✔️ Answer ─────────▶ React throws an error or produces bugs. Conditional hook calls break the order of hooks between renders, causing React to associate state with wrong hooks. This violates the rules of hooks and makes state unpredictable.
+
+❓ Q77. Can you use hooks in class components?
+✔️ Answer ─────────▶ No, hooks only work in functional components and custom hooks. Class components use lifecycle methods and this.state. If you need hooks in a class, convert it to a functional component or wrap it in a functional component that uses hooks.
+
+❓ Q78. What is the useState lazy initialization?
+✔️ Answer ─────────▶ You can pass a function to useState instead of a value. This function runs only on initial render, useful for expensive computations. Subsequent renders ignore the function, improving performance when initial state is costly to compute.
+
+❓ Q79. How do you update state based on previous state with hooks?
+✔️ Answer ─────────▶ Pass a function to the state updater: setState(prevState => prevState + 1). This ensures you're working with the latest state, important for async updates or when multiple updates happen together. Avoids stale state issues.
+
+❓ Q80. Can you call useState multiple times?
+✔️ Answer ─────────▶ Yes, you can call useState multiple times in a component for different state variables. Each call is independent with its own state and updater. React tracks them by call order. This is cleaner than managing a single state object.
+
+❓ Q81. What are hook dependencies?
+✔️ Answer ─────────▶ Dependencies are values that hooks like useEffect, useMemo, and useCallback watch. When dependencies change, the hook runs again. Include all values from component scope that the hook uses. Missing dependencies cause stale closures and bugs.
+
+❓ Q82. What are stale closures in hooks?
+✔️ Answer ─────────▶ Stale closures occur when a hook captures old prop/state values because dependencies are missing. The hook uses outdated values instead of current ones. Always include all dependencies the hook uses to avoid stale closures.
+
+❓ Q83. How do you fix missing dependencies warning?
+✔️ Answer ─────────▶ Add all variables used in the hook to the dependency array, use useCallback/useMemo for functions/values, move constant values outside component, use refs for values that shouldn't trigger updates, or use state updater functions with previous state.
+
+❓ Q84. What is the exhaustive-deps ESLint rule?
+✔️ Answer ─────────▶ This ESLint rule warns about missing dependencies in useEffect, useMemo, and useCallback. It helps prevent stale closures and bugs. While sometimes you may need to suppress it, usually it indicates a real problem that should be fixed.
+
+❓ Q85. Can useEffect run before render?
+✔️ Answer ─────────▶ No, useEffect runs after render and paint. For running before paint, use useLayoutEffect which runs synchronously after DOM mutations but before browser paint. Neither runs before React rendering starts.
+
+❓ Q86. How do you run an effect only once?
+✔️ Answer ─────────▶ Pass an empty dependency array []. The effect runs once after initial mount and cleanup runs on unmount. Without [], it runs after every render. With dependencies, it runs when those change.
+
+❓ Q87. How do you mimic componentDidMount with hooks?
+✔️ Answer ─────────▶ Use useEffect with empty dependency array: useEffect(() => { /* mount logic */ }, []). This runs once after initial render. Return a cleanup function to mimic componentWillUnmount.
+
+❓ Q88. How do you mimic componentWillUnmount with hooks?
+✔️ Answer ─────────▶ Return a cleanup function from useEffect: useEffect(() => { return () => { /* cleanup */ }; }, []). The cleanup runs when the component unmounts.
+
+❓ Q89. How do you mimic componentDidUpdate with hooks?
+✔️ Answer ─────────▶ Use useEffect with dependencies: useEffect(() => { /* update logic */ }, [dependency]). Runs after every render where dependency changed. To skip first render, use a ref to track if mounted.
+
+❓ Q90. Can you use async functions in useEffect?
+✔️ Answer ─────────▶ You can't make the useEffect callback itself async, but you can define and call an async function inside: useEffect(() => { async function fetchData() { /* await */ } fetchData(); }, []). Or use .then() for promises.
+
+❓ Q91. Why can't useEffect callback be async directly?
+✔️ Answer ─────────▶ useEffect expects either nothing or a cleanup function to be returned. Async functions always return promises, not cleanup functions. This would break React's cleanup mechanism. Define async functions inside and call them instead.
+
+❓ Q92. How do you handle cleanup for async operations?
+✔️ Answer ─────────▶ Use a boolean flag or AbortController. Set flag to false in cleanup to ignore results if component unmounts. For fetch, use AbortController to cancel requests. This prevents setting state on unmounted components.
+
+❓ Q93. What is the use case for useLayoutEffect?
+✔️ Answer ─────────▶ Use for: Measuring DOM elements, Making DOM changes that should be visible immediately, Preventing flicker in animations, Synchronous DOM updates before paint, Tooltip positioning, Modal focus management. Prefer useEffect unless you see visual problems.
+
+❓ Q94. Can you conditionally run effects?
+✔️ Answer ─────────▶ Yes, but don't conditionally call useEffect itself. Put conditions inside the effect: useEffect(() => { if (condition) { /* run effect */ } }, [condition]). This maintains hook order while controlling execution.
+
+❓ Q95. How do you share state between components with hooks?
+✔️ Answer ─────────▶ Use Context API with useContext, lift state to common parent, use custom hooks that share state via Context, use state management libraries (Redux, Zustand), or use URL state for certain cases.
+
+❓ Q96. What is the useReducer dispatch function?
+✔️ Answer ─────────▶ dispatch is a function returned by useReducer that sends actions to the reducer. It's stable across renders (doesn't change), so safe to omit from dependency arrays. Takes an action object (conventionally with type property).
+
+❓ Q97. What's the advantage of useReducer over multiple useState?
+✔️ Answer ─────────▶ useReducer is better when: Multiple state values update together, Complex state transitions, State logic is complex and testable separately, Next state depends on previous state, Passing dispatch is simpler than multiple callbacks.
+
+❓ Q98. Can you pass initial state to useReducer as a function?
+✔️ Answer ─────────▶ Yes, useReducer accepts a third argument: an init function. It's called with the second argument to compute initial state. This lazily initializes state, useful for expensive computations or reading from localStorage.
+
+❓ Q99. How do you optimize context to prevent unnecessary re-renders?
+✔️ Answer ─────────▶ Split contexts by update frequency, memoize context value with useMemo, pass only needed values, use multiple contexts instead of one large one, implement context selectors with custom hooks, or use state management libraries.
+
+❓ Q100. What is the useContext re-render behavior?
+✔️ Answer ─────────▶ Components using useContext re-render when context value changes, even if they don't use the changed part. Split contexts or use memoization to prevent this. All consumers re-render when provider's value prop changes reference.
+
+❓ Q101. Can you use multiple contexts in one component?
+✔️ Answer ─────────▶ Yes, call useContext multiple times for different contexts. Each returns its respective context value. Components can consume as many contexts as needed. No limit on number of useContext calls.
+
+❓ Q102. What is ref forwarding with hooks?
+✔️ Answer ─────────▶ Use forwardRef to pass refs through components: const Component = forwardRef((props, ref) => { /* use ref */ }). This lets parents access child DOM nodes or component instances. Combine with useImperativeHandle to control exposed API.
+
+❓ Q103. How do you create a ref to a DOM element with hooks?
+✔️ Answer ─────────▶ Use useRef and attach to JSX: const ref = useRef(null); return <div ref={ref}>. ref.current will be the DOM node after render. Useful for focus management, measurements, or DOM manipulation.
+
+❓ Q104. How do you access previous props or state with hooks?
+✔️ Answer ─────────▶ Create a custom hook using useRef and useEffect: Store current value in ref, return ref.current (which is previous value), then update ref in useEffect. The ref persists previous value across renders.
+
+❓ Q105. What is the difference between ref callback and useRef?
+✔️ Answer ─────────▶ Ref callback is a function that receives the DOM node: <div ref={node => { /* use node */ }}>. It's called with node on mount and null on unmount. useRef provides persistent .current property. Callbacks are useful for dynamic refs or side effects.
+
+❓ Q106. Can you use hooks in conditions or loops?
+✔️ Answer ─────────▶ No, hooks must be at top level of component function. Don't put them in if statements, loops, or nested functions. This ensures hooks are called in the same order every render, which React requires for state tracking.
+
+❓ Q107. How do you handle form state with hooks?
+✔️ Answer ─────────▶ Use useState for simple forms, useReducer for complex forms, or libraries like react-hook-form. Store values in state, create onChange handlers that update state, handle submit with state values. Controlled components are preferred.
+
+❓ Q108. What are the performance implications of hooks?
+✔️ Answer ─────────▶ Hooks can improve performance (avoiding HOC/render prop nesting, easier memoization) but can harm it (missing dependencies, too many states, expensive effects). Use React DevTools Profiler, memoization hooks, and dependency arrays correctly.
+
+❓ Q109. Can hooks replace Redux?
+✔️ Answer ─────────▶ For simple state, yes (useContext + useReducer). For complex apps, Redux offers: DevTools, middleware, time-travel debugging, predictable patterns, better performance optimization. Choose based on app complexity and team preference.
+
+❓ Q110. What is the useState functional update form?
+✔️ Answer ─────────▶ Instead of setState(newValue), use setState(prevValue => newValue). This ensures you work with latest state, important for async updates or multiple rapid updates. The function receives guaranteed current state.
+
+❓ Q111. How do you batch state updates with hooks?
+✔️ Answer ─────────▶ React automatically batches updates in event handlers. In async code (promises, setTimeout), use ReactDOM.unstable_batchedUpdates for older React versions. React 18+ uses automatic batching everywhere. Multiple setState calls in event handlers batch into one render.
+
+❓ Q112. What is the useCallback dependency array issue?
+✔️ Answer ─────────▶ If dependencies are missing, callback uses stale values. If too many dependencies, callback changes often, defeating memoization. Include all used values, use refs for values that shouldn't trigger changes, or restructure code.
+
+❓ Q113. How do you test custom hooks?
+✔️ Answer ─────────▶ Use React Testing Library's renderHook utility. It renders hooks in a test component, lets you access result and update props, and waits for async updates. Test hook behavior independently of components.
+
+❓ Q114. What are hook rules in ESLint?
+✔️ Answer ─────────▶ The eslint-plugin-react-hooks plugin enforces: Only call hooks at top level, only in React functions. It catches violations and suggests fixes. The exhaustive-deps rule warns about missing dependencies in useEffect/useMemo/useCallback.
+
+❓ Q115. Can you conditionally execute useEffect?
+✔️ Answer ─────────▶ Yes, put conditions inside the effect, not around useEffect call itself. Add condition to dependencies if it should re-run when condition changes. This maintains hook order while controlling when effect logic runs.
+
+❓ Q116. How do you prevent useEffect from running on mount?
+✔️ Answer ─────────▶ Use a ref to track if first render: const firstRender = useRef(true). In effect, check and set to false. Effect runs every time but logic executes only after first render. Alternative: use useLayoutEffect.
+
+❓ Q117. What is the cleanup function timing in useEffect?
+✔️ Answer ─────────▶ Cleanup runs before component unmounts and before running the effect again (when dependencies change). It runs after render but before next effect. Useful for canceling subscriptions, clearing timers, aborting requests.
+
+❓ Q118. Can you have multiple useEffect calls in one component?
+✔️ Answer ─────────▶ Yes, use multiple useEffect calls to separate concerns. Each tracks its own dependencies and cleanup. This makes code more organized and readable. React runs them in the order they're defined.
+
+❓ Q119. What happens if useEffect has no dependencies?
+✔️ Answer ─────────▶ Effect runs after every render, which can cause performance issues. Always specify dependencies or use empty array []. No dependencies means effect reads latest props/state but may run too often.
+
+❓ Q120. How do you debug hooks?
+✔️ Answer ─────────▶ Use React DevTools to inspect hook state, useDebugValue in custom hooks, console.log in hooks, React DevTools Profiler for performance, and ESLint rules for catching mistakes. Add debugging labels to hooks.
+
+❓ Q121. What is the React Hooks ESLint plugin?
+✔️ Answer ─────────▶ It's an official ESLint plugin that enforces rules of hooks and warns about common mistakes. Includes rules-of-hooks (enforces call order) and exhaustive-deps (checks dependency arrays). Install and configure in ESLint config.
+
+❓ Q122. Can you use hooks in React Native?
+✔️ Answer ─────────▶ Yes, all React hooks work in React Native. They're part of React core, not web-specific. Use them the same way in functional components. Some hooks like useLayoutEffect behave slightly differently in Native.
+
+❓ Q123. What is the useState initial value computation?
+✔️ Answer ─────────▶ If initial state is expensive to compute, pass a function: useState(() => expensiveComputation()). The function runs only on initial render, not every render. Without function, computation runs every render even though result is ignored.
+
+❓ Q124. How do you share hook logic between components?
+✔️ Answer ─────────▶ Create custom hooks: Extract hook logic into a function starting with "use", call other hooks inside, return values/functions needed. Components import and use the custom hook. Each usage gets independent state.
+
+❓ Q125. What is the difference between useCallback and useRef for functions?
+✔️ Answer ─────────▶ useCallback memoizes functions and changes when dependencies change, useful for preventing child re-renders. useRef stores function without memoization, never changes reference, useful for latest callback without dependencies. Choose based on whether you need memoization.
+
+
+===============================================================================
+SECTION 3: COMPONENT LIFECYCLE & STATE MANAGEMENT (❓ Questions 126-200)
+===============================================================================
+
+❓ Q126. What are lifecycle methods in React?
+✔️ Answer ─────────▶ Lifecycle methods are special methods in class components that run at specific points in a component's life: mounting (component creation), updating (re-rendering), and unmounting (removal). They allow side effects, setup, and cleanup at appropriate times.
+
+❓ Q127. What are the phases of component lifecycle?
+✔️ Answer ─────────▶ Three main phases: Mounting (component initialization and insertion into DOM), Updating (when props or state change causing re-renders), and Unmounting (component removal from DOM). Each phase has specific lifecycle methods.
+
+❓ Q128. What is componentDidMount?
+✔️ Answer ─────────▶ componentDidMount is called once after the component mounts (first render). Used for: API calls, subscriptions, DOM manipulation, third-party library initialization, setting up timers. It's equivalent to useEffect with empty dependency array.
+
+❓ Q129. What is componentDidUpdate?
+✔️ Answer ─────────▶ componentDidUpdate(prevProps, prevState, snapshot) is called after updates (except initial render). Used for: Responding to prop/state changes, Making API calls based on changes, Updating DOM in response to changes. Compare previous and current props/state to avoid infinite loops.
+
+❓ Q130. What is componentWillUnmount?
+✔️ Answer ─────────▶ componentWillUnmount is called right before component unmounts. Used for cleanup: Canceling timers, Unsubscribing from events, Aborting network requests, Cleaning up subscriptions. Equivalent to useEffect cleanup function.
+
+❓ Q131. What is shouldComponentUpdate?
+✔️ Answer ─────────▶ shouldComponentUpdate(nextProps, nextState) determines if component should re-render. Returns true (render) or false (skip). Used for performance optimization by preventing unnecessary renders. PureComponent implements this with shallow comparison.
+
+❓ Q132. What is getDerivedStateFromProps?
+✔️ Answer ─────────▶ A static lifecycle method that returns an object to update state or null. Called before rendering on both mount and update. Used for rare cases where state depends on props changes. Runs every render, so use sparingly.
+
+❓ Q133. When should you use getDerivedStateFromProps?
+✔️ Answer ─────────▶ Use it when state needs to update in response to prop changes. Common cases include: Resetting state when props change, Syncing state with props, Updating animation state. Most cases have better alternatives like fully controlled components or key changes.
+
+❓ Q134. What is getSnapshotBeforeUpdate?
+✔️ Answer ─────────▶ Called right before DOM updates. Receives previous props/state and can return a snapshot value passed to componentDidUpdate. Used for: Capturing scroll position, Preserving selections, Getting pre-update measurements. Rare use cases.
+
+❓ Q135. What replaced componentWillMount?
+✔️ Answer ─────────▶ componentWillMount is deprecated. Use constructor for initialization or componentDidMount for side effects. For functional components, use code before return or useEffect. componentWillMount's timing was problematic with async rendering.
+
+❓ Q136. What replaced componentWillReceiveProps?
+✔️ Answer ─────────▶ Use getDerivedStateFromProps (static method) or componentDidUpdate. componentWillReceiveProps is deprecated because it ran too often and enabled anti-patterns. Most cases should use componentDidUpdate with prop comparison.
+
+❓ Q137. What replaced componentWillUpdate?
+✔️ Answer ─────────▶ Use getSnapshotBeforeUpdate or componentDidUpdate. componentWillUpdate is deprecated for async rendering safety. getSnapshotBeforeUpdate captures values before updates; componentDidUpdate performs actions after.
+
+❓ Q138. What is the order of lifecycle methods on mounting?
+✔️ Answer ─────────▶ 1) constructor, 2) getDerivedStateFromProps, 3) render, 4) componentDidMount. This order allows initialization, derived state, rendering, then side effects after DOM is ready.
+
+❓ Q139. What is the order of lifecycle methods on updating?
+✔️ Answer ─────────▶ 1) getDerivedStateFromProps, 2) shouldComponentUpdate, 3) render, 4) getSnapshotBeforeUpdate, 5) componentDidUpdate. This allows derived state, render optimization, rendering, pre-update capture, then post-update effects.
+
+❓ Q140. What is the order of lifecycle methods on unmounting?
+✔️ Answer ─────────▶ Only componentWillUnmount is called before removal. This is the cleanup phase where you cancel subscriptions, clear timers, and clean up to prevent memory leaks.
+
+❓ Q141. What is state in React?
+✔️ Answer ─────────▶ State is a built-in object holding data that changes over time within a component. Unlike props, state is local and mutable. State changes trigger re-renders. Each component instance has independent state.
+
+❓ Q142. How do you initialize state in class components?
+✔️ Answer ─────────▶ In constructor: this.state = { key: value }. Don't use setState in constructor. State can also be initialized as a class property: state = { key: value }. Both work the same but class property is more concise.
+
+❓ Q143. How do you update state in class components?
+✔️ Answer ─────────▶ Use this.setState(newState) or this.setState((prevState, props) => newState). setState is asynchronous and batches multiple calls. Never modify this.state directly. setState triggers re-render after updates are merged.
+
+❓ Q144. Why is setState asynchronous?
+✔️ Answer ─────────▶ For performance. React batches multiple setState calls into a single update for efficiency. Asynchronous updates allow React to optimize rendering, group updates, and maintain consistent state across lifecycle. Immediate updates would cause too many re-renders.
+
+❓ Q145. How do you access updated state immediately after setState?
+✔️ Answer ─────────▶ Use setState's callback: this.setState({count: 1}, () => { /* use this.state.count */ }). Or use componentDidUpdate. The callback runs after state is updated and component re-rendered.
+
+❓ Q146. Can you call setState in componentDidUpdate?
+✔️ Answer ─────────▶ Yes, but wrap it in a condition to avoid infinite loops: if (prevProps.value !== this.props.value) { this.setState(...) }. Always compare previous values before setState to prevent continuous updates.
+
+❓ Q147. Can you call setState in componentDidMount?
+✔️ Answer ─────────▶ Yes, it's common for initializing state with API data. It triggers a re-render before browser updates the screen, so users don't see the initial empty state. However, it causes two renders.
+
+❓ Q148. Can you call setState in render?
+✔️ Answer ─────────▶ No, calling setState in render causes infinite loops. render must be pure (no side effects). Put state updates in lifecycle methods, event handlers, or callbacks, not in render.
+
+❓ Q149. What is the second parameter of setState?
+✔️ Answer ─────────▶ A callback function that executes after state is updated and component re-rendered. Useful for actions that depend on new state, like API calls or DOM updates based on the updated state.
+
+❓ Q150. Does setState merge state automatically?
+✔️ Answer ─────────▶ In class components, yes - setState merges the object into current state. In hooks, useState does NOT merge - it replaces state. For objects with useState, spread previous state: setState({...prev, newKey: value}).
+
+❓ Q151. What is state lifting?
+✔️ Answer ─────────▶ Lifting state up means moving state to the nearest common ancestor of components that need it. The ancestor passes state down as props and callbacks to update. This enables sibling components to share state.
+
+❓ Q152. When should you lift state up?
+✔️ Answer ─────────▶ When: Multiple components need the same state, Siblings need to share data, Child needs to update parent state, State is needed at multiple levels. Lift state to the lowest common ancestor.
+
+❓ Q153. What is prop drilling?
+✔️ Answer ─────────▶ Prop drilling is passing props through multiple component layers to reach deeply nested components. It makes code verbose and hard to maintain. Solutions include Context API, state management libraries, or component composition.
+
+❓ Q154. How do you avoid prop drilling?
+✔️ Answer ─────────▶ Use Context API to pass data without explicit props at every level, use state management libraries (Redux, Zustand), restructure components with composition (children prop), or use component composition patterns.
+
+❓ Q155. What is the Context API?
+✔️ Answer ─────────▶ Context provides a way to share values between components without passing props through every level. Create context with React.createContext, provide value with Provider component, consume with Consumer or useContext hook.
+
+❓ Q156. How do you create a Context?
+✔️ Answer ─────────▶ Use React.createContext(defaultValue). Returns an object with Provider and Consumer components. Provider accepts value prop and makes it available to descendants. Consumer or useContext accesses the value.
+
+❓ Q157. What is a Context Provider?
+✔️ Answer ─────────▶ Provider is a component that makes context value available to descendants. All consumers re-render when Provider's value prop changes. Place Provider high in the tree to share values across many components.
+
+❓ Q158. What is a Context Consumer?
+✔️ Answer ─────────▶ Consumer is a component (or useContext hook) that accesses context value. Function component receives value as argument. Class component uses render props. Multiple consumers can use same context.
+
+❓ Q159. Can you use multiple Contexts?
+✔️ Answer ─────────▶ Yes, create multiple contexts for different data types. Components can consume multiple contexts. Nest Providers for different contexts. This keeps contexts focused and reduces unnecessary re-renders.
+
+❓ Q160. What happens when Context value changes?
+✔️ Answer ─────────▶ All consumers re-render, even if they don't use the changed part of the value. This can cause performance issues. Optimize by: Splitting contexts, Memoizing context value, Using multiple contexts, Implementing selectors.
+
+❓ Q161. How do you optimize Context performance?
+✔️ Answer ─────────▶ Memoize context value with useMemo, split frequently/rarely updating values into separate contexts, use React.memo on consumers, structure context to minimize changes, or consider state management libraries for complex state.
+
+❓ Q162. What is the default value in createContext?
+✔️ Answer ─────────▶ Default value is used only when a component doesn't have a matching Provider above it in the tree. It's not used when Provider exists with value={undefined}. Useful for testing components in isolation.
+
+❓ Q163. Can you update Context from consumers?
+✔️ Answer ─────────▶ Yes, pass a function in context value that updates state in Provider's component. Consumers call this function to trigger updates. This enables two-way communication through context.
+
+❓ Q164. What is Redux?
+✔️ Answer ─────────▶ Redux is a predictable state container for JavaScript apps. It maintains global state in a single store, uses actions to describe state changes, and reducers to specify how state updates. Provides time-travel debugging and middleware support.
+
+❓ Q165. What are the three principles of Redux?
+✔️ Answer ─────────▶ 1) Single source of truth - One store for entire app state. 2) State is read-only - Only change state by dispatching actions. 3) Changes made with pure functions - Reducers are pure functions that take state and action, return new state.
+
+❓ Q166. What is a Redux store?
+✔️ Answer ─────────▶ The store holds the entire application state tree. Only one store per app. It has methods: getState() to access state, dispatch(action) to update state, subscribe(listener) to register callbacks. Created with createStore or configureStore (Redux Toolkit).
+
+❓ Q167. What are Redux actions?
+✔️ Answer ─────────▶ Actions are plain JavaScript objects describing what happened. Must have a type property (string constant). Can have additional data (payload). Actions are dispatched to the store to trigger state updates. Created by action creators (functions returning actions).
+
+❓ Q168. What are Redux reducers?
+✔️ Answer ─────────▶ Pure functions that take current state and action, return new state. They specify how state changes in response to actions. Must not mutate state - return new objects. Handle different action types with switch statements.
+
+❓ Q169. What is a Redux action creator?
+✔️ Answer ─────────▶ A function that creates and returns an action object. Keeps action creation logic in one place, makes actions reusable, and can contain logic for generating action payload. Simpler than creating action objects everywhere.
+
+❓ Q170. What is middleware in Redux?
+✔️ Answer ─────────▶ Middleware provides a way to extend Redux with custom functionality. It sits between dispatching an action and reaching the reducer. Used for: Logging, async actions (thunks), API calls, routing. Redux Toolkit includes thunk middleware.
+
+❓ Q171. What is Redux Thunk?
+✔️ Answer ─────────▶ Middleware that allows action creators to return functions instead of actions. These functions receive dispatch and getState as arguments. Used for async operations like API calls. Functions can dispatch multiple actions and access current state.
+
+❓ Q172. What is Redux Saga?
+✔️ Answer ─────────▶ Alternative to thunk using generator functions for side effects. More powerful for complex async flows, easier testing, better error handling, cancellation support. Uses "sagas" to handle async logic separately from components and reducers.
+
+❓ Q173. What is the difference between Redux Thunk and Redux Saga?
+✔️ Answer ─────────▶ Thunk returns functions, Saga uses generators. Thunk is simpler for basic async, Saga is better for complex flows. Saga offers better testing, cancellation, racing, parallel tasks. Thunk is included in Redux Toolkit, Saga is separate library.
+
+❓ Q174. What is mapStateToProps?
+✔️ Answer ─────────▶ Function in React-Redux connect() that maps Redux store state to component props. Receives state, returns object of props. Component re-renders when mapped state changes. Replaced by useSelector hook in functional components.
+
+❓ Q175. What is mapDispatchToProps?
+✔️ Answer ─────────▶ Function in connect() that maps action creators to props. Receives dispatch, returns object of functions that dispatch actions. Allows components to dispatch without accessing dispatch directly. Replaced by useDispatch hook in functional components.
+
+❓ Q176. What is React-Redux connect?
+✔️ Answer ─────────▶ Higher-order component that connects React components to Redux store. Takes mapStateToProps and mapDispatchToProps, returns enhanced component. Handles subscriptions and updates. Replaced by hooks (useSelector, useDispatch) in modern React.
+
+❓ Q177. What are Redux hooks?
+✔️ Answer ─────────▶ React-Redux hooks for functional components: useSelector to access store state (replaces mapStateToProps), useDispatch to dispatch actions (replaces mapDispatchToProps), useStore to access store directly. Cleaner than connect HOC.
+
+❓ Q178. What is useSelector?
+✔️ Answer ─────────▶ Hook that extracts data from Redux store. Takes selector function receiving state, returns derived data. Component re-renders when selector result changes. Can use multiple useSelector calls for different state slices.
+
+❓ Q179. What is useDispatch?
+✔️ Answer ─────────▶ Hook that returns dispatch function from Redux store. Use it to dispatch actions from functional components. More straightforward than mapDispatchToProps. Returns stable dispatch reference that doesn't change.
+
+❓ Q180. What is Redux Toolkit?
+✔️ Answer ─────────▶ Official, opinionated toolset for Redux development. Includes configureStore (simpler setup), createSlice (combines actions and reducers), createAsyncThunk (async logic), Immer (allows "mutable" updates). Reduces boilerplate significantly.
+
+❓ Q181. What is createSlice in Redux Toolkit?
+✔️ Answer ─────────▶ Function that generates action creators and reducers together. Takes slice name, initial state, and reducers object. Returns slice object with reducer and action creators. Uses Immer internally for immutable updates with mutable syntax.
+
+❓ Q182. What is createAsyncThunk?
+✔️ Answer ─────────▶ Redux Toolkit helper for async logic. Generates pending/fulfilled/rejected action types automatically. Accepts type string and async function. Handles lifecycle actions for async requests. Integrates with createSlice extraReducers.
+
+❓ Q183. What are extraReducers in createSlice?
+✔️ Answer ─────────▶ Handle actions from other slices or async thunks. Used when slice needs to respond to actions it doesn't own. Takes builder pattern with addCase/addMatcher/addDefaultCase to handle different action types.
+
+❓ Q184. What is Immer in Redux Toolkit?
+✔️ Answer ─────────▶ Library that lets you write "mutating" logic that produces immutable updates. Used internally by createSlice. Write state.value = newValue instead of {...state, value: newValue}. Makes reducers cleaner and less error-prone.
+
+❓ Q185. Should you put all state in Redux?
+✔️ Answer ─────────▶ No, only state needed across components or state that benefits from Redux features (time-travel, middleware, persistence). Local component state is fine for UI state, form inputs, temporary data. Balance based on app needs.
+
+❓ Q186. What state should go in Redux?
+✔️ Answer ─────────▶ Shared data needed by multiple components, Cached server data, Complex state requiring complex updates, State benefiting from time-travel debugging, State persisted to localStorage, Global UI state (theme, language).
+
+❓ Q187. What state should stay in component?
+✔️ Answer ─────────▶ Form inputs before submission, UI state like hover/focus, Temporary UI state like modal open/closed, Derived data that can be calculated from props, State only used in one component, Transient values.
+
+❓ Q188. What is state normalization?
+✔️ Answer ─────────▶ Organizing state in a flat, relational structure like a database. Store entities in objects keyed by ID, use IDs to reference relationships. Avoids nested data, simplifies updates, prevents duplication. Redux docs recommend normalized state.
+
+❓ Q189. What are state slices in Redux?
+✔️ Answer ─────────▶ Logical divisions of global state by feature or domain. Each slice handles its own state and actions. Slices are combined into root reducer. Helps organize large applications by feature rather than type.
+
+❓ Q190. What is the Redux DevTools?
+✔️ Answer ─────────▶ Browser extension for debugging Redux apps. Shows dispatched actions, state changes, allows time-travel debugging (undo/redo actions), import/export state, inspect action payloads, test action dispatch. Essential for Redux development.
+
+❓ Q191. How does Redux handle async operations?
+✔️ Answer ─────────▶ Redux itself is synchronous. Use middleware for async: Redux Thunk for simple async (functions as actions), Redux Saga for complex flows (generators), Redux Observable (RxJS), or custom middleware. Redux Toolkit includes thunk by default.
+
+❓ Q192. What is the difference between Redux and Context API?
+✔️ Answer ─────────▶ Context is built into React, simpler for simple cases, can cause performance issues with frequent updates. Redux has: Better DevTools, Middleware ecosystem, Better performance optimization, More predictable patterns, Time-travel debugging. Use Context for simpler state, Redux for complex apps.
+
+❓ Q193. Can you use Redux and Context together?
+✔️ Answer ─────────▶ Yes, use Redux for global app state and Context for specific features or dependency injection. Some use Context to pass Redux store instead of react-redux. Combine based on needs - not everything needs Redux.
+
+❓ Q194. What is Redux middleware execution order?
+✔️ Answer ─────────▶ Middleware executes in the order it's applied when creating store. For dispatched actions: first middleware receives it, can pass to next or stop. Return journey: last middleware returns first, travels back to first middleware.
+
+❓ Q195. What is the purpose of combineReducers?
+✔️ Answer ─────────▶ Combines multiple slice reducers into single root reducer. Each slice manages its own state portion. Takes object with slice reducers, returns single reducer for createStore. Organizes reducers by feature/domain.
+
+❓ Q196. What are selectors in Redux?
+✔️ Answer ─────────▶ Functions that extract and derive data from store state. Encapsulate state shape, make components independent of state structure, can compute derived data, cacheable with reselect library. Take state, return derived value.
+
+❓ Q197. What is Reselect?
+✔️ Answer ─────────▶ Library for creating memoized selectors. Selectors recompute only when input values change, preventing expensive computations on every render. Useful for derived data, filtering, sorting. Improves performance in Redux apps.
+
+❓ Q198. What is Redux state immutability?
+✔️ Answer ─────────▶ Never modify existing state directly. Always return new state objects/arrays. This lets React detect changes via reference comparison, enables time-travel debugging, prevents bugs. Use spread operators, array methods that return new arrays, or Immer.
+
+❓ Q199. How do you handle form state in Redux?
+✔️ Answer ─────────▶ Use Redux Form or Formik libraries, or manage manually with actions for input changes. However, forms are often better in local state unless you need features like cross-form communication, wizard flows, or persisting drafts.
+
+❓ Q200. What are Redux best practices?
+✔️ Answer ─────────▶ Normalize state shape, Use Redux Toolkit, Keep reducers pure, Use action creators, Implement selectors, Don't put everything in Redux, Use middleware for side effects, Enable Redux DevTools, Organize by feature, Write tests for reducers.
+
+
+===============================================================================
+SECTION 4: ADVANCED REACT PATTERNS & OPTIMIZATION (❓ Questions 201-300)
+===============================================================================
+
+❓ Q201. What are Higher-Order Components (HOCs)?
+✔️ Answer ─────────▶ HOCs are functions that take a component and return a new enhanced component. They're used for code reuse, logic abstraction, and prop manipulation. Common uses: Authentication, Logging, Data fetching. Function composition pattern, not components themselves.
+
+❓ Q202. How do you create a HOC?
+✔️ Answer ─────────▶ Create a function that accepts a component, returns a new component that renders the wrapped component with additional props or behavior. Convention: Name starts with "with" (withAuth, withLogger). Pass through unused props to wrapped component.
+
+❓ Q203. What are the advantages of HOCs?
+✔️ Answer ─────────▶ Reuse component logic across multiple components, Abstract complex state or logic, Enhance components without modifying them (composition), Provide props injection, Enable code organization by concern, Support multiple HOCs through composition.
+
+❓ Q204. What are the disadvantages of HOCs?
+✔️ Answer ─────────▶ Can cause prop naming collisions, Make debugging harder (wrapper hell), Create unnecessary component nesting, Static composition means can't be conditional, Lose component type information, Hooks often provide cleaner alternative.
+
+❓ Q205. What is the difference between HOC and render props?
+✔️ Answer ─────────▶ HOCs are function composition creating new components. Render props pass functions as props to control rendering. HOCs compose at definition time, render props compose at render time. Hooks often replace both patterns with cleaner solutions.
+
+❓ Q206. What are render props?
+✔️ Answer ─────────▶ Pattern where a component accepts a function prop that returns React elements. The component calls this function in render, passing data as arguments. Enables code reuse without HOCs, provides dynamic composition, allows multiple render functions.
+
+❓ Q207. What are the advantages of render props?
+✔️ Answer ─────────▶ More flexible than HOCs (dynamic composition), Avoid prop naming conflicts, Clear data flow, Can use multiple in one component, Don't create extra components, Better TypeScript support, Explicit rather than implicit.
+
+❓ Q208. What are the disadvantages of render props?
+✔️ Answer ─────────▶ Can cause callback hell with multiple render props, Harder to optimize with PureComponent, Verbose syntax, Anonymous functions in render may affect performance, Hooks often provide cleaner solution.
+
+❓ Q209. What is component composition?
+✔️ Answer ─────────▶ Building complex UIs by combining simpler components. Use children prop, render props, or component props to compose. Enables flexibility, reusability, and separation of concerns. Preferred over inheritance in React.
+
+❓ Q210. What are compound components?
+✔️ Answer ─────────▶ Components that work together to form a complete UI, sharing implicit state. Parent and children communicate through Context or cloneElement. Examples: Tabs, Accordion, Dropdown. Provides flexible, declarative API.
+
+❓ Q211. What is the compound component pattern?
+✔️ Answer ─────────▶ Pattern where multiple components work together through shared state. Parent manages state, children access it via Context. Provides flexibility in component structure while maintaining functionality. Used in UI libraries.
+
+❓ Q212. What is lazy loading in React?
+✔️ Answer ─────────▶ Loading components only when needed, not upfront. Use React.lazy() for dynamic imports. Improves initial load time by splitting code into smaller bundles. Combine with Suspense for loading states.
+
+❓ Q213. What is React.lazy()?
+✔️ Answer ─────────▶ Function for code-splitting that dynamically imports components. Takes a function that returns dynamic import(). Returns a component that renders lazily-loaded component. Must be used with Suspense for fallback UI.
+
+❓ Q214. What is Suspense?
+✔️ Answer ─────────▶ Component that shows fallback UI while waiting for lazy components to load. Wraps lazy components, catches loading promises. Takes fallback prop (loading UI). Will support data fetching in future React versions.
+
+❓ Q215. How do you implement code splitting?
+✔️ Answer ─────────▶ Use React.lazy() with dynamic imports, Suspense for fallback UI, Route-based splitting with React Router, Component-based splitting for large components, Use webpack's code splitting features. Reduces initial bundle size.
+
+❓ Q216. What is route-based code splitting?
+✔️ Answer ─────────▶ Splitting code by routes/pages. Each route loads only its required components. Use React.lazy() with React Router. Common pattern: lazy load route components, eager load common components. Improves perceived performance.
+
+❓ Q217. What are the benefits of code splitting?
+✔️ Answer ─────────▶ Smaller initial bundle size, Faster initial load, Better caching (change one chunk, others unchanged), Load only what's needed, Better performance on slow connections, Reduced time to interactive.
+
+❓ Q218. What is tree shaking?
+✔️ Answer ─────────▶ Dead code elimination during bundling. Removes unused imports and code. Works with ES6 modules (not CommonJS). Import only what you use. Build tools (webpack, Rollup) analyze and remove unused code.
+
+❓ Q219. How do you optimize React performance?
+✔️ Answer ─────────▶ Use production builds, Code splitting with React.lazy, Memoization (React.memo, useMemo, useCallback), Virtualize long lists, Avoid inline functions/objects in render, Use keys correctly, Profile with React DevTools, Lazy load images.
+
+❓ Q220. What is React.memo()?
+✔️ Answer ─────────▶ Higher-order component that memoizes functional components. Prevents re-renders if props haven't changed. Does shallow comparison by default, accepts custom comparison function. Similar to PureComponent for functions.
+
+❓ Q221. When should you use React.memo()?
+✔️ Answer ─────────▶ When component renders often with same props, Component is expensive to render, Parent re-renders frequently but child props rarely change. Don't overuse - profiling should guide decisions. Memoization has overhead.
+
+❓ Q222. What is the difference between React.memo() and useMemo()?
+✔️ Answer ─────────▶ React.memo() memoizes entire component, preventing re-renders. useMemo() memoizes values/computations within a component. React.memo() is HOC, useMemo() is hook. Use memo for components, useMemo for expensive calculations.
+
+❓ Q223. What is reconciliation?
+✔️ Answer ─────────▶ Process of updating the DOM efficiently. React creates new Virtual DOM, compares with previous (diffing), calculates minimal changes needed, applies changes to real DOM. Uses key prop for list optimization.
+
+❓ Q224. What is the diffing algorithm?
+✔️ Answer ─────────▶ Algorithm React uses to compare Virtual DOM trees. Assumptions: Different element types produce different trees, Use keys for list children, Check component type first, Compare props/state. Makes reconciliation O(n) instead of O(n³).
+
+❓ Q225. How does React handle list updates efficiently?
+✔️ Answer ─────────▶ Uses key prop to track elements. Matching keys = same element (potentially moved), No match = added/removed. Stable, unique keys enable React to minimize DOM operations during list updates.
+
+❓ Q226. What is windowing or virtualization?
+✔️ Answer ─────────▶ Rendering only visible items in long lists. Libraries: react-window, react-virtualized. Renders small subset of items, updates as user scrolls. Dramatically improves performance for long lists (thousands of items).
+
+❓ Q227. What is react-window?
+✔️ Answer ─────────▶ Library for efficiently rendering large lists by only rendering visible items. Lighter than react-virtualized. Provides FixedSizeList, VariableSizeList, FixedSizeGrid, VariableSizeGrid components. Improves performance and reduces memory usage.
+
+❓ Q228. How do you optimize re-renders?
+✔️ Answer ─────────▶ Use React.memo for components, useMemo for expensive calculations, useCallback for stable function references, Split components to isolate updates, Move state down to minimize affected components, Use context wisely, Profile to identify bottlenecks.
+
+❓ Q229. What causes unnecessary re-renders?
+✔️ Answer ─────────▶ Parent re-render (without memo), State/props change, Context value change, forceUpdate call, Inline functions/objects as props (new references), Missing dependencies in hooks, Not using keys properly in lists.
+
+❓ Q230. How do you prevent unnecessary re-renders?
+✔️ Answer ─────────▶ Memoize components with React.memo, Use useMemo/useCallback for values/functions, Split large components, Move state closer to where it's used, Optimize context (split, memoize value), Use proper keys, Avoid inline objects/arrays as props.
+
+❓ Q231. What is the React Profiler?
+✔️ Answer ─────────▶ Tool in React DevTools for measuring component performance. Shows render duration, number of renders, why component rendered, Identifies performance bottlenecks, Compares renders. Essential for optimization decisions.
+
+❓ Q232. How do you use the React Profiler?
+✔️ Answer ─────────▶ In React DevTools, switch to Profiler tab, Start recording, Interact with app, Stop recording, Analyze flame graph/ranked chart. Look for: Slow components, Frequent renders, Render cascades. Make targeted optimizations.
+
+❓ Q233. What is the Profiler component?
+✔️ Answer ─────────▶ React component that measures rendering performance programmatically. Wraps component tree, calls onRender callback with timing info. Useful for production monitoring, measuring specific features, Automated performance testing.
+
+❓ Q234. What metrics does Profiler provide?
+✔️ Answer ─────────▶ Component ID, Render phase (mount/update), Actual duration (time to render), Base duration (without memoization), Start time, Commit time, Interactions being traced. Helps identify performance issues.
+
+❓ Q235. What is batch updating in React?
+✔️ Answer ─────────▶ Grouping multiple state updates into single re-render for performance. Automatic in event handlers. React 18+ has automatic batching everywhere (async code, promises, timeouts). Reduces render count.
+
+❓ Q236. What is React 18 automatic batching?
+✔️ Answer ─────────▶ React 18 automatically batches all state updates, even in promises, setTimeout, native event handlers. Previously only batched in React event handlers. Improves performance without code changes. Can opt out with flushSync.
+
+❓ Q237. What is flushSync?
+✔️ Answer ─────────▶ Forces React to flush updates synchronously, bypassing automatic batching. Use sparingly - only when you need DOM updated immediately (measuring DOM, third-party integrations). Hurts performance if overused.
+
+❓ Q238. What is Concurrent Mode?
+✔️ Answer ─────────▶ React rendering mode that allows interrupting rendering for higher-priority updates. Enables features: Suspense, transitions, automatic batching. Makes apps more responsive. Gradually adopted (now Concurrent Features in React 18+).
+
+❓ Q239. What are transitions in React?
+✔️ Answer ─────────▶ Way to mark non-urgent updates, allowing React to interrupt them for urgent updates. Use startTransition or useTransition. Keeps UI responsive during expensive updates. Urgent updates (typing) interrupt non-urgent (filter results).
+
+❓ Q240. What is useTransition?
+✔️ Answer ─────────▶ Hook that marks state updates as transitions (non-urgent). Returns isPending flag and startTransition function. Shows loading state without blocking UI. Good for filtering, searching, navigation where you want to keep existing UI responsive.
+
+❓ Q241. What is useDeferredValue?
+✔️ Answer ─────────▶ Hook that defers updating a value, similar to debouncing. Returns deferred value that "lags behind" real value. React prioritizes other updates. Use for expensive renders based on input, where you want to keep input responsive.
+
+❓ Q242. What is the difference between useTransition and useDeferredValue?
+✔️ Answer ─────────▶ useTransition wraps state updates you control (your setState calls). useDeferredValue wraps values, useful when you can't wrap the update (prop from parent). Both enable concurrent rendering, keeping UI responsive during expensive updates.
+
+❓ Q243. What is priority in React?
+✔️ Answer ─────────▶ React assigns priority levels to updates: User interactions (clicks, typing) are high priority, Transitions are low priority. Higher priority updates interrupt lower priority. Keeps UI responsive even during expensive updates.
+
+❓ Q244. What is the commitment phase?
+✔️ Answer ─────────▶ Final phase where React applies changes to DOM. Follows render phase. Runs synchronously, cannot be interrupted. Includes layout effects (useLayoutEffect), DOM mutations, Cleanup functions. User sees results after commit.
+
+❓ Q245. What is the render phase?
+✔️ Answer ─────────▶ Phase where React calls component functions/render methods, computes what changed. Can be paused, aborted, restarted. Pure, no side effects. Followed by commit phase that applies changes. Concurrent features leverage render phase interruptibility.
+
+❓ Q246. What is hydration?
+✔️ Answer ─────────▶ Process of attaching React to server-rendered HTML. React assumes server HTML is correct, attaches event listeners, makes app interactive. Faster initial render than client-only. Mismatches cause warnings/issues.
+
+❓ Q247. What is server-side rendering (SSR)?
+✔️ Answer ─────────▶ Rendering React on the server, sending HTML to client. Faster initial load, better SEO, Works without JavaScript. Requires hydration on client. Use frameworks: Next.js, Remix. ReactDOMServer.renderToString() for manual implementation.
+
+❓ Q248. What is the difference between SSR and client-side rendering?
+✔️ Answer ─────────▶ SSR renders on server, sends HTML (faster initial load, better SEO). Client-side renders in browser with JavaScript (slower initial load, blank page until JS loads). SSR requires hydration. Most apps use hybrid approach.
+
+❓ Q249. What is static site generation (SSG)?
+✔️ Answer ─────────▶ Pre-rendering pages at build time, generating static HTML files. Faster than SSR (no server rendering on request), Great for content sites, blogs. Use getStaticProps in Next.js. Combine with incremental regeneration for updates.
+
+❓ Q250. What is incremental static regeneration?
+✔️ Answer ─────────▶ Updating static pages after build without full rebuild. Specify revalidation interval, Next.js regenerates page in background. Combines SSG benefits (speed) with dynamic content. Pages update without deploying.
+
+❓ Q251. What is React Server Components?
+✔️ Answer ─────────▶ Components that render only on server, don't send JavaScript to client. Reduce bundle size, Access backend resources directly, Better performance. Still experimental. Different from SSR - these components never hydrate.
+
+❓ Q252. What is Streaming SSR?
+✔️ Answer ─────────▶ Sending HTML to client in chunks as it's rendered, not waiting for full page. Use Suspense boundaries to mark what can stream. Faster time to first byte, Progressive rendering. React 18+ feature.
+
+❓ Q253. What is selective hydration?
+✔️ Answer ─────────▶ Hydrating parts of page independently based on user interaction. Combined with Streaming SSR and Suspense. React prioritizes hydrating what user interacts with. Faster time to interactive.
+
+❓ Q254. What are portals?
+✔️ Answer ─────────▶ Render children into DOM node outside parent component hierarchy. Use ReactDOM.createPortal(child, container). Useful for modals, tooltips, dropdowns. Event bubbling works through React tree, not DOM tree.
+
+❓ Q255. When should you use portals?
+✔️ Answer ─────────▶ Modals/dialogs (render at body level), Tooltips positioned outside parent, Breaking out of overflow:hidden, Rendering to different DOM subtree, Working with third-party DOM libraries.
+
+❓ Q256. What is forwardRef?
+✔️ Answer ─────────▶ Forwards refs through component to child. Needed because functional components don't have instances. Enables parent to access child DOM node or component instance. Common in reusable component libraries.
+
+❓ Q257. When should you use forwardRef?
+✔️ Answer ─────────▶ Exposing DOM nodes to parent (focus management), Reusable component libraries, Imperative handles (useImperativeHandle), Higher-order components that need to pass refs, Ref forwarding through multiple levels.
+
+❓ Q258. What is useImperativeHandle?
+✔️ Answer ─────────▶ Customizes ref value exposed to parent when using forwardRef. Lets you expose only specific methods/properties, not entire DOM node. Encapsulates implementation, Provides clean API to parents. Use with forwardRef.
+
+❓ Q259. What are synthetic events?
+✔️ Answer ─────────▶ React's cross-browser event wrapper. Consistent API across browsers, Event pooling (reuse objects), Automatic delegation, Normalized properties. Access native event via event.nativeEvent if needed.
+
+❓ Q260. What is event pooling?
+✔️ Answer ─────────▶ React reuses SyntheticEvent objects for performance. Event properties are nullified after callback. Access async requires event.persist() (React 16) or saving properties. React 17+ removed pooling, no longer needed.
+
+❓ Q261. How do you access native DOM events?
+✔️ Answer ─────────▶ Access via event.nativeEvent in synthetic event handler. Gives access to browser-specific properties. Usually unnecessary - synthetic events provide what you need. Use for browser-specific features.
+
+❓ Q262. What is the difference between onClick and onclick?
+✔️ Answer ─────────▶ onClick is React synthetic event (camelCase), onclick is HTML attribute (lowercase). React events: Accept functions not strings, Work across browsers consistently, Use event delegation, Return false doesn't prevent default (use preventDefault).
+
+❓ Q263. How do you prevent default behavior in React?
+✔️ Answer ─────────▶ Call event.preventDefault() in event handler. Cannot return false like HTML. Required for form submit, links, drag/drop. preventDefault() is on synthetic event, works same as native.
+
+❓ Q264. How do you stop event propagation in React?
+✔️ Answer ─────────▶ Call event.stopPropagation() to stop bubbling. Events in React bubble through React tree, not DOM tree. Useful for preventing parent handlers from running.
+
+❓ Q265. What is error boundary implementation?
+✔️ Answer ─────────▶ Class component with getDerivedStateFromError and/or componentDidCatch. Return fallback UI when error caught. Wrap component trees that might error. Cannot catch errors in event handlers or async code.
+
+❓ Q266. Can functional components be error boundaries?
+✔️ Answer ─────────▶ No, error boundaries must be class components. No hook equivalent yet. Create a class error boundary and use it to wrap functional components. Proposal for error boundary hook exists.
+
+❓ Q267. Where should you place error boundaries?
+✔️ Answer ─────────▶ Around route components, Around independent widgets, At app root as last resort, Around code that might fail (third-party, data-dependent). Granularity depends on desired user experience.
+
+❓ Q268. What is React strict mode?
+✔️ Answer ─────────▶ Development tool that activates additional checks. Identifies unsafe lifecycles, Warns about legacy APIs, Detects unexpected side effects (runs effects twice), Warns about deprecated features. No production impact.
+
+❓ Q269. Why does strict mode render twice?
+✔️ Answer ─────────▶ To help detect side effects in render phase. Pure components should handle this. If double-render causes issues, you have side effects that should be in useEffect. Only happens in development.
+
+❓ Q270. What is React Fragment?
+✔️ Answer ─────────▶ Wrapper that groups children without adding DOM nodes. Use <React.Fragment> or <>. Short syntax can't have keys or props. Use full syntax when you need keys (lists).
+
+❓ Q271. What are keys in React?
+✔️ Answer ─────────▶ Special prop that identifies list items. Helps React identify changes (added/removed/reordered). Should be stable (not random), unique among siblings (not globally). Avoid array index unless list never reorders.
+
+❓ Q272. What happens if you don't use keys?
+✔️ Answer ─────────▶ React uses index by default. Works poorly for dynamic lists. Can cause bugs: wrong component state, incorrect updates, performance issues. Always provide explicit, stable keys for lists.
+
+❓ Q273. Can you use index as key?
+✔️ Answer ─────────▶ Only if list is static, never reorders, and no items added/removed. Bad for dynamic lists. Index changes when items reorder, causing React to mismatch state with elements. Use stable unique IDs.
+
+❓ Q274. What makes a good key?
+✔️ Answer ─────────▶ Stable (doesn't change between renders), Unique among siblings, Identifies same item across renders. Database IDs are ideal. Avoid indexes, random numbers, timestamps generated during render.
+
+❓ Q275. What is dangerouslySetInnerHTML?
+✔️ Answer ─────────▶ Prop that sets HTML from string, bypassing React's XSS protections. Name warns it's dangerous. Use only for trusted content. Sanitize content first. Better to use proper React components when possible.
+
+❓ Q276. When should you use dangerouslySetInnerHTML?
+✔️ Answer ─────────▶ Rendering trusted HTML from CMS, Displaying sanitized user content, Integrating with rich text editors, Working with markdown renderers. Always sanitize first. Consider alternatives like react-markdown.
+
+❓ Q277. What is XSS in React?
+✔️ Answer ─────────▶ Cross-site scripting attack where malicious scripts execute in user's browser. React escapes strings by default, protecting against XSS. Unsafe: dangerouslySetInnerHTML, href="javascript:", inline event handlers from user input.
+
+❓ Q278. How does React prevent XSS?
+✔️ Answer ─────────▶ Escapes all string content before rendering. Converts < to &lt;, etc. dangerouslySetInnerHTML bypasses this. Don't construct HTML from user input. Don't use user input in javascript: URLs or inline handlers.
+
+❓ Q279. What is ref callback?
+✔️ Answer ─────────▶ Function passed as ref prop. Called with DOM node (or null on unmount). Alternative to useRef. Useful for: Measuring DOM, Dynamic refs, Running code when ref is set, Multiple refs on one element.
+
+❓ Q280. What is callback ref vs object ref?
+✔️ Answer ─────────▶ Object ref (useRef) has .current property you read/write. Callback ref is function called with node. Callbacks let you run code when ref is set. Objects are simpler for most cases.
+
+❓ Q281. What are controlled vs uncontrolled components for refs?
+✔️ Answer ─────────▶ Controlled: React state controls value, refs optional. Uncontrolled: DOM controls value, use refs to access. Controlled is preferred (validation, formatting, conditional logic). Uncontrolled is simpler for basic forms.
+
+❓ Q282. What is the purpose of defaultValue?
+✔️ Answer ─────────▶ Sets initial value for uncontrolled components. Unlike value prop, doesn't make input controlled. Useful for uncontrolled inputs with initial values. Use value prop for controlled components.
+
+❓ Q283. How do you focus an input on mount?
+✔️ Answer ─────────▶ Use ref with useEffect: const ref = useRef(); useEffect(() => ref.current.focus(), []). Or use autoFocus prop for simpler cases. useEffect ensures DOM is ready.
+
+❓ Q284. What is React.Children?
+✔️ Answer ─────────▶ Utility for working with this.props.children opaque data structure. Methods: map, forEach, count, only, toArray. Handles children edge cases (single child vs array).
+
+❓ Q285. What is React.cloneElement?
+✔️ Answer ─────────▶ Clones element and modifies props/children. Preserves key and ref. Useful for adding props to children, HOC implementation, Manipulating children. Different from createElement which creates new element.
+
+❓ Q286. What is React.isValidElement?
+✔️ Answer ─────────▶ Checks if value is valid React element. Returns boolean. Useful for: Validating children prop, Type guards, Conditional rendering logic.
+
+❓ Q287. What is the difference between component and element?
+✔️ Answer ─────────▶ Component is function/class that returns elements. Element is object describing component instance or DOM node. Components are blueprints, elements are instances. React renders elements, not components directly.
+
+❓ Q288. What is shallow comparison?
+✔️ Answer ─────────▶ Compares object references, not deep values. For primitives, compares values. For objects/arrays, only compares reference (same object?). Used by PureComponent, React.memo, useCallback, useMemo. Reason for avoiding new objects/arrays in render.
+
+❓ Q289. What is deep comparison?
+✔️ Answer ─────────▶ Recursively compares all nested values. Expensive for large objects. Not used by React by default. Can implement with libraries (lodash.isEqual) for custom comparison in React.memo.
+
+❓ Q290. What is referential equality?
+✔️ Answer ─────────▶ Two values are equal if they reference same object in memory. {} === {} is false (different references). For optimization, maintain same reference (useCallback, useMemo) to prevent re-renders.
+
+❓ Q291. What causes referential inequality?
+✔️ Answer ─────────▶ Creating new objects/arrays/functions in render. Each render creates new references even if content is same. Causes child re-renders, breaks memoization. Solution: useMemo, useCallback, move outside component.
+
+❓ Q292. How do you maintain referential equality?
+✔️ Answer ─────────▶ useCallback for functions, useMemo for objects/arrays, Define outside component if no dependencies, Use refs for mutable values, State setters are stable (no need to memoize).
+
+❓ Q293. What is prop spreading?
+✔️ Answer ─────────▶ Using spread operator to pass props: <Component {...props}>. Passes all object properties as props. Convenient but: Can pass unnecessary props, Obscures what props component receives, Can override later props.
+
+❓ Q294. When should you use prop spreading?
+✔️ Answer ─────────▶ HOCs passing through props, Wrapper components, Configurable components with many props, Forwarding HTML attributes. Always explicit about added/overridden props.
+
+❓ Q295. What is children as a function?
+✔️ Answer ─────────▶ Render prop pattern where children is a function. Parent calls children with ✔️ datanswer ─────────▶ this.props.children(data). Provides flexible API for customization. Used in libraries for component control.
+
+❓ Q296. What are uncontrolled components best for?
+✔️ Answer ─────────▶ Simple forms, File inputs (must be uncontrolled), Integrating with non-React code, ❓ Quick prototypes, Forms where you don't need validation/formatting. Most cases prefer controlled.
+
+❓ Q297. What is the key difference between class and className?
+✔️ Answer ─────────▶ className is React/JSX prop for CSS classes (maps to HTML class attribute). class is JavaScript reserved word, can't be used as prop. Use className in JSX, translates to class in HTML.
+
+❓ Q298. What is htmlFor in React?
+✔️ Answer ─────────▶ React prop for label's for attribute (maps to HTML for). for is JavaScript keyword, can't be used as prop. Use htmlFor in JSX: <label htmlFor="input-id">.
+
+❓ Q299. What are data attributes in React?
+✔️ Answer ─────────▶ Set with data-* props: <div data-id="123">. Access via event.target.dataset.id or ref.current.dataset.id. Useful for storing custom data, Working with third-party libraries, Testing selectors.
+
+❓ Q300. What is ARIA in React?
+✔️ Answer ─────────▶ Accessibility attributes (aria-*) work same as HTML. No transformation needed (unlike class→className). Use for: Screen reader support, Keyboard navigation, Focus management, Semantic information. Example: aria-label, aria-hidden.
+
+
+===============================================================================
+SECTION 5: REACT ROUTER & NAVIGATION (❓ Questions 301-350)
+===============================================================================
+
+❓ Q301. What is React Router?
+✔️ Answer ─────────▶ Library for routing in React SPAs. Enables navigation between views, Manages browser history, Provides nested routing, URL parameters, Programmatic navigation. Most popular: react-router-dom for web apps.
+
+❓ Q302. What are the main components of React Router?
+✔️ Answer ─────────▶ BrowserRouter/HashRouter (router providers), Routes and Route (route matching), Link and NavLink (navigation), Navigate (redirects), Outlet (nested route rendering), useNavigate, useParams, useLocation (hooks).
+
+❓ Q303. What is BrowserRouter?
+✔️ Answer ─────────▶ Router using HTML5 history API (clean URLs). Uses pushState and popState. Requires server configuration for deep links. Preferred for modern apps. Provides routing context to app.
+
+❓ Q304. What is HashRouter?
+✔️ Answer ─────────▶ Router using URL hash (#). Works without server configuration, Compatible with legacy browsers, URLs have # (e.g., /#/about). Use when can't configure server or need IE9 support.
+
+❓ Q305. What's the difference between BrowserRouter and HashRouter?
+✔️ Answer ─────────▶ BrowserRouter: Clean URLs, Requires server config, Modern. HashRouter: Hash URLs (#/path), No server config needed, Legacy-compatible. BrowserRouter preferred for production apps.
+
+❓ Q306. What is the Route component?
+✔️ Answer ─────────▶ Matches URL to component. In v6: <Route path="/about" element={<About />} />. Renders element when path matches. Supports nested routes, dynamic segments, optional parameters.
+
+❓ Q307. What is the Routes component?
+✔️ Answer ─────────▶ Container for Route components (replaced Switch in v6). Matches first matching route, Renders nested routes, Supports relative paths. Wrap all Routes in Routes component.
+
+❓ Q308. What is the difference between Switch and Routes?
+✔️ Answer ─────────▶ Switch is v5, Routes is v6. Routes: Better route ranking, Relative paths, Element prop instead of component/render, Better TypeScript support, Nested routing improved. Routes is more powerful and intuitive.
+
+❓ Q309. What is the Link component?
+✔️ Answer ─────────▶ Creates navigation links without page reload. Renders as <a> tag but prevents default, Uses React Router's navigation. Props: to (path), replace (replace history), state (location state).
+
+❓ Q310. What is NavLink?
+✔️ Answer ─────────▶ Link with styling based on active state. Adds className/style when link is active. Use for navigation menus. Props: className/style can be functions receiving isActive.
+
+❓ Q311. What's the difference between Link and NavLink?
+✔️ Answer ─────────▶ Link is basic navigation. NavLink adds active state styling. NavLink has isActive prop for conditional styles. Use Link for basic links, NavLink for navigation menus.
+
+❓ Q312. What is the Navigate component?
+✔️ Answer ─────────▶ Declarative redirect component (replaced Redirect in v6). Renders Navigate to redirect: <Navigate to="/home" replace />. Use for: Conditional redirects, Auth flows, Not found handling.
+
+❓ Q313. What is programmatic navigation?
+✔️ Answer ─────────▶ Navigating from JavaScript code, not Link clicks. Use useNavigate hook: const navigate = useNavigate(); navigate('/path'). For redirects based on logic, Form submissions, After API calls.
+
+❓ Q314. What is the useNavigate hook?
+✔️ Answer ─────────▶ Returns function for programmatic navigation. navigate('/path') or navigate(-1) for back. Options: { replace: true, state: {...} }. Replaces useHistory from v5.
+
+❓ Q315. What is useParams?
+✔️ Answer ─────────▶ Hook that returns URL parameters object. For route /user/:id, useParams() returns { id: '123' }. Used for accessing dynamic route segments.
+
+❓ Q316. What is useLocation?
+✔️ Answer ─────────▶ Returns current location object with pathname, search, hash, state, key. Useful for: Tracking page views, Conditional rendering based on path, Accessing navigation state.
+
+❓ Q317. What is useSearchParams?
+✔️ Answer ─────────▶ Hook for reading/writing URL query parameters. Returns [searchParams, setSearchParams]. Similar to useState but syncs with URL. searchParams.get('key') reads, setSearchParams updates.
+
+❓ Q318. What are dynamic routes?
+✔️ Answer ─────────▶ Routes with variable segments: /user/:id, /post/:slug. Segments starting with : are parameters. Access via useParams(). Useful for detail pages, RESTful routes.
+
+❓ Q319. What are nested routes?
+✔️ Answer ─────────▶ Routes defined inside other routes. Parent route has Outlet where child renders. Enables layouts, Shared components across routes. Use <Outlet /> in parent component.
+
+❓ Q320. What is Outlet?
+✔️ Answer ─────────▶ Placeholder where child routes render in nested routing. Place in parent component layout. Child route content appears at Outlet location. Multiple Outlets not supported in same component.
+
+❓ Q321. How do you create a layout with React Router?
+✔️ Answer ─────────▶ Create route with children, use Outlet in element component. Parent provides layout (header, sidebar), children render in Outlet. Shared layout across multiple routes.
+
+❓ Q322. What are route parameters?
+✔️ Answer ─────────▶ Dynamic URL segments captured by :param syntax. Access via useParams hook. Example: /user/:userId → useParams().userId. Support optional params with ?, wildcards with *.
+
+❓ Q323. What are query parameters?
+✔️ Answer ─────────▶ URL parameters after ?. Access with useSearchParams or useLocation().search. Format: ?key=value&other=123. Not part of route path matching.
+
+❓ Q324. How do you pass state between routes?
+✔️ Answer ─────────▶ Use state option in Link or navigate: <Link to="/next" state={{ from: 'prev' }}>. Access with useLocation().state. Useful for: Form data, Context between pages, Breadcrumbs.
+
+❓ Q325. What is route matching?
+✔️ Answer ─────────▶ Process of comparing URL to route paths. Exact matching by default in v6. Routes ranked by specificity (static > dynamic > wildcard). First matching route renders.
+
+❓ Q326. What are catch-all routes?
+✔️ Answer ─────────▶ Routes matching any path: path="*". Used for 404 pages. Place last in Routes (lowest priority). Matches when no other route matches.
+
+❓ Q327. What is lazy loading with React Router?
+✔️ Answer ─────────▶ Load route components only when accessed. Use React.lazy(): const About = lazy(() => import('./About')). Wrap in Suspense. Reduces initial bundle, Faster load time.
+
+❓ Q328. How do you protect routes?
+✔️ Answer ─────────▶ Create wrapper component checking authentication. Render Navigate if unauthorized: {!isAuth ? <Navigate to="/login" /> : <Component />}. Or use custom ProtectedRoute component.
+
+❓ Q329. What is route-based code splitting?
+✔️ Answer ─────────▶ Splitting code by route. Each route loads its component bundle. Use React.lazy with routes. Natural split points, Reduces initial load, Loads code on navigation.
+
+❓ Q330. What is basename in BrowserRouter?
+✔️ Answer ─────────▶ Base URL for app. If app deployed at /myapp, set basename="/myapp". All routes relative to basename. Useful for apps not at domain root.
+
+❓ Q331. What are index routes?
+✔️ Answer ─────────▶ Route rendered at parent's path. Use index prop instead of path: <Route index element={<Home />} />. Renders at exact parent path, no slash appended.
+
+❓ Q332. What is the useMatch hook?
+✔️ Answer ─────────▶ Checks if current location matches a path pattern. Returns match object or null. Useful for: Conditional rendering, Custom active state, Checking current route.
+
+❓ Q333. What is the useResolvedPath hook?
+✔️ Answer ─────────▶ Resolves relative paths against current location. Returns path object. Used internally by Link. Useful for custom navigation components.
+
+❓ Q334. What is the difference between path and pathname?
+✔️ Answer ─────────▶ path is route pattern (/user/:id), pathname is actual URL path (/user/123). path has placeholders, pathname has values. path in Route definition, pathname in location object.
+
+❓ Q335. What is absolute vs relative routing?
+✔️ Answer ─────────▶ Absolute paths start with / (from root). Relative paths don't (from current route). v6 supports relative routing, making nested routes easier. to="." is current location.
+
+❓ Q336. How do you handle 404 pages?
+✔️ Answer ─────────▶ Add catch-all route at end: <Route path="*" element={<NotFound />} />. Matches any unmatched path. Always place last (lowest priority).
+
+❓ Q337. What is hash-based routing?
+✔️ Answer ─────────▶ Routing using URL hash (#/path). HashRouter implementation. Everything after # is route. No server config needed. URLs less clean than history-based.
+
+❓ Q338. What is memory routing?
+✔️ Answer ─────────▶ Routing without affecting browser URL (MemoryRouter). Keeps history in memory. Useful for: Testing, React Native, Non-browser environments, Embedded widgets.
+
+❓ Q339. What is scroll restoration?
+✔️ Answer ─────────▶ Restoring scroll position on navigation. Manual in React Router: Use ScrollToTop component or useEffect with useLocation. Window.scrollTo(0, 0) on navigation.
+
+❓ Q340. How do you create a scroll-to-top component?
+✔️ Answer ─────────▶ Component using useEffect and useLocation: On location change, scroll to top. Wrap app or routes. Alternative: scrollTo in navigate function (coming in future versions).
+
+❓ Q341. What are route transitions?
+✔️ Answer ─────────▶ Animations between route changes. Not built into React Router. Use libraries: framer-motion, react-transition-group. Combine with route state and location keys.
+
+❓ Q342. What is prompt for unsaved changes?
+✔️ Answer ─────────▶ Warning user about unsaved changes before navigation. No built-in in v6 (Prompt removed). Implement with useBeforeUnload and useBlocker (experimental).
+
+❓ Q343. What is useBlocker?
+✔️ Answer ─────────▶ Experimental hook to block navigation. Replacement for Prompt. Prevents navigation based on condition. Use for: Unsaved changes warning, Form protection.
+
+❓ Q344. What are loader functions?
+✔️ Answer ─────────▶ React Router v6.4+ feature for data loading before route renders. Define loader on route, access data with useLoaderData. Better data fetching patterns than useEffect.
+
+❓ Q345. What are action functions?
+✔️ Answer ─────────▶ React Router v6.4+ feature for handling form submissions. Define action on route, automatically called on form submit. Better than manual form handling.
+
+❓ Q346. What is createBrowserRouter?
+✔️ Answer ─────────▶ New router creation API in v6.4+. Supports data APIs (loader, action). More powerful than BrowserRouter. Use with RouterProvider.
+
+❓ Q347. What is RouterProvider?
+✔️ Answer ─────────▶ Component that provides router created with createBrowserRouter. Replaces BrowserRouter for data router apps. Required for loader/action features.
+
+❓ Q348. What is defer in React Router?
+✔️ Answer ─────────▶ Function to defer slow data loading. Returns promise that resolves later. Enables streaming server rendering. Use with Suspense for loading states.
+
+❓ Q349. What is Await component?
+✔️ Answer ─────────▶ Component for handling deferred data. Works with defer function. Wraps with Suspense boundary. Renders children when promise resolves.
+
+❓ Q350. What are the benefits of React Router v6?
+✔️ Answer ─────────▶ Smaller bundle size, Relative routing, Better TypeScript support, Simpler API, Nested routes improved, No switch needed, Element prop cleaner, Hooks over render props, Better ranking algorithm.
+
+
+===============================================================================
+SECTION 6: FORMS & VALIDATION (❓ Questions 351-400)
+===============================================================================
+
+❓ Q351. How do you handle forms in React?
+✔️ Answer ─────────▶ Use controlled components: Store values in state, Handle changes with onChange, Submit with onSubmit. Uncontrolled: Use refs. Libraries: react-hook-form, Formik for complex forms.
+
+❓ Q352. What are controlled form inputs?
+✔️ Answer ─────────▶ Inputs whose value is controlled by React state. Value prop from state, onChange updates state. React is single source of truth. Enables validation, formatting, conditional logic.
+
+❓ Q353. What are uncontrolled form inputs?
+✔️ Answer ─────────▶ Inputs that manage own state in DOM. Access values with refs. Simpler for basic forms. Less React control, harder validation. Use defaultValue for initial values.
+
+❓ Q354. When should you use controlled vs uncontrolled?
+✔️ Answer ─────────▶ Controlled for: Validation, Formatting, Conditional enabling, Dynamic inputs, Form logic. Uncontrolled for: Simple forms, ❓ Quick prototypes, File inputs (always uncontrolled). Controlled preferred generally.
+
+❓ Q355. How do you handle form submission?
+✔️ Answer ─────────▶ Use onSubmit on form element. Call event.preventDefault() to stop page reload. Access form data from state (controlled) or refs/FormData (uncontrolled). Validate, process, submit to API.
+
+❓ Q356. How do you prevent default form behavior?
+✔️ Answer ─────────▶ Call event.preventDefault() in onSubmit handler. Stops browser from: Page reload, Appending data to URL, Navigating away. Required for SPA forms.
+
+❓ Q357. How do you handle multiple inputs?
+✔️ Answer ─────────▶ Use single onChange handler with input name. Compute state key from event.target.name. Update state dynamically: setState({ ...state, [name]: value }). Scales to many inputs.
+
+❓ Q358. What is form validation?
+✔️ Answer ─────────▶ Checking if form data meets requirements. Types: Required fields, Format (email, phone), Length, Range, Custom rules. Can validate onChange, onBlur, or onSubmit.
+
+❓ Q359. When should you validate forms?
+✔️ Answer ─────────▶ onBlur for immediate feedback, onChange for real-time validation, onSubmit for final check. Combine approaches for best UX. Show errors after user interaction, not immediately.
+
+❓ Q360. How do you display validation errors?
+✔️ Answer ─────────▶ Store errors in state, Display below/near inputs, Use error messages, Disable submit until valid (optional), Use red styling for error state, Clear errors on fix.
+
+❓ Q361. What is client-side vs server-side validation?
+✔️ Answer ─────────▶ Client-side: In browser, Fast feedback, Better UX, Can be bypassed. Server-side: On server, Security, Cannot bypass, Slower feedback. Always do both (client for UX, server for security).
+
+❓ Q362. What is Formik?
+✔️ Answer ─────────▶ Popular form library. Handles: State management, Validation, Error handling, Submission. Reduces boilerplate. Uses render props or hooks. Has validation schema support (Yup).
+
+❓ Q363. What is React Hook Form?
+✔️ Answer ─────────▶ Performance-focused form library. Uses refs (uncontrolled), Minimal re-renders, Smaller bundle, Built-in validation, TypeScript support. register function connects inputs.
+
+❓ Q364. What's the difference between Formik and React Hook Form?
+✔️ Answer ─────────▶ Formik: Controlled inputs, More re-renders, Simpler API, Larger bundle. React Hook Form: Uncontrolled (refs), Better performance, Smaller bundle, Steeper learning curve. RHF better for large forms.
+
+❓ Q365. What is Yup?
+✔️ Answer ─────────▶ Schema validation library. Define validation rules declaratively. Works with Formik. Supports: Type checking, Required fields, Min/max, Custom validation, Async validation, Error messages.
+
+❓ Q366. How do you validate with Yup?
+✔️ Answer ─────────▶ Define ✔️ schemanswer ─────────▶ yup.object({ email: yup.string().email().required() }). Use with Formik's validationSchema. Yup validates values, returns errors. Clean, declarative validation.
+
+❓ Q367. What is schema validation?
+✔️ Answer ─────────▶ Defining validation rules as schema object. Libraries: Yup, Zod, Joi. Benefits: Declarative, Reusable, Type-safe (TypeScript), Easier testing, Consistent error messages.
+
+❓ Q368. How do you handle file uploads?
+✔️ Answer ─────────▶ File input must be uncontrolled. Use ref or onChange: event.target.files. Create FormData for submission. Validate file type/size. Preview with FileReader or URL.createObjectURL.
+
+❓ Q369. How do you preview uploaded images?
+✔️ Answer ─────────▶ Use FileReader.readAsDataURL() or URL.createObjectURL(file). Set as img src. Remember to revoke object URLs: URL.revokeObjectURL(url) to prevent memory leaks.
+
+❓ Q370. How do you handle checkboxes?
+✔️ Answer ─────────▶ Use checked prop (not value). For single: Store boolean in state. For multiple: Store array, toggle values in onChange. Check if value in array for checked prop.
+
+❓ Q371. How do you handle radio buttons?
+✔️ Answer ─────────▶ Multiple inputs same name, different values. Use checked={value === state}. onChange updates state to selected value. All radios controlled by same state variable.
+
+❓ Q372. How do you handle select dropdowns?
+✔️ Answer ─────────▶ Use value and onChange props. Single select: value is string. Multiple select: value is array, use multiple prop. Map options from data.
+
+❓ Q373. How do you handle multi-select?
+✔️ Answer ─────────▶ Use select with multiple prop. value is array. onChange: Array.from(event.target.selectedOptions, option => option.value). Or use checkboxes for better UX.
+
+❓ Q374. What are field arrays in forms?
+✔️ Answer ─────────▶ Dynamic list of fields (add/remove rows). Libraries (Formik, RHF) have helpers: FieldArray (Formik), useFieldArray (RHF). Manage array state, render inputs, handle add/remove.
+
+❓ Q375. How do you add/remove form fields dynamically?
+✔️ Answer ─────────▶ Store fields in array state. Map array to render fields. Add: append to array. Remove: filter array. Each field needs unique key. Libraries simplify this.
+
+❓ Q376. What is form state management?
+✔️ Answer ─────────▶ Managing: Field values, Errors, Touched fields, Submission status, Validation state. Can use useState, useReducer, or libraries. Libraries provide this out of box.
+
+❓ Q377. What are touched fields?
+✔️ Answer ─────────▶ Fields user has interacted with (focused then blurred). Used to determine when to show errors. Don't show errors for untouched fields. Track in state or use library.
+
+❓ Q378. What is dirty state?
+✔️ Answer ─────────▶ Form is dirty if values differ from initial. User has made changes. Use to: Warn before navigation, Enable submit button, Prompt unsaved changes. Compare current with initial values.
+
+❓ Q379. How do you reset a form?
+✔️ Answer ─────────▶ Set state back to initial values. With libraries: reset() function. Clear errors, touched state. Option to reset to specific values or initial.
+
+❓ Q380. How do you prefill form values?
+✔️ Answer ─────────▶ Set initial state to existing values. For edit forms: Fetch data, set as initial state. With libraries: initialValues prop. User edits existing data.
+
+❓ Q381. What is form debouncing?
+✔️ Answer ─────────▶ Delaying validation/API calls until user stops typing. Prevents excessive calls. Use debounce function with onChange. Libraries often include debouncing.
+
+❓ Q382. How do you implement async validation?
+✔️ Answer ─────────▶ Return promise from validation function. Check uniqueness, Format validation via API. Show loading state. Handle errors. Libraries support async validation.
+
+❓ Q383. What is field-level vs form-level validation?
+✔️ Answer ─────────▶ Field-level: Validate each field independently (as user types/leaves). Form-level: Validate entire form (on submit). Use both: Field-level for UX, Form-level for final check.
+
+❓ Q384. How do you validate on blur?
+✔️ Answer ─────────▶ onBlur event handler. Validate field, set error for that field. Better UX than onChange for some fields (less interruption). Standard for email, complex formats.
+
+❓ Q385. How do you disable submit button?
+✔️ Answer ─────────▶ Based on validation state: disabled={!isValid || isSubmitting}. Prevent submission while validating/submitting. Or allow submit, show errors after. UX preference.
+
+❓ Q386. How do you show loading state during submit?
+✔️ Answer ─────────▶ Track submitting state, Show spinner/disable button during submit, Handle success/error, Reset state. Prevents double submission, Provides feedback.
+
+❓ Q387. What is optimistic UI update?
+✔️ Answer ─────────▶ Update UI before server confirms. Assume success, revert if failed. Better perceived performance. Show success immediately, Handle failures gracefully.
+
+❓ Q388. How do you handle form errors from server?
+✔️ Answer ─────────▶ Catch API errors, Map to field errors or form error, Display in UI, Allow retry. Server errors override client validation.
+
+❓ Q389. What is the difference between error and warning?
+✔️ Answer ─────────▶ Error prevents submission, shown in red, required to fix. Warning doesn't prevent, shown in yellow, optional to fix. Both inform user but different severity.
+
+❓ Q390. How do you create custom validation rules?
+✔️ Answer ─────────▶ Write validation function: Takes value, returns error message or null. With Yup: .test() method. With RHF: validate prop. Reusable across forms.
+
+❓ Q391. What are validation triggers?
+✔️ Answer ─────────▶ When validation runs: onChange, onBlur, onSubmit, manual. Configure per use case. onChange for real-time, onBlur for less interruption, onSubmit for final check.
+
+❓ Q392. How do you validate dependent fields?
+✔️ Answer ─────────▶ Validation of one field depends on another. Access other values in validation function. Example: Password confirmation matches password. End date after start date.
+
+❓ Q393. What is cross-field validation?
+✔️ Answer ─────────▶ Validation involving multiple fields. Example: At least one checkbox checked, Total equals sum. Validate at form level with access to all values.
+
+❓ Q394. How do you handle conditional validation?
+✔️ Answer ─────────▶ Validation rules change based on conditions. Example: Required if another field has value. Use when() in Yup or conditional logic in validation function.
+
+❓ Q395. What is progressive validation?
+✔️ Answer ─────────▶ Validating multi-step forms step by step. Validate current step before next. Store step state, Schema per step, Aggregate errors. Better UX for long forms.
+
+❓ Q396. How do you create multi-step forms?
+✔️ Answer ─────────▶ Track current step in state, Render step component, Validate before next, Store values across steps, Navigate between steps. Libraries have helpers for this.
+
+❓ Q397. What is wizard form pattern?
+✔️ Answer ─────────▶ Multi-step form with progress indicator. Linear flow (can go back). Submit at end with all data. Good for: Long forms, Complex workflows, Onboarding.
+
+❓ Q398. How do you persist form data?
+✔️ Answer ─────────▶ Save to localStorage/sessionStorage on change. Restore on mount. Clear on submit. Prevents data loss on refresh. Be careful with sensitive data.
+
+❓ Q399. What is form autocomplete?
+✔️ Answer ─────────▶ Browser's autocomplete feature. Use autocomplete attribute. Values: "on", "off", "email", "name", etc. Improves UX, Security consideration for sensitive fields.
+
+❓ Q400. How do you test forms?
+✔️ Answer ─────────▶ Test: Rendering, User input (type, select), Validation (valid/invalid states), Submission, Error display. Use React Testing Library: fireEvent, userEvent, waitFor, screen queries.
+
+
+===============================================================================
+SECTION 7: TESTING & DEBUGGING (❓ Questions 401-450)
+===============================================================================
+
+❓ Q401. What is testing in React?
+✔️ Answer ─────────▶ Writing automated tests to verify component behavior. Types: Unit tests (individual components), Integration tests (component interaction), E2E tests (full app flow). Libraries: Jest, React Testing Library, Cypress.
+
+❓ Q402. What is React Testing Library?
+✔️ Answer ─────────▶ Testing library focused on testing from user perspective. ❓ Query by text, labels, roles (not implementation). Encourages accessible components. Preferred over Enzyme for modern React.
+
+❓ Q403. What is Jest?
+✔️ Answer ─────────▶ JavaScript testing framework. Includes: Test runner, Assertion library, Mocking, Coverage reports. Built into Create React App. Works with React Testing Library.
+
+❓ Q404. What's the difference between Jest and React Testing Library?
+✔️ Answer ─────────▶ Jest is test runner/framework (runs tests, assertions). RTL is React-specific testing utilities (render components, query elements). Use together: Jest runs tests, RTL tests components.
+
+❓ Q405. What is enzyme?
+✔️ Answer ─────────▶ Testing utility by Airbnb. Allows shallow rendering, Testing implementation details, Direct state access. Less used now - React Testing Library preferred. Doesn't support hooks well.
+
+❓ Q406. Why is React Testing Library preferred over Enzyme?
+✔️ Answer ─────────▶ RTL tests user behavior (not implementation). Encourages accessible queries. Better hooks support. Discourages testing implementation details. More maintainable tests. Aligns with React best practices.
+
+❓ Q407. What is shallow rendering?
+✔️ Answer ─────────▶ Rendering component without rendering children. Enzyme feature. Isolates component. Discouraged in RTL - tests should render full tree like browser. Tests should reflect real usage.
+
+❓ Q408. What is a unit test?
+✔️ Answer ─────────▶ Tests individual component in isolation. Mocks dependencies. Fast, focused. Tests single responsibility. Example: Button renders text, handles click.
+
+❓ Q409. What is integration testing?
+✔️ Answer ─────────▶ Tests multiple components together. Tests component interaction. More realistic than unit tests. Example: Form with inputs and submit button, testing complete flow.
+
+❓ Q410. What is E2E testing?
+✔️ Answer ─────────▶ Tests entire application from user perspective. Simulates real user interactions. Tests full workflows. Tools: Cypress, Playwright, Selenium. Slower but most comprehensive.
+
+❓ Q411. How do you render components for testing?
+✔️ Answer ─────────▶ Use render() from React Testing Library: const { container, getByText } = render(<Component />). Returns queries and utilities. Component renders in jsdom environment.
+
+❓ Q412. What are RTL queries?
+✔️ Answer ─────────▶ Functions to find elements: getBy (throws if not found), queryBy (returns null), findBy (async). Variants: getByText, getByRole, getByLabelText, getByTestId. Use most accessible query available.
+
+❓ Q413. What is getByRole?
+✔️ Answer ─────────▶ ❓ Queries element by ARIA role. Most accessible query. Examples: getByRole('button'), getByRole('textbox', { name: 'Email' }). Encourages semantic HTML and accessibility.
+
+❓ Q414. What is getByText?
+✔️ Answer ─────────▶ ❓ Queries element by text content. Case-insensitive by default. Accepts string or regex. Example: getByText('Submit'), getByText(/submit/i). Good for buttons, headings, labels.
+
+❓ Q415. What is getByLabelText?
+✔️ Answer ─────────▶ ❓ Queries form inputs by associated label. Ensures proper labeling (accessibility). Example: getByLabelText('Email'). Finds input with matching label.
+
+❓ Q416. When should you use getByTestId?
+✔️ Answer ─────────▶ Last resort when no accessible query works. Add data-testid to element. Example: getByTestId('custom-element'). Avoid if possible - use semantic queries.
+
+❓ Q417. What's the difference between getBy, queryBy, and findBy?
+✔️ Answer ─────────▶ getBy: Throws error if not found (element should exist). queryBy: Returns null if not found (element shouldn't exist). findBy: Async, waits for element (element will appear). Choose based on expected presence.
+
+❓ Q418. What is waitFor?
+✔️ Answer ─────────▶ Waits for assertion to pass. Retries until timeout. For async updates: await waitFor(() => expect(element).toBeInTheDocument()). Handles async state updates.
+
+❓ Q419. What is fireEvent?
+✔️ Answer ─────────▶ Triggers DOM events for testing. Example: fireEvent.click(button), fireEvent.change(input, { target: { value: 'text' } }). Synchronous. Lower-level than userEvent.
+
+❓ Q420. What is userEvent?
+✔️ Answer ─────────▶ Simulates realistic user interactions. More accurate than fireEvent. Example: userEvent.click(button), userEvent.type(input, 'text'). Fires multiple events (focus, click, blur). Preferred over fireEvent.
+
+❓ Q421. How do you test user interactions?
+✔️ Answer ─────────▶ Use userEvent: userEvent.click(), userEvent.type(), userEvent.selectOptions(). Assert expected changes: State updates, UI changes, API calls. Test as user would interact.
+
+❓ Q422. How do you test async behavior?
+✔️ Answer ─────────▶ Use findBy queries or waitFor. Example: const element = await findByText('Loaded'). Or: await waitFor(() => expect(mockApi).toHaveBeenCalled()). Handle promises, loading states.
+
+❓ Q423. How do you test forms?
+✔️ Answer ─────────▶ Render form, type into inputs (userEvent.type), submit form (fireEvent.submit or click submit button), assert: Validation errors, Submission calls, Success messages.
+
+❓ Q424. How do you test API calls?
+✔️ Answer ─────────▶ Mock API functions: jest.fn(), Mock fetch: jest.spyOn(global, 'fetch'), Use MSW (Mock Service Worker) for realistic mocking. Assert calls, arguments, responses.
+
+❓ Q425. What is mocking?
+✔️ Answer ─────────▶ Replacing real implementations with fake ones for testing. Mock: Functions, Modules, API calls, Timers. Isolates component from dependencies. Jest provides mocking utilities.
+
+❓ Q426. How do you mock functions?
+✔️ Answer ─────────▶ Use jest.fn(): const mockFn = jest.fn(). Pass as prop. Assert: toHaveBeenCalled(), toHaveBeenCalledWith(args), toHaveBeenCalledTimes(n). Check implementation was called correctly.
+
+❓ Q427. How do you mock modules?
+✔️ Answer ─────────▶ jest.mock('module-name'): Mocks entire module. jest.mock('module', () => ({ export: jest.fn() })): Custom implementation. Useful for: API modules, Utilities, External libraries.
+
+❓ Q428. How do you mock API calls?
+✔️ Answer ─────────▶ Mock fetch with jest.spyOn or jest.mock. Or use MSW for realistic mocks. Mock response: mockResolvedValue({ data }). Test loading/success/error states.
+
+❓ Q429. What is MSW (Mock Service Worker)?
+✔️ Answer ─────────▶ Library for mocking network requests. Intercepts requests at network level. More realistic than jest.mock. Define handlers for endpoints. Works in tests and browser.
+
+❓ Q430. How do you test loading states?
+✔️ Answer ─────────▶ Render component, assert loading indicator present, await async completion, assert loading indicator gone, assert loaded content present. Test all async states.
+
+❓ Q431. How do you test error states?
+✔️ Answer ─────────▶ Mock API to reject, render component, await error, assert error message displayed. Test error boundaries, error messages, retry buttons.
+
+❓ Q432. What is snapshot testing?
+✔️ Answer ─────────▶ Saves component output as snapshot file. Future tests compare output to snapshot. Detects unexpected changes. Use sparingly - can become noise. Good for: Static content, Generated markup.
+
+❓ Q433. When should you use snapshot testing?
+✔️ Answer ─────────▶ For components unlikely to change. Not for dynamic/interactive components. Useful for: Component libraries, Design systems, Generated HTML/CSS. Review snapshot changes carefully.
+
+❓ Q434. What are the drawbacks of snapshot testing?
+✔️ Answer ─────────▶ Tests pass even if output is wrong (if snapshot updated). Brittle (break on small changes). Hard to review large snapshots. Miss logic errors. Often updated without review.
+
+❓ Q435. How do you update snapshots?
+✔️ Answer ─────────▶ Run tests with --updateSnapshot or -u flag. Reviews changed snapshots. Only update if change is intentional. Don't blindly update - defeats purpose.
+
+❓ Q436. How do you test hooks?
+✔️ Answer ─────────▶ Use @testing-library/react-hooks renderHook utility. Example: const { result } = renderHook(() => useCustomHook()). Access returned values via result.current. Test hook logic in isolation.
+
+❓ Q437. How do you test custom hooks?
+✔️ Answer ─────────▶ renderHook from testing-library. Test: Initial values, Updates, Side effects, Cleanup. Rerender with different props. Test as black box, not implementation.
+
+❓ Q438. How do you test context?
+✔️ Answer ─────────▶ Wrap component in context provider during render: render(<Provider value={value}><Component /></Provider>). Test components consume context correctly. Test provider updates consumers.
+
+❓ Q439. How do you test refs?
+✔️ Answer ─────────▶ Access ref after render: const ref = React.createRef(); render(<Component ref={ref} />). Assert: ref.current is correct element, ref methods work. Test imperative APIs.
+
+❓ Q440. What is test coverage?
+✔️ Answer ─────────▶ Percentage of code executed by tests. Metrics: Line coverage, Branch coverage, Function coverage, Statement coverage. Use jest --coverage. High coverage doesn't guarantee good tests.
+
+❓ Q441. What is a good test coverage percentage?
+✔️ Answer ─────────▶ 80%+ is good target. 100% not necessary (diminishing returns). Focus on critical paths. Coverage is metric, not goal. Better: Test important behaviors thoroughly.
+
+❓ Q442. How do you debug React components?
+✔️ Answer ─────────▶ React DevTools: Inspect component tree, view props/state, Highlight updates. Console.log strategically. Breakpoints in dev tools. React error messages. Component stack traces.
+
+❓ Q443. What are React DevTools?
+✔️ Answer ─────────▶ Browser extension for debugging React. Features: Component tree inspection, Props/state viewing, Profiler for performance, Hooks inspection, Highlight updates, Search components.
+
+❓ Q444. How do you use React DevTools Profiler?
+✔️ Answer ─────────▶ Record interaction, view flame graph/ranked chart. Identify: Slow renders, Frequent renders, Component cascades. Optimize based on data. Compare before/after optimizations.
+
+❓ Q445. What causes React warnings?
+✔️ Answer ─────────▶ Missing keys, Deprecated APIs, Memory leaks (setState on unmounted), Invalid HTML nesting, Accessibility issues. Fix warnings - they indicate real problems.
+
+❓ Q446. What is the React error overlay?
+✔️ Answer ─────────▶ Development feature showing errors in browser. Displays: Error message, Component stack, Source location. Click to open in editor. Makes debugging easier.
+
+❓ Q447. How do you debug infinite loops?
+✔️ Answer ─────────▶ Check: useEffect dependencies, Derived state in render, setState in render. Add console.logs. Use debugger statement. React DevTools profiler shows render count.
+
+❓ Q448. How do you debug performance issues?
+✔️ Answer ─────────▶ React DevTools Profiler: Record interactions, identify slow components. Check: Unnecessary re-renders, Large lists without virtualization, Expensive computations. Optimize hot paths first.
+
+❓ Q449. What are common React errors?
+✔️ Answer ─────────▶ Cannot read property of undefined/null, Too many re-renders, Maximum update depth exceeded, Hook call order violations, Missing key prop, Memory leaks, Invalid hook call.
+
+❓ Q450. How do you prevent memory leaks?
+✔️ Answer ─────────▶ Cleanup in useEffect: Return cleanup function, Cancel subscriptions, Clear timers/intervals, Abort API requests. Check for setState on unmounted components. Use ref to track mounting.
+
+
+===============================================================================
+SECTION 8: PERFORMANCE & BEST PRACTICES (❓ Questions 451-500)
+===============================================================================
+
+❓ Q451. What are React best practices?
+✔️ Answer ─────────▶ Keep components small and focused, Use functional components and hooks, Proper key props, Avoid inline functions/objects, Use production builds, Code splitting, Proper error handling, Accessibility, Clean code organization, Write tests.
+
+❓ Q452. How do you write clean React components?
+✔️ Answer ─────────▶ Single responsibility, Extract logic to custom hooks, Descriptive names, Props interface/types, Default props, Prop validation, Keep render pure, Early returns for conditions, Avoid deep nesting.
+
+❓ Q453. What is component composition best practice?
+✔️ Answer ─────────▶ Prefer composition over inheritance, Use children prop, Specialized components, Container/presentational pattern, Compound components, Avoid prop drilling with composition.
+
+❓ Q454. What is the container/presentational pattern?
+✔️ Answer ─────────▶ Separate logic (container) from UI (presentational). Containers: Handle state, data fetching, business logic. Presentational: Receive props, render UI, reusable. Hooks reduced need but still useful.
+
+❓ Q455. What are presentational components?
+✔️ Answer ─────────▶ Components focused on UI rendering. No state/logic (or minimal), Receive data via props, Highly reusable, Easy to test, Pure functions often. Also called "dumb" or "stateless" components.
+
+❓ Q456. What are container components?
+✔️ Answer ─────────▶ Components handling logic/data. Manage state, Make API calls, Handle business logic, Pass data to presentational. Also called "smart" or "stateful" components.
+
+❓ Q457. When should you split components?
+✔️ Answer ─────────▶ When: Component too large (>200 lines), Multiple responsibilities, Repeated code, Hard to test, Hard to understand, Performance issues. Keep components focused.
+
+❓ Q458. What is prop drilling and how to avoid it?
+✔️ Answer ─────────▶ Passing props through many levels. Solutions: Context API, Component composition, State management library, Custom hooks. Choose based on use case.
+
+❓ Q459. When should you use Context vs props?
+✔️ Answer ─────────▶ Props for: Parent-child communication, Few levels, Explicit dependencies. Context for: Deep component trees, Truly global data, Theme, auth. Don't use Context for all state.
+
+❓ Q460. What are code organization best practices?
+✔️ Answer ─────────▶ Feature-based folders, Separate concerns, Consistent naming, Group related files, Index files for cleaner imports, Shared utilities folder, Clear component hierarchy.
+
+❓ Q461. How do you structure a React project?
+✔️ Answer ─────────▶ Common structure: src/components/, src/hooks/, src/utils/, src/contexts/, src/services/, src/pages/, src/assets/. Feature folders for large apps. Consistent conventions.
+
+❓ Q462. What is feature-based organization?
+✔️ Answer ─────────▶ Organize by feature, not type. Each feature folder has: Components, hooks, utils, tests. Benefits: Easier to find related files, Better for large teams, Clear boundaries.
+
+❓ Q463. What are naming conventions in React?
+✔️ Answer ─────────▶ Components: PascalCase, Hooks: useCamelCase, Utilities: camelCase, Constants: UPPER_SNAKE_CASE, Files: Match component names, Test files: *.test.js or *.spec.js.
+
+❓ Q464. How do you handle errors in React?
+✔️ Answer ─────────▶ Error boundaries for component errors, try-catch in async code, Error states for API calls, User-friendly error messages, Log errors for debugging, Provide recovery options.
+
+❓ Q465. What are accessibility best practices?
+✔️ Answer ─────────▶ Semantic HTML, ARIA attributes when needed, Keyboard navigation, Focus management, Alt text for images, Form labels, Color contrast, Screen reader testing, Focus indicators.
+
+❓ Q466. What is semantic HTML in React?
+✔️ Answer ─────────▶ Use proper HTML elements: button not div for buttons, nav for navigation, header/footer/main, h1-h6 for headings. Improves accessibility, SEO. React supports all HTML elements.
+
+❓ Q467. How do you ensure keyboard accessibility?
+✔️ Answer ─────────▶ Tab navigation works, Enter/Space activate buttons, Escape closes modals, Arrow keys for custom widgets, Focus visible, No keyboard traps, Skip links, Test with keyboard only.
+
+❓ Q468. What is ARIA in React?
+✔️ Answer ─────────▶ Accessibility attributes: aria-label, aria-hidden, aria-describedby, role. Use when semantic HTML insufficient. Don't override semantic HTML. Test with screen readers.
+
+❓ Q469. How do you manage focus in React?
+✔️ Answer ─────────▶ Use refs to focus elements, Focus first input in modal, Return focus when closing, Focus error messages, Skip links for main content, Manage focus in SPAs during navigation.
+
+❓ Q470. What are security best practices?
+✔️ Answer ─────────▶ Validate all inputs, Sanitize HTML (avoid dangerouslySetInnerHTML), Escape user content, Use HTTPS, Secure auth tokens, Don't expose sensitive data, Update dependencies, Use CSP headers.
+
+❓ Q471. How do you prevent XSS attacks?
+✔️ Answer ─────────▶ React escapes by default (safe). Don't use dangerouslySetInnerHTML with user content. Sanitize HTML before using. Avoid user input in href="javascript:". Don't trust user input.
+
+❓ Q472. How do you handle authentication?
+✔️ Answer ─────────▶ Store tokens securely (httpOnly cookies or memory), Protected routes, Refresh tokens, Logout functionality, Token expiry handling, Secure API calls, Don't store sensitive data in localStorage.
+
+❓ Q473. What are environment variables best practices?
+✔️ Answer ─────────▶ Use .env files, Don't commit secrets, REACT_APP_ prefix for CRA, Access via process.env, Different .env per environment, Document required variables.
+
+❓ Q474. How do you optimize bundle size?
+✔️ Answer ─────────▶ Code splitting (React.lazy), Tree shaking, Lazy load heavy libraries, Remove unused dependencies, Use production builds, Analyze bundle (webpack-bundle-analyzer), Use lighter alternatives.
+
+❓ Q475. What is tree shaking?
+✔️ Answer ─────────▶ Removing unused code during build. Works with ES6 modules. Import only what you use: import { specific } from 'library'. Reduces bundle size. Build tools handle automatically.
+
+❓ Q476. How do you analyze bundle size?
+✔️ Answer ─────────▶ Use webpack-bundle-analyzer or source-map-explorer. Identify: Large dependencies, Duplicate code, Unused code. Optimize largest chunks first. Regular analysis during development.
+
+❓ Q477. What are performance monitoring best practices?
+✔️ Answer ─────────▶ Use React DevTools Profiler, Lighthouse for metrics, Web Vitals, Performance API, Error tracking (Sentry), Analytics, Monitor production, Set performance budgets.
+
+❓ Q478. What is lazy loading images?
+✔️ Answer ─────────▶ Load images when needed (scrolling into view). Use Intersection Observer, Libraries like react-lazyload, Native loading="lazy" attribute, Placeholder while loading. Improves initial load.
+
+❓ Q479. How do you optimize images?
+✔️ Answer ─────────▶ Proper formats (WebP), Compression, Responsive images (srcset), Lazy loading, CDN delivery, Correct sizing, Consider modern formats, Optimize above-fold images.
+
+❓ Q480. What are Web Vitals?
+✔️ Answer ─────────▶ Core performance metrics: LCP (Largest Contentful Paint), FID (First Input Delay), CLS (Cumulative Layout Shift). Measure user experience. Google ranking factors. Optimize for good scores.
+
+❓ Q481. How do you reduce re-renders?
+✔️ Answer ─────────▶ React.memo for components, useMemo for values, useCallback for functions, Split components, Move state down, Proper keys, Avoid inline objects/arrays/functions, Context optimization.
+
+❓ Q482. What causes slow React apps?
+✔️ Answer ─────────▶ Too many re-renders, Large component trees, Expensive computations in render, No code splitting, Large lists without virtualization, Memory leaks, Not using production build, Unoptimized images.
+
+❓ Q483. How do you optimize large lists?
+✔️ Answer ─────────▶ Virtualization (react-window), Pagination, Infinite scroll, Proper keys, Memoization, Avoid re-rendering all items, Load data incrementally, Debounce filtering.
+
+❓ Q484. What is memoization in React?
+✔️ Answer ─────────▶ Caching results to avoid recomputation. React.memo for components, useMemo for values, useCallback for functions. Trade memory for computation time. Use when profiling shows benefit.
+
+❓ Q485. When should you optimize?
+✔️ Answer ─────────▶ After identifying real performance issues (profiling). Premature optimization wastes time. Focus on: User-facing performance, Proven bottlenecks, High-traffic features. Measure before and after.
+
+❓ Q486. What is premature optimization?
+✔️ Answer ─────────▶ Optimizing before knowing there's a problem. Wastes time, Complicates code, May not help. Better: Write clean code, Profile to find issues, Optimize bottlenecks, Measure improvements.
+
+❓ Q487. How do you measure React performance?
+✔️ Answer ─────────▶ React DevTools Profiler (render time), Lighthouse (page metrics), Web Vitals, Performance API, User monitoring tools, Measure real user experience, A/B testing optimizations.
+
+❓ Q488. What are React anti-patterns?
+✔️ Answer ─────────▶ Mutating state directly, Using index as key, Too many props, God components, Prop drilling excessively, No error boundaries, Not using keys, Memory leaks, Testing implementation details.
+
+❓ Q489. What is a god component?
+✔️ Answer ─────────▶ Component doing too much. Too many responsibilities, Hundreds of lines, Hard to test/maintain, Difficult to reuse. Solution: Split into smaller, focused components.
+
+❓ Q490. How do you avoid over-engineering?
+✔️ Answer ─────────▶ Start simple, Add complexity when needed, YAGNI principle, Solve current problems, Refactor when patterns emerge, Don't predict future needs, Keep it simple.
+
+❓ Q491. What is technical debt in React?
+✔️ Answer ─────────▶ Code shortcuts that slow future development. Examples: No tests, Inconsistent patterns, Outdated dependencies, Workarounds, Poor documentation. Address regularly to prevent accumulation.
+
+❓ Q492. How do you manage dependencies?
+✔️ Answer ─────────▶ Regular updates, Security audits (npm audit), Lock file committed, Minimal dependencies, Evaluate before adding, Remove unused, Pin critical versions, Test after updates.
+
+❓ Q493. How do you document React code?
+✔️ Answer ─────────▶ JSDoc comments for complex logic, README for setup, Component props documentation, Inline comments for non-obvious code, Storybook for component library, API documentation, Architecture decisions.
+
+❓ Q494. What is Storybook?
+✔️ Answer ─────────▶ Tool for developing UI components in isolation. Benefits: Component showcase, Documentation, Testing edge cases, Design system development, Shared component library. Independent of app.
+
+❓ Q495. How do you handle different environments?
+✔️ Answer ─────────▶ Environment variables (.env), Different builds (dev/staging/prod), Feature flags, Environment-specific configs, API endpoints per environment, Debug tools only in dev.
+
+❓ Q496. What are feature flags?
+✔️ Answer ─────────▶ Toggle features without deployment. Enable gradual rollout, A/B testing, Emergency disable, Development of unreleased features. Tools: LaunchDarkly, Split, custom implementation.
+
+❓ Q497. How do you handle backwards compatibility?
+✔️ Answer ─────────▶ Versioned APIs, Gradual migration, Feature detection, Polyfills for browsers, Deprecation warnings, Documentation, Communication with users, Upgrade guides.
+
+❓ Q498. What is continuous integration with React?
+✔️ Answer ─────────▶ Automated testing/building on code changes. Run tests, Linting, Build validation, Deploy previews. Tools: GitHub Actions, Jenkins, CircleCI. Catches issues early.
+
+❓ Q499. How do you deploy React apps?
+✔️ Answer ─────────▶ Build production bundle (npm run build), Static hosting (Vercel, Netlify, S3), CDN for assets, Environment variables, CI/CD pipeline, Monitor errors, Gradual rollout.
+
+❓ Q500. What are React interview preparation tips?
+✔️ Answer ─────────▶ Understand fundamentals deeply, Build projects, Practice coding problems, Know hooks thoroughly, Study performance optimization, Understand component lifecycle, Practice explaining concepts, Review recent React features, Prepare questions for interviewer, Stay current with React ecosystem.
+
+
+===============================================================================
+END OF REACT INTERVIEW ❓ QUESTIONS
+===============================================================================
+
+SUMMARY OF TOPICS COVERED:
+
+✅ React Fundamentals & Basics (❓ Q1-50)
+✅ React Hooks (❓ Q51-125)
+✅ Component Lifecycle & State Management (❓ Q126-200)
+✅ Advanced React Patterns & Optimization (❓ Q201-300)
+✅ React Router & Navigation (❓ Q301-350)
+✅ Forms & Validation (❓ Q351-400)
+✅ Testing & Debugging (❓ Q401-450)
+✅ Performance & Best Practices (❓ Q451-500)
+
+This comprehensive guide covers everything from basic concepts to advanced topics
+that a 3+ year experienced Full Stack Developer should know for React interviews.
+
+Good luck with your interview preparation! 🚀

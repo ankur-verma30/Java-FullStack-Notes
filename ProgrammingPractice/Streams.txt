@@ -3,10 +3,11 @@ Given a list of integers, use Streams to filter only even numbers and collect th
 👉 Input: [1, 2, 3, 4, 5, 6]
 👉 Output: [2, 4, 6]
 
-✅ Solution: 
+✅ Solution:
 list.stream()
     .filter(x -> x % 2 == 0)
     .forEach(System.out::println);
+
 
 2️⃣ Convert Strings to Uppercase
 Given a list of strings, convert each string to uppercase using Streams.
@@ -19,29 +20,31 @@ list1.stream()
     .forEach(System.out::println);
 
 
-3️⃣Square and Collect
+3️⃣ Square and Collect
 Given a list of integers, square each number and collect them into a set (to remove duplicates).
 👉 Input: [1, 2, 2, 3]
 👉 Output: [1, 4, 9]
 
-✅ Solution 1:
+✅ Solution 1️⃣:
 Set<Integer> squares = numbers.stream()
                               .map(x -> x * x)
                               .collect(Collectors.toSet());
 
-✅ Solution 2:If order matters (e.g., interviewer asks for sorted unique squares), you can collect into a TreeSet:
+
+✅ Solution 2️⃣:If order matters (e.g., interviewer asks for sorted unique squares), you can collect into a TreeSet:
 Set<Integer> squares = numbers.stream()
                               .map(x -> x * x)
                               .collect(Collectors.toCollection(TreeSet::new));
 
-✅ Solution 3: If dealing with large numbers, use mapToInt for efficiency:
+
+✅ Solution 3️⃣: If dealing with large numbers, use mapToInt for efficiency:
 Set<Integer> squares = numbers.stream()
                               .mapToInt(x -> x * x)
                               .boxed()
                               .collect(Collectors.toSet());
 
 
-4️⃣Distinct & Sorted Words
+4️⃣ Distinct & Sorted Words
 Given a list of words, print all distinct words in sorted order using streams.
 👉 Input: ["java", "code", "java", "stream", "code"]
 👉 Output: ["code", "java", "stream"]
@@ -49,6 +52,7 @@ Given a list of words, print all distinct words in sorted order using streams.
 ✅ Solution 1:
 Set<String> str = list.stream()
                       .collect(Collectors.toCollection(TreeSet::new));
+
 
 ✅ Solution 2:
 Set<String> distinct = list.stream()
@@ -61,7 +65,8 @@ Set<String> str = list.stream()
                       .map(String::toLowerCase)
                       .collect(Collectors.toCollection(() -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)));
 
-5️⃣Sum of Squares of Odd Numbers
+
+5️⃣ Sum of Squares of Odd Numbers
 Given a list of integers, use streams to compute the sum of squares of only odd numbers.
 👉 Input: [1, 2, 3, 4, 5]
 👉 Output: 35 (1^2 + 3^2 + 5^2 = 35)
@@ -85,7 +90,7 @@ int sum = list.stream()
               .sum();
 
 
-6️⃣Find the Longest String
+6️⃣ Find the Longest String
 Given a list of strings, use streams to find the longest string.
 (If multiple strings have the same length, return any one of them.)
 👉 Input: ["java", "stream", "exercise", "api"]
@@ -106,6 +111,7 @@ List<String> longestStrings = list.stream()
                                   .filter(s -> s.length() == maxLength)
                                   .toList();
 
+
 7️⃣ Count Word Occurrences
 Given a list of words, use streams to count how many times each word occurs.
 👉 Input: ["apple", "banana", "apple", "orange", "banana", "apple"]
@@ -120,14 +126,12 @@ Map<Object, Long> freq = fruits.stream()
 ✅ Solution 2: Use TreeMap (Sorted by Key Automatically)
 Map<String, Long> freq = fruits.stream()
     .collect(Collectors.groupingBy(w -> w, TreeMap::new, Collectors.counting()));
-
 ➤ Here TreeMap is provided as the map supplier → gives you natural key ordering.
-
 👉 Output for ["apple", "banana", "apple", "orange", "banana", "apple"]:
 {apple=3, banana=2, orange=1} (keys sorted alphabetically).
 
 
-8️⃣Partition Numbers into Even and Odd
+8️⃣ Partition Numbers into Even and Odd
 Given a list of integers, partition them into evens and odds using streams.
 👉 Input: [1, 2, 3, 4, 5, 6]
 👉 Output: {false=[1, 3, 5], true=[2, 4, 6]}
@@ -137,6 +141,7 @@ Given a list of integers, partition them into evens and odds using streams.
 Map<Boolean, List<Integer>> freq = fruits.stream()
         .collect(Collectors.partitioningBy(x -> x % 2 == 0));
 ✅Output: {false=[1, 3, 5], true=[2, 4, 6]}
+
 
 ✅ Solution 2: If you want counts instead of lists, you can do:
 Map<Boolean, Long> partitionedCount = fruits.stream()
@@ -152,11 +157,14 @@ Given a string, use streams to find the character with the maximum frequency.
 ✅ Solution 1:
 Character mostFrequent = input.chars() // IntStream of Unicode values
             .mapToObj(c -> (char) c)          // convert int to Character
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())) // count frequency
+            .collect(Collectors.groupingBy(
+				w->w,
+				Collectors.counting())) // count frequency
             .entrySet().stream()
             .max(Map.Entry.comparingByValue()) // find entry with max frequency
             .map(Map.Entry::getKey)            // extract the character
             .orElse(null);                     // handle empty string case
+
 
 1️⃣0️⃣ Given a list of strings, join them into a single comma-separated string using streams.
 👉 Input: ["apple", "banana", "orange"]
@@ -179,13 +187,13 @@ Map<Integer, List<String>> ans = persons.stream()
 Map<Integer, List<String>> ans = persons.stream()
     .collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.toList()));
 
+
 1️⃣2️⃣ You have a list of students with their subject and score. Use streams to find the top scorer per subject.
 👉 Input (Student class with name, subject, score):
-[("Alice", "Math", 90), 
- ("Bob", "Math", 85), 
- ("Charlie", "Science", 95), 
+[("Alice", "Math", 90),
+ ("Bob", "Math", 85),
+ ("Charlie", "Science", 95),
  ("David", "Science", 80)]
-
 👉 Output:{Math=Alice, Science=Charlie}
 
 ✅ Solution:
@@ -248,7 +256,7 @@ System.out.println(topStudentBySubject);
 }
 
 
-1️⃣3️⃣Top Performer by Marks
+1️⃣3️⃣ Top Performer by Marks
 ➤ You are given a list of Student objects (name, subject, marks).
 ➤ Find the student with the highest marks overall.
 
@@ -322,7 +330,7 @@ Optional<Student> topStudent = student.stream()
 topStudent.ifPresent(s -> System.out.println(s.getName()));
 
 
-1️⃣4️⃣Top Student in Each Subject
+1️⃣4️⃣ Top Student in Each Subject
 ➤ From the same Student list, find the student with the maximum marks in each subject.
 ➤ (Basically what you attempted yesterday, but now you’ll write the clean final solution).
 
@@ -385,20 +393,21 @@ public class Student{
 		
 		for(Entry<String, Student>s :topStudent.entrySet()) {
 			System.out.println("Subject is "+s.getKey() +" marks is "+s.getValue().getMarks());
-		}	
+		}
 	}
 }
 
 🔄 Improvements
 ✔️ Instead of a for loop, you could also use forEach on the map for cleaner code:
 
-topStudent.forEach((subject, stud) -> 
+topStudent.forEach((subject, stud) ->
     System.out.println("Subject: " + subject + ", Topper: " + stud.getName() + " with marks " + stud.getMarks())
 );
 
 ✔️ If you ever want to make it null-safe (in case of empty student list), you could avoid Optional::get and handle Optional<Student> directly
 
-1️⃣5️⃣Average Marks by Subject
+
+1️⃣5️⃣ Average Marks by Subject
 ➤ Group students by subject and compute the average marks for each subject.
 
 ✅ Solution:
@@ -459,11 +468,11 @@ public class Student{
 		collect(Collectors.groupingBy(Student::getSubject,Collectors.averagingInt(Student::getMarks)));
 		for(Entry<String, Double> s :topStudent.entrySet()) {
 			System.out.println("Subject is "+s.getKey() +" marks is "+s.getValue());
-		}	
-    }	
+		}
+    }
 }
 
-1️⃣6️⃣You have a list of Student(name, subject, marks).
+1️⃣6️⃣ You have a list of Student(name, subject, marks).
 Find the number of students in each subject.
 
 ✅ Solution:
@@ -479,6 +488,7 @@ public class Student {
 		this.subject = subject;
 		this.marks = marks;
 	}
+
 	public String getName() {
 		return name;
 	}
@@ -519,7 +529,7 @@ public class Solution{
 	}
 }
 
-1️⃣7️⃣From the same list, group students by subject and collect only their names into a list.
+1️⃣7️⃣ From the same list, group students by subject and collect only their names into a list.
 
 ✅ Solution:
 Map<String, List<String>> namesBySubject = students.stream()
@@ -532,16 +542,20 @@ Map<String, List<String>> namesBySubject = students.stream()
 1️⃣8️⃣Find the top 2 students with the highest marks overall (not grouped by subject).
 
 ✅ Solution:
-List<String> top2Students = students.stream()
-				.sorted(java.util.Comparator.comparing(Student::getMarks)
-			    .reversed())
-				.limit(2).collect(Collectors.mapping(Student::getName, Collectors.toList()));
+List<String> top2Students = students
+							.stream()
+							.sorted(Comparator.comparing(Student::getMarks)
+							.reversed())
+							.limit(2)
+							.map(Student::getName)
+							.toList();
+
 
 ✅Solution 2: Cleaner Code
 List<String> top2Students = students.stream()
         .sorted(Comparator.comparingInt(Student::getMarks).reversed())
         .limit(2)
-        .map(Student::getName) 
+        .map(Student::getName)
         .collect(Collectors.toList());
 
 System.out.println(top2Students);
@@ -606,7 +620,7 @@ public class Solution{
 			 System.out.println("Department: "+ entry.getKey());
 			 entry.getValue().forEach(System.out::println);
 		        System.out.println();
-		 });	
+		 });
 	}
 }
 
@@ -650,7 +664,7 @@ employees.stream()
 transactions.stream()
     .collect(Collectors.groupingBy(Transaction::getType,
             Collectors.summingDouble(Transaction::getAmount)))
-    .forEach((type, amount) -> 
+    .forEach((type, amount) ->
         System.out.println("Type is: " + type + " Amount is: " + amount));
 
 
@@ -662,6 +676,7 @@ transactions.stream()
         .sorted(Comparator.comparingDouble(Transaction::getAmount)
         		.reversed()).limit(3)
         .forEach(e->System.out.println(e.getAmount()));;
+
 
 2️⃣4️⃣ Transactions Above a Threshold
 ➤ Given a threshold (e.g., 5000), get the list of transaction IDs whose amount is greater than the threshold.
@@ -707,7 +722,7 @@ List<Employee> employees = Arrays.asList(
        .map(e->{
     	   e.setSalary(e.getSalary()+0.1*e.getSalary());
     	   return e;
-       }).forEach(System.out::println);  
+       }).forEach(System.out::println);
 
 
 2️⃣6️⃣ Longest String in a List
@@ -754,6 +769,7 @@ employees.stream()
                 System.out.println("Department: " + department + " | Avg Salary: " + avgSalary);
             });
 
+
 2️⃣9️⃣String Frequency (Sorted)
 Given a list of strings, count the frequency of each string and return the result sorted by frequency in descending order.
 
@@ -761,10 +777,11 @@ Given a list of strings, count the frequency of each string and return the resul
   	words.stream()
         .collect(Collectors.groupingBy(word -> word, Collectors.counting())) // count frequency
         .entrySet().stream()
-        .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())) 
+        .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder()))
         .forEach(entry -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
 
-3️⃣0️⃣Top Customer by Transaction Amount
+
+3️⃣0️⃣ Top Customer by Transaction Amount
 Given a list of Transaction objects (id, customerName, type, amount), find the customer who spent the highest total amount (summing all their transactions).
 
 String key = transactions.stream()

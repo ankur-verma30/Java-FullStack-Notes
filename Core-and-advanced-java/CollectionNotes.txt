@@ -120,6 +120,7 @@ public void addIntegers(List<? super Integer> list) {
     list.add(20);
 }
 
+
 🔄 Producer ─────────▶ extends
 ➤ If the list gives you data, use extends
 👉 Think: I am only taking things out of the list
@@ -139,6 +140,7 @@ Because Java doesn't know:
     ✔️ Is it a List<Dog>?
     ✔️ Is it a List<Cat>?
     ✔️ Is it a List<Animal>?
+
 
 🔄 Consumer ─────────▶ super
 "If the list takes your data, use super"
@@ -263,11 +265,13 @@ Because type info is gone at runtime
 T[] arr=new T[10]; //❌ not allowed
 ➤ JVM doesn't know what T is at runtime
 
+
 ❌ Cannot use instanceof with generics
 if (obj instanceof List<String>) // ❌ not allowed
 
 But this is allowed:
 if (obj instanceof List<?>) // ✅ allowed
+
 
 ❌ Cannot overload methods only by generic type
 void print(List<String> list)
@@ -284,7 +288,6 @@ List<String> names = new ArrayList<>();
 names.add("Ankur");
 
 String name = names.get(0); // implicit cast
-
 👉 After erasure: String name=(String )names.get(0);
 
 
@@ -450,8 +453,7 @@ Iterable
 
  The hierarchy flows from Iterable ─────────▶ Collection ─────────▶ SequencedCollection ─────────▶ List ─────────▶ ArrayList.
 
-Let’s break this down step by step:
-===========================
+awd===========================
 🔷 Iterable<E> (Interface)
 ===========================
 ➤ Iterable is the top-most interface in the Java Collections Framework hierarchy.
@@ -919,14 +921,14 @@ public class ListExample {
 6️⃣ Amortized Cost: Although resizing is an expensive operation (O(n) due to array copy), it does not occur with every insertion. Most `add()` operations run in O(1) time. The occasional cost of resizing is spread out over many insertions, leading to an amortized time complexity of O(1) for additions at the end.
     
 
-🔄 Performance Costs Explained
-| Operation                    | Time Complexity Details                                                                                  |
-| -----------------------------| ---------------------------------------------------------------------------------------------------------|
-| Adding element at end        | O(1) amortized — most insertions are constant time; occasional resizing costs O(n) but is infrequent     |
-| Adding element in middle     | O(n) — elements to the right of the index must be shifted                                                |
-| Removing element from middle | O(n) — elements to the left must shift to fill the gap                                                   |
-| Access by index              | O(1) — direct access using the internal array                                                            |
-| Contains / Search            | O(n) — requires linear traversal of elements                                                             |
+🔄 Performance Costsff
+| Operation                    | Time Complexity Details                                                                              |
+| -----------------------------| ---------------------------------------------------------------------------------------------------- |
+| Adding element at end        | O(1) amortized — most insertions are constant time; occasional resizing costs O(n) but is infrequent |
+| Adding element in middle     | O(n) — elements to the right of the index must be shifted                                            |
+| Removing element from middle | O(n) — elements to the left must shift to fill the gap                                               |
+| Access by index              | O(1) — direct access using the internal array                                                        |
+| Contains / Search            | O(n) — requires linear traversal of elements                                                         |
 
 
 🔄 Important Points
@@ -1002,10 +1004,11 @@ Here is a comprehensive overview of common operations on ArrayList in Java, cove
 ➤ int lastIdx = list.lastIndexOf(50); ─────────▶ get last occurrence index
 
 6️⃣ Iteration
-    1️⃣ For-each loop 
+    1️⃣ For-each loop
     for(Integer val : list) { System.out.println(val); }
 
-    2️⃣ Using Iterator  
+
+    2️⃣ Using Iterator
     Iterator<Integer> it = list.iterator();
     while(it.hasNext()) System.out.println(it.next());
 
@@ -1163,14 +1166,14 @@ The LinkedList class provides multiple constructors to create instances of linke
 
 
 🔄 Performance Complexity
-| Operation              | LinkedList Complexity                 | ArrayList Complexity    |
-| -----------------------| --------------------------------------| ------------------------|
-| Access by index        | O(n)                                  | O(1)                    |
-| Add at end             | O(1)                                  | O(1) amortized          |
-| Add at beginning       | O(1)                                  | O(n)                    |
-| Add / remove in middle | O(n) to traverse + O(1) to modify     | O(n) (element shifting) |
-| Remove by value        | O(n)                                  | O(n)                    |
-| Search (contains)      | O(n)                                  | O(n)                    |
+| Operation              | LinkedList Complexity             | ArrayList Complexity    |
+| -----------------------| ----------------------------------| ------------------------|
+| Access by index        | O(n)                              | O(1)                    |
+| Add at end             | O(1)                              | O(1) amortized          |
+| Add at beginning       | O(1)                              | O(n)                    |
+| Add / remove in middle | O(n) to traverse + O(1) to modify | O(n) (element shifting) |
+| Remove by value        | O(n)                              | O(n)                    |
+| Search (contains)      | O(n)                              | O(n)                    |
 
 
 🔄 Use Cases
@@ -1327,7 +1330,7 @@ public class VectorDemo {
         System.out.println("After remove at index 3: " + vector);
 
         // 6. remove(Object o) - remove by value
-        vector.remove("Apple"); 
+        vector.remove("Apple");
         System.out.println("After removing 'Apple': " + vector);
 
         // 7. size() - get number of elements
