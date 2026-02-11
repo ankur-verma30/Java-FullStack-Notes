@@ -20,7 +20,7 @@ public class DatabaseConnection {
         System.out.println("Database Connection created...");
     }
 
-    public static DatabaseConnection getInstance() { 
+    public static DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();
         }
@@ -42,7 +42,7 @@ public class Main {
 🔗 Eager Initialization Singleton
 ➤ Eager initialization means creating the instance of the object at the loading of the class
 public class EagerSingleton {
-    private static final EagerSingleton instance = new EagerSingleton();  
+    private static final EagerSingleton instance = new EagerSingleton();
 
     private EagerSingleton() {}
 

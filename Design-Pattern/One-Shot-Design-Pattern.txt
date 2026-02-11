@@ -12,7 +12,7 @@
 🔁 Problem It Solves
 Prevents multiple objects from being created for something that should exist only once.
 Without Singleton:
-    ✔️ Multiple instances → inconsistent state
+    ✔️ Multiple instances ─────────▶ inconsistent state
     ✔️ Wasted memory/resources
     ✔️ Hard-to-track bugs in large applications
 Especially critical when:
@@ -25,7 +25,7 @@ Especially critical when:
 Country’s Prime Minister
     ✔️ Only one Prime Minister exists at a time.
     ✔️ Everyone refers to the same authority.
-    ✔️ If multiple PMs existed → chaos and conflicting decisions.
+    ✔️ If multiple PMs existed ─────────▶ chaos and conflicting decisions.
 Same idea: one object, one authority, global access.
 
 
@@ -46,7 +46,7 @@ Same idea: one object, one authority, global access.
     ✔️ By default, Spring beans are Singleton-scoped, meaning the framework manages one instance per container.
 
 
-🔁 Obervational Questions 
+🔁 Obervational Questions
 Tests understanding of:
     ✔️ Object lifecycle
     ✔️ Resource management
@@ -55,6 +55,7 @@ Tests understanding of:
 Often followed by:
     ✔️ “Is Singleton good or bad?”
     ✔️ “How does Spring handle Singleton internally?”
+
 
 ===========================
 🔷 Factory Design Pattern
@@ -81,10 +82,10 @@ Often followed by:
     ✔️ You order food (Pizza / Burger / Pasta)
     ✔️ You don’t know how it’s cooked or who cooks it
     ✔️ The kitchen (factory) decides which chef prepares your order
-➤ You ask → Factory decides → You receive the object
+➤ You ask ─────────▶ Factory decides ─────────▶ You receive the object
 
 
-🔁 Real-World Project Usage 
+🔁 Real-World Project Usage
 1️⃣ Payment Processing Systems
     ✔️ Factory returns different payment handlers (Card, UPI, Wallet) based on input.
 
@@ -207,7 +208,7 @@ Ordering a Custom Burger
 Builder = Burger customization counter
 
 
-🔁 Real-World Project Usage 
+🔁 Real-World Project Usage
 1️⃣ User Registration / Profile Objects
     ✔️ Many optional fields like address, preferences, social links
 
@@ -259,7 +260,7 @@ Prototype solves:
     ✔️ Cleaner and reusable object setup
 
 
-🔁 Real-Life Analogy 
+🔁 Real-Life Analogy
 ➤ Photocopy Machine
     ✔️ You don’t rewrite the entire document
     ✔️ You copy an existing one and make small changes
@@ -267,7 +268,7 @@ Prototype solves:
 ➤ New object = Photocopy
 
 
-🔁 Real-World Project Usage 
+🔁 Real-World Project Usage
 1️⃣ Game Development
     ✔️ Cloning enemies or characters with similar attributes
 
@@ -321,7 +322,7 @@ Common follow-ups:
 🔁 Real-Life Analogy
 ➤ Customer Support Escalation
     ✔️ Level 1 support tries to resolve the issue
-    ✔️ If not resolved → escalates to Level 2
+    ✔️ If not resolved ─────────▶ escalates to Level 2
     ✔️ Then Level 3 if needed
 ➤ Each support agent = Handler
 ➤ Issue moves along the chain until handled
@@ -681,17 +682,17 @@ Common follow-ups:
 
 🔁 Real-Life Analogy
 ➤ Traffic Light
-    ✔️ Red → Stop
-    ✔️ Yellow → Ready
-    ✔️ Green → Go
+    ✔️ Red ─────────▶ Stop
+    ✔️ Yellow ─────────▶ Ready
+    ✔️ Green ─────────▶ Go
 ➤ Same object, different behavior based on state
 
 
 🔁 Real-World Project Usage
 1️⃣ Order Lifecycle Management
-    ✔️ Created → Paid → Shipped → Delivered → Cancelled
+    ✔️ Created ─────────▶ Paid ─────────▶ Shipped ─────────▶ Delivered ─────────▶ Cancelled
 2️⃣ Authentication Flow
-    ✔️ Logged out → Logged in → Session expired
+    ✔️ Logged out ─────────▶ Logged in ─────────▶ Session expired
 3️⃣ Workflow Engines
     ✔️ Each workflow step behaves differently
 4️⃣ Game Development
@@ -780,7 +781,7 @@ Common follow-ups:
 
 🔁 Real-Life Analogy
 ➤ Cooking Recipe
-    ✔️ Steps like prepare → cook → serve are fixed
+    ✔️ Steps like prepare ─────────▶ cook ─────────▶ serve are fixed
     ✔️ Ingredients or cooking style may vary
 ➤ Recipe structure = Template
 ➤ Variations = Custom steps
@@ -788,9 +789,9 @@ Common follow-ups:
 
 🔁 Real-World Project Usage
 1️⃣ Authentication Workflows
-    ✔️ Validate → Authenticate → Authorize → Respond
+    ✔️ Validate ─────────▶ Authenticate ─────────▶ Authorize ─────────▶ Respond
 2️⃣ Data Processing Pipelines
-    ✔️ Read → Process → Save
+    ✔️ Read ─────────▶ Process ─────────▶ Save
 3️⃣ Spring Framework Development
     ✔️ Base classes defining lifecycle methods
 4️⃣ Batch Processing Jobs
@@ -925,7 +926,7 @@ Mobile Charger Adapter
     ✔️ Rigid inheritance hierarchies
 ➤ Without Bridge:
     ✔️ Every combination needs a new subclass
-    (e.g., Shape + Color → CircleRed, CircleBlue, SquareRed…)
+    (e.g., Shape + Color ─────────▶ CircleRed, CircleBlue, SquareRed…)
 ➤ Bridge solves:
     ✔️ Independent extensibility
     ✔️ Reduced class count
@@ -985,8 +986,8 @@ Mobile Charger Adapter
 
 🔁 Real-Life Analogy
 ➤ Company Organization Structure
-    ✔️ Employee → individual object
-    ✔️ Manager → manages multiple employees
+    ✔️ Employee ─────────▶ individual object
+    ✔️ Manager ─────────▶ manages multiple employees
 ➤ Both employee and manager are treated as company members
 ➤ Manager is just a composite of employees
 
@@ -1124,8 +1125,8 @@ Mobile Charger Adapter
 ============================
 ➤ Flyweight Design Pattern minimizes memory usage by sharing common object state instead of creating many similar objects.
 ➤ It separates:
-    ✔️ Intrinsic state → shared, immutable
-    ✔️ Extrinsic state → provided from outside, varies per use
+    ✔️ Intrinsic state ─────────▶ shared, immutable
+    ✔️ Extrinsic state ─────────▶ provided from outside, varies per use
 
 
 🔁 Problem It Solves

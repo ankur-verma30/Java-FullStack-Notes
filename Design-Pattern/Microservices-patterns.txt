@@ -1,8 +1,10 @@
+==========================
 🔷 Saga Design Pattern
-Saga is a microservices transaction management pattern used when a distributed transaction spans multiple services.
-Instead of using a global transaction (which is impossible across microservices), Saga breaks the workflow into a sequence of local transactions, each with a compensating transaction to undo its effect if anything fails.
+==========================
+➤ Saga is a microservices transaction management pattern used when a distributed transaction spans multiple services.
+➤ Instead of using a global transaction (which is impossible across microservices), Saga breaks the workflow into a sequence of local transactions, each with a compensating transaction to undo its effect if anything fails.
 
-Simple idea: Each microservice completes its step and triggers the next. If any step fails, compensating actions undo the previous successful steps.
+➤ Simple idea: Each microservice completes its step and triggers the next. If any step fails, compensating actions undo the previous successful steps.
 
 ❓ Why Do We Need Saga
 ➤ No distributed ACID transactions across microservices
@@ -18,19 +20,19 @@ Simple idea: Each microservice completes its step and triggers the next. If any 
 ➤ Each service listens to events and publishes new events.
 
 🔄 Flow:
-Order Service → OrderCreatedEvent
+Order Service ─────────▶ OrderCreatedEvent
         ↓
-Payment Service → PaymentCompletedEvent
+Payment Service ─────────▶ PaymentCompletedEvent
         ↓
-Inventory Service → InventoryReservedEvent
+Inventory Service ─────────▶ InventoryReservedEvent
 
 
 🔄 If Inventory fails:
-Inventory Service → InventoryFailedEvent
+Inventory Service ─────────▶ InventoryFailedEvent
         ↓
-Payment Service → Compensate Payment (Refund)
+Payment Service ─────────▶ Compensate Payment (Refund)
         ↓
-Order Service → Cancel Order
+Order Service ─────────▶ Cancel Order
 
 🔄 Pros
 ✔️ Simple
@@ -72,10 +74,10 @@ Scenario: User places an order
 3️⃣ Inventory Service reserves stock
 4️⃣ Shipping Service schedules delivery
 5️⃣ If inventory fails, Saga triggers compensations:
-6️⃣ Shipping → cancel
-7️⃣Inventory → no-op
-8️⃣ Payment → refund
-9️⃣ Order → mark as failed
+6️⃣ Shipping ─────────▶ cancel
+7️⃣Inventory ─────────▶ no-op
+8️⃣ Payment ─────────▶ refund
+9️⃣ Order ─────────▶ mark as failed
 
 
 Dependencies
@@ -88,7 +90,7 @@ There are two approaches:
 1️⃣ Choreography: event-driven, decentralized
 2️⃣ Orchestration: central coordinator controls the flow
 
-✅ Real example: Order → Payment → Inventory → Shipping.
+✅ Real example: Order ─────────▶ Payment ─────────▶ Inventory ─────────▶ Shipping.
 If inventory fails, Saga triggers refund + order cancellation.
 
 🌟 Advantages
@@ -96,7 +98,7 @@ If inventory fails, Saga triggers refund + order cancellation.
 ➤ Ensures eventual consistency
 ➤ Fault-tolerant
 ➤ Works naturally in microservices
-➤ Local transactions → faster
+➤ Local transactions ─────────▶ faster
 
 ❌ Disadvantages
 ➤ Hard to debug
@@ -106,15 +108,15 @@ If inventory fails, Saga triggers refund + order cancellation.
 
 
 🔄 Quick Text Diagram (Orchestrator)
-[Order Service] 
+[Order Service]
      ↓
-[Orchestrator] → calls Payment → OK
+[Orchestrator] ─────────▶ calls Payment ─────────▶ OK
      ↓
-[Orchestrator] → calls Inventory → FAIL
+[Orchestrator] ─────────▶ calls Inventory ─────────▶ FAIL
      ↓
 [Compensating Actions Triggered]
-Payment → refund
-Order → cancel
+Payment ─────────▶ refund
+Order ─────────▶ cancel
 
 ✅ Example:
 Choreography Saga Pattern (Event-Driven)
@@ -130,7 +132,7 @@ Events:
 3️⃣ InventoryReservedEvent
 4️⃣ Failure events: PaymentFailedEvent, InventoryFailedEvent
 
-🔁 Choreography — Order Service  →  OrderCreatedEvent
+🔁 Choreography — Order Service  ─────────▶  OrderCreatedEvent
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -219,13 +221,13 @@ public class InventoryFailedListener {
 
     @KafkaListener(topics = "inventory-failed", groupId = "payment-compensation")
     public void compensatePayment(InventoryFailedEvent event) {
-        System.out.println("Compensating Payment → Refund for order: " + event.getOrderId());
+        System.out.println("Compensating Payment ─────────▶ Refund for order: " + event.getOrderId());
         // refund logic here
     }
 }
 
 
-✅ 2. Orchestration Saga Pattern (Coordinator + Services)
+🔄 Orchestration Saga Pattern (Coordinator + Services)
 Here we introduce a Saga Orchestrator, which calls microservices and triggers compensations on failure.
 🔄 Services:
 1️⃣ Order Service
@@ -254,15 +256,15 @@ public class OrderSagaOrchestrator {
             // Step 2: inventory
             inventoryClient.reserve(orderId);
 
-            System.out.println("Saga completed → Order confirmed");
+            System.out.println("Saga completed ─────────▶ Order confirmed");
 
         } catch (Exception e) {
-            System.out.println("Saga failed → Triggering compensations");
+            System.out.println("Saga failed ─────────▶ Triggering compensations");
 
             paymentClient.refund(orderId);
             inventoryClient.release(orderId);
 
-            System.out.println("Compensation completed → Order Cancelled");
+            System.out.println("Compensation completed ─────────▶ Order Cancelled");
         }
     }
 }
