@@ -18,10 +18,10 @@
 🔷 Spring Modules
 ===================
 1️⃣ Spring Core
-➤ It is the fundamental module of the Spring framework. 
+➤ It is the fundamental module of the Spring framework.
 ➤ It  is all about managing dependencies among the classes with loosely coupling.
 ➤ It provides the basic features of the Spring framework:
-    ✔️ Inversion of Control (IoC) 
+    ✔️ Inversion of Control (IoC)
     ✔️ Dependency Injection (DI).
     ✔️ Bean Life cycles
     ✔️ Bean Scopes
@@ -259,7 +259,7 @@ Debug mode is enabled!
 🔄 Difference Between CommandLineRunner and ApplicationRunner
 | Feature          | CommandLineRunner | ApplicationRunner                                         |
 | ---------------- | ----------------- | --------------------------------------------------------- |
-| Arguments Type   | `String... args`  | `ApplicationArguments`                                    |
+| Arguments Type   | String... args  | ApplicationArguments                                    |
 | Argument Parsing | Manual            | Built-in support for options and non-option args          |
 | Use Case         | Simple tasks      | When you need to access or parse command-line args easily |
 
@@ -359,10 +359,10 @@ public class AppStartup {
 
 | Concept               | Description                                                                                       |
 | --------------------- | ------------------------------------------------------------------------------------------------- |
-| Annotation Source     | `jakarta.annotation.PostConstruct`                                                                |
+| Annotation Source     | jakarta.annotation.PostConstruct                                                                |
 | Runs When             | After dependency injection, before bean is used                                                   |
-| Method Rules          | Must be `void`, no parameters, can throw exceptions                                               |
-| Alternatives          | `InitializingBean.afterPropertiesSet()` or a custom `@EventListener(ApplicationReadyEvent.class)` |
+| Method Rules          | Must be void, no parameters, can throw exceptions                                               |
+| Alternatives          | InitializingBean.afterPropertiesSet() or a custom @EventListener(ApplicationReadyEvent.class) |
 
 
 🔄 Modern Alternative (Recommended in Spring Boot)
@@ -438,8 +438,8 @@ public class ResourceManager {
 @PreDestroy 🆚 @PostConstruct
 | Annotation       | Purpose                          |
 | ---------------- | -------------------------------- |
-| `@PostConstruct` | Runs after bean creation         |
-| `@PreDestroy`    | Runs before bean destruction     |
+| @PostConstruct | Runs after bean creation         |
+| @PreDestroy    | Runs before bean destruction     |
 
 🔄 @PreDestroy vs DisposableBean
 Using DisposableBean
@@ -620,11 +620,10 @@ public class UserService {}
 2️⃣ Stereotype Annotations
 | Annotation        | Use            |
 | ----------------- | -------------- |
-| `@Component`      | Generic        |
-| `@Service`        | Business logic |
-| `@Repository`     | DAO layer      |
-| `@Controller`     | MVC Controller |
-| `@RestController` | REST APIs      |
+| @Component      | Generic        |
+| @Service        | Business logic |
+| @Repository     | DAO layer      |
+| @Controller     | MVC Controller |
 
 
 3️⃣ Using @Bean (Java Config)
@@ -697,9 +696,9 @@ public class PaymentService {
 Spring injects internal objects:
 | Interface                 | Injected Object    |
 | ------------------------- | ------------------ |
-| `BeanNameAware`           | Bean name          |
-| `BeanFactoryAware`        | BeanFactory        |
-| `ApplicationContextAware` | ApplicationContext |
+| BeanNameAware           | Bean name          |
+| BeanFactoryAware        | BeanFactory        |
+| ApplicationContextAware | ApplicationContext |
 @Component
 public class DemoBean implements BeanNameAware {
 
@@ -753,7 +752,7 @@ postProcessAfterInitialization()
     ✔️ Security
     ✔️ Transaction management
 
-8️⃣ Bean Ready to Use 
+8️⃣ Bean Ready to Use
 Bean is:
     ✔️ Fully initialized
     ✔️ Injected
@@ -785,11 +784,11 @@ public void destroy() {}
 🔄 Bean Scopes
 | Scope         | Description                          |
 | ------------- | ------------------------------------ |
-| `singleton`   | One instance per container (DEFAULT) |
-| `prototype`   | New instance every time              |
-| `request`     | One per HTTP request                 |
-| `session`     | One per HTTP session                 |
-| `application` | One per ServletContext               |
+| singleton     | One instance per container (DEFAULT) |
+| prototype     | New instance every time              |
+| request       | One per HTTP request                 |
+| session       | One per HTTP session                 |
+| application   | One per ServletContext               |
 
 @Scope("prototype")
 @Component
@@ -1022,8 +1021,8 @@ public class UserService {
 | -------------------------- | --------------- | ---------------- | --------------------- |
 | Visibility                 | Hidden          | Visible          | Visible               |
 | Immutability               | ❌ No           | ❌ No           | ✅ Yes                |
-| Testability                | ❌ Poor        | ⚙️ Medium        | ✅ Best               |
-| Optional Dependencies      | ⚙️ Medium      | ✅ Yes           | ❌ No                 |
+| Testability                | ❌ Poor         | ⚙️ Medium       | ✅ Best               |
+| Optional Dependencies      | ⚙️ Medium       | ✅ Yes          | ❌ No                 |
 | Mandatory Dependencies     | ❌ Risky        | ⚙️ Medium       | ✅ Best               |
 | Spring Recommendation      | ❌ No           | ⚙️ Sometimes    | ✅ Yes                |
 
@@ -1137,8 +1136,8 @@ Actual Request Bean (created per request)
 🔄 Types of ProxyMode
 | Mode           | Used When                       |
 | -------------- | ------------------------------- |
-| `TARGET_CLASS` | Class-based beans (most common) |
-| `INTERFACES`   | Interface-based beans           |
+| TARGET_CLASS | Class-based beans (most common) |
+| INTERFACES   | Interface-based beans           |
 
 
 4️⃣ Session Scope (Web)
@@ -1190,7 +1189,7 @@ Problem it solves:
 
 Without it:
     ✔️ You’d need if-else logic inside beans
-    ✔️ Beans would still be created → wasted memory
+    ✔️ Beans would still be created ─────────▶ wasted memory
     ✔️ Hard to maintain
 
 
@@ -1235,7 +1234,7 @@ havingValue = "true"
 
 3️⃣ matchIfMissing
 ➤ Default: false
-➤ If true → condition passes even if property is not present
+➤ If true ─────────▶ condition passes even if property is not present
 matchIfMissing = true
 👉 Useful for default ON behavior
 
@@ -1308,7 +1307,7 @@ feature.b=true
 
 🌟 Evaluation Steps:
 1️⃣ Reads Environment
-2️⃣C hecks property existence
+2️⃣ Checks property existence
 3️⃣ Compares string value
 4️⃣ Applies matchIfMissing
 5️⃣ Returns TRUE / FALSE
@@ -1326,7 +1325,7 @@ Spring checks properties in this order:
 
 
 🔄 Difference: @Value vs @ConditionalOnProperty
-| Aspect        | `@Value`     | `@ConditionalOnProperty` |
+| Aspect        | @Value       | @ConditionalOnProperty   |
 | ------------- | ------------ | ------------------------ |
 | Purpose       | Inject value | Control bean creation    |
 | Bean created? | Always       | Conditional              |
@@ -1377,8 +1376,8 @@ Condition applies after scanning, not during scanning
 ➤ Both @Component and @Service are annotations used in Spring to define beans, but they serve different purposes and convey different semantics.
 | Annotation   | Description                                                                                                     |
 | ------------ | --------------------------------------------------------------------------------------------------------------- |
-| `@Component` | Generic stereotype annotation that marks a class as a Spring-managed bean.                                      |
-| `@Service`   | A specialized type of `@Component used to mark classes that hold business logic or service-layer code.          |
+| @Component   | Generic stereotype annotation that marks a class as a Spring-managed bean.                                      |
+| @Service     | A specialized type of @Component used to mark classes that hold business logic or service-layer code.           |
 
 🔄 What They Do Internally
 ✅ Both @Component and @Service
@@ -1388,13 +1387,13 @@ Condition applies after scanning, not during scanning
 👉 In short:
 @Service = @Component + Semantic meaning (used for service/business layer)
 
-🔄 Layer Meaning in Spring 
+🔄 Layer Meaning in Spring
 | Layer                | Annotation                        | Purpose                                   |
 | -------------------- | --------------------------------- | ----------------------------------------- |
-| Controller Layer     | `@Controller` / `@RestController` | Handles web requests (presentation layer) |
-| Service Layer        | `@Service`                        | Contains business logic                   |
-| Repository Layer     | `@Repository`                     | Deals with persistence (database access)  |
-| Generic Bean         | `@Component`                      | Used for any other general-purpose bean   |
+| Controller Layer     | @Controller / @RestController     | Handles web requests (presentation layer) |
+| Service Layer        | @Service                          | Contains business logic                   |
+| Repository Layer     | @Repository                       | Deals with persistence (database access)  |
+| Generic Bean         | @Component                        | Used for any other general-purpose bean   |
 
 ✅ Example: Using @Component
 @Component
@@ -1419,7 +1418,7 @@ public class UserService {
 ➤ But used to represent business logic layer.
 
 🔄 Key Difference — Intent and Semantics
-| Feature                               | `@Component`         | `@Service`                                             |
+| Feature                               | @Component           | @Service                                               |
 | ------------------------------------- | -------------------- | ------------------------------------------------------ |
 | Purpose                               | Generic bean         | Business logic layer                                   |
 | Spring Behavior                       | Registers bean       | Registers bean (same behavior)                         |
@@ -1501,11 +1500,11 @@ public void logAround(ProceedingJoinPoint joinPoint) throws Throwable {
 Actual code that runs at a join point.
 | Advice Type       | When it Runs                      |
 | ----------------- | --------------------------------- |
-| `@Before`         | Before method execution           |
-| `@After`          | After method (success or failure) |
-| `@AfterReturning` | After successful return           |
-| `@AfterThrowing`  | After exception                   |
-| `@Around`         | Before + After (most powerful)     |
+| @Before           | Before method execution           |
+| @After            | After method (success or failure) |
+| @AfterReturning   | After successful return           |
+| @AfterThrowing    | After exception                   |
+| @Around           | Before + After (most powerful)    |
 
 
 🌟 Pointcut
@@ -1527,7 +1526,6 @@ execution(modifiers? returnType declaringType? methodName(params))
 
 ✅ Example
 execution(* com.app.service.*.*(..))
-
 ✔️ Any return type
 ✔️ Any method
 ✔️ Any parameters
@@ -1542,8 +1540,8 @@ execution(* com.app.service.*.*(..))
 
 
 🆚 Difference from execution:
-➤ within → class/package scope
-➤ execution → method-level control
+➤ within ─────────▶ class/package scope
+➤ execution ─────────▶ method-level control
 
 
 3️⃣ Args Pointcut
@@ -1578,8 +1576,8 @@ target(com.app.service.UserService)
 
 
 🆚 Difference:
-➤ this → proxy object
-➤ target → actual object
+➤ this ─────────▶ proxy object
+➤ target ─────────▶ actual object
 
 7️⃣ Bean Pointcut (Spring-Specific)
 Matches based on Spring bean name
@@ -1846,8 +1844,8 @@ public class PaymentService {
 👉 Without @Transactional, if orderRepo.save() succeeds but paymentRepo.save() fails, you’d get inconsistent data. With @Transactional, both operations succeed or both rollback.
 
 It can be applied at:
-1️⃣ Method Level → Only that method runs in a transaction.
-2️⃣ Class Level → All public methods in the class run in transactions.
+1️⃣ Method Level ─────────▶ Only that method runs in a transaction.
+2️⃣ Class Level ─────────▶ All public methods in the class run in transactions.
 
 
 🔄 Key Features
@@ -1865,7 +1863,7 @@ public void doWork() { ... }
 ➤ If the other transaction rolls back, the read data becomes invalid (dirty)
 
 ✅ Example
-➤ T1 updates balance from 100 → 200 (not committed)
+➤ T1 updates balance from 100 ─────────▶ 200 (not committed)
 ➤ T2 reads balance = 200
 ➤ T1 rolls back
 ➤ T2 used wrong data
@@ -1882,7 +1880,7 @@ public void doWork() { ... }
 ✅ Example
 ➤ T1 reads salary = 50k
 ➤ T2 updates salary to 60k and commits
-➤ T1 reads salary again → 60k
+➤ T1 reads salary again ─────────▶ 60k
 
 ❗ Why dangerous?
 ➤ Same query returns different results
@@ -1895,9 +1893,9 @@ public void doWork() { ... }
 ➤ New rows appear or disappear (phantoms)
 
 ✅ Example
-➤ T1 reads employees with salary > 50k → 5 rows
+➤ T1 reads employees with salary > 50k ─────────▶ 5 rows
 ➤ T2 inserts new employee with salary 70k
-➤ T1 runs same query again → 6 rows
+➤ T1 runs same query again ─────────▶ 6 rows
 
 ❗ Why dangerous?
 ➤ Row count changes
@@ -1947,7 +1945,7 @@ public void doWork() { ... }
 
 
 3️⃣ REPEATABLE READ
-➤ Same row read multiple times → same value
+➤ Same row read multiple times ─────────▶ same value
 ➤ Uses row-level locks
 ➤ New rows can still appear
 ✔️ Read: Shared lock acquired and released only at the end of the transaction
@@ -1966,12 +1964,12 @@ public void doWork() { ... }
 
 
 🔄 Propagation (what happens if a method with a transaction calls another transactional method)
-✔️ REQUIRED (default) → joins existing transaction or creates new one if none.
-✔️ REQUIRES_NEW → always starts a new transaction.
-✔️ MANDATORY → must run inside an existing  parent transaction if present else throw exception.
-✔️ SUPPORTS → if parent transaction exists, joins it or execute the method without any transaction.
-✔️ NOT_SUPPORTED → if parent transaction is present suspend the parent transaction and execute the method without any transaction. and resume the parent transaction or if not parent transaction is present execute the method without any transaction.
-✔️ NEVER → if parent transaction is present throw exception, if not present execute the method without any transaction.
+✔️ REQUIRED (default) ─────────▶ joins existing transaction or creates new one if none.
+✔️ REQUIRES_NEW ─────────▶ always starts a new transaction.
+✔️ MANDATORY ─────────▶ must run inside an existing  parent transaction if present else throw exception.
+✔️ SUPPORTS ─────────▶ if parent transaction exists, joins it or execute the method without any transaction.
+✔️ NOT_SUPPORTED ─────────▶ if parent transaction is present suspend the parent transaction and execute the method without any transaction. and resume the parent transaction or if not parent transaction is present execute the method without any transaction.
+✔️ NEVER ─────────▶ if parent transaction is present throw exception, if not present execute the method without any transaction.
 
 ✅ Example:
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -2035,7 +2033,7 @@ emails:
 
 
 🔄 Advantages of YAML over Properties:
-| Feature            | `.properties`   | `.yml`                      |
+| Feature            | .properties   | .yml                      |
 | ------------------ | -------------   | ------------------------    |
 | Readability        | ❌ Average     | ✅ Excellent                |
 | Hierarchical Data  | ❌ Complex     | ✅ Natural                  |
@@ -2064,10 +2062,10 @@ Spring Boot to load all settings from application-dev.properties in addition to 
 Spring uses Environment abstraction and checks multiple sources in priority order.
 | Priority | Source                                           |
 | -------- | ------------------------------------------------ |
-| 1️⃣      | JVM argument `-Dspring.profiles.active=prod`     |
-| 2️⃣      | OS environment variable `SPRING_PROFILES_ACTIVE` |
-| 3️⃣      | `application.properties / application.yml`       |
-| 4️⃣      | `spring.profiles.default`                        |
+| 1️⃣      | JVM argument -Dspring.profiles.active=prod     |
+| 2️⃣      | OS environment variable SPRING_PROFILES_ACTIVE |
+| 3️⃣      | application.properties / application.yml       |
+| 4️⃣      | spring.profiles.default                        |
 | 5️⃣      | No profile (default behavior)                    |
 
 
@@ -2107,7 +2105,7 @@ import org.springframework.stereotype.Service;
 public class DevEmailService implements EmailService {
     @Override
     public void sendEmail(String msg) {
-        System.out.println("DEV: Sending mock email → " + msg);
+        System.out.println("DEV: Sending mock email ─────────▶ " + msg);
     }
 }
 
@@ -2116,7 +2114,7 @@ public class DevEmailService implements EmailService {
 public class ProdEmailService implements EmailService {
     @Override
     public void sendEmail(String msg) {
-        System.out.println("PROD: Sending real email → " + msg);
+        System.out.println("PROD: Sending real email ─────────▶ " + msg);
     }
 }
 👉 If spring.profiles.active=dev, then only DevEmailService will be loaded.
@@ -2286,8 +2284,8 @@ public class PatientController {
 Resolves the logical view name (like "patientsView") to an actual view (e.g., patientsView.jsp or patients.html).
 
 ✅ Common examples:
-InternalResourceViewResolver → JSP
-ThymeleafViewResolver → HTML template
+InternalResourceViewResolver ─────────▶ JSP
+ThymeleafViewResolver ─────────▶ HTML template
 
 7️⃣ View
 ➤ The actual UI component (e.g., JSP, Thymeleaf, React frontend, etc.)
@@ -2511,14 +2509,14 @@ public String registerUser(BindingResult result, @Valid @RequestBody User user) 
 public String registerUser(@Valid @RequestBody User user, BindingResult result) { ... }
 
 🔄 What BindingResult Contains
-🔗 result.hasErrors() → checks if there are validation errors
-🔗 result.getAllErrors() → returns all validation messages
-🔗 result.getFieldErrors() → returns only field-specific errors
+🔗 result.hasErrors() ─────────▶ checks if there are validation errors
+🔗 result.getAllErrors() ─────────▶ returns all validation messages
+🔗 result.getFieldErrors() ─────────▶ returns only field-specific errors
 
 🔄 Typical Use Case Flow
 ➤ Client sends JSON data to endpoint
 ➤ Spring validates it using @Valid and annotations in the DTO
-➤ If errors exist → captured in BindingResult
+➤ If errors exist ─────────▶ captured in BindingResult
 ➤ Controller handles validation failure gracefully (instead of 400 Bad Request)
 
 ✅ Example Output (if invalid data sent)
@@ -2628,7 +2626,7 @@ public class EmployeeDto {
 ➤ Instead:
     ✔️ Employee entity stores employee-specific info.
     ✔️ Address entity stores address info.
-    ✔️ BeanUtils.copyProperties() copies data from DTO → Entities.
+    ✔️ BeanUtils.copyProperties() copies data from DTO ─────────▶ Entities.
 
 
 ❓ Why Not Use Entity Instead of DTO?
@@ -2843,9 +2841,9 @@ public class AuthFilter implements Filter {
 
 
 🔄 Filter Lifecycle Methods
-➤ init() → called once
-➤ doFilter() → called for every request
-➤ destroy() → called when app shuts down
+➤ init() ─────────▶ called once
+➤ doFilter() ─────────▶ called for every request
+➤ destroy() ─────────▶ called when app shuts down
 
 ➤ Order of Multiple Filters
 bean.setOrder(1); // lower value = higher priority
@@ -2970,10 +2968,10 @@ public @interface LogExecution {}
 🔄 Meta-Annotations(Annotations used over annotations)
 | Annotation    | Purpose                 |
 | ------------- | ----------------------- |
-| `@Target`     | Where it can be used    |
-| `@Retention`  | Lifecycle               |
-| `@Documented` | Appears in Javadoc      |
-| `@Inherited`  | Inherited by subclasses |
+| @Target     | Where it can be used    |
+| @Retention  | Lifecycle               |
+| @Documented | Appears in Javadoc      |
+| @Inherited  | Inherited by subclasses |
 
 
 2️⃣ @Target – Where Annotation Can Be Used
@@ -2981,10 +2979,10 @@ public @interface LogExecution {}
 @Target(ElementType.METHOD)
 
 ➤ Common ElementType values:
-    ✔️ TYPE → class, interface
-    ✔️ METHOD → methods
-    ✔️ FIELD → variables
-    ✔️ PARAMETER → method parameters
+    ✔️ TYPE ─────────▶ class, interface
+    ✔️ METHOD ─────────▶ methods
+    ✔️ FIELD ─────────▶ variables
+    ✔️ PARAMETER ─────────▶ method parameters
     ✔️ CONSTRUCTOR
     ✔️ ANNOTATION_TYPE
 
@@ -2995,9 +2993,9 @@ public @interface LogExecution {}
 Retention Types:
 | Policy    |                                         Available At                                                     |
 | --------- | ---------------------------------------------------------------------------------------------------------|
-| `SOURCE`  | Compile time only, It will be discarded by compiler itself and its not even recored in .class file       |
-| `CLASS`   | Will be recorded in .class file but ignored by JVM duirng runtime                                        |
-| `RUNTIME` | Recorded in .class file and available at runtime (Reflection, AOP)                                       |
+| SOURCE  | Compile time only, It will be discarded by compiler itself and its not even recored in .class file       |
+| CLASS   | Will be recorded in .class file but ignored by JVM duirng runtime                                        |
+| RUNTIME | Recorded in .class file and available at runtime (Reflection, AOP)                                       |
 👉 Spring & AOP need RUNTIME retention
 
 
@@ -3497,7 +3495,7 @@ If multiple exception handlers match:
 | Concept           | Description                                                         |
 | ----------------- | ------------------------------------------------------------------- |
 | Job           | Represents the entire batch process (contains one or more steps).   |
-| Step          | A single phase of the job — e.g., read → process → write.           |
+| Step          | A single phase of the job — e.g., read ─────────▶ process ─────────▶ write.           |
 | ItemReader    | Reads data (from file, DB, API, etc.).                              |
 | ItemProcessor | Processes/transforms the data (e.g., filtering, mapping).           |
 | ItemWriter    | Writes data to a destination (DB, file, etc.).                      |
@@ -3530,7 +3528,7 @@ If multiple exception handlers match:
 ➤ JobLauncher starts the Job.
 ➤ A Job consists of one or more Steps.
 ➤ Each Step performs:
-    ✔️ Read → Process → Write.
+    ✔️ Read ─────────▶ Process ─────────▶ Write.
 ➤ Metadata is saved in JobRepository.
 ➤ If a job fails midway, you can restart from the last checkpoint.
 
@@ -3543,7 +3541,7 @@ Data is processed in small "chunks" instead of all at once — improving memory 
 chunk-size: 10
 
 👉 Process flow:
-Read 10 items → Process → Write → Commit Transaction → Repeat
+Read 10 items ─────────▶ Process ─────────▶ Write ─────────▶ Commit Transaction ─────────▶ Repeat
 
 👉 If something fails in that chunk, only that chunk rolls back.
 
@@ -3637,7 +3635,7 @@ public void runJob() throws Exception {
 | Partitioning             | Split data into multiple partitions for parallel processing. |
 | Skip and Retry Logic     | Skip or retry items that fail processing.                    |
 | Listeners                | Hook into lifecycle events (before/after job or step).       |
-| Database-backed Metadata | Stores job execution data in DB via `JobRepository`.         |
+| Database-backed Metadata | Stores job execution data in DB via JobRepository.         |
 
 
 =========================
@@ -3672,10 +3670,10 @@ Reactive programming helps when your system:
 
 🔄 Reactive Streams Specification (4 Interfaces)
 Spring implements Reactive Streams, which has four interfaces:
-    ✔️ Publisher → Emits data
-    ✔️ Subscriber → Consumes data
-    ✔️ Subscription → Controls data request/cancel
-    ✔️ Processor → Acts as both publisher and subscriber
+    ✔️ Publisher ─────────▶ Emits data
+    ✔️ Subscriber ─────────▶ Consumes data
+    ✔️ Subscription ─────────▶ Controls data request/cancel
+    ✔️ Processor ─────────▶ Acts as both publisher and subscriber
 
 🔄 Reactive in Spring Boot — The Spring WebFlux Module
 Spring Boot provides Spring WebFlux — a reactive alternative to Spring MVC.
@@ -3686,14 +3684,14 @@ Spring Boot provides Spring WebFlux — a reactive alternative to Spring MVC.
 | Spring WebFlux | Asynchronous | Non-Blocking |
 
 👉 WebFlux is built on:
-➤ Project Reactor → core reactive library used internally.
-➤ Netty / Undertow → non-blocking servers (instead of Tomcat).
+➤ Project Reactor ─────────▶ core reactive library used internally.
+➤ Netty / Undertow ─────────▶ non-blocking servers (instead of Tomcat).
 
 Core Types in Project Reactor
 | Type        | Description                                   | Example      |
 | ----------- | --------------------------------------------- | ------------ |
-| Mono<T> | Emits 0 or 1 item (for single responses)  | `Mono<User>` |
-| Flux<T> | Emits 0 or many items (for streams/lists) | `Flux<User>` |
+| Mono<T> | Emits 0 or 1 item (for single responses)  | Mono<User> |
+| Flux<T> | Emits 0 or many items (for streams/lists) | Flux<User> |
 These replace the traditional User or List<User> in reactive code.
 
 ✅ Example: Reactive Controller
@@ -3728,7 +3726,7 @@ public interface UserRepository extends ReactiveCrudRepository<User, String> {
 ✔️ Returns Mono or Flux
 
 🔄 End-to-End Reactive Flow
-Client → Reactive Controller → Reactive Service → Reactive Repository → DB/External API
+Client ─────────▶ Reactive Controller ─────────▶ Reactive Service ─────────▶ Reactive Repository ─────────▶ DB/External API
 
 ✔️ Each layer returns Mono or Flux
 ✔️ Execution is non-blocking
@@ -3738,7 +3736,7 @@ Client → Reactive Controller → Reactive Service → Reactive Repository → 
 | Advantage                         | Explanation                                                  |
 | --------------------------------- | ------------------------------------------------------------ |
 | 🚀 High Scalability           | Handles thousands of concurrent connections with few threads |
-| ⚡ Better Resource Utilization | No blocking → less thread overhead                           |
+| ⚡ Better Resource Utilization | No blocking ─────────▶ less thread overhead                           |
 | 🔄 Asynchronous               | Data flows as streams, not as fixed responses                |
 | 📡 Streaming Data Support     | Perfect for real-time dashboards, notifications, etc.        |
 | ⚙️ Resilient Systems          | Built-in error handling and backpressure support             |
