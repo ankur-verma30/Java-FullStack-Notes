@@ -1,1326 +1,2151 @@
-###############################
-🔷 Introduction to Containers
-###############################
-➤ Containers are lightweight, isolated runtime environments that package an application along with its dependencies (libraries, configs, binaries).
-➤ They share the host OS kernel, unlike VMs which need a full guest OS.
-➤ They ensure “Works on my machine” issues disappear by providing a consistent environment across development, testing, and production.
-➤ Popular container runtime: Docker (most common), containerd, CRI-O, runc.
+================================================================================
+CHAPTER 1 : WHAT IS A CONTAINER?
+================================================================================
+Think of a container like a lunch box.
 
+  You put your food (application), the spoon (libraries), and the napkin
+  (config files) all inside ONE box. Now wherever you carry that lunch box,
+  everything needed is inside it. No more "it works on my machine" problems.
+
+A container is a lightweight, isolated environment that packages:
+  - Your application (e.g., Spring Boot jar file)
+  - All its dependencies (Java runtime, libraries)
+  - Configuration files
+
+Containers share the HOST operating system kernel. They do NOT need their own full operating system like Virtual Machines (VMs) do.
 
-🔄 Problems With Virtual Machines
-❌ Problem 1️⃣─────────▶ Heavy Resource Usage
-➤ VMs include a full guest operating system ─────────▶ large in size (GBs).
-➤ Heavy CPU/RAM consumption.
 
-❌ Problem 2️⃣─────────▶ Slow Boot Time
-➤ VMs take minutes to start because they boot a complete OS.
+--------------------------------------------------------------------------------
+WHY DID WE NEED CONTAINERS? (THE PROBLEM BEFORE CONTAINERS)
+--------------------------------------------------------------------------------
 
-❌ Problem 3️⃣─────────▶ Hard to Scale
-➤ Spinning up multiple VMs is costly and slow ─────────▶ not ideal for microservices.
+Imagine this real scenario:
+
+  Developer A builds a Spring Boot app on Windows with Java 17.
+  Developer B tries to run it on Ubuntu with Java 11.
+  Result: App crashes. Bug reports. Blame game. Wasted time.
+
+  OR
 
-❌ Problem 4️⃣─────────▶ Duplication of OS
-➤ Each VM has its own OS ─────────▶ wastes disk space.
+  You test your app locally. It works. You deploy to production. It fails.
+  Because the server has different OS version, different Java version,
+  different environment variables.
 
-❌ Problem 5️⃣─────────▶ Hard to Port
-➤ VM images are large ─────────▶ difficult to move, copy, push/pull.
+THIS is the problem containers solve.
+
+  With containers:
+    - Your app + Java 17 + all libraries = ONE container image
+    - That image runs EXACTLY the same on any machine
+    - Developer A, Developer B, production server = all same result
+
+
+--------------------------------------------------------------------------------
+CONTAINERS vs VIRTUAL MACHINES (VMs)
+--------------------------------------------------------------------------------
+
+Before containers, VMs were popular. Let us understand the difference.
+
+VIRTUAL MACHINE:
+  [Your App]
+  [Guest OS - Ubuntu/Windows - Full OS ~2GB]
+  [Hypervisor - VMware/VirtualBox]
+  [Host OS]
+  [Hardware]
+
+CONTAINER:
+  [Your App]  [Another App]  [Another App]
+  [Container Runtime - Docker]
+  [Host OS Kernel - SHARED]
+  [Hardware]
+
+  +------------------+-------------------------+-------------------------+
+  | Feature          | Containers              | Virtual Machines        |
+  +------------------+-------------------------+-------------------------+
+  | OS               | Shares host OS kernel   | Each has its own OS     |
+  | Startup time     | Seconds (2-5 sec)       | Minutes (1-5 min)       |
+  | Size             | Megabytes (50-500 MB)   | Gigabytes (2-20 GB)     |
+  | Isolation        | Process-level           | Full OS-level           |
+  | Performance      | Near-native speed       | Some overhead           |
+  | Scaling          | Very fast               | Slow and costly         |
+  | Best for         | Microservices, CI/CD    | Legacy apps, security   |
+  +------------------+-------------------------+-------------------------+
+
+SIMPLE ANALOGY:
+  VM   = Buying a full house for each guest
+  Container = Renting a room in the same house for each guest
+  (Shared walls/kitchen = shared OS kernel)
+
+
+--------------------------------------------------------------------------------
+PROBLEMS WITH VIRTUAL MACHINES
+--------------------------------------------------------------------------------
+
+  Problem 1: Heavy Resource Usage
+    - VMs include a full guest OS
+    - Each VM uses GBs of disk space
+    - Heavy CPU and RAM consumption
+    - Running 10 VMs = 10 full operating systems running
+
+  Problem 2: Slow Boot Time
+    - VMs take minutes to start
+    - They boot a complete OS every time
+    - Not ideal for quick scaling
+
+  Problem 3: Hard to Scale
+    - Spinning up multiple VMs is costly and slow
+    - Each VM needs its own license, resources, setup
+
+  Problem 4: Duplication of OS
+    - 10 VMs = 10 copies of Ubuntu = wasted disk space
+
+  Problem 5: Hard to Port
+    - VM images are huge (GBs)
+    - Difficult to move, copy, push or pull
+
+  Problem 6: Dev/Prod Inconsistency
+    - Dev team uses Windows, prod server runs Ubuntu
+    - Different Java versions, different configs
+    - "Works on my machine" problem
+
+
+--------------------------------------------------------------------------------
+HOW CONTAINERS SOLVE THESE PROBLEMS
+--------------------------------------------------------------------------------
+
+  Solution 1: Lightweight
+    - No guest OS needed
+    - Containers share host OS kernel
+    - Size is MBs not GBs
+    - A Spring Boot app container = ~200-400 MB
+
+  Solution 2: Fast Startup
+    - Containers start in seconds (no OS booting)
+    - Perfect for microservices that need to scale quickly
+
+  Solution 3: Easy Scaling
+    - Spin up 10 containers in seconds
+    - Less resources consumed per container
+
+  Solution 4: No OS Duplication
+    - All containers share one OS kernel
+    - Saves huge amounts of disk space
+
+  Solution 5: Portability
+    - Same container image runs on:
+        Your laptop
+        Test server
+        Production server
+        AWS / Azure / GCP cloud
+
+  Solution 6: Consistent Environments
+    - Your Spring Boot app + Java 17 + MySQL connector = ONE image
+    - Runs exactly the same everywhere
+    - No more "it works on my machine" problem
+
+
+--------------------------------------------------------------------------------
+CONTAINER ARCHITECTURE (HOW IT WORKS INTERNALLY)
+--------------------------------------------------------------------------------
+
+  Layer 5 (Top):    Your Application (Spring Boot JAR)
+                    + Libraries + Config + Env Variables
+                    ↓
+  Layer 4:          Container Image (Read-only filesystem)
+                    (Stored in Docker Hub or your registry)
+                    ↓
+  Layer 3:          Container Runtime
+                    - High-level: Docker or containerd
+                    - Low-level: runc (creates namespaces & cgroups)
+                    ↓
+  Layer 2:          OS Kernel Features Used
+                    - Namespaces  → isolation (each container has its own view)
+                    - cgroups     → resource limits (CPU, RAM limits)
+                    - UnionFS     → layered file system
+                    ↓
+  Layer 1 (Bottom): Host OS + Hardware
+
+  KEY LINUX CONCEPTS:
+    Namespaces:
+      - Each container thinks it is the only process on the system
+      - It has its own process IDs, network, file system view
+      - Like giving each container its own "bubble"
+
+    cgroups (Control Groups):
+      - Limits how much CPU, RAM, disk a container can use
+      - Example: Container A can only use max 512 MB RAM
+      - Prevents one container from eating all resources
+
+    UnionFS (Union File System):
+      - Images are made of layers stacked on top of each other
+      - Layer 1: Ubuntu base
+      - Layer 2: Java 17 installed
+      - Layer 3: Your Spring Boot jar copied
+      - Each layer is cached → faster builds
+
+
+
+================================================================================
+CHAPTER 2 : WHAT IS DOCKER?
+================================================================================
+
+Docker is the most popular tool to create, run, and manage containers.
+
+  "Containerization" is the concept/technology.
+  "Docker" is the tool that implements it.
+
+Think of it this way:
+  Containerization = The concept of putting apps in boxes
+  Docker          = The company and tool that made it easy for everyone
+
+Docker lets you:
+  1. Build a container image from your Spring Boot app
+  2. Run that image as a container
+  3. Push (upload) the image to Docker Hub so others can use it
+
+
+--------------------------------------------------------------------------------
+DOCKER LIFECYCLE (THE BIG PICTURE)
+--------------------------------------------------------------------------------
+
+  Step 1: You write a Dockerfile (instructions to build your image)
+          ↓
+  Step 2: docker build → Creates a Docker Image from Dockerfile
+          ↓
+  Step 3: docker run  → Runs the Image as a Container
+          ↓
+  Step 4: docker push → Pushes Image to Registry (Docker Hub / AWS ECR)
+          ↓
+  Step 5: Anyone can docker pull → Get image → docker run → Run container
+
+  REAL WORLD EXAMPLE:
+    You build a Spring Boot app
+    → Dockerfile packages it with Java 17
+    → docker build creates an image
+    → docker push uploads to Docker Hub
+    → Production server does docker pull + docker run
+    → App is live!
+
+
+--------------------------------------------------------------------------------
+KEY DOCKER TERMS YOU MUST KNOW
+--------------------------------------------------------------------------------
+
+  1. DOCKERFILE
+     - A simple text file with instructions to build a Docker image
+     - Like a recipe: "Take Ubuntu, install Java 17, copy my jar, run it"
+     - Every instruction becomes a layer in the image
+
+  2. DOCKER IMAGE
+     - The result of building a Dockerfile
+     - It is READ-ONLY (you cannot change it once built)
+     - Think of it as a blueprint or template
+     - Example: my-spring-app:v1.0
+
+  3. DOCKER CONTAINER
+     - A RUNNING instance of a Docker image
+     - Image is like a class in Java
+     - Container is like an object (instance) of that class
+     - You can run 10 containers from 1 image (like 10 objects from 1 class)
+
+  4. DOCKER DAEMON (dockerd)
+     - A background service running on your machine
+     - It does all the heavy lifting:
+         Builds images from Dockerfile
+         Runs containers
+         Manages networks and volumes
+         Talks to Docker Hub
+     - Listens for commands from the Docker client
+     - Runs as ROOT user (security concern - discussed later)
+
+  5. DOCKER CLIENT
+     - The command-line tool you type commands into
+     - Example: "docker run nginx"
+     - It sends your command to the Docker Daemon
+     - Daemon does the actual work
+
+     YOU TYPE COMMAND        DAEMON EXECUTES IT
+     [Docker Client] ------→ [Docker Daemon] ------→ [Container runs]
+
+  6. DOCKER REGISTRY
+     - A place to store and share Docker images
+     - Docker Hub: Public registry (like GitHub but for images)
+     - AWS ECR: Amazon's private registry
+     - GCR: Google Container Registry
+     - You can also run your own private registry
+
+  7. DOCKER DESKTOP
+     - A GUI application for Mac/Windows/Linux
+     - Includes Docker Daemon + Docker Client + Docker Compose
+     - Great for local development
+
+
+--------------------------------------------------------------------------------
+INSTALLING DOCKER (ON UBUNTU / AWS EC2)
+--------------------------------------------------------------------------------
+
+  Step 1: Update your package list
+    $ sudo apt update
+
+  Step 2: Install Docker
+    $ sudo apt install docker.io -y
+
+  Step 3: Start the Docker Daemon
+    $ sudo systemctl start docker
+
+  Step 4: Enable Docker to start on boot
+    $ sudo systemctl enable docker
+
+  Step 5: Check if Docker is running
+    $ sudo systemctl status docker
+    (Should show: Active: active (running))
+
+  Step 6: Verify installation
+    $ docker run hello-world
+
+  Step 7: Add your user to docker group (so you don't need sudo every time)
+    $ sudo usermod -aG docker ubuntu
+    (Replace "ubuntu" with your username)
+    (Then logout and login again for changes to take effect)
+
+  COMMON ERROR AND FIX:
+    Error: "Got permission denied while trying to connect to Docker daemon"
+    Fix 1: Run "sudo systemctl start docker"  ← Daemon not running
+    Fix 2: Run "sudo usermod -aG docker $USER" and re-login  ← No permission
+
+
+--------------------------------------------------------------------------------
+ESSENTIAL DOCKER COMMANDS
+--------------------------------------------------------------------------------
+
+  IMAGES:
+    docker images                     → List all images on your machine
+    docker pull ubuntu                → Download ubuntu image from Docker Hub
+    docker pull mysql:8.0             → Download specific version
+    docker rmi image-name             → Remove/delete an image
+    docker rmi image-name:tag         → Remove specific tagged image
+    docker image prune                → Remove all unused images
+
+  CONTAINERS:
+    docker run nginx                  → Run nginx image (downloads if not found)
+    docker run -d nginx               → Run in background (detached mode)
+    docker run -p 8080:80 nginx       → Map host port 8080 to container port 80
+    docker run --name myapp nginx     → Give container a custom name
+    docker run -it ubuntu bash        → Run interactively with bash shell
+    docker ps                         → List RUNNING containers
+    docker ps -a                      → List ALL containers (running + stopped)
+    docker stop container-id          → Stop a container gracefully (SIGTERM)
+    docker kill container-id          → Force stop a container (SIGKILL)
+    docker start container-id         → Start a stopped container
+    docker restart container-id       → Stop + Start a container
+    docker rm container-id            → Delete a stopped container
+    docker rm -f container-id         → Force delete even if running
+    docker logs container-id          → View container logs
+    docker logs -f container-id       → Follow/tail logs (like tail -f)
+    docker exec -it container-id bash → Open bash shell inside container
+    docker inspect container-id       → Detailed info about container
+
+  BUILD:
+    docker build -t my-app:v1 .       → Build image from Dockerfile in current dir
+    docker build -t my-app:v1 -f Dockerfile.prod .  → Use specific Dockerfile
+
+  PUSH & PULL:
+    docker login                      → Login to Docker Hub
+    docker push username/my-app:v1   → Push image to Docker Hub
+    docker pull username/my-app:v1   → Pull image from Docker Hub
+
+  SYSTEM:
+    docker system prune               → Remove all unused containers, images, networks
+    docker stats                      → Live resource usage of containers
+    docker top container-id           → Processes running inside container
+
+
+--------------------------------------------------------------------------------
+CONTAINER LIFECYCLE (ALL STATES A CONTAINER CAN BE IN)
+--------------------------------------------------------------------------------
+
+  1. CREATE  → Container is created but NOT running
+     $ docker create nginx
+     (Container exists but not started)
+
+  2. START   → Container starts running
+     $ docker start container-id
+
+  3. RUN     → Create + Start in one command (most commonly used)
+     $ docker run nginx
+
+  4. PAUSE   → Temporarily freeze the container (still running in memory)
+     $ docker pause container-id
+
+  5. UNPAUSE → Resume a paused container
+     $ docker unpause container-id
+
+  6. STOP    → Gracefully stop (sends SIGTERM, waits, then SIGKILL)
+     $ docker stop container-id
+
+  7. KILL    → Force stop immediately (sends SIGKILL)
+     $ docker kill container-id
+
+  8. RESTART → Stop then Start again
+     $ docker restart container-id
+
+  9. REMOVE  → Delete the container permanently
+     $ docker rm container-id
+
+  STATE FLOW:
+    [Created] → [Running] → [Paused] → [Running]
+                    ↓
+                [Stopped] → [Running] (via start)
+                    ↓
+                [Removed] (permanent)
+
+
+
+================================================================================
+CHAPTER 3 : DOCKERFILE - HOW TO BUILD YOUR OWN IMAGE
+================================================================================
+
+A Dockerfile is a text file with step-by-step instructions to build a Docker image. Docker reads it top to bottom and executes each instruction.
+
+REAL ANALOGY:
+  Dockerfile = A recipe card
+  Each instruction = One step in the recipe
+  Docker build = Actually cooking following the recipe
+  Docker image = The finished dish ready to serve
+
+--------------------------------------------------------------------------------
+DOCKERFILE INSTRUCTIONS EXPLAINED
+--------------------------------------------------------------------------------
+
+  FROM     - Start with a base image (always the first line)
+  WORKDIR  - Set the working directory inside the container
+  COPY     - Copy files from your machine into the container
+  ADD      - Like COPY but can also unzip and download from URLs
+  RUN      - Execute a command while BUILDING the image
+  CMD      - Default command to run when container STARTS
+  ENTRYPOINT - Similar to CMD but harder to override
+  EXPOSE   - Document which port the container will use (informational)
+  ENV      - Set environment variables
+  ARG      - Build-time variables (not available in running container)
+  VOLUME   - Create a mount point for persistent data
+  USER     - Set which user to run as (for security, avoid root)
+  LABEL    - Add metadata to image
+
+
+--------------------------------------------------------------------------------
+DOCKERFILE EXAMPLE 1: SIMPLE SPRING BOOT APP
+--------------------------------------------------------------------------------
+
+  Scenario:
+    You have a Spring Boot app.
+    You built it with Maven and got a JAR file: app.jar
+    You want to containerize it.
+
+  Your project structure:
+    my-spring-app/
+    ├── src/
+    ├── pom.xml
+    └── target/
+        └── app.jar
+
+  Dockerfile (simple, single-stage):
+  ─────────────────────────────────────────────────────────────
+  # Start with official Java 17 image (includes JDK)
+  FROM eclipse-temurin:17-jdk-alpine
+
+  # Set working directory inside container
+  WORKDIR /app
+
+  # Copy the built JAR from your machine into container
+  COPY target/app.jar app.jar
+
+  # Tell Docker this container will use port 8080
+  EXPOSE 8080
+
+  # Command to run when container starts
+  CMD ["java", "-jar", "app.jar"]
+  ─────────────────────────────────────────────────────────────
+
+  Build command:
+    $ docker build -t my-spring-app:v1 .
+
+  Run command:
+    $ docker run -d -p 8080:8080 --name spring-container my-spring-app:v1
+
+  Test it:
+    $ curl http://localhost:8080/api/hello
+    OR open browser: http://localhost:8080
+
+
+--------------------------------------------------------------------------------
+DOCKERFILE EXAMPLE 2: SPRING BOOT WITH ENVIRONMENT VARIABLES
+--------------------------------------------------------------------------------
+
+  Real-world apps need database connections, API keys etc.
+  NEVER hardcode secrets in Dockerfile. Use environment variables.
+
+  ─────────────────────────────────────────────────────────────
+  FROM eclipse-temurin:17-jdk-alpine
+
+  WORKDIR /app
+
+  COPY target/app.jar app.jar
+
+  # Set default values (can be overridden at runtime)
+  ENV SPRING_PROFILES_ACTIVE=prod
+  ENV SERVER_PORT=8080
+
+  EXPOSE 8080
+
+  CMD ["java", "-jar", "app.jar"]
+  ─────────────────────────────────────────────────────────────
+
+  Run with custom environment variables:
+    $ docker run -d \
+      -p 8080:8080 \
+      -e SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/mydb \
+      -e SPRING_DATASOURCE_USERNAME=root \
+      -e SPRING_DATASOURCE_PASSWORD=secret \
+      my-spring-app:v1
+
+  These env variables become available in your application.properties:
+    spring.datasource.url=${SPRING_DATASOURCE_URL}
+    spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+    spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+
+--------------------------------------------------------------------------------
+CMD vs ENTRYPOINT (COMMON INTERVIEW QUESTION)
+--------------------------------------------------------------------------------
+
+  CMD:
+    - Default command to run
+    - CAN be overridden when you run docker run
+    - Example: CMD ["java", "-jar", "app.jar"]
+    - Override: docker run my-image bash  (runs bash instead)
+
+  ENTRYPOINT:
+    - The main command that ALWAYS runs
+    - CANNOT be easily overridden
+    - Used when you want the container to behave like an executable
+
+  EXAMPLE:
+    ENTRYPOINT ["java", "-jar"]
+    CMD ["app.jar"]
+
+    Running: docker run my-image          → runs "java -jar app.jar"
+    Running: docker run my-image other.jar → runs "java -jar other.jar"
+    (CMD gets replaced but ENTRYPOINT stays)
+
+  SIMPLE RULE:
+    Use CMD for most cases.
+    Use ENTRYPOINT when your container IS the command (like a CLI tool).
+
+
+--------------------------------------------------------------------------------
+IMAGE LAYERS - HOW DOCKER CACHING WORKS
+--------------------------------------------------------------------------------
+
+  Every instruction in Dockerfile creates a NEW LAYER.
+  Docker CACHES each layer. If layer did not change, it reuses cache.
+  This makes rebuilds MUCH faster.
+
+  EXAMPLE:
+    ─────────────────────────────────────────────────────────────
+    FROM eclipse-temurin:17        ← Layer 1 (cached after first build)
+    WORKDIR /app                   ← Layer 2 (cached)
+    COPY pom.xml .                 ← Layer 3 (cached if pom.xml unchanged)
+    RUN mvn dependency:resolve     ← Layer 4 (cached if pom.xml unchanged)
+    COPY src ./src                 ← Layer 5 (changes when code changes)
+    RUN mvn package                ← Layer 6 (rebuilds when code changes)
+    CMD ["java", "-jar", "app.jar"]← Layer 7
+    ─────────────────────────────────────────────────────────────
+
+  SMART ORDERING RULE:
+    Put instructions that change LESS OFTEN at the TOP.
+    Put instructions that change MORE OFTEN at the BOTTOM.
+
+  BAD ORDER (every rebuild downloads all dependencies):
+    COPY . .           ← Code changes often → invalidates ALL layers below
+    RUN mvn install    ← Downloads dependencies again every time! Slow!
+
+  GOOD ORDER (dependencies cached, only changed code rebuilt):
+    COPY pom.xml .     ← pom.xml changes rarely
+    RUN mvn dependency:resolve  ← Cached! Only rerun if pom.xml changed
+    COPY src ./src     ← Code changes often, but only rebuilds from here
+    RUN mvn package    ← Only rerun when code changes
+
+
+
+================================================================================
+CHAPTER 4 : MULTI-STAGE DOCKER BUILDS
+================================================================================
+
+This is one of the most important concepts for backend engineers!
+
+THE PROBLEM WITH SIMPLE DOCKERFILE:
+  When you build a Spring Boot app inside Docker, you need:
+    - Maven (to compile)
+    - JDK (to compile)
+    - Source code
+    - All test dependencies
+    
+  But in PRODUCTION you only need:
+    - JRE (just to run, not compile)
+    - The final JAR file
+    
+  If you use a simple Dockerfile:
+    Image contains: Maven + JDK + Source + Tests + JAR = ~800 MB
+    Security risk: Maven, JDK source tools in production
+    Slow to pull and deploy
+
+
+THE SOLUTION: MULTI-STAGE BUILDS
+  Stage 1 (Build Stage):  Use Maven + JDK to build the JAR
+  Stage 2 (Run Stage):    Use only JRE + the JAR file
+  Everything from Stage 1 is THROWN AWAY
+  Only Stage 2 ends up in your final image
+
+
+--------------------------------------------------------------------------------
+SYNTAX OF MULTI-STAGE BUILD
+--------------------------------------------------------------------------------
+
+  FROM image-name AS stage-name
+  (You can have multiple FROM statements. Each starts a new stage.)
+
+  To copy from a previous stage:
+  COPY --from=stage-name /path/in/that/stage /path/in/current/stage
+
+
+--------------------------------------------------------------------------------
+SPRING BOOT MULTI-STAGE DOCKERFILE (MOST IMPORTANT EXAMPLE)
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────
+  # ========== STAGE 1: BUILD STAGE ==========
+  # Use Maven image which has Maven + JDK 17
+  FROM maven:3.9-eclipse-temurin-17 AS builder
+
+  # Set working directory
+  WORKDIR /app
+
+  # Copy pom.xml first (for caching trick)
+  COPY pom.xml .
+
+  # Download dependencies (cached if pom.xml didn't change)
+  RUN mvn dependency:resolve
+
+  # Now copy source code
+  COPY src ./src
+
+  # Build the JAR file (skip tests for speed, run tests separately in CI)
+  RUN mvn clean package -DskipTests
+
+
+  # ========== STAGE 2: RUNTIME STAGE ==========
+  # Use only JRE (not full JDK), Alpine = tiny Linux
+  FROM eclipse-temurin:17-jre-alpine
+
+  # Set working directory
+  WORKDIR /app
+
+  # Copy ONLY the JAR from the builder stage
+  # Maven puts JAR in /app/target/
+  COPY --from=builder /app/target/*.jar app.jar
+
+  # Run as non-root user (security best practice)
+  RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+  USER appuser
+
+  # Expose port
+  EXPOSE 8080
+
+  # Run the app
+  CMD ["java", "-jar", "app.jar"]
+  ─────────────────────────────────────────────────────────────
+
+  Build it:
+    $ docker build -t my-spring-app:v1 .
+
+  Check image size:
+    $ docker images
+    (You will see: ~200-250 MB instead of ~800 MB!)
+
+  Run it:
+    $ docker run -d -p 8080:8080 my-spring-app:v1
+
+
+--------------------------------------------------------------------------------
+WHAT HAPPENS INTERNALLY (STEP BY STEP)
+--------------------------------------------------------------------------------
+
+  1. Docker reads Dockerfile from top to bottom
+  2. Stage 1 starts: Downloads maven:3.9-eclipse-temurin-17 image
+  3. Copies pom.xml and downloads dependencies
+  4. Copies src/ and builds JAR with Maven
+  5. JAR file created at /app/target/app.jar
+  6. Stage 2 starts: Downloads eclipse-temurin:17-jre-alpine image
+  7. Copies ONLY the JAR from Stage 1 (/app/target/*.jar)
+  8. Stage 1 image is COMPLETELY DISCARDED (not in final image)
+  9. Final image = JRE Alpine + your JAR only
+  10. Result: Small, secure, production-ready image
+
+
+--------------------------------------------------------------------------------
+SIZE COMPARISON
+--------------------------------------------------------------------------------
+
+  WITHOUT multi-stage (simple Dockerfile with Maven + JDK):
+    Image size: ~700-900 MB
+    Contains: Maven, JDK, source code, test dependencies
+
+  WITH multi-stage (JRE only + JAR):
+    Image size: ~180-250 MB
+    Contains: JRE, your JAR file only
+
+  Savings: ~600 MB less per image!
+  If you run 100 containers → saves 60 GB of disk space!
+
+
+--------------------------------------------------------------------------------
+MULTI-STAGE: COMPARISON TABLE
+--------------------------------------------------------------------------------
+
+  +--------------------+------------------+--------------------+
+  | Feature            | Single Stage     | Multi-Stage        |
+  +--------------------+------------------+--------------------+
+  | Image size         | Large (700+ MB)  | Small (200 MB)     |
+  | Security           | Poor (many tools)| High (minimal)     |
+  | Build tools inside | Yes              | No                 |
+  | Source code inside | Yes              | No                 |
+  | Production ready   | No               | Yes                |
+  | Best practice      | No               | YES                |
+  +--------------------+------------------+--------------------+
+
+
+
+================================================================================
+CHAPTER 5 : DISTROLESS IMAGES (ADVANCED SECURITY)
+================================================================================
+
+You learned multi-stage builds cut down image size.
+Now let us go one step further: Distroless images.
+
+WHAT IS DISTROLESS?
+  Even a small Alpine Linux image has:
+    - A shell (sh)
+    - Basic utilities (ls, cp, ps)
+    - Package manager (apk)
+
+  Distroless images have NONE of that.
+  They contain ONLY:
+    - Your application
+    - The runtime it needs (JRE, Node, Python)
+    - Required system libraries
+    - CA certificates
+
+  NOTHING ELSE. No shell. No tools. No package manager.
+
+  Made by Google. Used at Google scale in production.
+
+
+--------------------------------------------------------------------------------
+WHY IS NO SHELL A BIG DEAL? (SECURITY)
+--------------------------------------------------------------------------------
+
+  Normal scenario when an attacker compromises your container:
+    - Attacker gets inside
+    - Opens bash shell: "bash -i"
+    - Runs commands: ls, cat, curl, wget
+    - Downloads malware, steals data, pivots to other containers
+
+  With distroless:
+    - Attacker gets inside
+    - Tries to open shell → ERROR: /bin/sh not found
+    - Cannot run any commands
+    - Cannot download anything
+    - Damage is SEVERELY limited
+
+  This is the "principle of least privilege" - give only what is needed.
+
+
+--------------------------------------------------------------------------------
+DISTROLESS vs ALPINE vs UBUNTU
+--------------------------------------------------------------------------------
+
+  +------------------+--------+--------+---------------+
+  | Feature          | Ubuntu | Alpine | Distroless    |
+  +------------------+--------+--------+---------------+
+  | OS present       | Yes    | Yes    | No            |
+  | Shell (bash/sh)  | Yes    | Yes    | No            |
+  | Package manager  | Yes    | Yes    | No            |
+  | Image size       | ~70MB  | ~5MB   | ~2-15 MB      |
+  | Security         | Medium | Better | Best          |
+  | Can exec into it | Yes    | Yes    | No            |
+  | Production ready | No     | Maybe  | YES           |
+  +------------------+--------+--------+---------------+
+
+
+--------------------------------------------------------------------------------
+AVAILABLE DISTROLESS IMAGES
+--------------------------------------------------------------------------------
+
+  For Java:   gcr.io/distroless/java17-debian12
+  For Node:   gcr.io/distroless/nodejs20-debian12
+  For Python: gcr.io/distroless/python3-debian12
+  For Static: gcr.io/distroless/static-debian12  (Go apps)
+  For Base:   gcr.io/distroless/base-debian12
+
+
+--------------------------------------------------------------------------------
+SPRING BOOT WITH DISTROLESS (BEST PRACTICE DOCKERFILE)
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────
+  # ========== STAGE 1: BUILD ==========
+  FROM maven:3.9-eclipse-temurin-17 AS builder
+
+  WORKDIR /app
+  COPY pom.xml .
+  RUN mvn dependency:resolve
+  COPY src ./src
+  RUN mvn clean package -DskipTests
+
+
+  # ========== STAGE 2: DISTROLESS RUNTIME ==========
+  FROM gcr.io/distroless/java17-debian12
 
-❌ Problem 6️⃣─────────▶ Dev/Prod Inconsistency
-➤ Developers run different OS versions or dependencies ─────────▶ deployment failures.
-
-
-🔄 How Containers Solve Those Problems
-1️⃣ Lightweight (No Guest OS)
-✔️ Containers share the host OS kernel ─────────▶ only app + its libraries are packaged.
-✔️ Much smaller than VMs (MBs instead of GBs).
-
-2️⃣ Fast Startup
-✔️ Containers start in seconds (no OS booting).
-
-3️⃣ Easy Scaling
-✔️ Spin up multiple containers instantly ─────────▶ perfect for microservices + Kubernetes.
-
-4️⃣ Better Resource Utilization
-More containers on same hardware vs VMs ─────────▶ cheaper infrastructure.
-
-5️⃣ Portability
-Same container image runs on:
-  ✔️Dev laptop
-  ✔️Test server
-  ✔️Production
-  ✔️Cloud
-
-6️⃣ Consistent Environments
-✔️ Application + dependencies packaged together ─────────▶ no configuration drift.
-
- 
-🔄 Containers 🆚 VMs
-| Feature      | Containers           | Virtual Machines              |
-| ------------ | -------------------- | ----------------------------- |
-| OS           | Share host OS kernel | Each has its own guest OS     |
-| Startup time | Seconds              | Minutes                       |
-| Size         | MBs                  | GBs                           |
-| Isolation    | Process-level        | Full OS-level                 |
-| Performance  | Near-native          | Some overhead                 |
-| Scaling      | Very fast            | Slow                          |
-| Use case     | Microservices, CI/CD | Strong isolation, legacy apps |
-
-
-🔄 Drawbacks of Containers & How to Overcome Them
-❌  Weaker Security (Shared Kernel)
-➤ If kernel is compromised ─────────▶ all containers are at risk.
-✅ Solution
-➤ Use VM isolation for untrusted workloads.
-➤ Use Kubernetes Pod Security Policies, AppArmor, SELinux.
-➤ Regular kernel patching.
-
-
-❌ Limited Isolation Compared to VMs
-➤ Containers share the same OS kernel.
-✅ Solution
-➤ Use sandboxed containers (gVisor, Kata Containers).
-➤ Use hardened distros (Bottlerocket, Flatcar).
-
-
-❌ Complex Networking
-➤ Container networking (bridge, overlay, CNI plugins) is harder than VM networks.
-✅ Solution
-➤ Use Kubernetes CNI (Calico, Flannel) for easier management.
-
-
-❌ Persistent Storage Challenges
-➤ Containers are ephemeral; data disappears on deletion.
-✅ Solution:
-➤ Use volumes: Docker volumes, Kubernetes PersistentVolumes.
-
-
-❌ Image Bloat
-➤ Large base images ─────────▶ slow builds and pulls.
-✅ Solution
-➤ Use slim images (alpine, debian-slim).
-➤ Multi-stage Docker builds.
-
-
-🔄 Architecture of Containers
-Container architecture consists of:
-1️⃣ User Layer
-✔️ Applications
-✔️ Libraries
-✔️ Dependencies
-✔️ Environment variables
-
-
-2️⃣ Container Image Layer
-➤ Immutable filesystem created by layering: base image ─────────▶ runtime ─────────▶ dependencies ─────────▶ source code
-➤ Stored in a registry (Docker Hub, ECR, GCR)
-
-
-3️⃣ Runtime Layer
-Two main components:
-1️⃣ High-level runtime (Docker, containerd)
-2️⃣ Low-level runtime (runc) — responsible for creating the container’s namespaces & cgroups
-
-
-4️⃣ OS Layer
-Kernel features used:
-✔️ Namespaces ─────────▶ isolation
-✔️ cgroups ─────────▶ resource limits
-✔️ UnionFS ─────────▶ layered filesystem
-
-
-5️⃣ Host Layer
-Host OS + hardware resources
-
-
-🔄 Features of Containers
-1️⃣ Isolation ─────────▶ Each container runs independently.
-2️⃣ Portability ─────────▶ Runs anywhere (Linux, Windows, Cloud, Kubernetes).
-3️⃣ Lightweight ─────────▶ No OS included ➡ fast and small.
-4️⃣ Scalability ─────────▶ Scale up/down quickly.
-5️⃣ Immutability ─────────▶ Images are read-only; changes create new layers.
-6️⃣ Consistency ─────────▶ Same environment across all stages.
-7️⃣ Resource Efficiency ─────────▶ More apps per host vs VMs.
-8️⃣ Fast Deployment ─────────▶ Containers spin up in seconds.
-9️⃣ Loose Coupling ─────────▶ Perfect for microservices architecture.
-
-
-🔄 Lifecycle of Containers
-1️⃣ Create ─────────▶ Container is defined but not running.
-🔗 docker create image-name
-
-2️⃣ Start ─────────▶ Container starts execution.
-🔗 docker start container-id
-
-3️⃣ Run ─────────▶ Equivalent to create + start.
-🔗 docker run image-name
-
-4️⃣ Pause ─────────▶ Temporarily pause execution.
-🔗 docker pause container-id
-
-5️⃣ Resume / Unpause
-🔗 docker unpause container-id
-
-6️⃣ Stop ─────────▶ Gracefully stops the container (SIGTERM).
-🔗 docker stop container-id
-
-7️⃣ Kill ─────────▶ Force stop (SIGKILL).
-🔗 docker kill container-id
-
-8️⃣ Restart ─────────▶ Stop + start.
-🔗 docker restart container-id
-
-9️⃣ Remove ─────────▶ Deletes the container.
-🔗 docker rm container-id
-
-
-🔄 Files and Folders in containers base images
-1️⃣ /bin ➡ contains binary executable files, such as the ls, cp, and ps commands.
-2️⃣ /sbin ➡ contains system binary executable files, such as the init and shutdown commands.
-3️⃣ /etc ➡ contains configuration files for various system services.
-4️⃣ /lib ➡ contains library files that are used by the binary executables.
-5️⃣ /usr ➡ contains user-related files and utilities, such as applications, libraries, and documentation.
-6️⃣ /var ➡ contains variable data, such as log files, spool files, and temporary files.
-7️⃣ /root ➡ is the home directory of the root user.
-
-
-🔄 Files and Folders that containers use from host operating system
-1️⃣ The host's file system ─────────▶ Docker containers can access the host file system using bind mounts, which allow the container to read and write files in the host file system.
-
-2️⃣ The host's Networking stack ─────────▶ The host's networking stack is used to provide network connectivity to the container. Docker containers can be connected to the host's network directly or through a virtual network.
-
-3️⃣ The host's System calls ─────────▶ The host's kernel handles system calls from the container, which is how the container accesses the host's resources, such as CPU, memory, and I/O.
-
-4️⃣ Namespaces ─────────▶ Docker containers use Linux namespaces to create isolated environments for the container's processes. Namespaces provide isolation for resources such as the file system, process ID, and network.
-
-5️⃣ Control groups (cgroups) ─────────▶ Docker containers use cgroups to limit and control the amount of resources, such as CPU, memory, and I/O, that a container can access.
-
-
-###########
-🔷 Docker
-###########
-Docker is a containerization platform that provides easy way to containerize your applications, which means, using Docker you can build container images, run the images to create containers and also push these containers to container regestries such as DockerHub, Quay.io and so on.
-
-Containerization is a concept or technology and Docker Implements Containerization.
-
-
-🔄 Docker LifeCycle
-There are three important things:
-1️⃣ docker build ➡ builds docker images from Dockerfile
-2️⃣ docker run ➡ runs container from docker images
-3️⃣ docker push ➡ push the container image to public/private registries to share the docker images.
-
-
-🔄 Understanding the terminology
-1️⃣ Docker daemon
-➤ It is a background service that actually builds, runs, and manages containers on your machine.
-➤ The Docker daemon (dockerd) listens for Docker API requests and manages Docker objects such as images, containers, networks, and volumes.
-➤ A daemon can also communicate with other daemons to manage Docker services.
-
-🔁 Core Responsibilities of Docker Daemon
-📦 Pull images from Docker Hub / private registry
-🏗️ Build images from Dockerfile
-▶️ Run containers
-🧠 Manage container lifecycle
-🗄️ Manage volumes
-🌐 Manage Docker networks
-🧹 Clean up unused resources
-
-
-2️⃣ Docker client
-➤ The Docker client(docker) is the primary way that many Docker users interact with Docker.
-➤ When you use commands such as docker run, the client sends these commands to dockerd, which carries them out.
-➤ The docker command uses the Docker API. The Docker client can communicate with more than one daemon.
-
-
-3️⃣ Docker Desktop
-➤ Docker Desktop is an easy-to-install application for your Mac, Windows or Linux environment that enables you to build and share containerized applications and microservices.
-➤ Docker Desktop includes the Docker daemon (dockerd), the Docker client (docker), Docker Compose, Docker Content Trust, Kubernetes, and Credential Helper.
-
-
-4️⃣ Docker registries
-➤ A Docker registry stores Docker images.
-➤ Docker Hub is a public registry that anyone can use, and Docker is configured to look for images on Docker Hub by default.
-➤ You can even run your own private registry.
-➤ When you use the docker pull or docker run commands, the required images are pulled from your configured registry.
-➤ When you use the docker push command, your image is pushed to your configured registry.
-➤ When you use Docker, you are creating and using images, containers, networks, volumes, plugins, and other objects.
-
-
-5️⃣ Dockerfile
-Dockerfile is a file where you provide the steps to build your Docker Image.
-
-
-6️⃣ Images
-➤ An image is a read-only template with instructions for creating a Docker container.
-➤ Often, an image is based on another image, with some additional customization.
-✅ For example, you may build an image which is based on the ubuntu image, but installs the Apache web server and your application, as well as the configuration details needed to make your application run.
-
-➤ You might create your own images or you might only use those created by others and published in a registry.
-➤ To build your own image, you create a Dockerfile with a simple syntax for defining the steps needed to create the image and run it.
-➤ Each instruction in a Dockerfile creates a layer in the image.
-➤ When you change the Dockerfile and rebuild the image, only those layers which have changed are rebuilt.
-➤ This is part of what makes images so lightweight, small, and fast, when compared to other virtualization technologies.
-
-
-🔄 INSTALL DOCKER
-A very detailed instructions to install Docker are provide in this link
-🔗 https://docs.docker.com/get-docker/
-
-For Demo,
-1️⃣ You can create an Ubuntu EC2 Instance on AWS and run the below commands to install docker.
-🔗 sudo apt update
-🔗 sudo apt install docker.io -y
-
-
-2️⃣ Start Docker and Grant Access
-A very common mistake that many beginners do is, After they install docker using the sudo access, they miss the step to Start the Docker daemon and grant acess to the user they want to use to interact with docker and run docker commands.
-
-
-3️⃣ Always ensure the docker daemon is up and running.
-A easy way to verify your Docker installation is by running the below command
-🔗 docker run hello-world
-
-👉 If the output says:
-docker: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/create": dial unix /var/run/docker.sock: connect: permission denied.
-See 'docker run --help'.
-
-This can mean two things,
-1️⃣ Docker deamon is not running.
-2️⃣ Your user does not have access to run docker commands.
-
-
-4️⃣ Start Docker daemon
-You use the below command to verify if the docker daemon is actually started and Active
-🔗 sudo systemctl status docker
-
-5️⃣ If you notice that the docker daemon is not running, you can start the daemon using the below command
-🔗 sudo systemctl start docker
-
-
-6️⃣ Grant Access to your user to run docker commands
-➤ To grant access to your user to run the docker command, you should add the user to the Docker Linux group.
-➤ Docker group is create by default when docker is installed.
-🔗 sudo usermod -aG docker ubuntu
-
-👉 In the above command ubuntu is the name of the user, you can change the username appropriately.
-⚡ NOTE: : You need to logout and login back for the changes to be reflected.
-
-Docker is Installed, up and running 🥳🥳
-Use the same command again, to verify that docker is up and running.
-
-🔗 docker run hello-world
-✅ Output should look like:
-....
-....
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-...
-...
-
-
-#############################
-🔷 Multi-Stage Docker Build
-#############################
-Multi-stage Docker build allows you to use multiple temporary images during the build process and copy only the required final artifacts into a small, clean production image.
-
-👉 In short:
-➤ Build in one image
-➤ Run in another image
-➤ Discard everything else
-
-
-🔄 Why Multi-Stage Build Was Introduced (The Problem)
-❌ Old (Single-Stage Dockerfile) Problem
-Earlier, Dockerfiles looked like this:
-FROM node:18
-
-WORKDIR /app
-COPY . .
-RUN npm install
-RUN npm run build
-
-CMD ["npm", "start"]
-
-❗ Issues with this approach:
-➤ Image contains:
-  ✔️ Node.js
-  ✔️ npm
-  ✔️ source code
-  ✔️ build tools
-  ✔️ dev dependencies
-➤ Image size becomes very large (300–800MB)
-➤ Security risk (extra tools inside production container)
-➤ Slow deployment
-
-
-🔄 Core Idea of Multi-Stage Build
-Use different images for different stages of the build.
-| Stage         | Purpose                   |
-| ------------- | ------------------------- |
-| Build stage   | Compile / build code      |
-| Runtime stage | Only run the final output |
-👉 Only the final stage image is shipped 🚀
-
-
-🔗  Basic Syntax of Multi-Stage Dockerfile
-FROM image AS stage-name
-👉 You can have multiple FROM statements in one Dockerfile.
-
-
-✅ Example (Node.js App)
-📁 Project Structure
-.
-├── package.json
-├── src/
-└── Dockerfile
-
-
-🔗 Multi-Stage Dockerfile
-# ---------- Stage 1️⃣: Build ----------
-FROM node:18 AS builder
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-
-# ---------- Stage 2️⃣: Production ----------
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
-
-RUN npm install --only=production
-
-CMD ["node", "dist/index.js"]
-
-
-🔄 Internal Working
-1️⃣ Docker starts Stage 1 (builder)
-2️⃣ Installs dependencies
-3️⃣ Builds the project
-4️⃣ Output goes to /app/dist
-5️⃣ Docker starts Stage 2
-6️⃣ Copies only /app/dist from Stage 1
-7️⃣ Stage 1 image is discarded
-8️⃣ Final image contains:
-  ✔️ compiled files
-  ✔️ minimal runtime
-👉 Intermediate images are NOT shipped
-
-
-🔄 COPY --from
-COPY --from=builder /app/dist ./dist
-👉 Means:
-➤ Copy files from another stage
-➤ Not from local filesystem
-➤ Stage name acts like a virtual image
-
-✅ Real-World Example: React App + Nginx
-🎯 Goal
-➤ Build React app
-➤ Serve via Nginx
-➤ No Node.js in production
-
-🔗 Dockerfile
-# ---------- Stage 1️⃣: Build ----------
-FROM node:18 AS builder
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-
-# ---------- Stage 2️⃣: Nginx ----------
-FROM nginx:alpine
-
-COPY --from=builder /app/build /usr/share/nginx/html
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-
-👉 Final image:
-➤ No Node.js
-➤ Only static files + Nginx
-➤ Very small (~25MB)
-
-
-🔄Multi-Stage 🆚 Single-Stage
-| Feature            | Single Stage | Multi-Stage |
-| ------------------ | ------------ | ----------- |
-| Image size         | Large        | Very small  |
-| Security           | Poor         | High        |
-| Build tools inside | Yes          | No          |
-| Production ready   | ❌           | ✅         |
-| Best practice      | ❌           | ✅         |
-
-
-🔐 Security Advantages
-➤ No compilers
-➤ No package managers
-➤ No source code
-➤ Reduced attack surface
-➤ Follows principle of least privilege
-⚡ “Multi-stage builds significantly reduce the attack surface of production containers.”
-
-
-🔄 Performance Benefits
-➤ Faster pull time
-➤ Faster container startup
-➤ Less disk usage
-➤ Faster CI/CD pipelines
-
-
-✅ Multi-Stage Build with Java
-Spring Boot Example
-# ---------- Stage 1️⃣: Build ----------
-FROM maven:3.9-eclipse-temurin-17 AS builder
-
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-
-# ---------- Stage 2️⃣: Runtime ----------
-FROM eclipse-temurin:17-jre-alpine
-
-WORKDIR /app
-COPY --from=builder /app/target/app.jar app.jar
-
-CMD ["java", "-jar", "app.jar"]
-👉 Maven is not included in final image.
-
-
-❓ Can multiple stages use different base images?
-✅ Yes (Node, Nginx, JRE, Alpine, etc.)
-
-❓ Are intermediate images stored?
-❌ No (unless you tag them manually)
-
-❓ Does multi-stage increase build time?
-❌ Slightly during build
-✅ But saves time in runtime and deployment
-
-❓ Can we copy between stages?
-✅ Yes using COPY --from=stage
-
-
-🔄 Best Practices
-➤ Use small base images (alpine)
-➤ Separate build and runtime
-➤ Name stages clearly (builder, runtime)
-➤ Copy only required artifacts
-➤ Avoid copying .env or secrets
-
-
-❌ When NOT to Use Multi-Stage?
-➤ Very small scripts
-➤ One-file utilities
-➤ Quick local testing
-👉 In production ─────────▶ Always use multi-stage
-
-
-#################################
-🔷 Distroless Container Images
-#################################
-Distroless container images are Docker/container images that contain only the application and its runtime dependencies, and nothing else.
-➤ No OS package manager
-➤ No shell (bash/sh)
-➤ No utilities like ls, curl, ps
-➤ No unnecessary libraries
-➡️ Distroless images remove everything except what is required to run the app.”
-
-
-❓ Why are they called “Distroless”?
-🔗 Traditional images:
-Ubuntu / Debian / Alpine
-+ Shell
-+ Coreutils
-+ Package manager
-+ Debug tools
-+ App
-
-
-🔗 Distroless images:
-Only App + Runtime (JRE / Node / Python / libc)
-➡️ There is no Linux distribution inside, so the image is called “distroless”.
-👉 Distroless was Developed by Google
-👉 Used internally at Google Cloud
-👉 Open-sourced for production workloads
-
-
-🔄 Goal of Distroless Images ─────────▶ Reduce attack surface + increase security + reduce image size
-
-
-🚫 Problems with Traditional Container Images
-❌ 1️⃣ Large Image Size
-➤ Ubuntu image ~70MB
-➤ Debian ~120MB
-➤ Includes tools not required in production
-
-❌ 2️⃣ Security Vulnerabilities
-➤ Shells + utilities = more CVEs
-➤ Hackers can exploit bash, curl, apt, etc.
-
-❌ 3️⃣ Containers Used as Mini VMs
-➤ Devs SSH into containers (bad practice)
-➤ Containers should be immutable
-
-
-🔄 Distroless Solves These Problems
-| Problem        | Distroless Solution             |
-| -------------- | ------------------------------- |
-| Large size     | Only runtime libraries included |
-| Security risk  | No shell, no package manager    |
-| Debug misuse   | Forces proper observability     |
-| Faster startup | Less filesystem to scan         |
-
-
-🔄 Distroless Images Contain
-Depending on runtime:
-1️⃣ Java Distroless
-  ✔️ JVM
-  ✔️ Required libc
-  ✔️ CA certificates
-  ✔️ Your .jar
-
-2️⃣ Node.js Distroless
-  ✔️ Node runtime
-  ✔️ Required shared libraries
-  ✔️ Your JS app
-
-3️⃣ Python Distroless
-  ✔️ Python interpreter
-  ✔️ Required libraries
-  ✔️ Your app
-
-
-🔄 Distroless Images DO NOT Contain
-❌ /bin/bash
-❌ /bin/sh
-❌ apt, apk, yum
-❌ curl, wget
-❌ ps, top, netstat
-👉 This is intentional.
-
-
-🔄 Why No Shell is a BIG DEAL
-1️⃣ Security Impact:
-➤ Attacker cannot run commands inside container
-➤ Even if container is compromised ─────────▶ limited damage
-
-2️⃣ Operational Impact:
-➤ Cannot docker exec -it bash
-➤ Must rely on:
-  ✔️ Logs
-  ✔️ Metrics
-  ✔️ Tracing
-👉 Encourages cloud-native best practices
-
-
-🔄 Distroless 🆚 Alpine 🆚 Ubuntu
-| Feature          | Ubuntu | Alpine | Distroless    |
-| ---------------- | ------ | ------ | ------------  |
-| OS present       | Yes    | Yes    | ❌ No         |
-| Shell            | Yes    | Yes    | ❌ No         |
-| Package manager  | Yes    | Yes    | ❌ No         |
-| Image size       | Large  | Small  | Smallest      |
-| Security         | Medium | Better | Best          |
-| Debugging        | Easy   | Easy   | Hard          |
-| Production ready | ❌     | ⚠️    | ✅            |
-
-
-🔄 Distroless is for Production, not Development
-❌ Bad Use Case
-➤ Local debugging
-➤ Running scripts interactively
-➤ Installing packages dynamically
-
-✅ Good Use Case
-➤ Microservices
-➤ Kubernetes workloads
-➤ Cloud-native apps
-➤ CI/CD final stage images
-
-👉 Distroless is almost always used with multi-stage builds.
-
-
-🔄 How Distroless Containers Run Without a Shell
-❌ Instead of:
-🔗 CMD java -jar app.jar
-
-✅ They use exec form:
-🔗 CMD ["java", "-jar", "app.jar"]
-👉 Shell form (CMD java -jar) requires /bin/sh ─────────▶ not available
-
-
-🔄 Logging in Distroless Containers
-➤ Logs go to stdout / stderr
-➤ Docker / Kubernetes captures logs
-➤ Use:
-  ✔️ kubectl logs
-  ✔️ ELK / Loki / Cloud Logging
-
-
-🔄 Debugging Distroless Containers (Interview Trap)
-❌ You cannot exec into them
-✅ Proper debugging methods:
-✔️ Application logs
-✔️ Metrics (Prometheus)
-✔️ Tracing (Jaeger)
-✔️ Sidecar containers
-✔️ Temporary debug image
-
-
-🔄 Distroless & Kubernetes (Real World)
-➤ Preferred for:
-  ✔️ Backend services
-  ✔️ APIs
-  ✔️ Event consumers
-
-➤ Used by:
-  ✔️ Google
-  ✔️ Large SaaS companies
-
-➤ Works best with:
-  ✔️ Read-only root filesystem
-  ✔️ Non-root users
-
-✅ Distroless Images Examples
-| Runtime | Image                                 |
-| ------- | ------------------------------------- |
-| Java    | `gcr.io/distroless/java17-debian12`   |
-| Node    | `gcr.io/distroless/nodejs20-debian12` |
-| Python  | `gcr.io/distroless/python3-debian12`  |
-| Base    | `gcr.io/distroless/base-debian12`     |
-
-
-🌟 Common Questions
-❓ Why are distroless images more secure?
-Answer ─────────▶ Because they remove shell, package managers, and unnecessary binaries, which significantly reduces the attack surface and vulnerability exposure.
-
-❓ Can you SSH into a distroless container?
-Answer ─────────▶ No. Distroless containers do not contain a shell or SSH server.
-
-❓ How do you debug a distroless container?
-Answer ─────────▶ By using logs, metrics, distributed tracing, or attaching a temporary debug container.
-
-❓ Why not use Alpine instead?
-Answer ─────────▶ Alpine still contains a shell and package manager, whereas distroless removes everything unnecessary, making it more secure for production.
-
-❓ Is distroless suitable for development?
-Answer ─────────▶ No. It is designed for production workloads only.
-
-
-#################################
-🔷 Persistent Storage in Docker
-#################################
-🔄 Why Do We Need Persistent Storage in Docker?
-❗ Problem:
-➤ Containers are ephemeral
-➤ When a container stops or is deleted:
-    ✔️ All data inside it is lost
-
-✅ Example:
-Container ─────────▶ writes data ─────────▶ container deleted ─────────▶ data gone ❌
-
-👉 But real applications need:
-➤ Database data
-➤ Logs
-➤ Uploaded files
-➤ Cache
-👉 This is where persistent storage comes in.
-
-🔄 Persistent Storage in Docker
-➤ Data lives outside the container lifecycle
-
-➤ Docker provides two main mechanisms:
-1️⃣ Bind Mounts
-2️⃣ Volumes
-
-
-#################
-🔷 Bind Mounts
-#################
-A bind mount maps a specific directory/file on the host machine directly into a container.
-Host Path  ─────────▶  Container Path
-
-✅ Example (Bind Mount)
-🔗 docker run -v /home/user/data:/app/data nginx
-➤ /home/user/data ─────────▶ host directory
-➤ /app/data ─────────▶ container directory
-
-Any change in:
-➤ Host ─────────▶ visible in container
-➤ Container ─────────▶ visible on host
-
-🔄 Characteristics of Bind Mounts
-| Property          | Bind Mount  |
-| ----------------- | ----------- |
-| Host-dependent    | ✅ Yes      |
-| Managed by Docker | ❌ No       |
-| Performance       | High        |
-| Portability       | ❌ Low      |
-| Security          | Risky       |
-| Use case          | Development |
-
-🔄 When to Use Bind Mounts❓ 
-✅ Local development
-✅ Live code reload
-✅ Debugging
-✅ Editing files from IDE
-
-🔄 Bind Mount Internals
-➤ Docker does not manage the data
-➤ Docker just creates a filesystem link
-➤ If the host path is deleted ─────────▶ data lost
-
-🔄 Problems with Bind Mounts
-❌ Not portable (path differs per machine)
-❌ Host filesystem exposure
-❌ Permission issues
-❌ Harder to secure
-
-
-####################
-🔷 Docker Volumes
-####################
-A Docker volume is a directory managed by Docker, stored in Docker’s own storage area.
-
-📁 Location (Linux):
-🔗 /var/lib/docker/volumes/
-
-✅ Example (Volume)
-🔗 docker volume create myvolume
-🔗 docker run -v myvolume:/app/data nginx
-
-🔗 docker volume inspect myvolume ─────────▶ gives the detail about a particular volume
-🔗 docker volume ls ─────────▶ lists all the volumes created in docker
-🔗 docker volume rm myvolume1 myvolume2 ─────────▶ removes a particular/group of volumes
-🔗 docker run -d --mount source=myvolume, target = /app docker-volume
-🔗 docker ps ─────────▶ to check the running containers
-🔗  docker inspect <container_id> ─────────▶ to check the volume attached to the particular container
-
-
-Docker decides:
-➤ Where data is stored
-➤ How it’s managed
-
-🔄 Characteristics of Docker Volumes
-| Property         | Volume     |
-| ---------------- | ---------- |
-| Docker-managed   | ✅ Yes     |
-| Host-independent | ✅ Yes     |
-| Portable         | ✅ Yes     |
-| Secure           | ✅ Safer   |
-| Backup           | Easy       |
-| Use case         | Production |
-
-
-🔄 Volume Internals
-➤ Stored outside container filesystem
-➤ Survive:
-  ✔️ Container stop
-  ✔️ Container delete
-➤ Can be shared across containers
-
-🔄 Volume Lifecycle
-Create ─────────▶ Attach ─────────▶ Use ─────────▶ Detach ─────────▶ Still Exists
-👉 Volume exists until explicitly deleted.
-
-🔄 Volumes vs Bind Mounts 
-| Feature           | Volumes    | Bind Mounts |
-| ----------------- | ---------- | ----------- |
-| Managed by Docker | ✅ Yes     | ❌ No      |
-| Host path needed  | ❌ No      | ✅ Yes     |
-| Portable          | ✅ Yes     | ❌ No      |
-| Security          | High       | Medium      |
-| Backup & restore  | Easy       | Manual      |
-| Cross-platform    | ✅         | ❌         |
-| Best for          | Production | Development |
-
-🔄 Anonymous Volumes
-🔗 docker run -v /app/data nginx
-
-➤ Docker creates a volume automatically
-➤ No name
-➤ Hard to manage
-➤ Often causes disk leaks
-👉 Avoid in production
-
-🔄 Real-World Examples
-✅ Database (MySQL)
-🔗 docker volume create mysql_data
-
-🔗 docker run -d \
-  -v mysql_data:/var/lib/mysql \
-  mysql
-
-✔️ Data survives container restart
-✔️ Easy backup
-
-🔄 Development (Bind Mount)
-🔗 docker run -v $(pwd):/app node
-
-✔️ Code changes reflect instantly
-✔️ IDE friendly
-
-
-⚡ Best Practices
-✅ Use volumes for databases
-✅ Use bind mounts for dev code
-❌ Don’t store state inside container
-❌ Avoid anonymous volumes
-✅ Backup volumes regularly
-
-🔄 Common Traps
-❌ Saying bind mounts are better than volumes
-❌ Using volumes for live code editing
-❌ Forgetting volume cleanup
-❌ Mixing production & dev storage strategy
-
-
-######################
-🔷 Docker Networking
-######################
-🔄 Why Networking Is Needed in Containers
-➤ Containers run in isolated environments
-
-➤ Each container has:
-  ✔️ Its own network namespace
-  ✔️ Its own IP address
-
-➤ Without Docker networking:
-  ✔️ Containers cannot talk to host
-  ✔️ Containers cannot talk to each other
-👉 Docker networking connects these isolated namespaces in a controlled way.
-
-
-🔄 Containers Communicate with the Host
-Case 1️⃣: Using Port Mapping
-✅ Example:
-🔗 docker run -p 8080:80 nginx
-
-👉 What happens internally:
-Browser ─────────▶ Host:8080 ─────────▶ Docker NAT ─────────▶ Container:80
-⚡ 8080 ─────────▶ Host port
-⚡ 80 ─────────▶ Container port
-⚡ Docker uses iptables + NAT
-
-➤ Container cannot directly access host services
-➤ Host exposes services via ports
-
-
-Case 2️⃣: Using Host IP (172.x.x.x)
-Docker bridge network creates a virtual gateway:
-
-🔗 docker0 ─────────▶ 172.17.0.1 (host)
-🔗 Container ─────────▶ Host via: 172.17.0.1
-
-
-Case 3️⃣: Host Network Mode
-🔗 docker run --network host nginx
-
-➤ Container uses host’s network stack
-➤ No isolation
-➤ Same IP as host
-❌ Not recommended for security
-
-
-🔄 Containers Communicate With Each Other
-🌟 Default: Bridge Network
-✅ Example:
-🔗 docker network create mybridge
-
-🔗 docker run -d --name app1 --network mybridge nginx
-🔗 docker run -d --name app2 --network mybridge nginx
-
-👉 Communication: app1 ─────────▶ app2 (via container name)
-
-Docker provides:
-✔️ Internal DNS
-✔️ Automatic IP resolution
-
-
-🔄 Why NOT Use IPs?
-❌ IP changes on restart
-❌ Breaks communication
-✅ Always use container name
-
-
-🔄 Docker Networking Internals
-Docker creates:
-➤ Network Namespace: Isolated network stack per container
-➤ Virtual Ethernet (veth pair): Container ↔ veth ↔ docker0 bridge ↔ host
-➤ Docker Bridge (docker0): Acts like a virtual switch
-➤ iptables Rules Handle:
-  ✔️ NAT
-  ✔️ Port forwarding
-  ✔️ Isolation
-
-🔄 Types of Docker Networks
-| Network Type | Purpose                      | Isolation |
-| ------------ | ---------------------------- | --------- |
-| bridge       | Default container networking | Medium    |
-| host         | No isolation                 | None      |
-| none         | No networking                | Full      |
-| overlay      | Multi-host (Swarm/K8s)       | High      |
-| macvlan      | Container gets real IP       | Medium    |
-
-
-🔄 How Docker Networking Enables Communication
-| Scenario              | Network Used    |
-| --------------------- | --------------- |
-| Container ↔ Container | Bridge          |
-| Container ↔ Host      | NAT / Host mode |
-| Multi-host containers | Overlay         |
-| No communication      | None            |
- 
-
-🔄 How to PREVENT Containers from Communicating (Complete Isolation)
-Method 1️⃣: none Network (BEST)
-🔗 docker run --network none nginx
-
-Result:
-  ✔️ No IP
-  ✔️ No internet
-  ✔️ No container communication
-✔ FULL ISOLATION
-
- 
-Method 2️⃣: Separate Bridge Networks
-🔗 docker network create net1
-🔗 docker network create net2
-
-🔗 docker run --network net1 app1
-🔗 docker run --network net2 app2
-👉 Result: app1 ❌ app2
-✔ Logical isolation
-
-
-Method 3️⃣: Disable Inter-Container Communication (ICC)
-🔗 dockerd --icc=false
-
-➤ Containers cannot talk by default
-➤ Legacy but interview-relevant
-
-
-Method 4️⃣: Firewall / iptables Rules
-  ✔️ Block traffic between containers
-  ✔️ Advanced security
-
-➤ Used in:
-  ✔️ Production
-  ✔️ Zero-trust architecture
-
-
-Method 5️⃣: Kubernetes Network Policies (Advanced)
-➤ Define: Who can talk to whom
-➤ Fine-grained isolation
-
-
-✅ Real-World Isolation Example
-Scenario:
-➤ Frontend should talk to backend
-➤ Backend should talk to DB
-➤ Frontend ❌ DB
-
-✅ Solution:
-frontend-net ─────────▶ frontend + backend
-backend-net ─────────▶ backend + db
-⚡ Controlled communication
-
-9️⃣ Common Traps
-❌ Saying containers share host IP
-❌ Using IP instead of container name
-❌ Using host network in production
-❌ Assuming Docker networks are optional
-
-
-#####################################
-🔷 Real Time Challenges with Docker
-#####################################
-1️⃣ Docker is a single daemon process. Which can cause a single point of failure. If the docker daemon goes down for some reason all the applications running inside the docker containers will also go down. Tools like podman, Buildah can be used to overcome this issue.
-
-2️⃣ Docker Daemon runs as a root user. which is a security threat. Any process running as a root can have adverse effects. when it is compromised for security reasons, it can impact other applications or containers on the host.
-
-3️⃣ Rescource Contraints: If you are running too many containers on a single host, you may experience issues with resource constraints. This can result in slow performance crashes.
-
-
-################################
-🔷 Steps to secure Containers
-################################
-1️⃣ Use Distroless or images with not too many packages as your final image in multi-stage docker builds, so that there is less chance of CVE or security vulnerabilities.
-
-2️⃣ Ensure that the networking is configured properly. This is one of the most common reasons for security breaches in containers. If required configure custom bridge networks to isolate the containers.
-
-3️⃣ Use utilities like Sync to scan your container images for vulnerabilities before deploying them to production.
-
-
-####################
-🔷 Docker Compose
-####################
-Docker Compose is a tool used to define, configure, and run multi-container Docker applications using a single YAML file (docker-compose.yml).
-
-❌Instead of running:
-docker run ...
-docker run ...
-docker run ...
-
-✅ You run:
-docker compose up
-
-➤ Docker ─────────▶ runs one container
-➤ Docker Compose ─────────▶ runs multiple containers together
-➤ Configuration is written once in YAML
-➤ Ideal for microservices & local development
-
-
-🔄 Why Docker Compose Exists (Problem It Solves)
-❌ Without Docker Compose:
-➤ Multiple docker run commands
-➤ Manual port linking
-➤ Manual network creation
-➤ Manual startup order
-➤ Error-prone and hard to maintain
-
-✅ With Docker Compose:
-➤ One file
-➤ One command
-➤ Automatic networking
-➤ Service discovery by name
-
-
-🔄 Working of Docker Compose
-When you run:
-🔗 docker compose up
-
-⚡ Internally Docker Compose does:
-1️⃣ Reads docker-compose.yml
-2️⃣ Creates a default network
-3️⃣ Creates containers for each service
-4️⃣ Assigns DNS names = service names
-5️⃣ Sets environment variables
-6️⃣ Starts containers in dependency order
-7️⃣ Streams logs to terminal
-
-📌 Each service = one container
-
-🔄 Docker Compose Architecture
-⚡ High-Level Architecture
-docker-compose.yml
-        |
-        v
- Docker Compose CLI
-        |
-        v
-   Docker Engine
-        |
-        v
- Containers + Network + Volumes
-
-
-🔄 Key Components
-| Component            | Purpose                 |
-| -------------------- | ----------------------- |
-| `docker-compose.yml` | Application definition  |
-| Docker Compose CLI   | Orchestrates containers |
-| Docker Engine        | Runs containers         |
-| Bridge Network       | Container communication |
-| Volumes              | Persistent storage      |
-
-
-🔄 Key Features of Docker Compose
-1️⃣ Multi-Container Orchestration
-➤ Define multiple services in one file
-
-2️⃣ Service Discovery
-➤ Containers communicate via service name
-🔗 jdbc:mysql://mysql-db:3306/app_db
-
-3️⃣ Single Command Control
-🔗 docker compose up
-🔗 docker compose down
-🔗 docker compose restart
-
-4️⃣ Environment Configuration
-➤ Environment variables
-➤ .env file support
-
-5️⃣ Volume Management
-➤ Persistent DB storage
-
-6️⃣ Network Isolation
-➤ Dedicated network per compose project
-
-7️⃣ Dependency Management
-depends_on:
-  - mysql
-
-6️⃣ Docker Compose vs Kubernetes
-| Feature         | Docker Compose       | Kubernetes               |
-| --------------- | -------------------- | ------------------------ |
-| Purpose         | Local / small setups | Production orchestration |
-| Complexity      | Simple               | Very complex             |
-| Scaling         | Manual               | Automatic                |
-| Load Balancing  | Basic                | Advanced                 |
-| Self-Healing    | ❌                    | ✅                        |
-| Rolling Updates | ❌                    | ✅                        |
-| Learning Curve  | Low                  | High                     |
-
-
-🔄 When to Use Docker Compose
-✔️ Local development
-✔️ Microservice testing
-✔️ Small teams
-✔️ CI pipelines
-✔️ Proof of concepts
-
-🔄 Use Kubernetes when:
-✔️ Large scale systems
-✔️ Auto-scaling required
-✔️ High availability
-✔️ Production workloads
-
-
-❗Important Interview Point
-“Docker Compose is NOT a replacement for Docker”
-➤ Docker ─────────▶ container runtime
-➤ Docker Compose ─────────▶ container orchestration tool
-
-📌 Docker Compose depends on Docker
-📌 Docker works without Compose, but Compose cannot work without Docker
-
-📌 Real-World Architecture
-Requirements:
-➤ 2 Spring Boot services
-➤ Redis cache
-➤ MySQL database
-➤ Eureka Server (Service Discovery)
-➤ Load balancing via Eureka + Spring Cloud
-
-🔷 Microservices Architecture
-             Client
-               |
-        ----------------
-        |              |
-  Service-1        Service-2
-        |              |
-        ------ Eureka ------
-               |
-        ------------------
-        |                |
-      MySQL             Redis
-
-🔄 Docker Compose File
-🔗 docker-compose.yml
-version: "3.9"
-
-services:
-
-  eureka-server:
-    image: netflixoss/eureka:latest
-    container_name: eureka-server
-    ports:
-      - "8761:8761"
-    networks:
-      - microservices-net
-
-  mysql-db:
-    image: mysql:8.0
-    container_name: mysql-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: job_portal
-      MYSQL_USER: app_user
-      MYSQL_PASSWORD: app_pass
-    ports:
-      - "3306:3306"
+  WORKDIR /app
+
+  # Copy ONLY the jar from builder
+  COPY --from=builder /app/target/*.jar app.jar
+
+  EXPOSE 8080
+
+  # MUST use exec form (array format)
+  # Shell form won't work - there is no shell!
+  CMD ["app.jar"]
+  ─────────────────────────────────────────────────────────────
+
+  IMPORTANT: Use array format CMD ["app.jar"] not shell format CMD java -jar app.jar
+  Because the distroless java image's entrypoint is already "java -jar"
+  Shell form requires /bin/sh which does not exist!
+
+
+--------------------------------------------------------------------------------
+HOW TO DEBUG DISTROLESS CONTAINERS (INTERVIEW QUESTION!)
+--------------------------------------------------------------------------------
+
+  You CANNOT do this:
+    $ docker exec -it container-id bash    ← ERROR: bash not found
+    $ docker exec -it container-id sh      ← ERROR: sh not found
+
+  You CAN use these methods:
+
+  Method 1: Application Logs
+    $ docker logs container-id
+    $ docker logs -f container-id    (follow logs)
+
+  Method 2: Use Debug variant (temporary)
+    gcr.io/distroless/java17-debian12:debug  ← Has busybox shell for debugging
+    Switch to this for debugging, then switch back to regular for production
+
+  Method 3: Metrics (Prometheus/Grafana)
+    Your app exposes /actuator/metrics
+    Monitor from outside the container
+
+  Method 4: Distributed Tracing (Jaeger/Zipkin)
+    Trace requests through your microservices
+
+  Method 5: Sidecar Container (Kubernetes)
+    Run a debug container alongside your distroless container
+
+
+
+================================================================================
+CHAPTER 6 : PERSISTENT STORAGE IN DOCKER
+================================================================================
+
+THE PROBLEM:
+  Containers are EPHEMERAL (temporary).
+  
+  What this means:
+    - You run a MySQL container
+    - You insert 10,000 rows of data
+    - You stop and delete the container
+    - ALL that data is GONE FOREVER!
+
+  This is a problem for:
+    - Databases (MySQL, PostgreSQL, MongoDB)
+    - Log files
+    - User uploaded files
+    - Cache data
+
+THE SOLUTION: Persistent Storage
+  Store data OUTSIDE the container.
+  Even if container is deleted, data survives.
+
+Docker gives us TWO ways to do this:
+  1. Volumes   (recommended for production)
+  2. Bind Mounts (good for development)
+
+
+--------------------------------------------------------------------------------
+OPTION 1: DOCKER VOLUMES (PRODUCTION RECOMMENDED)
+--------------------------------------------------------------------------------
+
+  A Docker Volume is a directory managed BY DOCKER.
+  Docker decides where to store it (usually /var/lib/docker/volumes/).
+  Even if container is deleted, volume data remains.
+
+  COMMANDS:
+    Create a volume:
+      $ docker volume create mysql-data
+
+    List all volumes:
+      $ docker volume ls
+
+    See details of a volume:
+      $ docker volume inspect mysql-data
+
+    Delete a volume:
+      $ docker volume rm mysql-data
+
+    Delete all unused volumes:
+      $ docker volume prune
+
+  USING A VOLUME WITH MYSQL CONTAINER:
+    $ docker run -d \
+      --name mysql-container \
+      -e MYSQL_ROOT_PASSWORD=rootpass \
+      -e MYSQL_DATABASE=myapp_db \
+      -v mysql-data:/var/lib/mysql \
+      -p 3306:3306 \
+      mysql:8.0
+
+    What this does:
+      -v mysql-data:/var/lib/mysql
+      means: mount the volume "mysql-data" at "/var/lib/mysql" inside container
+      MySQL stores all data in /var/lib/mysql
+      So all MySQL data is now saved in the volume!
+
+  PROOF IT WORKS:
+    $ docker stop mysql-container
+    $ docker rm mysql-container
+    (Container is gone! But data is still in the volume)
+
+    $ docker run -d \
+      --name mysql-container-new \
+      -v mysql-data:/var/lib/mysql \
+      mysql:8.0
+    (All previous data is back! Volume was preserved)
+
+  VOLUME PROPERTIES:
+    +------------------+-------------------------+
+    | Property         | Value                   |
+    +------------------+-------------------------+
+    | Managed by       | Docker                  |
+    | Stored at        | /var/lib/docker/volumes |
+    | Host path needed | No                      |
+    | Portable         | Yes                     |
+    | Security         | High                    |
+    | Survives delete  | Yes                     |
+    | Best for         | Production, databases   |
+    +------------------+-------------------------+
+
+
+--------------------------------------------------------------------------------
+OPTION 2: BIND MOUNTS (DEVELOPMENT RECOMMENDED)
+--------------------------------------------------------------------------------
+
+  A Bind Mount maps a SPECIFIC folder on YOUR machine directly into container.
+  Changes on your machine = immediately visible in container.
+  Changes in container = immediately visible on your machine.
+
+  SYNTAX:
+    -v /host/path:/container/path
+
+  EXAMPLE: Running Spring Boot with live code changes
+    $ docker run -d \
+      -v /home/user/my-spring-app:/app \
+      -p 8080:8080 \
+      my-spring-app:dev
+
+    Any file change in /home/user/my-spring-app is instantly reflected.
+    Great for development with Spring DevTools hot reload!
+
+  BIND MOUNT PROPERTIES:
+    +------------------+-------------------------+
+    | Property         | Value                   |
+    +------------------+-------------------------+
+    | Managed by       | You (host filesystem)   |
+    | Stored at        | Wherever you specify    |
+    | Host path needed | Yes (exact path)        |
+    | Portable         | No (path may differ)    |
+    | Security         | Lower (host exposed)    |
+    | Best for         | Development only        |
+    +------------------+-------------------------+
+
+
+--------------------------------------------------------------------------------
+VOLUMES vs BIND MOUNTS COMPARISON
+--------------------------------------------------------------------------------
+
+  +---------------------+------------------+------------------+
+  | Feature             | Volumes          | Bind Mounts      |
+  +---------------------+------------------+------------------+
+  | Managed by Docker   | YES              | No               |
+  | Host path needed    | No               | YES              |
+  | Portable            | YES              | No               |
+  | Works on any OS     | YES              | Path must exist  |
+  | Security            | High             | Medium           |
+  | Backup/restore      | Easy             | Manual           |
+  | Production use      | YES              | No               |
+  | Development use     | Can use          | YES              |
+  +---------------------+------------------+------------------+
+
+  SIMPLE RULE:
+    Development → Bind Mount (live code reload)
+    Production  → Volumes (databases, persistent data)
+
+
+--------------------------------------------------------------------------------
+REAL WORLD SPRING BOOT + MYSQL SETUP
+--------------------------------------------------------------------------------
+
+  Running MySQL with volume and Spring Boot that connects to it:
+
+  Step 1: Create a network (so containers can talk to each other)
+    $ docker network create springapp-network
+
+  Step 2: Run MySQL with volume
+    $ docker run -d \
+      --name mysql-db \
+      --network springapp-network \
+      -e MYSQL_ROOT_PASSWORD=rootpass \
+      -e MYSQL_DATABASE=jobportal \
+      -e MYSQL_USER=appuser \
+      -e MYSQL_PASSWORD=apppass \
+      -v mysql-data:/var/lib/mysql \
+      -p 3306:3306 \
+      mysql:8.0
+
+  Step 3: Run Spring Boot app
+    $ docker run -d \
+      --name spring-app \
+      --network springapp-network \
+      -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/jobportal \
+      -e SPRING_DATASOURCE_USERNAME=appuser \
+      -e SPRING_DATASOURCE_PASSWORD=apppass \
+      -p 8080:8080 \
+      my-spring-app:v1
+
+  Note: "mysql-db" in the URL is the container NAME, not an IP address.
+  Docker provides internal DNS, so container names work as hostnames!
+
+
+
+================================================================================
+CHAPTER 7 : DOCKER NETWORKING
+================================================================================
+
+THE PROBLEM:
+  Containers are isolated. By default they cannot talk to each other.
+  Your Spring Boot container needs to talk to MySQL container.
+  Your frontend needs to talk to backend.
+  How do they communicate?
+
+THE ANSWER: Docker Networking
+
+
+--------------------------------------------------------------------------------
+HOW DOCKER NETWORKING WORKS INTERNALLY
+--------------------------------------------------------------------------------
+
+  When you install Docker, it creates a virtual network bridge called "docker0".
+  Think of docker0 as a virtual switch/router.
+
+  Each container gets:
+    - Its own network namespace (isolated network stack)
+    - Its own IP address (like 172.17.0.2, 172.17.0.3...)
+    - A virtual ethernet cable (veth pair) connecting it to docker0
+
+  Network flow:
+    Container A (172.17.0.2)
+        ↕ veth0
+    docker0 bridge (172.17.0.1) ← virtual router
+        ↕ veth1
+    Container B (172.17.0.3)
+
+  Docker also sets up iptables rules for:
+    - NAT (Network Address Translation)
+    - Port forwarding
+    - Isolation between networks
+
+
+--------------------------------------------------------------------------------
+TYPES OF DOCKER NETWORKS
+--------------------------------------------------------------------------------
+
+  1. BRIDGE NETWORK (default, most common)
+     - Containers on same bridge network can talk to each other
+     - Container names work as hostnames (internal DNS)
+     - Isolated from other bridge networks
+     - Use for: Most apps, microservices
+
+  2. HOST NETWORK
+     - Container uses the host's network directly
+     - No isolation. Container has same IP as host.
+     - Command: docker run --network host my-app
+     - Security risk! Avoid in production.
+     - Use for: Performance testing, special cases
+
+  3. NONE NETWORK
+     - Complete isolation. No network at all.
+     - Container cannot access internet or other containers
+     - Command: docker run --network none my-app
+     - Use for: Batch processing, security-critical containers
+
+  4. OVERLAY NETWORK
+     - Connects containers across MULTIPLE hosts/servers
+     - Used by Docker Swarm and Kubernetes
+     - For microservices spread across many servers
+
+  5. MACVLAN NETWORK
+     - Container gets its own MAC address and real IP on your network
+     - Advanced use case, rare
+
+  +---------------+---------------------------+-----------+
+  | Network Type  | Purpose                   | Isolation |
+  +---------------+---------------------------+-----------+
+  | bridge        | Default (single host)     | Medium    |
+  | host          | No isolation              | None      |
+  | none          | Complete isolation        | Full      |
+  | overlay       | Multi-host (Swarm/K8s)    | High      |
+  | macvlan        | Real IP assignment        | Medium    |
+  +---------------+---------------------------+-----------+
+
+
+--------------------------------------------------------------------------------
+PORT MAPPING (HOW OUTSIDE WORLD REACHES YOUR CONTAINER)
+--------------------------------------------------------------------------------
+
+  Your container runs Spring Boot on port 8080 INSIDE the container.
+  Your laptop/host machine has its own ports.
+  Without port mapping, you CANNOT reach the container from outside.
+
+  COMMAND: docker run -p HOST_PORT:CONTAINER_PORT
+
+  Example:
+    $ docker run -d -p 8080:8080 my-spring-app
+
+    Flow:
+    You → browser → localhost:8080 (host port)
+         → Docker NAT
+         → container:8080 (container port)
+         → Spring Boot responds
+
+    Another example:
+    $ docker run -d -p 9090:8080 my-spring-app
+    (Host port 9090 maps to container port 8080)
+    Access at: localhost:9090
+
+  MULTIPLE PORT MAPPINGS:
+    $ docker run -d -p 8080:8080 -p 9090:9090 -p 5005:5005 my-spring-app
+    (Map multiple ports at once, useful for remote debugging too)
+
+
+--------------------------------------------------------------------------------
+CONTAINER TO CONTAINER COMMUNICATION
+--------------------------------------------------------------------------------
+
+  IMPORTANT RULE: Always use container NAME not IP address!
+
+  WHY?
+    - Container IP can change every time it restarts
+    - Container NAME stays the same
+    - Docker provides internal DNS to resolve names to IPs
+
+  STEP 1: Create a custom bridge network
+    $ docker network create myapp-network
+
+  STEP 2: Run containers on SAME network
+    $ docker run -d --name mysql-db --network myapp-network mysql:8.0
+    $ docker run -d --name spring-app --network myapp-network my-spring-app
+
+  STEP 3: Spring Boot can now reach MySQL using name "mysql-db"
+    spring.datasource.url=jdbc:mysql://mysql-db:3306/mydb
+                                              ↑
+                                     This is the container NAME
+                                     Docker resolves it to IP automatically!
+
+  WHY CUSTOM NETWORK OVER DEFAULT?
+    - Default bridge network does NOT support DNS (container names as hostnames)
+    - Custom bridge networks DO support DNS
+    - So always create a custom network for your apps
+
+
+--------------------------------------------------------------------------------
+NETWORK COMMANDS
+--------------------------------------------------------------------------------
+
+  Create network:
+    $ docker network create mynetwork
+
+  Create network with specific driver:
+    $ docker network create --driver bridge mynetwork
+
+  List all networks:
+    $ docker network ls
+
+  Inspect a network (see connected containers, IP ranges):
+    $ docker network inspect mynetwork
+
+  Connect existing container to network:
+    $ docker network connect mynetwork container-id
+
+  Disconnect container from network:
+    $ docker network disconnect mynetwork container-id
+
+  Delete a network:
+    $ docker network rm mynetwork
+
+  Delete all unused networks:
+    $ docker network prune
+
+
+--------------------------------------------------------------------------------
+HOW TO ISOLATE CONTAINERS (PREVENT COMMUNICATION)
+--------------------------------------------------------------------------------
+
+  Sometimes you WANT containers to be isolated. Example:
+    - Frontend can talk to backend
+    - Backend can talk to database
+    - Frontend CANNOT talk directly to database (security)
+
+  METHOD 1: Use NONE network (full isolation)
+    $ docker run --network none my-secure-container
+    No network access at all.
+
+  METHOD 2: Separate bridge networks
+    $ docker network create frontend-net
+    $ docker network create backend-net
+
+    $ docker run --network frontend-net --name frontend my-frontend
+    $ docker run --network backend-net --name database mysql
+
+    (frontend and database are on different networks → cannot communicate)
+
+    To allow backend to talk to BOTH:
+    $ docker network connect frontend-net backend
+    $ docker network connect backend-net backend
+    (Backend is on both networks, can talk to both sides)
+
+  RESULT:
+    frontend → backend  ✓ (same network)
+    backend  → database ✓ (same network)
+    frontend → database ✗ (different networks, blocked!)
+
+
+
+================================================================================
+CHAPTER 8 : DOCKER COMPOSE
+================================================================================
+
+THE PROBLEM:
+  Your Spring Boot microservices app needs:
+    - Spring Boot Service 1 (User Service)
+    - Spring Boot Service 2 (Order Service)
+    - MySQL database
+    - Redis cache
+    - Eureka Service Discovery
+
+  Without Docker Compose, you would run:
+    $ docker network create mynet
+    $ docker volume create mysql-data
+    $ docker run -d --name mysql ...long command...
+    $ docker run -d --name redis ...long command...
+    $ docker run -d --name eureka ...long command...
+    $ docker run -d --name user-service ...long command...
+    $ docker run -d --name order-service ...long command...
+
+  That is 7+ commands. You must remember the right order. Error-prone.
+
+THE SOLUTION: Docker Compose
+  Put all configuration in ONE YAML file.
+  Start everything with ONE command: docker compose up
+  Stop everything with ONE command: docker compose down
+
+
+--------------------------------------------------------------------------------
+WHAT IS DOCKER COMPOSE?
+--------------------------------------------------------------------------------
+
+  Docker Compose = A tool to define and run multi-container Docker applications.
+
+  You write a "docker-compose.yml" file describing:
+    - What services (containers) to run
+    - What image each uses
+    - Port mappings
+    - Environment variables
+    - Volumes
+    - Networks
+    - Dependencies (which service starts first)
+
+  Docker Compose reads this file and orchestrates everything.
+
+  Docker Compose Architecture:
+    docker-compose.yml
+           ↓
+    Docker Compose CLI (reads YAML)
+           ↓
+    Docker Engine (creates containers)
+           ↓
+    Containers + Networks + Volumes (all created automatically)
+
+
+--------------------------------------------------------------------------------
+DOCKER COMPOSE FILE STRUCTURE
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────
+  version: "3.9"         ← Compose file version
+
+  services:              ← List of containers to run
+    service-name:        ← Name of your service
+      image: ...         ← Docker image to use
+      build: ...         ← Or build from Dockerfile
+      ports: ...         ← Port mapping
+      environment: ...   ← Environment variables
+      volumes: ...       ← Volume mounts
+      networks: ...      ← Which network to join
+      depends_on: ...    ← Wait for these services first
+
+  volumes:               ← Define named volumes
+    volume-name:
+
+  networks:              ← Define custom networks
+    network-name:
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+COMPLETE SPRING BOOT MICROSERVICES DOCKER COMPOSE EXAMPLE
+--------------------------------------------------------------------------------
+
+  Scenario:
+    - user-service: Spring Boot app on port 8081
+    - order-service: Spring Boot app on port 8082
+    - mysql: Database
+    - redis: Cache for sessions/JWT tokens
+    - eureka: Service discovery
+
+  ─────────────────────────────────────────────────────────────
+  version: "3.9"
+
+  services:
+
+    # ── Eureka Service Discovery ──────────────────────────────
+    eureka-server:
+      image: springcloud/eureka:latest
+      container_name: eureka-server
+      ports:
+        - "8761:8761"
+      networks:
+        - microservices-net
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+
+    # ── MySQL Database ────────────────────────────────────────
+    mysql-db:
+      image: mysql:8.0
+      container_name: mysql-db
+      environment:
+        MYSQL_ROOT_PASSWORD: rootpass
+        MYSQL_DATABASE: jobportal
+        MYSQL_USER: appuser
+        MYSQL_PASSWORD: apppass
+      ports:
+        - "3306:3306"
+      volumes:
+        - mysql-data:/var/lib/mysql    # data persists!
+      networks:
+        - microservices-net
+      restart: unless-stopped          # auto-restart if crashes
+
+    # ── Redis Cache ───────────────────────────────────────────
+    redis-cache:
+      image: redis:7-alpine
+      container_name: redis-cache
+      ports:
+        - "6379:6379"
+      networks:
+        - microservices-net
+      restart: unless-stopped
+
+    # ── User Service (Spring Boot) ────────────────────────────
+    user-service:
+      build:
+        context: ./user-service        # folder with Dockerfile
+        dockerfile: Dockerfile
+      container_name: user-service
+      ports:
+        - "8081:8080"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/jobportal
+        SPRING_DATASOURCE_USERNAME: appuser
+        SPRING_DATASOURCE_PASSWORD: apppass
+        SPRING_REDIS_HOST: redis-cache
+        SPRING_REDIS_PORT: 6379
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+        SPRING_PROFILES_ACTIVE: docker
+      depends_on:
+        - mysql-db
+        - redis-cache
+        - eureka-server
+      networks:
+        - microservices-net
+      restart: unless-stopped
+
+    # ── Order Service (Spring Boot) ───────────────────────────
+    order-service:
+      build:
+        context: ./order-service
+        dockerfile: Dockerfile
+      container_name: order-service
+      ports:
+        - "8082:8080"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/jobportal
+        SPRING_DATASOURCE_USERNAME: appuser
+        SPRING_DATASOURCE_PASSWORD: apppass
+        SPRING_REDIS_HOST: redis-cache
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+        SPRING_PROFILES_ACTIVE: docker
+      depends_on:
+        - mysql-db
+        - redis-cache
+        - eureka-server
+      networks:
+        - microservices-net
+      restart: unless-stopped
+
+  # ── Volumes ─────────────────────────────────────────────────
+  volumes:
+    mysql-data:                        # Docker manages this volume
+
+  # ── Networks ─────────────────────────────────────────────────
+  networks:
+    microservices-net:
+      driver: bridge
+  ─────────────────────────────────────────────────────────────
+
+  Your Spring Boot application.properties for docker profile:
+  (src/main/resources/application-docker.properties)
+  ─────────────────────────────────────────────────────────────
+  spring.datasource.url=${SPRING_DATASOURCE_URL}
+  spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+  spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+  spring.data.redis.host=${SPRING_REDIS_HOST}
+  spring.data.redis.port=${SPRING_REDIS_PORT:6379}
+
+  eureka.client.service-url.defaultZone=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+DOCKER COMPOSE COMMANDS
+--------------------------------------------------------------------------------
+
+  Start all services (in background):
+    $ docker compose up -d
+
+  Start all services (with logs visible):
+    $ docker compose up
+
+  Start specific service only:
+    $ docker compose up -d mysql-db
+
+  Stop all services:
+    $ docker compose down
+
+  Stop and DELETE volumes too (CAREFUL: deletes data!):
+    $ docker compose down -v
+
+  View running services:
+    $ docker compose ps
+
+  View logs of all services:
+    $ docker compose logs
+
+  View logs of specific service (follow):
+    $ docker compose logs -f user-service
+
+  Rebuild images and start:
+    $ docker compose up -d --build
+
+  Scale a service (run multiple instances):
+    $ docker compose up -d --scale user-service=3
+
+  Execute command inside a service:
+    $ docker compose exec mysql-db bash
+
+  Restart a specific service:
+    $ docker compose restart user-service
+
+
+--------------------------------------------------------------------------------
+DEPENDS_ON - CONTROLLING STARTUP ORDER
+--------------------------------------------------------------------------------
+
+  depends_on says "start this service AFTER these services"
+
+  Example:
+    user-service:
+      depends_on:
+        - mysql-db      ← Start mysql-db first, then user-service
+        - redis-cache
+        - eureka-server
+
+  IMPORTANT LIMITATION:
+    depends_on only waits for container to START, not for it to be READY.
+    MySQL might still be initializing when Spring Boot tries to connect!
+
+  SOLUTION: Add healthcheck and wait for healthy status:
+    depends_on:
+      mysql-db:
+        condition: service_healthy  ← Wait until healthcheck passes
+
+    mysql-db:
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+  Alternative: Add connection retry in Spring Boot:
+  ─────────────────────────────────────────────────────────────
+  spring.datasource.hikari.connection-timeout=30000
+  spring.datasource.hikari.initialization-fail-timeout=60000
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+DOCKER COMPOSE vs KUBERNETES COMPARISON
+--------------------------------------------------------------------------------
+
+  +------------------+--------------------------+-------------------------+
+  | Feature          | Docker Compose           | Kubernetes              |
+  +------------------+--------------------------+-------------------------+
+  | Purpose          | Local / small setups     | Production at scale     |
+  | Complexity       | Simple                   | Complex                 |
+  | Auto-scaling     | Manual (--scale)         | Automatic (HPA)         |
+  | Load balancing   | Basic                    | Advanced                |
+  | Self-healing     | No (restart: always)     | Yes (auto-replacement)  |
+  | Rolling updates  | Manual                   | Automatic               |
+  | Multi-host       | No (single machine)      | Yes (cluster)           |
+  | Learning curve   | Low (easy)               | High (steep)            |
+  | Best for         | Dev, testing, CI/CD      | Production workloads    |
+  +------------------+--------------------------+-------------------------+
+
+  USE DOCKER COMPOSE WHEN:
+    - Local development on your laptop
+    - Testing microservices together
+    - Small teams / small projects
+    - CI/CD pipelines (GitHub Actions etc.)
+    - Proof of concepts
+
+  USE KUBERNETES WHEN:
+    - Large-scale production systems
+    - Auto-scaling required
+    - High availability (99.99% uptime)
+    - Multiple servers / cloud deployments
+
+
+
+================================================================================
+CHAPTER 9 : REAL-WORLD CHALLENGES WITH DOCKER
+================================================================================
+
+Being a good backend engineer means knowing not just the good parts,
+but also the problems and how to solve them.
+
+
+--------------------------------------------------------------------------------
+CHALLENGE 1: DOCKER SINGLE POINT OF FAILURE
+--------------------------------------------------------------------------------
+
+  Problem:
+    Docker uses ONE daemon process (dockerd).
+    If the Docker daemon crashes, ALL containers go down with it.
+    Your entire application is down because of ONE process failure.
+
+  This is called "Single Point of Failure" (SPOF).
+
+  Solutions:
+    - Use Kubernetes (manages containers without single daemon)
+    - Use Podman (daemonless container runtime, each container is independent)
+    - Use Docker Swarm (cluster mode, multiple managers)
+    - Always have health checks and monitoring
+
+
+--------------------------------------------------------------------------------
+CHALLENGE 2: DOCKER DAEMON RUNS AS ROOT
+--------------------------------------------------------------------------------
+
+  Problem:
+    The Docker daemon runs as the root user.
+    Root = highest privilege on Linux.
+    If Docker daemon is hacked → attacker has root access to your entire server.
+    Very serious security risk.
+
+  Solutions:
+    - Run containers as non-root user (add USER instruction in Dockerfile)
+    - Use Podman (rootless by default, each user runs their own containers)
+    - Enable Docker rootless mode
+    - Use AppArmor/SELinux profiles to limit what root can do
+
+  DOCKERFILE EXAMPLE (running as non-root):
+  ─────────────────────────────────────────────────────────────
+  FROM eclipse-temurin:17-jre-alpine
+
+  WORKDIR /app
+  COPY target/*.jar app.jar
+
+  # Create a non-root user
+  RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+  # Switch to non-root user
+  USER appuser
+
+  EXPOSE 8080
+  CMD ["java", "-jar", "app.jar"]
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+CHALLENGE 3: RESOURCE CONSTRAINTS
+--------------------------------------------------------------------------------
+
+  Problem:
+    Running too many containers on one machine.
+    One container uses too much RAM → other containers starve → crashes.
+    No limits set → containers fight for resources.
+
+  Solution: Set resource limits:
+    $ docker run -d \
+      --name spring-app \
+      --memory="512m" \        ← Max 512 MB RAM
+      --cpus="1.0" \           ← Max 1 CPU core
+      my-spring-app
+
+  In Docker Compose:
+  ─────────────────────────────────────────────────────────────
+  services:
+    user-service:
+      image: my-spring-app
+      deploy:
+        resources:
+          limits:
+            memory: 512M
+            cpus: "1.0"
+          reservations:
+            memory: 256M
+            cpus: "0.5"
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+CHALLENGE 4: IMAGE SECURITY VULNERABILITIES (CVEs)
+--------------------------------------------------------------------------------
+
+  Problem:
+    Every base image has packages. Packages have vulnerabilities.
+    Ubuntu base image might have 200+ known vulnerabilities.
+    You ship these vulnerabilities to production without knowing.
+
+  Solutions:
+    1. Use minimal images (Alpine, Distroless)
+       → Fewer packages = fewer vulnerabilities
+
+    2. Scan images before deployment using tools:
+       - Trivy (free, easy): $ trivy image my-spring-app:v1
+       - Snyk: Scans and shows CVEs
+       - Docker Scout: Built into Docker Desktop
+
+    3. Regularly update base images
+       - Set up automated image scanning in CI/CD pipeline
+
+  EXAMPLE TRIVY SCAN:
+    $ trivy image gcr.io/distroless/java17-debian12
+    Result: 0 critical, 0 high vulnerabilities (distroless is very clean!)
+
+    $ trivy image ubuntu:latest
+    Result: Might show 100+ vulnerabilities!
+
+
+--------------------------------------------------------------------------------
+CHALLENGE 5: PERSISTENT DATA IN DEVELOPMENT
+--------------------------------------------------------------------------------
+
+  Problem: During development, when you run docker compose down, MySQL data 
+  is gone if you used the wrong volume setup.
+
+  Solution: Always explicitly name your volumes in docker-compose.yml.
+  Never rely on anonymous volumes in development or production.
+
+  BAD (anonymous volume - data lost on docker compose down -v):
     volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - microservices-net
+      - /var/lib/mysql
 
-  redis-cache:
-    image: redis:7
-    container_name: redis-cache
-    ports:
-      - "6379:6379"
-    networks:
-      - microservices-net
+  GOOD (named volume - data persists):
+    volumes:
+      - mysql-data:/var/lib/mysql
 
-  service-1:
-    build: ./service-1
-    container_name: service-1
-    ports:
-      - "8081:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/job_portal
-      SPRING_DATASOURCE_USERNAME: app_user
-      SPRING_DATASOURCE_PASSWORD: app_pass
-      SPRING_REDIS_HOST: redis-cache
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-    depends_on:
-      - mysql-db
-      - redis-cache
-      - eureka-server
-    networks:
-      - microservices-net
-
-  service-2:
-    build: ./service-2
-    container_name: service-2
-    ports:
-      - "8082:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/job_portal
-      SPRING_DATASOURCE_USERNAME: app_user
-      SPRING_DATASOURCE_PASSWORD: app_pass
-      SPRING_REDIS_HOST: redis-cache
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-    depends_on:
-      - mysql-db
-      - redis-cache
-      - eureka-server
-    networks:
-      - microservices-net
-
-volumes:
-  mysql_data:
-
-networks:
-  microservices-net:
-    driver: bridge
+  volumes:
+    mysql-data:
 
 
-🔗 Spring Boot Application Properties (Inside Container)
-spring.datasource.url=jdbc:mysql://mysql-db:3306/job_portal
-spring.datasource.username=app_user
-spring.datasource.password=app_pass
+--------------------------------------------------------------------------------
+STEPS TO SECURE YOUR DOCKER CONTAINERS (SUMMARY)
+--------------------------------------------------------------------------------
 
-spring.redis.host=redis-cache
-spring.redis.port=6379
+  1. Use Multi-Stage Builds
+     → Remove build tools from production image
 
-eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+  2. Use Distroless or Alpine Images
+     → Minimal attack surface
+
+  3. Run as Non-Root User
+     → Add USER instruction in Dockerfile
+
+  4. Set Resource Limits
+     → --memory and --cpus flags
+
+  5. Use Custom Networks
+     → Don't use default bridge for production apps
+
+  6. Scan Images for Vulnerabilities
+     → Trivy, Snyk, Docker Scout
+
+  7. Never Store Secrets in Dockerfile
+     → Use environment variables or Docker Secrets
+
+  8. Keep Images Updated
+     → Regularly rebuild with latest base images
+
+  9. Use Read-Only Filesystem Where Possible
+     → docker run --read-only
+
+  10. Enable Docker Content Trust
+      → Verify image signatures before pulling
 
 
-❓ How Load Balancing Works Here
-➤ Eureka registers both services
-➤ Client uses Spring Cloud LoadBalancer
-➤ Requests distributed automatically
-➤ Docker Compose only provides networking, not LB logic
+
+================================================================================
+CHAPTER 10 : COMMON DOCKER COMMANDS QUICK REFERENCE
+================================================================================
+
+  IMAGES:
+  ───────
+  docker images                        List all local images
+  docker pull nginx:latest             Download image
+  docker build -t myapp:v1 .           Build from Dockerfile
+  docker build -t myapp:v1 -f Dockerfile.prod .   Build specific Dockerfile
+  docker rmi myapp:v1                  Remove image
+  docker image prune -a                Remove all unused images
+  docker tag myapp:v1 user/myapp:v1    Tag image for push
+  docker push user/myapp:v1            Push to Docker Hub
+  docker history myapp:v1              Show image layers
+
+  CONTAINERS:
+  ───────────
+  docker run nginx                     Run container
+  docker run -d nginx                  Run in background
+  docker run -d -p 8080:80 nginx       Run with port mapping
+  docker run -d --name myapp nginx     Run with custom name
+  docker run -it ubuntu bash           Interactive terminal
+  docker run --rm nginx                Auto-remove when stopped
+  docker run --env-file .env myapp     Use env file
+  docker run -v myvolume:/data myapp   Mount volume
+  docker run -v $(pwd):/app myapp      Bind mount current dir
+  docker ps                            List running containers
+  docker ps -a                         List all containers
+  docker stop myapp                    Stop gracefully
+  docker kill myapp                    Force stop
+  docker start myapp                   Start stopped container
+  docker restart myapp                 Restart container
+  docker rm myapp                      Remove stopped container
+  docker rm -f myapp                   Force remove running container
+  docker logs myapp                    View logs
+  docker logs -f myapp                 Follow logs
+  docker logs --tail 100 myapp         Last 100 lines
+  docker exec -it myapp bash           Open shell in container
+  docker exec myapp ls /app            Run command in container
+  docker inspect myapp                 Detailed container info
+  docker stats                         Live resource usage
+  docker top myapp                     Processes in container
+  docker cp file.txt myapp:/app/       Copy file to container
+  docker cp myapp:/app/logs/ ./logs/   Copy file from container
+
+  NETWORKS:
+  ─────────
+  docker network ls                    List networks
+  docker network create mynet          Create network
+  docker network inspect mynet         Inspect network
+  docker network connect mynet myapp   Connect container to network
+  docker network disconnect mynet myapp  Disconnect
+  docker network rm mynet              Remove network
+  docker network prune                 Remove unused networks
+
+  VOLUMES:
+  ────────
+  docker volume ls                     List volumes
+  docker volume create myvol           Create volume
+  docker volume inspect myvol          Inspect volume
+  docker volume rm myvol               Remove volume
+  docker volume prune                  Remove unused volumes
+
+  DOCKER COMPOSE:
+  ───────────────
+  docker compose up                    Start all services (with logs)
+  docker compose up -d                 Start all (detached/background)
+  docker compose up -d --build         Rebuild and start
+  docker compose down                  Stop and remove containers
+  docker compose down -v               Stop and remove + delete volumes
+  docker compose ps                    List compose services
+  docker compose logs                  View all logs
+  docker compose logs -f user-service  Follow specific service logs
+  docker compose restart user-service  Restart one service
+  docker compose exec mysql bash       Shell into service
+  docker compose stop                  Stop without removing
+  docker compose pull                  Pull latest images
+
+  SYSTEM:
+  ───────
+  docker system df                     Disk usage
+  docker system prune                  Remove all unused resources
+  docker system prune -a               Remove ALL unused (including images)
+  docker version                       Docker version info
+  docker info                          Docker system info
 
 
-🌟 Commands to manage Docker Compose
-docker compose up -d
-docker compose ps
-docker compose logs
-docker compose down
 
+================================================================================
+CHAPTER 11 : PUTTING IT ALL TOGETHER - COMPLETE SPRING BOOT PROJECT
+================================================================================
+
+Let us walk through a complete real-world setup from scratch.
+
+PROJECT: Job Portal Application
+  - user-service: Spring Boot, handles users/auth
+  - job-service: Spring Boot, handles job listings
+  - mysql: Database for both services
+  - redis: JWT token cache / session management
+
+--------------------------------------------------------------------------------
+PROJECT STRUCTURE
+--------------------------------------------------------------------------------
+
+  jobportal/
+  ├── user-service/
+  │   ├── src/
+  │   ├── pom.xml
+  │   └── Dockerfile
+  ├── job-service/
+  │   ├── src/
+  │   ├── pom.xml
+  │   └── Dockerfile
+  ├── docker-compose.yml
+  └── .env
+
+
+--------------------------------------------------------------------------------
+DOCKERFILE FOR EACH SERVICE (user-service/Dockerfile)
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────
+  # STAGE 1: Build
+  FROM maven:3.9-eclipse-temurin-17 AS builder
+
+  WORKDIR /app
+
+  # Cache dependencies
+  COPY pom.xml .
+  RUN mvn dependency:resolve -q
+
+  # Build
+  COPY src ./src
+  RUN mvn clean package -DskipTests -q
+
+
+  # STAGE 2: Runtime (Distroless for security)
+  FROM gcr.io/distroless/java17-debian12
+
+  WORKDIR /app
+
+  COPY --from=builder /app/target/*.jar app.jar
+
+  EXPOSE 8080
+
+  CMD ["app.jar"]
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+ENVIRONMENT FILE (.env)
+--------------------------------------------------------------------------------
+
+  Create a .env file (NEVER commit this to git!):
+  ─────────────────────────────────────────────────────────────
+  MYSQL_ROOT_PASSWORD=strongrootpass
+  MYSQL_DATABASE=jobportal
+  MYSQL_USER=jpuser
+  MYSQL_PASSWORD=jppass123
+  REDIS_PASSWORD=redispass
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+DOCKER COMPOSE (docker-compose.yml)
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────
+  version: "3.9"
+
+  services:
+
+    mysql-db:
+      image: mysql:8.0
+      container_name: mysql-db
+      env_file: .env             # reads variables from .env file
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      volumes:
+        - mysql-data:/var/lib/mysql
+      ports:
+        - "3306:3306"
+      networks:
+        - jobportal-net
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 15s
+        timeout: 5s
+        retries: 5
+      restart: unless-stopped
+
+    redis-cache:
+      image: redis:7-alpine
+      container_name: redis-cache
+      ports:
+        - "6379:6379"
+      networks:
+        - jobportal-net
+      restart: unless-stopped
+
+    user-service:
+      build:
+        context: ./user-service
+      container_name: user-service
+      ports:
+        - "8081:8080"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE}
+        SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+        SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+        SPRING_DATA_REDIS_HOST: redis-cache
+        SPRING_PROFILES_ACTIVE: docker
+      depends_on:
+        mysql-db:
+          condition: service_healthy
+        redis-cache:
+          condition: service_started
+      networks:
+        - jobportal-net
+      restart: unless-stopped
+
+    job-service:
+      build:
+        context: ./job-service
+      container_name: job-service
+      ports:
+        - "8082:8080"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE}
+        SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+        SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+        SPRING_DATA_REDIS_HOST: redis-cache
+        SPRING_PROFILES_ACTIVE: docker
+      depends_on:
+        mysql-db:
+          condition: service_healthy
+      networks:
+        - jobportal-net
+      restart: unless-stopped
+
+  volumes:
+    mysql-data:
+
+  networks:
+    jobportal-net:
+      driver: bridge
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+SPRING BOOT APPLICATION PROPERTIES
+--------------------------------------------------------------------------------
+
+  src/main/resources/application-docker.properties:
+  ─────────────────────────────────────────────────────────────
+  # Database
+  spring.datasource.url=${SPRING_DATASOURCE_URL}
+  spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+  spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+  spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+  # JPA / Hibernate
+  spring.jpa.hibernate.ddl-auto=update
+  spring.jpa.show-sql=false
+
+  # Redis
+  spring.data.redis.host=${SPRING_DATA_REDIS_HOST}
+  spring.data.redis.port=6379
+
+  # Logging (goes to stdout so Docker captures it)
+  logging.level.root=INFO
+  logging.level.com.yourcompany=DEBUG
+  ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+HOW TO RUN THE WHOLE PROJECT
+--------------------------------------------------------------------------------
+
+  Step 1: Build Spring Boot JARs (on your machine, outside Docker)
+    $ cd user-service && mvn clean package -DskipTests && cd ..
+    $ cd job-service && mvn clean package -DskipTests && cd ..
+
+  Step 2: Start everything with Docker Compose
+    $ docker compose up -d --build
+
+  Step 3: Check if everything is running
+    $ docker compose ps
+
+  Step 4: Check logs
+    $ docker compose logs -f user-service
+
+  Step 5: Test the API
+    $ curl http://localhost:8081/api/users
+    $ curl http://localhost:8082/api/jobs
+
+  Step 6: Stop everything
+    $ docker compose down
+
+  Step 7: Stop and delete all data (fresh start)
+    $ docker compose down -v
+
+
+
+================================================================================
+CHAPTER 12 : INTERVIEW QUESTIONS & ANSWERS
+================================================================================
+
+Q: What is the difference between a Docker image and a container?
+A: An image is a read-only blueprint/template. A container is a running instance
+   of that image. Image is like a Java class, container is like an object.
+   One image can run as many containers simultaneously.
+
+Q: What is the difference between CMD and ENTRYPOINT?
+A: CMD is the default command that CAN be overridden when running docker run.
+   ENTRYPOINT always runs and CANNOT be easily overridden. They work together:
+   ENTRYPOINT sets the executable, CMD sets default arguments.
+
+Q: Why use multi-stage builds?
+A: To separate build environment from runtime environment. Build stage uses
+   Maven/JDK (heavy). Runtime stage uses only JRE + final JAR (lightweight).
+   Results in smaller, more secure images. Build tools are not in production.
+
+Q: What is the difference between volumes and bind mounts?
+A: Volumes are managed by Docker, stored in /var/lib/docker/volumes/, portable,
+   secure, and best for production. Bind mounts link a specific host directory
+   to container, great for development (live code reload), but not portable.
+
+Q: How do containers communicate with each other?
+A: Put containers on the same custom Docker network. Use container names
+   (not IP addresses) as hostnames. Docker provides internal DNS to resolve
+   container names to IPs. IPs can change on restart, names stay the same.
+
+Q: What is a distroless image?
+A: An image that contains ONLY the application runtime and required libraries.
+   No shell, no package manager, no OS utilities. Developed by Google.
+   Maximum security - attacker cannot run commands even if they breach container.
+
+Q: How do you debug a distroless container?
+A: Use application logs (docker logs), metrics (Prometheus), distributed tracing
+   (Jaeger/Zipkin), or use the debug variant of the distroless image temporarily.
+   You cannot exec into it because there is no shell.
+
+Q: What are the security concerns with Docker?
+A: 1) Docker daemon runs as root, 2) Shared kernel means if kernel is hacked
+   all containers are affected, 3) Container images may have CVEs,
+   4) Misconfigured networks can expose containers.
+
+Q: What is Docker Compose? Is it a replacement for Docker?
+A: Docker Compose is a tool for running multi-container applications using YAML
+   config. It is NOT a replacement for Docker. Compose depends on Docker.
+   Docker runs single containers; Compose orchestrates multiple containers.
+
+Q: What happens when you run docker compose up?
+A: Compose reads docker-compose.yml, creates a default or specified network,
+   creates volumes defined in the file, starts containers in dependency order
+   (respecting depends_on), assigns DNS names equal to service names.
+
+Q: What is the Docker daemon?
+A: A background process (dockerd) that does all container management work:
+   builds images, runs containers, manages networks and volumes. It runs
+   as root and listens for commands from the Docker client.
+
+Q: How do you limit container resources?
+A: Use --memory="512m" and --cpus="1.0" in docker run command.
+   Or use the deploy.resources section in docker-compose.yml.
+
+Q: Why should you NOT use IP addresses for container communication?
+A: Container IPs change every time a container restarts. Using names with
+   Docker's internal DNS is reliable and always works regardless of IP changes.
+
+
+
+================================================================================
+QUICK CHEAT SHEET
+================================================================================
+
+  Build image:          docker build -t name:tag .
+  Run container:        docker run -d -p 8080:8080 --name myapp name:tag
+  Stop container:       docker stop myapp
+  Remove container:     docker rm myapp
+  Remove image:         docker rmi name:tag
+  View logs:            docker logs -f myapp
+  Shell into container: docker exec -it myapp bash
+  List containers:      docker ps -a
+  List images:          docker images
+  Create network:       docker network create mynet
+  Create volume:        docker volume create myvol
+  Compose up:           docker compose up -d
+  Compose down:         docker compose down
+  Compose logs:         docker compose logs -f service-name
+  Compose rebuild:      docker compose up -d --build
+  System cleanup:       docker system prune -a
+
+
+================================================================================
+       END OF GUIDE - Docker from Beginner to Intermediate
+       You now know everything a backend engineer needs about Docker!
+================================================================================
