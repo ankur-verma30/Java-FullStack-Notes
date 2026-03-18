@@ -2179,7 +2179,7 @@ public class IdentityHashMapDemo {
 
 }
 ✅ Output: {key=2};
-🧠Explaination: Even though string is made through new keyword, that hashcode will not be generated based on the memory address, as string already has a function to calculate hashcode based on the value stored inside the string so both the values are same. 
+🧠Explaination: Even though string is made through new keyword, that hashcode will not be generated based on the memory address, as string already has a function to calculate hashcode based on the value stored inside the string so both the values are same.
 Therefore, inside the map it will use the key1.equals(key2) and it will return true so it will return the value of key2 which is 2.
 
 If we want output like {key=1, key=2} then we can use IdentityHashMap.
@@ -2252,7 +2252,7 @@ public class IdentityHashMapDemo {
 		System.out.println(map);
 	}
 }
-✅Output : {Key=2}
+✅Output :{Key=1, Key=2}
 
 
 ===============
@@ -2311,7 +2311,8 @@ class NameComparator implements Comparator<Student> {
 }
 🔄 Usage: Collections.sort(list, new NameComparator());
 
-🆚 Comparable vs Comparator — Differences
+
+🆚 Comparable vs Comparator
 | Feature             | Comparable                              | Comparator                                          |
 | ------------------- | --------------------------------------- | --------------------------------------------------- |
 | Package             | `java.lang`                             | `java.util`                                         |

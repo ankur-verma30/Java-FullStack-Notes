@@ -1,4 +1,3 @@
-
 🔷 SDLC in Traditional 🆚 Agile
 | Aspect               | Traditional SDLC (outdated) (Waterfall)                                    | Agile SDLC                                                       |
 | Approach    | Sequential (phases: Requirement→Design→Implementation→Testing→Deployment→Maintenance)|Iterative & Incremental (short cycles called sprints/iterations) |

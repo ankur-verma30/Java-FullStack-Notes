@@ -1,0 +1,157 @@
+###########################
+🔷 Introduction to Datadog
+###########################
+➤ Datadog is a cloud-based observability and monitoring platform.
+➤ It provides a unified view of infrastructure, applications, logs, metrics, and traces in one place.
+
+➤ Think of Datadog as a central nervous system for your system health
+➤ It helps you:
+    ✔️ Monitor servers
+    ✔️ Track application performance
+    ✔️ Analyze logs
+    ✔️ Detect issues in real-time
+
+
+❓ Why Datadog is Used
+1️⃣ End-to-End Observability
+Combines:
+    ✔️ Metrics (CPU, memory, latency)
+    ✔️ Logs (error logs, system logs)
+    ✔️ Traces (request flow across microservices)
+👉 Instead of using 3–4 tools, you use one platform
+
+
+2️⃣ Real-time Monitoring & Alerting
+Detect issues instantly
+✅ Example:
+    ✔️ API latency suddenly spikes → alert triggered
+    ✔️ CPU > 90% → notify DevOps
+
+
+3️⃣ Microservices & Distributed System Visibility
+In modern architectures:
+    ✔️ Hundreds of services
+    ✔️ Hard to trace a single request
+
+👉 Datadog helps you:
+    ✔️ Track request flow across services
+    ✔️ Identify bottlenecks
+
+
+4️⃣ Cloud-native Support
+Works seamlessly with: AWS, Azure, Kubernetes, Docker
+👉 No heavy setup required
+
+
+5️⃣ Developer + DevOps Friendly
+Used by:
+    ✔️ Backend developers
+    ✔️ SREs
+    ✔️ DevOps engineers
+
+
+⚠️ Problem Datadog Solves
+❌ Before Datadog (Traditional Problem)
+In older systems Monitoring tools were fragmented:
+    ✔️ One tool for metrics (e.g., CPU)
+    ✔️ One for logs
+    ✔️ One for tracing
+
+👉 Problems:
+    ✔️ No single view
+    ✔️ Hard to debug production issues
+    ✔️ Time-consuming root cause analysis
+
+❌ In Microservices Architecture
+Request flow: API Gateway → Auth Service → Order Service → Payment Service → DB
+
+If something fails:
+    ✔️ Where did it fail?
+    ✔️ Which service caused delay?
+    ✔️ Which log is relevant?
+👉 Debugging becomes nightmare
+
+❌ Lack of Correlation
+➤ Logs say error
+➤ Metrics show spike
+➤ But no way to connect both
+
+
+✅ Datadog Solution
+Datadog provides:
+1️⃣ Correlation
+Connects: Logs ↔ Metrics ↔ Traces
+
+2️⃣ Root Cause Analysis
+Quickly identify:
+    ✔️ Which service failed
+    ✔️ Why it failed
+    ✔️ When it started
+
+3️⃣ Single Dashboard
+Everything in one UI:
+    ✔️ Infrastructure
+    ✔️ Application
+    ✔️ Logs
+
+
+❓ How Datadog Works (High-Level)
+1️⃣ Datadog Agent
+Installed on: Servers / containers
+Collects:
+    ✔️ Metrics
+    ✔️ Logs
+    ✔️ Events
+
+2️⃣ Data Pipeline
+➤ Agent → Datadog cloud
+➤ Data processed and stored
+
+3️⃣ Visualization Layer
+➤ Dashboards
+➤ Alerts
+➤ Analytics
+
+
+📈 Evolution Timeline
+🔗 2010–2012
+➤ Focus on infrastructure monitoring
+➤ Competing with tools like Nagios
+
+🔗 2014–2016
+➤ Log management
+
+Integrations with cloud providers
+
+🔗 2017–2019
+➤ APM (Application Performance Monitoring)
+➤ Distributed tracing
+
+🔗 2019
+➤ IPO (public company)
+
+🔗 2020–Present
+➤ Full observability platform
+➤ Security monitoring
+➤ AI-based anomaly detection
+
+
+✅ Real-World Example
+➤ Imagine you deployed a backend service: Users complain: “App is slow”
+➤ Without Datadog:
+    ✔️ Check logs manually
+    ✔️ SSH into servers
+    ✔️ Guess issue
+➤ Takes hours
+
+🔄 With Datadog:
+➤ Dashboard shows: Latency spike in Order Service
+➤ Trace shows: DB query taking 2 seconds
+➤ Logs show: Missing index
+⚡ Root cause found in minutes
+
+
+⚠️ Common Mistakes
+➤ Treating Datadog as just monitoring tool → It’s an observability platform
+➤ Not using correlation features → Biggest power wasted
+➤ Ignoring custom metrics → Default metrics are not enough for real systems

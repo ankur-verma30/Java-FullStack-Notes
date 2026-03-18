@@ -1,876 +1,2003 @@
-🔷 Linux Commands
-1️⃣ free — Check RAM (Memory) Usage
-Displays information about system memory — total, used, and free RAM & swap.
-
-🔄 Syntax:
-🔗 free
-🔗 free -m   # Show in MB
-🔗 free -g   # Show in GB
-
-✅ Example:
-🔗 free -g
-
-✅ Output Example:
-              total        used        free      shared  buff/cache   available
-Mem:              8           2           3           0           2           5
-Swap:             2           0           2
-
-👉 Meaning:
-✔️ total → Total RAM in the system
-✔️ used → RAM currently used
-✔️ free → RAM available
-✔️ buff/cache → Memory used by kernel buffers & cache
-✔️ available → Memory available for new processes
-
-⚡Use in scripts:
-To check if a server has enough memory before deploying or running a heavy service.
-
-2️⃣ nproc — Get Number of CPU Cores
-Displays the number of CPU cores available for processing.
-
-✅ Syntax: nproc
-✅ Example Output: 4
-
-👉 The system has 4 CPU cores (useful for tuning multi-threaded tasks or Docker containers).
-
-👉 Use in scripts:
-Automatically detect CPU cores to parallelize builds or workloads.
-✅ Example: make -j$(nproc)
-→ Compiles code using all available CPU cores.
-
-
-3️⃣ df -h — Check Disk Usage
-Shows disk space usage on all mounted file systems.
-
-✅ Syntax: df -h
-
-✅ Example Output:
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/xvda1       30G   10G   18G  36% /
-tmpfs           1.9G     0  1.9G   0% /dev/shm
-
-✔️ Filesystem → Name of the disk/partition
-✔️ Size → Total disk size
-✔️ Used → Space already used
-✔️ Avail → Free space available
-✔️ Use% → Percentage of disk used
-✔️ Mounted on → Directory where the disk is attached
-
-👉 Check if there’s enough disk space before uploading files, running backups, or installing packages.
-
-🔷 top Command — Real-Time Process & Resource Monitor
-
-🔄 Purpose:
-Shows real-time information about:
-1️⃣ Running processes
-2️⃣ CPU & memory usage
-3️⃣ System load
-4️⃣ Uptime
-5️⃣ Process IDs (PIDs)
-6️⃣ Users running those processes
-👉 It’s like Task Manager in Windows — but for Linux CLI.
-
-👉 Syntax : top
-
-👉 can also use:
-🔗 top -u <username>     # Show processes of a specific user
-🔗 top -p <pid>          # Monitor a specific process ID
-🔗 top -n 1              # Show output only once and exit
-
-
-✅ Sample Output:
-top - 10:12:36 up 3 days,  2:04,  1 user,  load average: 0.07, 0.03, 0.01
-Tasks: 120 total,   1 running, 119 sleeping,   0 stopped,   0 zombie
-%Cpu(s):  2.3 us,  1.2 sy,  0.0 ni, 96.2 id,  0.2 wa,  0.0 hi,  0.1 si,  0.0 st
-MiB Mem :   7982.4 total,   2345.1 free,   1223.5 used,   4413.8 buff/cache
-MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6037.3 avail Mem 
-
-PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
-1234 ec2-user  20   0  123456  5678  1234 S   1.3  0.2   0:02.34 java
-5678 root      20   0  87654  4321  3210 S   0.7  0.1   0:01.45 sshd
-
-
-🔄 Output Breakdown:
-| Field                | Description                                          |
-| -------------------- | ---------------------------------------------------- |
-| **PID**              | Process ID                                           |
-| **USER**             | Owner of the process                                 |
-| **PR / NI**          | Process priority & nice value                        |
-| **VIRT / RES / SHR** | Virtual, Resident & Shared memory usage              |
-| **S**                | Process status (`R` = running, `S` = sleeping, etc.) |
-| **%CPU / %MEM**      | CPU and memory usage of the process                  |
-| **TIME+**            | Total CPU time used                                  |
-| **COMMAND**          | Command/program name                                 |
-
-
-🔄 Top Section Details: 
-1️⃣ Uptime & Load Average
-load average: 0.07, 0.03, 0.01
-➤ Indicates system load in the last 1, 5, and 15 minutes.
-(Lower is better; if load > number of CPUs, system is overloaded.)
-
-2️⃣ Tasks
-Tasks: 120 total, 1 running, 119 sleeping
-➤ Shows how many processes are running, sleeping, or stopped.
-
-3️⃣ CPU Usage
-%Cpu(s): 2.3 us, 1.2 sy, 96.2 id
-✔️ us = user processes
-✔️ sy = system processes
-✔️ id = idle time
-✔️ wa = waiting for I/O
-
-4️⃣ Memory Usage
-Mem: 7982 total, 1223 used, 4413 buff/cache
-➤ Monitors RAM and swap usage in real-time.
-
-🔄 Top Command Shortcuts
-| Key           | Function                                 |
-| ------------- | ---------------------------------------- |
-| **q**         | Quit `top`                               |
-| **k**         | Kill a process (you’ll be asked for PID) |
-| **r**         | Renice (change process priority)         |
-| **M**         | Sort by memory usage                     |
-| **P**         | Sort by CPU usage                        |
-| **1**         | Show CPU usage for each core             |
-| **u**         | Filter processes by user                 |
-| **Shift + E** | Change memory units (KB → MB → GB)       |
-
-
-🔄 In Shell Scripts
-You usually don’t use top directly in scripts (since it’s interactive),
-but you can use:
-🔗 top -b -n 1
-
-👉 This runs top in batch mode (non-interactive) → useful for automation or logging.
-
-✅ Example:
-🔗 top -b -n 1 | head -15 > system_report.txt
-→ Saves top 15 lines of top output into a file.
-
-🔷 Shell Scripting
-A shell script is a file containing a series of Linux commands that the shell (command-line interpreter) executes one after another automatically.
-
-Think of it like:
-🧩 Instead of typing each command manually in the terminal, you write them in a file and let the system run them all at once.
-
-🔷 Why Use Shell Scripting?
-➤ Automation
-➤ Reusability
-➤ Security
-
-Creating a Shell Script
-🔗 nano script.sh --> file should be of .sh extension 
-
-
-🔄 Shebang (#! ) in Shell Scripting
-A shebang (#!) is the first line in a shell script that tells the system which interpreter should be used to execute the script.
-
-✅ Syntax:
-🔗 #!/bin/
-
- ✅Example 1 — Bash Script
-#!/bin/bash
-echo "Hello, World!"
-➡️ This tells Linux:
-"Use the bash shell (located at /bin/bash) to run this script."
-
-🔄 Why Shebang is Important
-➤ Specifies interpreter explicitly — ensures script runs the same way everywhere.
-➤ Avoids confusion — even if a user’s default shell is different (like zsh or fish).
-
-⚡ Used by system to know how to execute when you run:
-./script.sh
-⚡ save the file in vim editor and exit by :wq
-
-Running a Shell Script
-1️⃣ Can use sh prefix to run a script.
-🔗 sh script.sh
-
-2️⃣ Or make it executable and run directly:
-🔗 chmod +x script.sh   # Make it executable
-
-
-🔄 Always write metadata information about the script before writing the script
-##########################
-# Author: Ankur
-# Date: 12/11/2025
-#
-# This scripts outputs the node health
-#
-# Version:v1
-#####################################
-
-
-🔷 Writing shell script to check the health of the VM Machines
-🔄 Method 1: Using echo command to write the readabe scripts 
-#!/bin/bash
-
-
-echo "Print the disk space"
-🔗 df -h
-
-echo "Print the memory"
-🔗 free -g
-
-
-echo "Print the number of CPU"
-🔗 nproc
-➤ However for large and complex scripts writing echo is not a good idea and its a very cumbersome task
-
-🔄 Method 2: use Debug mode to write the script
-
-#!/bin/bash
-🔗 set -x   # Enable debug mode
-🔗 df -h
-🔗 free -g
-🔗 nproc
-
-➤ The set -x command enables debug mode, which prints each command and its arguments to the terminal as they are executed.
-➤ This makes it easier to write and troubleshoot the script since you can see exactly what commands are being run.
-
-
-🔷 ps -ef Command- Process status
-ps -ef shows a complete list of all running processes on a Linux system in full detail.
-It is one of the most common commands used in DevOps, EC2, Docker, Kubernetes, troubleshooting
-
-Breakdown of Operations
-ps → Process Status
--e → Show all processes
--f → Show full-format listing (detailed)
-
-🔷 Difference between ps and top
-| Command    | Purpose                                           |
-| ---------- | ------------------------------------------------- |
-| **ps -ef** | Shows a one-time snapshot of all processes        |
-| **top**    | Shows real-time updates of CPU, memory, processes |
-
-1️⃣ Check if a process is running
-🔗 ps -ef | grep nginx
-
-2️⃣ Find a process by port (with netstat/lsof)
-🔗 sudo lsof -i :8080
-
-3️⃣ then kill it:
-🔗 kill -9 <PID>
-
-4️⃣ Find parent-child process relationships
-🔗 ps -ef --forest
- 
-5️⃣ Kill a specific running process
-🔗 kill -9 <PID>
-
-5️⃣ Check JVM, MySQL, Python processes
-🔗 ps -ef | grep java
-🔗 ps -ef | grep python
-
-🔄 Working of awk command
-awk is a powerful text-processing tool used to:
-    ✔️ Search text
-    ✔️ Filter data
-    ✔️ Extract columns
-    ✔️ Perform calculations
-    ✔️ Format output
-    ✔️ Process logs
-It works line by line and splits each line into fields (columns).
-
-🔄 Basic Syntax
-awk 'pattern { action }' filename
-
-➤ pattern → what to search for
-➤ action → what to do when pattern matches
-➤ $1, $2, $3... → columns
-➤ $0 → whole line
-
-✔️ $1 → first column
-✔️ $2 → second column
-✔️ $0 → entire line
-✔️ NF → number of fields
-✔️ NR → line number
-
-✅ Example:
-ps -ef | grep amazon | awk -F" " '{print $2}' 
-
-
-🔷 set commands
-| Option        | Meaning                            |
-| ------------- | ---------------------------------- |
-| `-e`          | Exit on any error                  |
-| `-u`          | Exit on using undefined variables  |
-| `-o pipefail` | Fail pipeline if any command fails |
-
-✅Example:
-set -euo pipefail  # in almost all professional scripts this is used
-
-
-🔷 curl command
-curl (Client URL) is a command-line tool used to send HTTP requests and interact with APIs, servers, URLs.
-
-Supports many protocols: HTTP, HTTPS, FTP, SCP, SFTP, SMTP, etc.
-
-Very commonly used in DevOps, automation, shell scripting, backend testing, CI/CD pipelines.
-
-🔄 Basic curl Commands (Most Used)
-1️⃣ GET request (default)
-🔗 curl https://api.example.com/users
-
-2️⃣ Save output to a file
-🔗 curl -o output.json https://api.example.com/users
-
-3️⃣ Follow redirects
-🔗 curl -L https://example.com
-
-4️⃣ Show only HTTP response code
-🔗 curl -o /dev/null -w "%{http_code}\n" -s https://example.com
-
-5️⃣ Send a POST request with JSON body
-🔗 curl -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Ankur", "role":"DevOps"}' \
-  https://api.example.com/create
-
-🔄 Headers in curl
-Add a custom header
-🔗 curl -H "Authorization: Bearer <token>" https://api.example.com/data
-
-🔄 Download a file
-🔗 curl -O https://example.com/file.zip
-
-🔄 Upload a file
-🔗 curl -F "file=@/path/to/file.txt" https://api.example.com/upload
-
-🔄 Verbose Mode (Debugging APIs)
-🔗 curl -v https://example.com
-👉 Shows:
-➤ request headers
-➤ response headers
-➤ SSL details
-
-🔄 Check only response headers
-🔗 curl -I https://example.com
-
-🔄 Send form data (like HTML form)
-🔗 curl -X POST -F "username=ankur" -F "password=1234" https://example.com/login
-
-🔄 Use curl with authentication
-Basic Auth
-🔗 curl -u user:password https://example.com
-
-🔄 Send multiple headers
-🔗 curl -H "Accept: application/json" \
-     -H "X-API-KEY: 12345" \
-     https://example.com
-
-🔄 Test API speed
-🔗 curl -w "@curl-format.txt" -o /dev/null -s https://example.com
-
-🔄 wget Command
-🔗 wget dummylog.log 
-➤ It downloads the log file into your local machine.
-
-🔄 find command
-➤ find is used to search files and directories in a directory hierarchy.
-➤ You can search by name, type, size, extension, time, permissions, owner, etc.
-➤ Supports powerful actions: delete, move, exec 
-
-
-🔷 If else and for loop in Shell scripting
-1️⃣ IF Statement
-👉 Syntax
-if [ condition ]; then
-    commands
-fi
-
-✅ Example
-num=10
-if [ $num -gt 5 ]; then
-    echo "Number is greater than 5"
-fi
-
-2️⃣ IF–ELSE Statement
-👉 Syntax
-if [ condition ]; then
-    commands
-else
-    commands
-fi
-
-✅ Example
-n=3
-if [ $n -eq 3 ]; then
-    echo "Matched"
-else
-    echo "Not matched"
-fi
-
-3️⃣ IF–ELIF–ELSE Ladder (else-if)
-👉 Syntax
-if [ condition1 ]; then
-    commands
-elif [ condition2 ]; then
-    commands
-else
-    commands
-fi
-
-✅ Example
-marks=90
-
-if [ $marks -ge 90 ]; then
-    echo "Grade A"
-elif [ $marks -ge 80 ]; then
-    echo "Grade B"
-else
-    echo "Grade C"
-fi
-
-🔄 Common Conditions in Shell
-⚡ Numeric:
--eq   # equal
--ne   # not equal
--gt   # greater than
--lt   # less than
--ge   # greater or equal
--le   # less or equal
-
-⚡ Strings:
-=     # equal
-!=    # not equal
--z    # empty string
--n    # non-empty string
-
-⚡ Files:
--e file   # exists
--f file   # regular file
--d dir    # directory
--r        # readable
--w        # writable
--x        # executable
-
-✅ FOR Loop in Shell Scripting
-1️⃣ Basic FOR Loop
-for i in 1 2 3 4 5
-do
-    echo "Number: $i"
-done
-
-2️⃣ FOR Loop with Range
-for i in {1..10}
-do
-    echo $i
-done
-
-3️⃣ FOR Loop with Step Size
-for i in {1..10..2}
-do
-    echo $i
-done
-
-4️⃣ FOR Loop Through Files
-for file in *.sh
-do
-    echo "File: $file"
-done
-
-5️⃣ FOR Loop in Classic C-Style (Most used in DevOps)
-for ((i=1; i<=5; i++))
-do
-    echo "Iteration: $i"
-done
-
-🔄 IF inside a FOR Loop 
-for file in *.log
-do
-    if [ -s $file ]; then
-        echo "$file is not empty"
+================================================================================
+CHAPTER 1 : SYSTEM MONITORING COMMANDS
+================================================================================
+
+These commands help you understand what is happening on your Linux machine.
+As a backend engineer or DevOps person, you need these every day to:
+  - Check if server has enough memory before deploying
+  - Find which process is eating CPU
+  - Check if disk is full
+  - Monitor running processes
+
+
+--------------------------------------------------------------------------------
+COMMAND 1: free — CHECK RAM (MEMORY) USAGE
+--------------------------------------------------------------------------------
+
+  WHAT IT DOES:
+    Shows how much RAM (memory) your system has, how much is used,
+    and how much is free. Think of RAM like your desk workspace.
+    If your desk is full, you cannot work efficiently.
+
+  SYNTAX:
+    $ free          (shows in bytes - hard to read)
+    $ free -m       (shows in Megabytes - easier)
+    $ free -g       (shows in Gigabytes - easiest for large servers)
+
+  EXAMPLE:
+    $ free -g
+
+  OUTPUT:
+    ─────────────────────────────────────────────────────────────────
+                  total        used        free      shared  buff/cache   available
+    Mem:              8           2           3           0           2           5
+    Swap:             2           0           2
+    ─────────────────────────────────────────────────────────────────
+
+  UNDERSTANDING THE OUTPUT:
+    total      = Total RAM in the system (here 8 GB)
+    used       = RAM currently being used by programs (2 GB)
+    free       = RAM that is completely empty (3 GB)
+    buff/cache = RAM used by Linux for caching (makes things faster)
+    available  = RAM that can actually be used for new programs (5 GB)
+    Swap       = Virtual memory on disk (used when RAM is full)
+
+  IMPORTANT NOTE:
+    Do NOT worry if "free" is low. Linux always tries to use RAM for caching.
+    Look at "available" column - that is the real free memory.
+
+    Bad situation: available = 0 → Server is running out of RAM!
+
+  REAL USE CASE:
+    Before deploying a Spring Boot app that needs 512 MB:
+      $ free -m
+      Check if "available" is at least 512 MB. If not, the app may crash.
+
+  IN A SHELL SCRIPT:
+    ─────────────────────────────────────────────────────────────────
+    #!/bin/bash
+    available_mem=$(free -m | awk 'NR==2 {print $7}')
+    if [ "$available_mem" -lt 512 ]; then
+        echo "WARNING: Less than 512 MB available. Do not deploy!"
     else
-        echo "$file is empty"
+        echo "Memory OK. Safe to deploy."
     fi
-done
-
-
-🔷 trap command
-trap is used to catch and handle signals in a shell script.
-It allows you to run a custom command before the script exits, when it receives an interrupt, or when an error occurs.
-
-🔄 Important signals 
-| Signal    | Number | Meaning                                |
-| --------- | ------ | -------------------------------------- |
-| `SIGINT`  | 2      | Ctrl + C interrupt                     |
-| `SIGTERM` | 15     | Termination request                    |
-| `EXIT`    | 0      | Script exiting                         |
-| `ERR`     | —      | When any command fails (with `set -e`) |
-
-✅Example:
-trap "echo 'You pressed Ctrl+C. Stopping script...'" SIGINT
-
-✅ Example: Write the script to count the number of s in the letter mississipi
-1️⃣ Method 1: using for loop and if condition
-#!/bin/bash
-count=0
-for letter in mississipi
-do
-    if [ "$letter" == "s" ]; then
-        count=$((count+1))
-    fi
-done
-echo "Number of s's: $count"
-
-2️⃣ Using grep + wc -l
-#!/bin/bash
-count=$(echo "mississipi" | grep -o "s" | wc -l)
-echo "Number of s's: $count"
-
-1️⃣ echo "mississipi"
-➤ Prints the string mississipi to standard output.
-
-2️⃣ | grep -o "s"
-➤ grep -o prints each matching "s" on a new line.
-✅ Output becomes:
-s
-s
-s
-s
-(4 lines because "s" occurs 4 times)
-
-3️⃣ | wc -l
-➤ wc -l counts the number of lines.
-➤ Here, each "s" is one line → 4.
-
-5️⃣ count=$( ... )
-➤ Stores the output (number 4) into the count variable.
-
-6️⃣ echo "Number of s's: $count"
-➤ Prints the final count.
-
-3️⃣ Using “<<<” Here-String Operator
-#!/bin/bash
-x="mississipi"
-
-grep -o "s" <<< "$x" | wc -l
-
-❓ What is <<< ?
-➤ <<< is called a here-string.
-➤ It sends the content of a variable as input to a command.
-
-Equivalent to:
-echo "$x" | command
-
-1️⃣ x="mississipi"
-➤ Stores the string in variable x.
-
-2️⃣ grep -o "s" <<< "$x"
-➤ Takes the string directly from the variable and passes it to grep.
-➤ Again, grep -o prints each "s" on a separate line.
-
-3️⃣ | wc -l
-➤ Counts the number of lines → number of occurrences of s.
-
-Thus output is 4.
-
-🔄 Difference between Method 2 and Method 3
-| Method            | How Input is Passed | When to Use             |                            |
-| ----------------- | ------------------- | ----------------------- | -------------------------- |
-| **echo "text"     | grep**              | Through a pipeline      | Good for hardcoded strings |
-| **grep <<< "$x"** | Via here-string     | Best for variable input |                            |
-
-
-🔷 Crontab
-📌 Crontab = Cron Table
-➤ It is a file that contains scheduled commands.
-➤ These commands run automatically at specific times/dates.
-➤ Cron is the time-based job scheduler in Linux.
-
-🔄 Why is Crontab used?
-To automate tasks such as:
-✔️ Backup files
-✔️ Clean logs
-✔️ Start/stop services
-✔️ Run scripts at fixed intervals
-✔️ Send reports or emails
-✔️ Trigger monitoring or health checks
-✔️ Rotate logs
-✔️ Automate deployments (rare but possible)
-
-❓ Where is it used in DevOps?
-✔️ CI/CD automation
-✔️ Data pipeline scheduling
-✔️ Server maintenance
-✔️ EC2 instance tasks
-✔️ Kubernetes node scripts
-✔️ Managing cron jobs in Docker containers
-✔️ Log cleanup on servers
-
-🔄 Crontab Syntax
-A cron job has 5 time fields + command:
-*  *  *  *  *    command
-│  │  │  │  │
-│  │  │  │  └── Day of week (0–6)  Sun=0
-│  │  │  └───── Month (1–12)
-│  │  └──────── Day of month (1–31)
-│  └─────────── Hour (0–23)
-└────────────── Minute (0–59)
-
-🔄 Basic Crontab Commands
-👉 Edit cron jobs:
-🔗 crontab -e
-
-👉 View cron jobs:
-🔗 crontab -l
-
-👉 Delete all jobs:
-🔗 crontab -r
-
-🔄 How to open a read-only file?
-🔗 vim -r test.txt
-
-🔷 Difference between soft link and hard-link?
-1️⃣ Soft Link (Symbolic Link)
-➤ Works like a shortcut or pointer to another file.
-➤ Stores the path of the original file.
-➤ If original file is deleted → soft link breaks (becomes unusable).
-➤ Can link directories.
-➤ Can link across different file systems (partitions/disks).
-➤ Has a different inode number from the original.
-➤ Size is small (stores only file path).
-
-🔄 Create soft link:
-🔗 ln -s original.txt softlink.txt
-
-
-2️⃣ Hard Link
-➤ A duplicate directory entry pointing to the same underlying file.
-➤ Both original and hard link share the same inode number.
-➤ If original file is deleted → hard link still works
-(because data still exists).
-➤ Cannot link directories.
-➤ Cannot link across different file systems.
-➤ Acts like a copy, but does not take extra space (until content changes).
-➤ Content is the same for both.
-
-🔄 Create hard link:
-🔗 ln original.txt hardlink.txt
-
-🆚 Comparison between soft link and hard-link?
-| Feature                     | Soft Link (Symbolic) | Hard Link                   |
-| --------------------------- | -------------------- | --------------------------- |
-| Link Type                   | Shortcut             | Actual mirror pointer       |
-| Inode Number                | Different            | Same inode as original      |
-| Breaks if original deleted? | ❌ Yes                | ✔ No                        |
-| Can link directories?       | ✔ Yes                | ❌ No                        |
-| Can cross file systems?     | ✔ Yes                | ❌ No                        |
-| File size                   | Small (path only)    | Same as file (shares inode) |
-| Acts like                   | Shortcut             | Real file clone             |
-
-
-🔷 Disadvantages of Shell Scripting
-1️⃣ Hard to Debug
-➤ Error messages are not always clear.
-➤ Debugging large shell scripts is difficult.
-
-2️⃣ Not Portable Across Shells
-➤ Bash script may not run the same in sh, zsh, or dash.
-➤ Different OS versions behave differently.
-
-3️⃣ Poor Error Handling
-➤ No strong exception-handling mechanism.
-➤ Small mistakes can break the entire script.
-
-4️⃣ Difficult to Maintain Large Scripts
-➤ Not suitable for large, complex programs.
-➤ Code becomes messy without strict structure.
-
-5️⃣ Security Risks
-➤ Easy to accidentally expose secrets (passwords, keys).
-➤ Unsafe use of eval, input parameters, or file paths can cause vulnerabilities.
-
-6️⃣ Performance Limitations
-➤ Slower than compiled languages (C, Go, Java).
-➤ Not good for CPU-heavy tasks.
-
-7️⃣ Weak Typing
-➤ No strong data types → errors occur silently.
-➤ Strings and numbers mix easily without warnings.
-
-8️⃣ Limited Functionality
-➤ Cannot create advanced applications (APIs, microservices).
-➤ Mostly useful only for automation, file operations, and system tasks.
-
-9️⃣ Error-Prone Syntax
-➤ Brackets must be spaced correctly: [ $a -eq $b ]
-➤ Quotes, spaces, tabs → small mistakes break script.
-
-🔟 No Standard Library
-➤ Must use external tools (grep, awk, sed) for many operations.
-
-
-1️⃣ Traceroute Command 
-➤ traceroute shows the path (hops) your packet takes from your machine to a destination (server/website).
-➤ Each "hop" is a router or network device.
-➤ Used to diagnose network issues like high latency, packet loss, or routing loops.
-
-✅ How it works
-➤ Sends packets with increasing TTL (Time-To-Live).
-➤ Each router along the path reduces the TTL.
-➤ When TTL becomes zero, the router returns an ICMP Time Exceeded message.
-➤ Traceroute uses these messages to map the entire route.
-
-🧪 Example
-traceroute google.com
-Output shows:
-    ✔️ Hop number
-    ✔️ Router IP
-    ✔️ Time taken in ms (latency)
-
-🎯 Why DevOps uses traceroute
-➤ Checking connectivity between EC2 → RDS, local → server.
-➤ Diagnosing slow network issues.
-➤ Troubleshooting VPC networking problems.
-➤ Identifying firewall or routing issues.
-
-2️⃣ Logrotate — DevOps Notes
-A Linux utility that automatically manages log files by:
-    ✔️ Rotating (renaming old logs)
-    ✔️ Compressing (gzip)
-    ✔️ Deleting old logs
-    ✔️ Setting retention policies
-    ✔️ Scheduling (daily/weekly/monthly)
-    ✔️ Ensuring logs don't fill the disk
-
-🔄 🛠 Why DevOps Needs Logrotate
-Because logs can grow very large and crash servers by consuming disk space.
-
-You use logrotate to:
-    ✔️ Prevent /var/log/ from filling
-    ✔️ Maintain system logs
-    ✔️ Manage application logs (Nginx, Apache, custom logs)
-    ✔️ Auto delete logs older than X days
-
-📌 Default Config File Locations
-👉 Global config file:
-🔗 /etc/logrotate.conf
-
-👉 Service-specific configs:
-🔗 /etc/logrotate.d/
-
-✅ Example logrotate Configuration
-👉 Create a file:
-🔗 /etc/logrotate.d/myapp
-
-👉 Add:
-🔗 /var/log/myapp/*.log {
-    daily
-    rotate 7
-    compress
-    missingok
-    notifempty
-    create 0640 root root
-}
-
-✔️ daily → rotate logs every day
-✔️ rotate 7 → keep last 7 logs
-✔️ compress → compress old logs
-✔️ missingok → ignore if file is missing
-✔️ notifempty → don’t rotate empty logs
-✔️ create → create new log with permissions
-
-📌 Run logrotate manually
-🔗 logrotate /etc/logrotate.conf
-
-
-🔷 Write a script to report the usage of AWS in your project?
-!/bin/bash
-
-##########
-#Author :Ankur Verma
-#Date : 20/11/2025
-
-# Version : V1
-
-# This script is about the resource checking of aws"
-#####################################
-
-#AWS S3
-#AWS EC2
-#AWS Lambda
-#AWS IAM
-
-# To run the script in debug mode
-set -x
-
-set -euo pipefail
-
-# list s3 buckets
-echo "Print list of s3 buckets"
-aws s3 ls > resourceTracker
-
-# list EC-2 instances
-echo "Print list of ec-2"
-aws ec2 describe-instances | jq '.Reservations[].Instances[].InstanceId' >> resourceT>
-
-#list Lambda functions
-echo "Print list of lambda functions"
-aws lambda list-functions >> resourceTracker
-
-#list IAM users
-echo "Print list of IAM users"
-
-
-🔷 Script used to write the github uses listed in the collaborations
-#!/bin/bash
-
-helper()
-
-set -x
-set -euo pipefail
-
-# Github API URL
-API_URL="https://api.github.com"
-
-# Github username and personal access token (must be exported in env)
-USERNAME="$username"
-TOKEN="$token"
-
-# User and Repository information from command line args
-REPO_OWNER="$1"
-REPO_NAME="$2"
-
-# Function to make a GET request to the Github API
-function github_api_get() {
-    local endpoint="$1"
-    local url="${API_URL}/${endpoint}"
-
-    # Send a GET request with authentication
-    curl -s -u "${USERNAME}:${TOKEN}" "$url"
-}
-
-# Function to list users with read access
-function list_users_with_read_access() {
-    local endpoint="repos/${REPO_OWNER}/${REPO_NAME}/collaborators"
-
-    # Fetch collaborators with read permission
-    collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.pull == true) | .login')"
-
-    if [[ -z "$collaborators" ]]; then
-        echo "No users with read access found for ${REPO_OWNER}/${REPO_NAME}."
+    ─────────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+COMMAND 2: nproc — GET NUMBER OF CPU CORES
+--------------------------------------------------------------------------------
+
+  WHAT IT DOES:
+    Tells you how many CPU cores are available on your machine.
+    More cores = can do more things at the same time.
+
+  SYNTAX:
+    $ nproc
+
+  EXAMPLE OUTPUT:
+    4
+    (This server has 4 CPU cores)
+
+  WHY IT MATTERS:
+    Some programs can use multiple CPU cores to run faster.
+    If you know how many cores you have, you can tune performance.
+
+  REAL USE CASES:
+
+    1. Compile Java code faster using all cores:
+       $ mvn clean package -T $(nproc)
+       (Use all available CPU cores for Maven build)
+
+    2. Compile C code faster:
+       $ make -j$(nproc)
+       (The -j flag means "use this many parallel jobs")
+
+    3. In scripts to auto-detect and use all cores:
+       ─────────────────────────────────────────────────────────────
+       #!/bin/bash
+       CORES=$(nproc)
+       echo "Building with $CORES cores..."
+       mvn clean package -T $CORES
+       ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+COMMAND 3: df -h — CHECK DISK SPACE USAGE
+--------------------------------------------------------------------------------
+
+  WHAT IT DOES:
+    Shows how much disk space is used and available on all drives.
+    df = Disk Free, -h = human readable (shows GB/MB instead of bytes)
+
+  SYNTAX:
+    $ df -h
+
+  EXAMPLE OUTPUT:
+    ─────────────────────────────────────────────────────────────────
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/xvda1       30G   10G   18G  36% /
+    tmpfs           1.9G     0  1.9G   0% /dev/shm
+    ─────────────────────────────────────────────────────────────────
+
+  UNDERSTANDING THE OUTPUT:
+    Filesystem  = Name of the disk partition
+    Size        = Total size of that partition (30 GB)
+    Used        = How much is used (10 GB)
+    Avail       = How much is free (18 GB)
+    Use%        = Percentage used (36%)
+    Mounted on  = Which folder this disk is attached to
+
+  DANGER ZONE:
+    Use% above 80% = WARNING. Start cleaning up.
+    Use% above 90% = CRITICAL. Server may stop working.
+
+  COMMON REAL USE CASES:
+    Before uploading large files → check if disk has space
+    Before taking a backup → check if enough room
+    Before installing packages → check /var or /tmp space
+
+    Check specific folder:
+      $ df -h /var/log     (check log folder space)
+      $ df -h /home        (check home folder space)
+
+  IN A SHELL SCRIPT (auto-alert if disk above 80%):
+    ─────────────────────────────────────────────────────────────────
+    #!/bin/bash
+    usage=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+    if [ "$usage" -gt 80 ]; then
+        echo "ALERT: Disk usage is at ${usage}%! Please clean up."
     else
-        echo "Users with read access to ${REPO_OWNER}/${REPO_NAME}:"
-        echo "$collaborators"
+        echo "Disk usage is fine: ${usage}%"
     fi
-}
+    ─────────────────────────────────────────────────────────────────
 
-# Helper function for argument validation
-function helper() {
-    expected_cmd_args=2
-    if [ $# -ne $expected_cmd_args ]; then
-        echo "Error: Missing required arguments."
-        echo "Usage: $0 <repo-owner> <repo-name>"
-        exit 1
+
+--------------------------------------------------------------------------------
+COMMAND 4: top — REAL-TIME PROCESS & RESOURCE MONITOR
+--------------------------------------------------------------------------------
+
+  WHAT IT DOES:
+    Shows live, continuously updating information about:
+      - All running processes
+      - CPU usage (which process is using how much)
+      - Memory usage
+      - System uptime
+      - Load average
+
+    Think of it as the Task Manager of Linux (but in the terminal).
+
+  SYNTAX:
+    $ top
+
+  USEFUL VARIANTS:
+    $ top -u ubuntu         Show only processes of "ubuntu" user
+    $ top -p 1234           Monitor only process with PID 1234
+    $ top -n 1              Show output ONCE and exit (great for scripts)
+    $ top -b -n 1           Batch mode - non-interactive, for scripts
+
+  SAMPLE OUTPUT:
+    ─────────────────────────────────────────────────────────────────
+    top - 10:12:36 up 3 days, 2:04, 1 user, load average: 0.07, 0.03, 0.01
+    Tasks: 120 total, 1 running, 119 sleeping, 0 stopped, 0 zombie
+    %Cpu(s): 2.3 us, 1.2 sy, 0.0 ni, 96.2 id, 0.2 wa, 0.0 hi, 0.1 si
+    MiB Mem: 7982.4 total, 2345.1 free, 1223.5 used, 4413.8 buff/cache
+
+    PID   USER     PR  NI  VIRT    RES   SHR  S  %CPU %MEM  TIME+   COMMAND
+    1234  ec2user  20   0  12345  5678  1234  S   1.3  0.2  0:02.34  java
+    5678  root     20   0  87654  4321  3210  S   0.7  0.1  0:01.45  sshd
+    ─────────────────────────────────────────────────────────────────
+
+  UNDERSTANDING THE TOP HEADER:
+
+    Line 1 - Uptime & Load Average:
+      up 3 days → Server running for 3 days without restart
+      load average: 0.07, 0.03, 0.01 → System load in last 1, 5, 15 minutes
+      Rule: If load > number of CPUs → server is overloaded
+      Example: nproc = 4, load = 0.07 → very healthy (4 cores, barely used)
+      Example: nproc = 4, load = 9.5  → very bad! (overloaded)
+
+    Line 2 - Tasks:
+      120 total  → 120 processes exist
+      1 running  → Only 1 actually running on CPU right now
+      119 sleeping → Waiting for something (network, disk, user input)
+      0 zombie   → Dead processes not cleaned up (zombie = problem if many)
+
+    Line 3 - CPU Usage:
+      2.3 us  → User processes using 2.3% CPU (your apps)
+      1.2 sy  → System/kernel using 1.2% CPU
+      96.2 id → 96.2% idle (CPU is mostly free - good!)
+      0.2 wa  → Waiting for disk I/O (high = disk bottleneck)
+
+    Line 4 - Memory:
+      7982 total → 8 GB total RAM
+      1223 used  → About 1.2 GB used
+      4413 buff/cache → Used for caching (can be freed if needed)
+
+  UNDERSTANDING THE PROCESS TABLE:
+    +----------+-------------------------------------------------+
+    | Column   | Meaning                                         |
+    +----------+-------------------------------------------------+
+    | PID      | Process ID (unique number for each process)     |
+    | USER     | Who owns/started this process                   |
+    | PR / NI  | Priority (lower = higher priority)              |
+    | VIRT     | Total virtual memory the process reserved       |
+    | RES      | Actual RAM the process is using RIGHT NOW       |
+    | SHR      | Shared memory (shared with other processes)     |
+    | S        | Status: R=running, S=sleeping, Z=zombie         |
+    | %CPU     | How much CPU this process is using              |
+    | %MEM     | How much RAM this process is using              |
+    | TIME+    | Total CPU time used since start                 |
+    | COMMAND  | The program name                                |
+    +----------+-------------------------------------------------+
+
+  KEYBOARD SHORTCUTS WHILE top IS RUNNING:
+    +-------------+-------------------------------------------+
+    | Key         | Action                                    |
+    +-------------+-------------------------------------------+
+    | q           | Quit top                                  |
+    | k           | Kill a process (enter PID when asked)     |
+    | M           | Sort by Memory usage (heaviest first)     |
+    | P           | Sort by CPU usage (heaviest first)        |
+    | 1           | Show usage of each CPU core separately    |
+    | u           | Filter by username                        |
+    | r           | Change process priority                   |
+    | Shift + E   | Change memory units (KB → MB → GB)        |
+    +-------------+-------------------------------------------+
+
+  USING top IN SCRIPTS (BATCH MODE):
+    $ top -b -n 1                          Run once, output to terminal
+    $ top -b -n 1 | head -20              Show only top 20 lines
+    $ top -b -n 1 > system_report.txt     Save to file
+
+
+--------------------------------------------------------------------------------
+COMMAND 5: ps -ef — PROCESS SNAPSHOT
+--------------------------------------------------------------------------------
+
+  WHAT IT DOES:
+    Shows a ONE-TIME snapshot of all processes running on the system.
+    Unlike top which refreshes continuously, ps -ef shows a static list.
+
+  BREAKDOWN:
+    ps    = Process Status
+    -e    = Show ALL processes (not just yours)
+    -f    = Full format (show all columns)
+
+  SYNTAX:
+    $ ps -ef
+
+  SAMPLE OUTPUT:
+    ─────────────────────────────────────────────────────────────────
+    UID     PID   PPID  C STIME TTY    TIME     CMD
+    root      1      0  0 09:00 ?   00:00:01  /sbin/init
+    ubuntu 1234      1  0 09:05 ?   00:02:34  java -jar app.jar
+    ubuntu 5678   1234  0 09:06 pts 00:00:00  bash
+    ─────────────────────────────────────────────────────────────────
+
+    UID  = User who owns the process
+    PID  = Process ID
+    PPID = Parent Process ID (who started this process)
+    C    = CPU usage
+    STIME= When process started
+    TTY  = Terminal it is running on
+    TIME = Total CPU time used
+    CMD  = Full command that was run
+
+  DIFFERENCE BETWEEN ps AND top:
+    +--------+------------------------------------------------+
+    | ps -ef | One-time snapshot of processes, non-interactive|
+    | top    | Live, auto-refreshing, interactive dashboard   |
+    +--------+------------------------------------------------+
+    Use ps -ef when: You need to capture process info in a script.
+    Use top when: You want to watch system health live.
+
+  COMMON REAL WORLD USES:
+
+    1. Check if nginx is running:
+       $ ps -ef | grep nginx
+
+    2. Check if your Java app is running:
+       $ ps -ef | grep java
+
+    3. Find which process is using port 8080:
+       $ sudo lsof -i :8080
+
+    4. Kill a specific process:
+       $ kill -9 1234
+       (1234 = the PID from ps -ef)
+
+    5. See parent-child relationships (which process spawned which):
+       $ ps -ef --forest
+
+    6. Find all Python processes:
+       $ ps -ef | grep python
+
+  IN A HEALTH CHECK SCRIPT:
+    ─────────────────────────────────────────────────────────────────
+    #!/bin/bash
+    if ps -ef | grep -q "[j]ava"; then
+        echo "Java app is running"
+    else
+        echo "ALERT: Java app is NOT running! Restarting..."
+        java -jar /app/app.jar &
     fi
-}
+    ─────────────────────────────────────────────────────────────────
+    (The [j]ava trick prevents grep itself from showing in results)
 
 
-# Main script
-echo "Listing users with read access to ${REPO_OWNER}/${REPO_NAME}..."
-list_users_with_read_access
-echo "Done."
+
+================================================================================
+CHAPTER 2 : USEFUL TEXT PROCESSING COMMANDS
+================================================================================
+
+--------------------------------------------------------------------------------
+COMMAND: awk — EXTRACT AND PROCESS TEXT/COLUMNS
+--------------------------------------------------------------------------------
+
+  WHAT IT IS:
+    awk is a powerful tool that processes text LINE BY LINE.
+    It splits each line into columns and lets you work with specific columns.
+    Think of it like Excel but for the command line.
+
+  BASIC SYNTAX:
+    awk 'pattern { action }' filename
+    OR
+    some-command | awk 'pattern { action }'
+
+  BUILT-IN VARIABLES:
+    $1   = First column (field)
+    $2   = Second column
+    $3   = Third column
+    $0   = Entire line (all columns)
+    NR   = Current line number
+    NF   = Total number of fields (columns) in current line
+    FS   = Field separator (default is space/tab)
+
+  EXAMPLES:
+
+    Example 1: Print only 2nd column
+      Input file (names.txt):
+        Alice Engineer 50000
+        Bob Developer 60000
+        Carol Manager 80000
+
+      $ awk '{print $2}' names.txt
+      Output:
+        Engineer
+        Developer
+        Manager
+
+    Example 2: Print first and third columns
+      $ awk '{print $1, $3}' names.txt
+      Output:
+        Alice 50000
+        Bob 60000
+        Carol 80000
+
+    Example 3: Print line numbers with lines
+      $ awk '{print NR, $0}' names.txt
+      Output:
+        1 Alice Engineer 50000
+        2 Bob Developer 60000
+        3 Carol Manager 80000
+
+    Example 4: Print lines where salary > 55000
+      $ awk '$3 > 55000 {print $0}' names.txt
+      Output:
+        Bob Developer 60000
+        Carol Manager 80000
+
+    Example 5: Use different separator (CSV file)
+      data.csv: Alice,Engineer,50000
+      $ awk -F"," '{print $1}' data.csv
+      Output: Alice
+      (-F"," means use comma as separator instead of space)
+
+    Example 6: Get PID of amazon process (Real DevOps use)
+      $ ps -ef | grep amazon | awk '{print $2}'
+      Explanation:
+        ps -ef         → list all processes
+        grep amazon    → filter lines with "amazon"
+        awk '{print $2}' → print only PID column (second column)
+
+    Example 7: Get available memory from free command
+      $ free -m | awk 'NR==2 {print $7}'
+      Explanation:
+        free -m    → show memory in MB
+        NR==2      → only process line 2 (the Mem: line)
+        {print $7} → print the 7th column (available memory)
+
+    Example 8: Get disk usage percentage
+      $ df -h / | awk 'NR==2 {print $5}'
+      Output: 36%
+
+
+--------------------------------------------------------------------------------
+COMMAND: curl — SEND HTTP REQUESTS FROM TERMINAL
+--------------------------------------------------------------------------------
+
+  WHAT IT IS:
+    curl (Client URL) is a tool to send HTTP requests from the command line.
+    Used to test APIs, download files, interact with web services.
+    Essential for backend engineers and DevOps.
+
+  PROTOCOLS SUPPORTED:
+    HTTP, HTTPS, FTP, SFTP, SMTP, and more.
+
+  BASIC COMMANDS:
+
+    1. Simple GET request (like opening a URL):
+       $ curl https://api.example.com/users
+
+    2. Save output to a file:
+       $ curl -o output.json https://api.example.com/users
+
+    3. Follow redirects (if URL redirects to another URL):
+       $ curl -L https://example.com
+
+    4. Show only HTTP response code (200=OK, 404=Not Found, 500=Error):
+       $ curl -o /dev/null -w "%{http_code}\n" -s https://example.com
+       Output: 200
+
+    5. POST request with JSON body (test your Spring Boot API):
+       $ curl -X POST \
+         -H "Content-Type: application/json" \
+         -d '{"name":"Ankur", "role":"DevOps"}' \
+         https://api.example.com/users
+
+    6. Add Authorization header (JWT token):
+       $ curl -H "Authorization: Bearer eyJhbGci..." \
+         https://api.example.com/data
+
+    7. Download a file:
+       $ curl -O https://example.com/file.zip
+       (-O saves file with same name as on server)
+
+    8. Upload a file:
+       $ curl -F "file=@/path/to/file.txt" https://api.example.com/upload
+
+    9. Verbose mode (see request + response headers, great for debugging):
+       $ curl -v https://example.com
+
+    10. See only response headers:
+        $ curl -I https://example.com
+
+    11. Send form data:
+        $ curl -X POST -F "username=ankur" -F "password=1234" \
+          https://example.com/login
+
+    12. Basic authentication:
+        $ curl -u username:password https://example.com
+
+    13. Silent mode (hide progress bar):
+        $ curl -s https://api.example.com/health
+
+  TESTING SPRING BOOT API WITH CURL:
+    ─────────────────────────────────────────────────────────────
+    # GET all users
+    $ curl -s http://localhost:8080/api/users | python3 -m json.tool
+
+    # Create a new user
+    $ curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"name":"John","email":"john@example.com"}' \
+      http://localhost:8080/api/users
+
+    # Check health endpoint
+    $ curl http://localhost:8080/actuator/health
+    ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+COMMAND: wget — DOWNLOAD FILES
+--------------------------------------------------------------------------------
+
+  WHAT IT IS:
+    wget is used to download files from the internet.
+    Similar to curl but simpler - mainly for downloading.
+
+  EXAMPLES:
+    $ wget https://example.com/file.zip          Download a file
+    $ wget -O myfile.zip https://example.com/x   Download with custom name
+    $ wget -q https://example.com/file.zip        Quiet mode (no output)
+
+  curl vs wget:
+    Use curl for: API testing, sending POST requests, interacting with APIs
+    Use wget for: Simply downloading files, recursive downloads
+
+
+--------------------------------------------------------------------------------
+COMMAND: find — SEARCH FOR FILES AND DIRECTORIES
+--------------------------------------------------------------------------------
+
+  WHAT IT IS:
+    find searches your filesystem for files matching specific criteria.
+    You can search by name, size, type, date, permissions, and more.
+
+  SYNTAX:
+    $ find [where to search] [what to look for]
+
+  COMMON EXAMPLES:
+    Find file by name:
+      $ find /home -name "app.jar"
+
+    Find all .log files:
+      $ find /var/log -name "*.log"
+
+    Find files larger than 100 MB:
+      $ find / -size +100M
+
+    Find files modified in last 7 days:
+      $ find /var/log -mtime -7
+
+    Find and delete old log files:
+      $ find /var/log -name "*.log" -mtime +30 -delete
+      (Delete logs older than 30 days)
+
+    Find empty files:
+      $ find /app -empty
+
+    Find files by permission:
+      $ find / -perm 777
+
+
+--------------------------------------------------------------------------------
+COMMAND: traceroute — TRACE NETWORK PATH
+--------------------------------------------------------------------------------
+
+  WHAT IT IS:
+    traceroute shows the path your network packet takes from your machine
+    to a destination server. Each "hop" is a router along the way.
+
+  HOW IT WORKS:
+    Sends packets with increasing TTL (Time-To-Live value).
+    Each router decreases TTL by 1.
+    When TTL reaches 0, router sends back an error message.
+    traceroute uses these messages to map the entire route.
+
+  SYNTAX:
+    $ traceroute google.com
+
+  EXAMPLE OUTPUT:
+    ─────────────────────────────────────────────────────────────
+    traceroute to google.com (142.250.80.46)
+     1  192.168.1.1   1.234 ms    (your home router)
+     2  10.0.0.1      5.678 ms    (ISP router)
+     3  172.16.0.1   12.345 ms    (ISP backbone)
+     4  142.250.80.46 20.123 ms   (Google server)
+    ─────────────────────────────────────────────────────────────
+
+  HOW TO READ OUTPUT:
+    Hop number, router IP, time taken (latency in milliseconds)
+    * * *  = Packet lost or router did not respond (could be firewall)
+    High ms = Network bottleneck at that point
+
+  WHEN TO USE:
+    - Spring Boot cannot reach MySQL → traceroute to MySQL server
+    - App is slow → traceroute to find where delay is
+    - AWS EC2 cannot reach RDS → traceroute to debug VPC routing
+
+
+
+================================================================================
+CHAPTER 3 : SHELL SCRIPTING - BASICS
+================================================================================
+
+--------------------------------------------------------------------------------
+WHAT IS A SHELL SCRIPT?
+--------------------------------------------------------------------------------
+
+  A shell script is a TEXT FILE containing Linux commands.
+  When you RUN the script, it executes all commands one by one automatically.
+
+  REAL ANALOGY:
+    Instead of going to the kitchen every time and doing:
+      1. Open fridge
+      2. Take milk
+      3. Boil milk
+      4. Pour in cup
+
+    You write a recipe (script) once:
+      open_fridge; take_milk; boil; pour_in_cup
+
+    Now anyone can make milk by just running the recipe!
+
+  WHY USE SHELL SCRIPTS?
+    Automation:  Run 50 commands with 1 command
+    Reusability: Write once, run anywhere, anytime
+    Scheduling:  Run automatically at specific times (with crontab)
+    Consistency: Same steps every time, no human error
+
+
+--------------------------------------------------------------------------------
+CREATING AND RUNNING YOUR FIRST SHELL SCRIPT
+--------------------------------------------------------------------------------
+
+  STEP 1: Create the script file
+    $ nano my_first_script.sh
+    (Script files must end with .sh extension)
+
+  STEP 2: Write the script
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+
+    ##########################
+    # Author: Your Name
+    # Date: 15/02/2025
+    #
+    # This script checks server health
+    # Version: v1
+    ##########################
+
+    echo "=== Server Health Report ==="
+    echo ""
+
+    echo "Disk Space:"
+    df -h
+
+    echo ""
+    echo "Memory:"
+    free -g
+
+    echo ""
+    echo "CPU Cores:"
+    nproc
+    ─────────────────────────────────────────────────────────────
+
+  STEP 3: Save and exit nano
+    Press Ctrl + X → Press Y → Press Enter
+
+  STEP 4: Make the script executable
+    $ chmod +x my_first_script.sh
+
+  STEP 5: Run it
+    $ ./my_first_script.sh
+    OR
+    $ bash my_first_script.sh
+    OR
+    $ sh my_first_script.sh
+
+
+--------------------------------------------------------------------------------
+SHEBANG (#!) — THE FIRST LINE OF EVERY SCRIPT
+--------------------------------------------------------------------------------
+
+  WHAT IS SHEBANG?
+    The first line of your script starting with #! (hash + exclamation mark).
+    It tells Linux WHICH PROGRAM should interpret/run this script.
+
+  SYNTAX:
+    #!/path/to/interpreter
+
+  COMMON SHEBANGS:
+    #!/bin/bash     → Use bash shell (most common for DevOps scripts)
+    #!/bin/sh       → Use basic POSIX shell (more portable)
+    #!/usr/bin/python3 → This is a Python script
+    #!/usr/bin/env bash → Find bash automatically (cross-system compatible)
+
+  WHY IT MATTERS:
+    Without shebang, Linux does not know how to run the script.
+    Different machines may have interpreters in different locations.
+    #!/usr/bin/env bash finds bash wherever it is installed.
+
+  EXAMPLE:
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+    echo "This script runs with bash"
+    ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+ALWAYS WRITE METADATA COMMENT AT TOP
+--------------------------------------------------------------------------------
+
+  Professional scripts always have a comment block explaining what the script
+  does. Comments start with # (hash) and are ignored during execution.
+
+  TEMPLATE:
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+
+    ##############################################
+    # Author  : Your Name
+    # Date    : 15/02/2025
+    # Version : v1
+    #
+    # Description:
+    #   This script monitors server health.
+    #   It checks disk, memory, and CPU usage.
+    #   Run it daily via crontab.
+    ##############################################
+
+    # Your commands here...
+    ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+VARIABLES IN SHELL SCRIPTING
+--------------------------------------------------------------------------------
+
+  WHAT ARE VARIABLES?
+    Variables store data (text, numbers) that you can use later.
+
+  SYNTAX:
+    variable_name="value"    (no spaces around = sign!)
+
+  READING A VARIABLE:
+    $variable_name   or   ${variable_name}
+
+  EXAMPLES:
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+
+    # Storing values in variables
+    name="Ankur"
+    age=25
+    server="production-server-01"
+
+    # Using variables
+    echo "Hello, $name!"
+    echo "Age: $age"
+    echo "Deploying to: $server"
+
+    # Command output stored in variable
+    current_date=$(date)
+    disk_usage=$(df -h / | awk 'NR==2 {print $5}')
+
+    echo "Date: $current_date"
+    echo "Disk used: $disk_usage"
+    ─────────────────────────────────────────────────────────────
+
+  SPECIAL VARIABLES:
+    $0    = Name of the script itself
+    $1    = First argument passed to script
+    $2    = Second argument
+    $#    = Total number of arguments passed
+    $?    = Exit code of last command (0 = success, non-zero = failure)
+    $$    = PID of current script
+    $@    = All arguments passed
+
+
+--------------------------------------------------------------------------------
+set COMMANDS — CONTROL SCRIPT BEHAVIOR
+--------------------------------------------------------------------------------
+
+  WHAT THEY DO:
+    These options change how the shell handles errors and variables.
+    Used at the top of professional scripts to make them safer.
+
+  OPTIONS:
+    +----------+------------------------------------------------------------------+
+    | Option   | Meaning                                                          |
+    +----------+------------------------------------------------------------------+
+    | set -e   | Exit immediately if any command fails (non-zero exit code)       |
+    | set -u   | Exit if you use an undefined/unset variable (catches typos)      |
+    | set -x   | Debug mode: print each command before running it                |
+    | set -o pipefail | If any command in a pipeline fails, the pipeline fails  |
+    +----------+------------------------------------------------------------------+
+
+  PROFESSIONAL COMBINATION (use in almost all scripts):
+    $ set -euo pipefail
+
+  EXPLANATION OF EACH:
+
+    set -e (Exit on Error):
+      Without -e: If one command fails, script CONTINUES running (dangerous!)
+      With -e:    If any command fails, script STOPS immediately (safe!)
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      set -e
+      rm /nonexistent/file     # This fails
+      echo "This never runs"   # Script stopped because of above error
+      ─────────────────────────────────────────────────────────
+
+    set -u (Unbound Variable):
+      Without -u: Typo in variable name = empty string (silent bug)
+      With -u:    Typo = immediate error (catches bugs early)
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      set -u
+      echo $UNDEFNED_VARIABLE  # Typo! Script will exit with error.
+      ─────────────────────────────────────────────────────────
+
+    set -x (Debug Mode):
+      Prints every command before executing it.
+      Extremely useful when troubleshooting scripts.
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      set -x
+      echo "Hello"
+      df -h
+      ─────────────────────────────────────────────────────────
+      Output:
+      + echo "Hello"
+      Hello
+      + df -h
+      Filesystem  Size  Used  Avail  Use%  Mounted on
+      ...
+
+    set -o pipefail (Pipeline Failure):
+      Without: ls /fake | echo "done" → shows "done" even though ls failed
+      With:    ls /fake | echo "done" → entire pipeline fails correctly
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      set -o pipefail
+      ls /nonexistent | grep something  # ls fails → whole pipeline fails
+      ─────────────────────────────────────────────────────────
+
+
+
+================================================================================
+CHAPTER 4 : CONTROL FLOW — IF/ELSE AND LOOPS
+================================================================================
+
+--------------------------------------------------------------------------------
+IF / ELSE STATEMENTS
+--------------------------------------------------------------------------------
+
+  IF statements make decisions in your script.
+  "If this condition is true, do this. Otherwise, do that."
+
+  SYNTAX 1: Simple IF
+    ─────────────────────────────────────────────────────────────
+    if [ condition ]; then
+        commands to run if true
+    fi
+    ─────────────────────────────────────────────────────────────
+
+  SYNTAX 2: IF-ELSE
+    ─────────────────────────────────────────────────────────────
+    if [ condition ]; then
+        commands if true
+    else
+        commands if false
+    fi
+    ─────────────────────────────────────────────────────────────
+
+  SYNTAX 3: IF-ELIF-ELSE (Multiple conditions)
+    ─────────────────────────────────────────────────────────────
+    if [ condition1 ]; then
+        commands
+    elif [ condition2 ]; then
+        commands
+    else
+        commands
+    fi
+    ─────────────────────────────────────────────────────────────
+
+  -----------------------------------------------------------------------
+  CONDITION CHEAT SHEET
+  -----------------------------------------------------------------------
+
+    NUMBERS (Integer Comparison):
+      -eq   Equal to                  [ $a -eq $b ]   a == b
+      -ne   Not equal to              [ $a -ne $b ]   a != b
+      -gt   Greater than              [ $a -gt $b ]   a > b
+      -lt   Less than                 [ $a -lt $b ]   a < b
+      -ge   Greater than or equal     [ $a -ge $b ]   a >= b
+      -le   Less than or equal        [ $a -le $b ]   a <= b
+
+    STRINGS (Text Comparison):
+      =     Equal                     [ "$a" = "$b" ]
+      !=    Not equal                 [ "$a" != "$b" ]
+      -z    Is empty (zero length)    [ -z "$a" ]
+      -n    Is NOT empty              [ -n "$a" ]
+
+    FILES:
+      -e file    File exists (file or directory)
+      -f file    Is a regular file (not directory)
+      -d dir     Is a directory
+      -r file    Is readable
+      -w file    Is writable
+      -x file    Is executable
+      -s file    File exists and is NOT empty
+
+  -----------------------------------------------------------------------
+  EXAMPLES
+  -----------------------------------------------------------------------
+
+    Example 1: Check if number is greater
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      num=10
+      if [ $num -gt 5 ]; then
+          echo "Number $num is greater than 5"
+      fi
+      ─────────────────────────────────────────────────────────
+
+    Example 2: Check disk space and alert
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      usage=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+
+      if [ $usage -ge 90 ]; then
+          echo "CRITICAL: Disk is ${usage}% full! Take action now!"
+      elif [ $usage -ge 80 ]; then
+          echo "WARNING: Disk is ${usage}% full. Clean up soon."
+      else
+          echo "OK: Disk usage is ${usage}%. All fine."
+      fi
+      ─────────────────────────────────────────────────────────
+
+    Example 3: Check if file exists before reading
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      config_file="/etc/myapp/config.yml"
+
+      if [ -f "$config_file" ]; then
+          echo "Config file found. Reading..."
+          cat "$config_file"
+      else
+          echo "ERROR: Config file not found at $config_file"
+          exit 1
+      fi
+      ─────────────────────────────────────────────────────────
+
+    Example 4: Check if process is running
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      if ps -ef | grep -q "[j]ava"; then
+          echo "Java app is running"
+      else
+          echo "Java app is NOT running! Starting it..."
+          nohup java -jar /app/app.jar &
+      fi
+      ─────────────────────────────────────────────────────────
+
+    Example 5: Check if string is empty
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      name=""
+      if [ -z "$name" ]; then
+          echo "Name is empty! Please provide a name."
+          exit 1
+      else
+          echo "Hello, $name!"
+      fi
+      ─────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+FOR LOOPS
+--------------------------------------------------------------------------------
+
+  FOR loops repeat commands multiple times.
+  "Do this action FOR each item in this list."
+
+  SYNTAX:
+    ─────────────────────────────────────────────────────────────
+    for variable in list
+    do
+        commands
+    done
+    ─────────────────────────────────────────────────────────────
+
+  TYPES OF FOR LOOPS:
+
+    Type 1: Loop through a list of items
+      ─────────────────────────────────────────────────────────
+      for server in server1 server2 server3
+      do
+          echo "Connecting to $server..."
+          ssh ubuntu@$server "uptime"
+      done
+      ─────────────────────────────────────────────────────────
+
+    Type 2: Loop through a number range
+      ─────────────────────────────────────────────────────────
+      for i in {1..10}
+      do
+          echo "Number: $i"
+      done
+      ─────────────────────────────────────────────────────────
+
+    Type 3: Range with step size (count by 2s)
+      ─────────────────────────────────────────────────────────
+      for i in {1..10..2}      # 1, 3, 5, 7, 9
+      do
+          echo $i
+      done
+      ─────────────────────────────────────────────────────────
+
+    Type 4: Loop through files
+      ─────────────────────────────────────────────────────────
+      for file in *.log
+      do
+          echo "Processing: $file"
+          gzip "$file"
+      done
+      ─────────────────────────────────────────────────────────
+
+    Type 5: C-style loop (most common in DevOps)
+      ─────────────────────────────────────────────────────────
+      for ((i=1; i<=5; i++))
+      do
+          echo "Iteration: $i"
+      done
+      ─────────────────────────────────────────────────────────
+
+    Type 6: Loop through command output
+      ─────────────────────────────────────────────────────────
+      for user in $(cat /etc/passwd | cut -d: -f1)
+      do
+          echo "User: $user"
+      done
+      ─────────────────────────────────────────────────────────
+
+  REAL WORLD EXAMPLES:
+
+    Example: Check multiple servers health
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      set -euo pipefail
+
+      servers=("192.168.1.10" "192.168.1.11" "192.168.1.12")
+
+      for server in "${servers[@]}"
+      do
+          echo "Checking $server..."
+          if ping -c 1 "$server" &>/dev/null; then
+              echo "  $server is UP"
+          else
+              echo "  $server is DOWN - ALERT!"
+          fi
+      done
+      ─────────────────────────────────────────────────────────
+
+    Example: FOR loop with IF inside (check log files)
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      for file in *.log
+      do
+          if [ -s "$file" ]; then
+              echo "$file has content - processing..."
+          else
+              echo "$file is empty - skipping"
+          fi
+      done
+      ─────────────────────────────────────────────────────────
+
+    Example: Count occurrences with loop
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      # Count the number of 's' in "mississipi"
+
+      word="mississipi"
+      count=0
+
+      # Split word into individual characters and loop
+      for ((i=0; i<${#word}; i++))
+      do
+          letter="${word:$i:1}"    # Get one character at position i
+          if [ "$letter" == "s" ]; then
+              count=$((count + 1))
+          fi
+      done
+
+      echo "Number of 's' in '$word': $count"
+      ─────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+COUNTING CHARACTERS - MULTIPLE METHODS
+--------------------------------------------------------------------------------
+
+  Problem: Count how many times 's' appears in "mississipi"
+
+  METHOD 1: Using for loop and if (shown above)
+    Long way, good for learning control flow.
+
+  METHOD 2: Using grep and wc (shortest, most practical)
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+    count=$(echo "mississipi" | grep -o "s" | wc -l)
+    echo "Number of s's: $count"
+    ─────────────────────────────────────────────────────────────
+    Explanation:
+      echo "mississipi"   → outputs the string
+      | grep -o "s"       → -o means print each match on its own line
+                            so output is: s\ns\ns\ns (4 lines)
+      | wc -l             → count lines = count of matches
+      Result: 4
+
+  METHOD 3: Using here-string (<<<)
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+    x="mississipi"
+    count=$(grep -o "s" <<< "$x" | wc -l)
+    echo "Number of s's: $count"
+    ─────────────────────────────────────────────────────────────
+    Explanation:
+      <<< "$x"   = here-string: feeds variable directly to command
+                   Same as: echo "$x" | command
+                   Avoids creating an extra process (more efficient)
+
+  WHAT IS <<< (Here-String)?
+    <<< is called a "here-string" operator.
+    It passes the content of a variable directly as input to a command.
+    echo "$var" | command  =  command <<< "$var"
+    The here-string version is slightly more efficient.
+
+  METHOD 2 vs METHOD 3 COMPARISON:
+    +-----------------------------------------+-----------------------------+
+    | echo "text" | grep                      | Input is hardcoded string   |
+    | grep <<< "$var"                         | Best when using variables   |
+    | Both produce same result                | Use whichever is clearer    |
+    +-----------------------------------------+-----------------------------+
+
+
+
+================================================================================
+CHAPTER 5 : ADVANCED SHELL SCRIPTING TOPICS
+================================================================================
+
+--------------------------------------------------------------------------------
+FUNCTIONS IN SHELL SCRIPTS
+--------------------------------------------------------------------------------
+
+  WHAT ARE FUNCTIONS?
+    Functions are reusable blocks of code.
+    Write once, call many times.
+    Makes scripts organized and readable.
+
+  SYNTAX:
+    ─────────────────────────────────────────────────────────────
+    function function_name() {
+        commands
+    }
+
+    # Call it like this:
+    function_name
+    ─────────────────────────────────────────────────────────────
+
+  EXAMPLE: Function with arguments
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+
+    function greet() {
+        local name="$1"    # $1 = first argument passed to function
+        echo "Hello, $name! Welcome."
+    }
+
+    greet "Ankur"
+    greet "DevOps Engineer"
+    ─────────────────────────────────────────────────────────────
+
+  EXAMPLE: Function that validates arguments
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+
+    function helper() {
+        if [ $# -ne 2 ]; then
+            echo "Error: Exactly 2 arguments required."
+            echo "Usage: $0 <repo-owner> <repo-name>"
+            exit 1
+        fi
+    }
+
+    # Call at start of script to validate
+    helper "$@"
+    ─────────────────────────────────────────────────────────────
+
+  BEST PRACTICE: Define functions at top, call them at bottom.
+    ─────────────────────────────────────────────────────────────
+    #!/bin/bash
+    set -euo pipefail
+
+    # --- FUNCTION DEFINITIONS ---
+
+    function check_disk() {
+        local usage=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+        echo "Disk usage: ${usage}%"
+        if [ "$usage" -gt 80 ]; then
+            echo "WARNING: Disk above 80%"
+        fi
+    }
+
+    function check_memory() {
+        local available=$(free -m | awk 'NR==2 {print $7}')
+        echo "Available memory: ${available} MB"
+    }
+
+    # --- MAIN SCRIPT ---
+    echo "=== Health Check Report ==="
+    check_disk
+    check_memory
+    echo "=== Done ==="
+    ─────────────────────────────────────────────────────────────
+
+
+--------------------------------------------------------------------------------
+TRAP COMMAND — HANDLE ERRORS AND SIGNALS
+--------------------------------------------------------------------------------
+
+  WHAT IS trap?
+    trap catches signals (events) that happen to your script and lets you
+    run custom code when that event occurs.
+
+  COMMON SIGNALS:
+    +----------+--------+-------------------------------------------+
+    | Signal   | Number | When it happens                           |
+    +----------+--------+-------------------------------------------+
+    | SIGINT   | 2      | User presses Ctrl + C                     |
+    | SIGTERM  | 15     | kill command (graceful stop)              |
+    | EXIT     | 0      | When script finishes (success or failure) |
+    | ERR      | ---    | When any command fails (with set -e)      |
+    +----------+--------+-------------------------------------------+
+
+  SYNTAX:
+    trap "commands to run" SIGNAL_NAME
+
+  EXAMPLES:
+
+    Example 1: Cleanup when script exits (always runs)
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+
+      # This runs when script exits for ANY reason
+      trap "echo 'Script finished. Cleaning up temp files...'; rm -f /tmp/my_temp*" EXIT
+
+      echo "Working..."
+      touch /tmp/my_temp_file
+
+      echo "Done with work"
+      # Cleanup runs automatically now
+      ─────────────────────────────────────────────────────────
+
+    Example 2: Handle Ctrl+C gracefully
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+
+      trap "echo 'You pressed Ctrl+C. Stopping safely...'; exit 1" SIGINT
+
+      echo "Press Ctrl+C to test the trap"
+      sleep 100
+      ─────────────────────────────────────────────────────────
+
+    Example 3: Combined trap for cleanup on any exit
+      ─────────────────────────────────────────────────────────
+      #!/bin/bash
+      set -euo pipefail
+
+      TEMP_FILE=$(mktemp)
+
+      # Cleanup function
+      function cleanup() {
+          echo "Cleaning up temporary files..."
+          rm -f "$TEMP_FILE"
+      }
+
+      # Call cleanup on EXIT and on Ctrl+C
+      trap cleanup EXIT SIGINT SIGTERM
+
+      # Do your work
+      echo "Writing data to temp file..."
+      df -h > "$TEMP_FILE"
+      cat "$TEMP_FILE"
+      ─────────────────────────────────────────────────────────
+
+
+
+================================================================================
+CHAPTER 6 : CRONTAB — SCHEDULE JOBS AUTOMATICALLY
+================================================================================
+
+--------------------------------------------------------------------------------
+WHAT IS CRONTAB?
+--------------------------------------------------------------------------------
+
+  Crontab = Cron Table
+  It is a list of scheduled commands that Linux runs automatically.
+  "Cron" is the job scheduler built into Linux.
+
+  REAL WORLD USES:
+    - Run backup script every night at 2 AM
+    - Clean old log files every Sunday
+    - Check server health every 5 minutes
+    - Send weekly reports every Monday 9 AM
+    - Restart services that might crash
+    - Update security patches monthly
+
+
+--------------------------------------------------------------------------------
+CRONTAB SYNTAX (5 TIME FIELDS + COMMAND)
+--------------------------------------------------------------------------------
+
+  * * * * *  command_to_run
+  │ │ │ │ │
+  │ │ │ │ └── Day of WEEK (0-7, where 0 and 7 = Sunday)
+  │ │ │ └──── MONTH (1-12)
+  │ │ └────── Day of MONTH (1-31)
+  │ └──────── HOUR (0-23, 24-hour format)
+  └────────── MINUTE (0-59)
+
+  SPECIAL CHARACTERS:
+    *     = Any value (every minute/hour/day etc.)
+    ,     = Multiple values   (1,3,5 = at 1st, 3rd, and 5th)
+    -     = Range             (1-5 = from 1 to 5)
+    /n    = Every nth value   (*/5 = every 5 minutes)
+
+
+--------------------------------------------------------------------------------
+CRONTAB EXAMPLES
+--------------------------------------------------------------------------------
+
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ SCHEDULE              │ CRON EXPRESSION                           │
+  ├────────────────────────────────────────────────────────────────────┤
+  │ Every minute          │ * * * * *                                 │
+  │ Every 5 minutes       │ */5 * * * *                               │
+  │ Every 15 minutes      │ */15 * * * *                              │
+  │ Every hour            │ 0 * * * *                                 │
+  │ Every 6 hours         │ 0 */6 * * *                               │
+  │ Every day at 2 AM     │ 0 2 * * *                                 │
+  │ Every day at midnight │ 0 0 * * *                                 │
+  │ Every Sunday at 3 AM  │ 0 3 * * 0                                 │
+  │ Every Monday 9 AM     │ 0 9 * * 1                                 │
+  │ 1st of every month    │ 0 0 1 * *                                 │
+  │ Every Jan 1st         │ 0 0 1 1 *                                 │
+  │ Every 30 min, 8-6 PM  │ */30 8-18 * * *                           │
+  └────────────────────────────────────────────────────────────────────┘
+
+  REAL EXAMPLES:
+    Run backup every night at 2 AM:
+      0 2 * * *  /home/ubuntu/scripts/backup.sh >> /var/log/backup.log 2>&1
+
+    Clean logs older than 30 days, every Sunday midnight:
+      0 0 * * 0  find /var/log -name "*.log" -mtime +30 -delete
+
+    Check disk every 5 minutes and alert if full:
+      */5 * * * *  /home/ubuntu/scripts/disk_check.sh
+
+    Restart app if it crashed, every minute:
+      * * * * *  /home/ubuntu/scripts/auto_restart.sh
+
+
+--------------------------------------------------------------------------------
+CRONTAB COMMANDS
+--------------------------------------------------------------------------------
+
+  Edit your cron jobs (opens in editor):
+    $ crontab -e
+
+  View all your scheduled cron jobs:
+    $ crontab -l
+
+  Delete ALL your cron jobs (CAREFUL!):
+    $ crontab -r
+
+  View another user's cron jobs (root only):
+    $ sudo crontab -u username -l
+
+
+--------------------------------------------------------------------------------
+COMPLETE CRON JOB EXAMPLE
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────────────
+  $ crontab -e
+
+  # Add this line to check server health every 5 minutes:
+  */5 * * * *  /home/ubuntu/scripts/health_check.sh >> /var/log/health.log 2>&1
+
+  # Explanation:
+  # */5 * * * *   = Every 5 minutes
+  # /path/script  = Run this script
+  # >>            = Append output to log file (not overwrite)
+  # /var/log/...  = Log file location
+  # 2>&1          = Also capture error messages to the log file
+  ─────────────────────────────────────────────────────────────────────
+
+
+
+================================================================================
+CHAPTER 7 : FILE SYSTEM CONCEPTS
+================================================================================
+
+--------------------------------------------------------------------------------
+SOFT LINKS vs HARD LINKS
+--------------------------------------------------------------------------------
+
+  WHAT ARE LINKS?
+    Links are like shortcuts or aliases for files in Linux.
+    There are two types: soft links and hard links.
+
+  BACKGROUND - INODE:
+    Every file on Linux has an "inode" - a unique ID that stores file metadata.
+    The inode points to the actual data on disk.
+    File name → inode → actual data
+
+  -----------------------------------------------------------------------
+  SOFT LINK (Symbolic Link)
+  -----------------------------------------------------------------------
+
+    WHAT IT IS:
+      A soft link is a shortcut that points to the ORIGINAL FILE'S PATH.
+      It is like a Windows shortcut (.lnk file).
+
+    HOW TO CREATE:
+      $ ln -s original.txt softlink.txt
+      (-s means symbolic/soft)
+
+    PROPERTIES:
+      - Has a DIFFERENT inode than the original file
+      - Stores the PATH to original file
+      - If original is deleted → soft link BREAKS (dangling link)
+      - Can link to DIRECTORIES
+      - Can link across DIFFERENT file systems/partitions
+      - Small size (just stores the path string)
+
+    EXAMPLE:
+      $ echo "Hello" > original.txt
+      $ ln -s original.txt mylink.txt
+      $ cat mylink.txt           → Shows: Hello (reads through to original)
+      $ rm original.txt
+      $ cat mylink.txt           → ERROR: No such file (link is broken)
+
+
+  -----------------------------------------------------------------------
+  HARD LINK
+  -----------------------------------------------------------------------
+
+    WHAT IT IS:
+      A hard link is a SECOND NAME for the SAME FILE.
+      Both the original and hard link point to the SAME inode (same data).
+
+    HOW TO CREATE:
+      $ ln original.txt hardlink.txt
+      (no -s flag)
+
+    PROPERTIES:
+      - Has the SAME inode as the original file
+      - Both names point to same data on disk
+      - If original is deleted → hard link STILL WORKS
+        (data survives as long as at least one name/link exists)
+      - CANNOT link to directories (safety restriction)
+      - CANNOT cross different file systems
+      - Same size as the file (shares inode, not extra space)
+
+    EXAMPLE:
+      $ echo "Hello" > original.txt
+      $ ln original.txt hardlink.txt
+      $ cat hardlink.txt         → Shows: Hello
+      $ rm original.txt
+      $ cat hardlink.txt         → STILL shows: Hello! (data survived)
+
+
+  -----------------------------------------------------------------------
+  COMPARISON TABLE
+  -----------------------------------------------------------------------
+
+    +---------------------------+--------------------+--------------------+
+    | Feature                   | Soft Link          | Hard Link          |
+    +---------------------------+--------------------+--------------------+
+    | Type                      | Shortcut/pointer   | Actual file alias  |
+    | Inode number              | Different          | Same as original   |
+    | Breaks if original deleted| YES (broken link)  | NO (still works)   |
+    | Can link directories      | YES                | NO                 |
+    | Can cross file systems    | YES                | NO                 |
+    | File size                 | Small (path only)  | Same as original   |
+    | Command to create         | ln -s orig link    | ln orig link       |
+    | Acts like                 | Windows shortcut   | Real file clone    |
+    +---------------------------+--------------------+--------------------+
+
+  WHEN TO USE WHICH:
+    Use soft link when:
+      - Linking to directories
+      - Creating shortcuts across different disks
+      - Making alternative names that break when original moves (intentional)
+
+    Use hard link when:
+      - You want file to survive deletion of original name
+      - Backup copies that share data (no extra space)
+      - Keeping files in multiple directories without duplicating data
+
+
+
+================================================================================
+CHAPTER 8 : LOGROTATE — MANAGE LOG FILES
+================================================================================
+
+--------------------------------------------------------------------------------
+WHAT IS LOGROTATE?
+--------------------------------------------------------------------------------
+
+  PROBLEM:
+    Applications write logs constantly. Over time:
+      /var/log/nginx/access.log → 50 GB!
+      Server disk fills up → Server crashes!
+
+  SOLUTION: logrotate
+    logrotate automatically:
+      - Renames (rotates) old log files (access.log → access.log.1)
+      - Compresses old logs (saves space)
+      - Deletes logs older than X days
+      - Creates fresh new log file for the application
+      - Runs on a schedule (daily/weekly/monthly)
+
+
+--------------------------------------------------------------------------------
+HOW LOGROTATE WORKS
+--------------------------------------------------------------------------------
+
+  Without logrotate:
+    Day 1:  app.log (10 MB)
+    Day 30: app.log (300 MB)
+    Day 60: app.log (600 MB)
+    Day 90: DISK FULL → Server crashes!
+
+  With logrotate (daily, keep 7):
+    Today:   app.log         (current, being written to)
+    Day -1:  app.log.1       (yesterday, compressed)
+    Day -2:  app.log.2.gz    (day before, compressed)
+    ...
+    Day -7:  app.log.7.gz    (oldest kept)
+    Day -8:  DELETED automatically
+
+
+--------------------------------------------------------------------------------
+CONFIGURATION FILES
+--------------------------------------------------------------------------------
+
+  Main config file:
+    /etc/logrotate.conf       (global settings)
+
+  App-specific config folder:
+    /etc/logrotate.d/         (put one file per application here)
+    /etc/logrotate.d/nginx    (nginx log rotation config)
+    /etc/logrotate.d/myapp    (your app's log rotation config)
+
+
+--------------------------------------------------------------------------------
+LOGROTATE CONFIG EXAMPLE
+--------------------------------------------------------------------------------
+
+  Create: /etc/logrotate.d/myspringapp
+  ─────────────────────────────────────────────────────────────────────
+  /var/log/myspringapp/*.log {
+      daily                    ← Rotate every day
+      rotate 7                 ← Keep only last 7 log files
+      compress                 ← Compress old logs with gzip
+      delaycompress            ← Don't compress most recent (app may still write)
+      missingok                ← Don't error if log file is missing
+      notifempty               ← Don't rotate if log file is empty
+      create 0640 ubuntu ubuntu ← Create new log file with these permissions
+      dateext                  ← Add date to rotated filename (app.log.2025-02-15)
+      postrotate               ← Run this command AFTER rotating
+          systemctl reload myapp 2>/dev/null || true
+      endscript
+  }
+  ─────────────────────────────────────────────────────────────────────
+
+  OPTION EXPLANATIONS:
+    daily         = Rotate log files every day
+    weekly        = Rotate every week
+    monthly       = Rotate every month
+    rotate 7      = Keep 7 old log files, delete older ones
+    compress      = Compress rotated files with gzip (.gz)
+    delaycompress = Compress from 2nd rotation (not 1st)
+    missingok     = Do not show error if log file not found
+    notifempty    = Skip rotation if file is empty
+    create        = Create fresh log file after rotating
+    dateext       = Use date in filename instead of numbers
+
+  RUN LOGROTATE MANUALLY (for testing):
+    $ logrotate /etc/logrotate.conf                  (run all rotations)
+    $ logrotate --debug /etc/logrotate.d/myapp       (test without actual rotation)
+    $ logrotate --force /etc/logrotate.conf          (force rotation even if not due)
+
+
+
+================================================================================
+CHAPTER 9 : REAL-WORLD SHELL SCRIPTS
+================================================================================
+
+--------------------------------------------------------------------------------
+SCRIPT 1: VM HEALTH CHECK REPORT
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────────────
+  #!/bin/bash
+
+  ##############################################
+  # Author  : Ankur Verma
+  # Date    : 15/02/2025
+  # Version : v1
+  # Description:
+  #   Checks the health of the server.
+  #   Reports disk space, memory, and CPU cores.
+  #   Can be run manually or scheduled via crontab.
+  ##############################################
+
+  set -euo pipefail
+
+  echo "======================================"
+  echo " SERVER HEALTH REPORT"
+  echo " Date: $(date)"
+  echo "======================================"
+
+  echo ""
+  echo "--- DISK SPACE ---"
+  df -h
+
+  echo ""
+  echo "--- MEMORY USAGE ---"
+  free -g
+
+  echo ""
+  echo "--- CPU CORES ---"
+  echo "Available CPU cores: $(nproc)"
+
+  echo ""
+  echo "--- TOP PROCESSES (by CPU) ---"
+  top -b -n 1 | head -15
+
+  echo ""
+  echo "======================================"
+  echo " Report Complete"
+  echo "======================================"
+  ─────────────────────────────────────────────────────────────────────
+
+  HOW TO RUN:
+    $ chmod +x health_check.sh
+    $ ./health_check.sh
+
+  SCHEDULE VIA CRONTAB (run every 30 minutes):
+    $ crontab -e
+    # Add: */30 * * * * /home/ubuntu/scripts/health_check.sh >> /var/log/health.log 2>&1
+
+
+--------------------------------------------------------------------------------
+SCRIPT 2: AWS RESOURCE TRACKER
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────────────
+  #!/bin/bash
+
+  ##############################################
+  # Author  : Ankur Verma
+  # Date    : 20/11/2025
+  # Version : v1
+  # Description:
+  #   Reports all AWS resources in use.
+  #   Lists: S3 buckets, EC2 instances, Lambda, IAM users.
+  #   Output saved to resourceTracker file.
+  ##############################################
+
+  set -euo pipefail
+
+  OUTPUT_FILE="resourceTracker"
+  DATE=$(date '+%Y-%m-%d %H:%M:%S')
+
+  echo "AWS Resource Report - $DATE" > "$OUTPUT_FILE"
+  echo "==========================================" >> "$OUTPUT_FILE"
+
+  # ── List S3 Buckets ────────────────────────────────────────
+  echo ""
+  echo "Fetching S3 buckets..."
+  echo "" >> "$OUTPUT_FILE"
+  echo "--- S3 BUCKETS ---" >> "$OUTPUT_FILE"
+  aws s3 ls >> "$OUTPUT_FILE"
+
+  # ── List EC2 Instances ─────────────────────────────────────
+  echo "Fetching EC2 instances..."
+  echo "" >> "$OUTPUT_FILE"
+  echo "--- EC2 INSTANCE IDs ---" >> "$OUTPUT_FILE"
+  aws ec2 describe-instances | jq '.Reservations[].Instances[].InstanceId' >> "$OUTPUT_FILE"
+
+  # ── List Lambda Functions ──────────────────────────────────
+  echo "Fetching Lambda functions..."
+  echo "" >> "$OUTPUT_FILE"
+  echo "--- LAMBDA FUNCTIONS ---" >> "$OUTPUT_FILE"
+  aws lambda list-functions | jq '.Functions[].FunctionName' >> "$OUTPUT_FILE"
+
+  # ── List IAM Users ─────────────────────────────────────────
+  echo "Fetching IAM users..."
+  echo "" >> "$OUTPUT_FILE"
+  echo "--- IAM USERS ---" >> "$OUTPUT_FILE"
+  aws iam list-users | jq '.Users[].UserName' >> "$OUTPUT_FILE"
+
+  echo ""
+  echo "Report saved to $OUTPUT_FILE"
+  cat "$OUTPUT_FILE"
+  ─────────────────────────────────────────────────────────────────────
+
+  PREREQUISITES:
+    - AWS CLI installed: $ aws --version
+    - AWS CLI configured: $ aws configure
+    - jq installed: $ sudo apt install jq -y
+
+
+--------------------------------------------------------------------------------
+SCRIPT 3: GITHUB COLLABORATORS SCRIPT
+--------------------------------------------------------------------------------
+
+  WHAT IT DOES:
+    Lists all users who have READ access (pull permission) to a GitHub repo.
+    Uses GitHub REST API with authentication.
+
+  ─────────────────────────────────────────────────────────────────────
+  #!/bin/bash
+
+  ##############################################
+  # Author  : Ankur Verma
+  # Date    : 20/11/2025
+  # Version : v1
+  # Description:
+  #   Lists GitHub repo collaborators with read (pull) access.
+  #   Requires: USERNAME and TOKEN environment variables set.
+  # Usage:
+  #   export username="your-github-username"
+  #   export token="your-personal-access-token"
+  #   ./github_users.sh repo-owner repo-name
+  ##############################################
+
+  set -euo pipefail
+
+  # ── Configuration ─────────────────────────────────────────
+  API_URL="https://api.github.com"
+  USERNAME="${username}"        # must be exported in environment
+  TOKEN="${token}"              # must be exported in environment
+  REPO_OWNER="$1"              # first argument to script
+  REPO_NAME="$2"               # second argument to script
+
+  # ── Validate Arguments ─────────────────────────────────────
+  function helper() {
+      if [ $# -ne 2 ]; then
+          echo "Error: Missing required arguments."
+          echo ""
+          echo "Usage: $0 <repo-owner> <repo-name>"
+          echo "Example: $0 ankur-verma my-spring-app"
+          exit 1
+      fi
+  }
+
+  # ── Make API Request ───────────────────────────────────────
+  function github_api_get() {
+      local endpoint="$1"
+      local url="${API_URL}/${endpoint}"
+
+      # -s = silent (no progress bar)
+      # -u = basic auth (username:token)
+      curl -s -u "${USERNAME}:${TOKEN}" "$url"
+  }
+
+  # ── List Collaborators with Read Access ────────────────────
+  function list_users_with_read_access() {
+      local endpoint="repos/${REPO_OWNER}/${REPO_NAME}/collaborators"
+
+      echo "Fetching collaborators for ${REPO_OWNER}/${REPO_NAME}..."
+
+      # Call API, parse JSON with jq
+      # Select only users with pull (read) permission = true
+      collaborators=$(github_api_get "$endpoint" | \
+          jq -r '.[] | select(.permissions.pull == true) | .login')
+
+      if [ -z "$collaborators" ]; then
+          echo "No users with read access found."
+      else
+          echo ""
+          echo "Users with READ access:"
+          echo "─────────────────────"
+          echo "$collaborators"
+      fi
+  }
+
+  # ── Main ───────────────────────────────────────────────────
+  helper "$@"                       # validate arguments first
+  list_users_with_read_access       # then list users
+  echo ""
+  echo "Done."
+  ─────────────────────────────────────────────────────────────────────
+
+  HOW TO USE:
+    $ export username="your-github-username"
+    $ export token="ghp_xxxxxxxxxxxx"
+    $ chmod +x github_users.sh
+    $ ./github_users.sh microsoft vscode
+
+
+--------------------------------------------------------------------------------
+SCRIPT 4: DISK ALERT SCRIPT (For Crontab)
+--------------------------------------------------------------------------------
+
+  ─────────────────────────────────────────────────────────────────────
+  #!/bin/bash
+
+  ##############################################
+  # Author  : Ankur Verma
+  # Date    : 15/02/2025
+  # Version : v1
+  # Description:
+  #   Monitors disk usage and sends alert if above threshold.
+  #   Schedule via crontab every 5 minutes.
+  ##############################################
+
+  set -euo pipefail
+
+  THRESHOLD=80
+
+  usage=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+
+  if [ "$usage" -gt "$THRESHOLD" ]; then
+      echo "DISK ALERT: $(hostname) disk is at ${usage}%! (Threshold: ${THRESHOLD}%)"
+      echo "Time: $(date)"
+      echo "Disk Details:"
+      df -h /
+      # Add email or Slack notification here if needed
+  fi
+  ─────────────────────────────────────────────────────────────────────
+
+  SCHEDULE (check every 5 minutes):
+    $ crontab -e
+    */5 * * * * /home/ubuntu/scripts/disk_alert.sh >> /var/log/disk_alert.log 2>&1
+
+
+
+================================================================================
+CHAPTER 10 : DISADVANTAGES OF SHELL SCRIPTING
+================================================================================
+
+  Knowing the limitations helps you choose the right tool for the job.
+
+  1. HARD TO DEBUG
+     Error messages are vague and unclear.
+     "No such file or directory" — but which file? Which line?
+     Large scripts become nightmare to debug.
+     Use set -x as partial help, but still tough.
+
+  2. NOT PORTABLE ACROSS SHELLS
+     Bash script may not run in sh, zsh, or dash.
+     Different Linux versions behave differently.
+     Scripts that work on Ubuntu may fail on Alpine or CentOS.
+
+  3. POOR ERROR HANDLING
+     No try-catch like Java or Python.
+     Must manually use set -e, set -u, traps.
+     Easy to miss an error and continue with bad state.
+
+  4. HARD TO MAINTAIN LARGE SCRIPTS
+     No classes, no modules, no imports.
+     Scripts over 500 lines become unreadable.
+     Better to switch to Python for complex automation.
+
+  5. SECURITY RISKS
+     Easy to accidentally expose passwords in log files.
+     eval command is dangerous (can execute anything).
+     Unquoted variables can cause command injection.
+     Example: rm -rf $DIR (if DIR is empty → rm -rf /)!
+
+  6. PERFORMANCE LIMITATIONS
+     Shell scripts are slow compared to Python, Go, Java.
+     Spawning subshells for each command is expensive.
+     Not suitable for CPU-intensive tasks.
+
+  7. WEAK TYPING (No Data Types)
+     Everything is a string. 
+     No concept of integers, booleans, lists (properly).
+     Silent bugs when you expect number but get string.
+
+  8. ERROR-PRONE SYNTAX
+     Spaces are critical: [ $a -eq $b ] works
+                          [$a -eq $b] FAILS (missing spaces)
+     Quotes cause bugs if forgotten around variables.
+     Tab vs space matters in some contexts.
+
+  9. LIMITED FUNCTIONALITY
+     Cannot build REST APIs, microservices, or GUIs.
+     No proper data structures (linked lists, hashmaps).
+     Cannot handle binary data properly.
+
+  10. NO STANDARD LIBRARY
+      Must rely on external tools: awk, sed, grep, cut.
+      If those tools differ in version, behavior changes.
+
+  WHEN TO USE SHELL SCRIPTS:
+    Good for: System administration, file operations, glue code,
+              CI/CD steps, server setup, cron automation.
+
+  When to Switch to Python/Go:
+    Complex logic, API calls, JSON/XML parsing, data processing,
+    error-heavy workflows, anything over ~200 lines.
+
+
+
+================================================================================
+CHAPTER 11 : QUICK REFERENCE CHEAT SHEET
+================================================================================
+
+  SYSTEM MONITORING:
+  ─────────────────
+  free -g                     Check RAM in GB
+  free -m                     Check RAM in MB
+  nproc                       Number of CPU cores
+  df -h                       Disk usage (human readable)
+  df -h /var                  Disk usage for specific folder
+  top                         Live process monitor
+  top -b -n 1                 Top output once (for scripts)
+  ps -ef                      All processes snapshot
+  ps -ef | grep java          Check if Java process is running
+  kill -9 PID                 Force kill a process
+  sudo lsof -i :8080          What process is using port 8080
+
+  TEXT PROCESSING:
+  ────────────────
+  awk '{print $1}' file       Print first column
+  awk '{print $2}' file       Print second column
+  awk 'NR==2 {print $5}'     Print column 5 of line 2
+  awk -F"," '{print $1}'     Use comma as separator
+  grep "pattern" file         Search for pattern
+  grep -o "s" text            Print each match on own line
+  grep -c "pattern" file      Count matching lines
+  wc -l file                  Count lines in file
+  sed 's/old/new/g' file      Replace text
+  cut -d: -f1 /etc/passwd     Cut field by delimiter
+
+  FILE OPERATIONS:
+  ────────────────
+  find / -name "app.jar"       Find file by name
+  find /log -name "*.log"      Find all log files
+  find / -size +100M           Find files over 100 MB
+  find /log -mtime +30 -delete Delete files older than 30 days
+  ln -s original softlink      Create soft link
+  ln original hardlink          Create hard link
+  ls -la                       List files with details + hidden
+  chmod +x script.sh           Make script executable
+  chmod 755 script.sh          Set permissions
+  chown user:group file        Change file owner
+
+  CURL COMMANDS:
+  ──────────────
+  curl https://example.com                        GET request
+  curl -X POST -H "Content-Type: application/json" \
+    -d '{"key":"value"}' https://example.com      POST request
+  curl -H "Authorization: Bearer TOKEN" url       With auth header
+  curl -o file.json https://example.com           Save to file
+  curl -I https://example.com                     Headers only
+  curl -v https://example.com                     Verbose mode
+  curl -s -o /dev/null -w "%{http_code}" url      Get HTTP status code
+
+  SHELL SCRIPT ESSENTIALS:
+  ─────────────────────────
+  #!/bin/bash                  Shebang (always first line)
+  set -euo pipefail            Safe mode (exit on error)
+  set -x                       Debug mode (print commands)
+  $1, $2, $3                  Script arguments
+  $#                           Number of arguments
+  $?                           Exit code of last command
+  $0                           Script name
+  $(command)                   Capture command output
+  variable="value"             Assign variable
+  echo "$variable"             Print variable
+  if [ condition ]; then       If statement
+  for i in {1..10}; do        For loop
+  function name() { }          Define function
+  trap "cleanup" EXIT          Trap on exit
+
+  CRONTAB:
+  ─────────
+  crontab -e                   Edit cron jobs
+  crontab -l                   List cron jobs
+  crontab -r                   Remove all cron jobs
+
+  CRON QUICK REFERENCE:
+  * * * * *                    Every minute
+  */5 * * * *                  Every 5 minutes
+  0 * * * *                    Every hour
+  0 2 * * *                    Every day at 2 AM
+  0 0 * * 0                    Every Sunday midnight
+  0 9 * * 1-5                  Weekdays at 9 AM
+
+  LOGROTATE:
+  ──────────
+  logrotate /etc/logrotate.conf     Run logrotate
+  logrotate --debug /etc/logrotate.d/myapp   Test without rotating
+  /etc/logrotate.d/                 App-specific config folder
+
+
+================================================================================
+       END OF GUIDE - Linux Commands & Shell Scripting
+       You now have everything a backend/DevOps engineer needs!
+================================================================================
