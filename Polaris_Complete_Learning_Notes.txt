@@ -1,0 +1,644 @@
+========================================================================================
+POLARIS (COVERITY) SAST — Static Application Security Testing for Java Backend Projects
+========================================================================================
+##################
+WHAT IS POLARIS?
+##################
+➤ Polaris is a cloud-based, enterprise-grade Static Application Security Testing(SAST) platform developed by Synopsys (formerly Black Duck / Coverity).
+➤ It analyzes your source code — without executing it — to detect security vulnerabilities, coding defects, and compliance violations before the application ever runs.
+➤ Think of it as a highly intelligent code reviewer that reads every line of your Java application, traces how data flows through the system, and flags patterns
+that are known to cause security breaches or runtime failures.
+
+⚡ KEY INSIGHT: Polaris is NOT a runtime tool. It scans source code statically, meaning no server needs to be running, no test cases need to execute, and no network traffic is generated. This makes it extremely fast and safe to use in any environment.
+
+
+--------------
+Core Identity
+--------------
+Full Product Name         : Synopsys Polaris Software Integrity Platform
+Engine Behind It          : Coverity Static Analysis (industry gold standard since 2003)
+Scan Type                 : SAST — Static Application Security Testing
+Delivery Model            : SaaS (cloud-hosted) with on-prem agent/CLI
+Primary Language Support  : Java, C/C++, C#, Python, JavaScript, Go, Swift, Kotlin, Scala, and more
+Integration Points        : CI/CD pipelines, IDEs, Git hosting platforms, issue trackers
+
+
+---------------------------------
+Why Polaris Over Other Scanners?
+---------------------------------
+There are many SAST tools in the market (SonarQube, Checkmarx, Veracode, Fortify).
+
+Here is why organizations choose Polaris/Coverity:
+➤ Inter-procedural analysis: Tracks data across method calls, class boundaries, and even across files — not just within a single function
+➤ Path-sensitive analysis: Evaluates only feasible execution paths, drastically reducing false positives compared to competitors
+➤ Whole-program analysis: The entire codebase is analyzed together, not file by file
+➤ Zero false-negative commitment: Designed to never miss a real vulnerability in its coverage areas
+➤ Compliance-ready: Mapped to OWASP Top 10, CWE, CERT, PCI-DSS, MISRA standards out of the box
+
+✔️ OWASP stands for Open Web Application Security Project, which provides the top 10 most critical web application security risks.
+✔️ CWE stands for Common Weakness Enumeration, a list of common software and hardware security weaknesses maintained by MITRE.
+✔️ CERT stands for Computer Emergency Response Team, which provides cybersecurity standards, incident response practices, and secure coding guidelines.
+✔️ PCI-DSS stands for Payment Card Industry Data Security Standard, a security standard designed to protect credit and debit card transactions and cardholder data.
+✔️ MISRA stands for Motor Industry Software Reliability Association, which defines coding guidelines mainly for safety-critical systems, especially in automotive embedded software development.
+
+
+---------------------------
+Static vs Dynamic Analysis
+---------------------------
+When it runs     : Before runtime, on source code
+What it needs    : Source code (or bytecode)
+Speed            : Fast — minutes to hours
+False positives  : Possible but manageable
+Coverage         : 100% of code paths traced
+Cost to fix      : Cheapest — bugs caught in development
+✔️ Dynamic Analysis (like DAST tools: OWASP ZAP, Burp Suite) runs against a live application. Polaris is purely static — it never touches your running server.
+
+
+--------------------------------------
+Taint Analysis (The Heart of Polaris)
+--------------------------------------
+The most powerful capability of Polaris is taint analysis. Understanding this concept is critical to understanding every finding Polaris reports.
+➤ Source      : Where untrusted data enters your application (HTTP request params, database reads, file input, env vars)
+➤ Sink        : Where dangerous operations happen (SQL execution, shell commands, HTML output, file writes,  deserialization)
+➤ Sanitizer   : A function that cleanses or validates the data, breaking the taint chain
+➤ Tainted Data: Any data that has traveled from a Source to a Sink without passing through a Sanitizer
+
+✅ EXAMPLE — SQL Injection Taint Flow:
+  ✔️ Source: String id = request.getParameter("userId");
+  ✔️ Flow:   query = "SELECT * FROM users WHERE id = " + id;
+  ✔️ Sink:   statement.executeQuery(query);
+  ✔️ Result: Polaris reports SQL Injection — tainted data reached the SQL sink without sanitization.
+
+
+--------------------------------
+Checker Categories in Java
+--------------------------------
+Polaris organizes its analysis into checkers. Each checker looks for a specific class of defect. For Java projects, the most relevant are:
+✔️ TAINTED_DATA             : User-supplied data reaching dangerous sinks (SQLi, XSS, RCE)
+✔️ NULL_RETURNS             : Using a return value that can be null without null check
+✔️ RESOURCE_LEAK            : Streams, connections, or readers not closed in finally/try-with-resources
+✔️ UNREACHABLE_CODE         : Code that can never execute, indicating logic errors
+✔️ BUFFER_NOT_CHECKED       : Array/buffer access without bounds validation
+✔️ THREAD_SAFETY_VIOLATION  : Shared state accessed without synchronization
+✔️ HARDCODED_CREDENTIALS    : Passwords or keys embedded directly in source code
+✔️ WEAK_CRYPTOGRAPHY        : Use of MD5, SHA-1, DES, RC4, or other deprecated algorithms
+✔️ PATH_TRAVERSAL           : File paths constructed from user input without normalization
+✔️ INSECURE_DESERIALIZATION : Deserializing untrusted byte streams without type validation
+
+
+----------------
+Severity Levels
+----------------
+Every issue in Polaris is assigned a severity. Understand these before triaging findings:
+➤ Critical : Must fix immediately. Actively exploitable vulnerabilities (e.g., SQLi, RCE, auth bypass)
+➤ High     : Fix in current sprint. Significant security or stability risk
+➤ Medium   : Fix in next release. Defense-in-depth issues, data exposure risks
+➤ Low      : Fix when convenient. Code quality, informational findings
+
+
+-------------------------------------------
+RCE (Remote Code Execution) Vulnerability
+-------------------------------------------
+➤ It is a critical security vulnerability where an attacker can execute malicious code or commands on a remote server or application from another system over a network.
+➤ This usually happens when an application accepts untrusted input and executes it without proper validation or sanitization.
+➤ If exploited successfully, the attacker can gain control over the application, access sensitive data, modify files, or even take over the entire server.
+
+
+======================
+POLARIS ARCHITECTURE
+======================
+-----------------------------
+High-Level Architecture
+-----------------------------
+Polaris operates as a SaaS platform. Your code never leaves your network in raw form — the analysis happens after a secure upload. Here is how the pieces connect:
+• Polaris CLI / Plugin: Installed on your developer machine or CI server. Captures your build and uploads analysis data to the Polaris cloud.
+• Polaris Cloud Platform: Runs the full Coverity analysis engine. Stores results, manages projects, handles authentication.
+• Polaris Web UI: Browser-based dashboard where teams view findings, assign issues, track remediation progress.
+• REST API: Allows programmatic access to create projects, fetch results, integrate with ticketing systems.
+• Webhooks: Trigger external systems (like Jira) when new issues are found.
+
+DATA FLOW SUMMARY:
+Your Machine: Source Code
+  → Polaris CLI captures build artifacts and source metadata
+  → Encrypted upload to Polaris Cloud
+  → Analysis engine runs Coverity checks
+  → Results stored in Polaris database
+  → Available in Web UI and via API
+
+
+--------------------
+Key Components
+--------------------
+➤ polaris CLI      : Command-line interface, primary tool for triggering scans
+➤ polaris capture  : Intercepts your Java build to collect compilation data(like a build spy)
+➤ coverity-tool    : The underlying Coverity analysis binary, invoked by the CLI
+➤ polaris.yml      : Configuration file in your project root that defines scan behavior
+➤ Branch & Project : Organizational units in Polaris — a Project contains multiple Branches (like Git branches)
+➤ Issue / Defect   : A specific finding at a specific line of code, with a full event trace
+
+
+==========================================
+SETTING UP POLARIS FOR A JAVA PROJECT
+==========================================
+------------------
+1️⃣ Prerequisites
+------------------
+• Java JDK 11 or 17 installed on the build machine
+• Maven 3.x or Gradle 6+ (whichever your project uses)
+• Polaris CLI downloaded from your organization's Polaris instance
+• POLARIS_SERVER_URL and POLARIS_ACCESS_TOKEN environment variables (get these from your Polaris admin)
+• Network access to your Polaris server (cloud or on-prem)
+
+
+--------------------------------
+2️⃣ Installing the Polaris CLI
+--------------------------------
+Download the CLI binary from your Polaris web portal under Downloads. Then:
+  # Linux / macOS
+  chmod +x polaris
+  sudo mv polaris /usr/local/bin/
+
+  # Verify installation
+  polaris --version
+
+  # Set environment variables (add to ~/.bashrc or CI env)
+  export POLARIS_SERVER_URL=https://your-company.polaris.synopsys.com
+  export POLARIS_ACCESS_TOKEN=your-token-here
+
+
+---------------------------------------
+3️⃣ The polaris.yml Configuration File
+---------------------------------------
+This file goes in the root of your Java project repository. It tells Polaris how to build and scan your project.
+
+  # polaris.yml — Minimal Java/Maven config
+  version: "1"
+
+  project:
+    name: my-java-backend
+    branch: main
+
+  capture:
+    build:
+      cleanCommand: mvn clean
+      buildCommand: mvn compile -DskipTests
+
+  analyze:
+    checkers:
+      java:
+        enabled: true
+
+  reporting:
+    sarif:
+      create: true    # generates results.sarif for IDE integration
+
+
+For Gradle projects, replace the build commands:
+  capture:
+    build:
+      cleanCommand: ./gradlew clean
+      buildCommand: ./gradlew compileJava
+
+
+---------------------------
+4️⃣ Running Your First Scan
+---------------------------
+  # Run full scan (capture + analyze + submit results)
+  polaris analyze -w
+
+  # The -w flag waits for cloud analysis to complete
+  # Output will include a URL to view results in the web UI
+
+  # For verbose output (useful for debugging)
+  polaris --verbose analyze -w
+
+A successful scan will print something like:
+
+  Analysis complete. View results at:
+  https://your-company.polaris.synopsys.com/projects/my-java-backend
+
+  Issues found: 12 (Critical: 2, High: 4, Medium: 6)
+
+
+===================
+CI/CD INTEGRATION
+===================
+------------------------
+1️⃣  Jenkins Integration
+------------------------
+
+Add a Polaris scan stage to your Jenkinsfile. Run it after compilation,
+before deployment:
+
+  pipeline {
+    agent any
+    environment {
+      POLARIS_SERVER_URL = credentials('polaris-server-url')
+      POLARIS_ACCESS_TOKEN = credentials('polaris-access-token')
+    }
+    stages {
+      stage('Build') {
+        steps { sh 'mvn clean compile -DskipTests' }
+      }
+      stage('Polaris SAST Scan') {
+        steps {
+          sh 'polaris analyze -w'
+          // Fail pipeline if critical issues found
+          sh 'polaris check-results --fail-on-severity critical'
+        }
+      }
+      stage('Deploy') {
+        steps { /* your deployment steps */ }
+      }
+    }
+  }
+
+
+---------------------------------
+2️⃣  GitHub Actions Integration
+---------------------------------
+  name: Polaris SAST Scan
+  on: [push, pull_request]
+
+  jobs:
+    polaris:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+            java-version: '17'
+            distribution: 'temurin'
+        - name: Download Polaris CLI
+          run: |
+            curl -O ${{ vars.POLARIS_SERVER_URL }}/api/tools/polaris_cli-linux64.zip
+            unzip polaris_cli-linux64.zip
+            chmod +x polaris
+          env:
+            POLARIS_ACCESS_TOKEN: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+            POLARIS_SERVER_URL: ${{ vars.POLARIS_SERVER_URL }}
+        - name: Run Polaris Scan
+          run: ./polaris analyze -w
+          env:
+            POLARIS_ACCESS_TOKEN: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+            POLARIS_SERVER_URL: ${{ vars.POLARIS_SERVER_URL }}
+
+
+
+================================================================================
+READING AND UNDERSTANDING SCAN RESULTS
+================================================================================
+------------------------------------------------------------------------
+1️⃣  Navigating the Polaris Web UI
+------------------------------------------------------------------------
+After a scan completes, open your project in the Polaris web portal. Here is what you will see:
+• Dashboard    : Summary of all open issues by severity, checker type, and age
+• Issues List  : Filterable, sortable table of every finding. Filter by: checker, severity, file, assignee, triage status
+• Issue Detail : The most important view — shows the full defect event trace
+• Code Viewer  : Inline source code with highlighted paths from source to sink
+• Triage Panel : Assign, dismiss, or comment on an issue
+
+
+-------------------------------------------
+2️⃣ The Defect Event Trace — How to Read It
+-------------------------------------------
+Every Polaris issue shows an event trace — a step-by-step path showing exactly how the vulnerability exists. This is unique to Coverity and far more informative than line-number-only reports.
+
+Example trace for a SQL Injection finding:
+  Event 1 (Source)     → Line 45 in UserController.java
+                         String userId = request.getParameter("id");
+                         [Tainted data enters here from HTTP request]
+
+  Event 2 (Assignment) → Line 47 in UserController.java
+                         String query = "SELECT * FROM users WHERE id=" + userId;
+                         [Tainted data propagated into query string]
+
+  Event 3 (Call)       → Line 49 → UserRepository.findUser(query)
+                         [Tainted data passed to method]
+
+  Event 4 (Sink)       → Line 23 in UserRepository.java
+                         stmt.executeQuery(query);
+                         [!!! Tainted data used in SQL sink !!!]
+Reading this trace tells you exactly what to fix: sanitize userId before it reaches the SQL execution. The fix here is to use a PreparedStatement.
+
+-----------------------
+3️⃣  Triage Statuses
+-----------------------
+  Outstanding  : Newly found, not yet reviewed
+  Intentional  : Known behavior, accepted as a design choice (mark with justification)
+  Bug          : Confirmed as a real issue, needs a fix
+  Dismissed    : False positive — Polaris flagged it incorrectly
+  Fixed        : Developer marked as fixed; will be verified in next scan
+
+
+================================================================================
+COMMON JAVA VULNERABILITIES & HOW TO FIX THEM
+================================================================================
+------------------------------------------------------------------------
+1️⃣  SQL Injection (TAINTED_DATA → SQL_INJECTION)
+------------------------------------------------------------------------
+Most common Java finding. Occurs when user input is concatenated into SQL queries.
+
+  // VULNERABLE — Never do this
+  String query = "SELECT * FROM users WHERE name='" + userInput + "'";
+  Statement stmt = conn.createStatement();
+  ResultSet rs = stmt.executeQuery(query);
+
+  // FIXED — Always use PreparedStatement
+  String query = "SELECT * FROM users WHERE name = ?";
+  PreparedStatement pstmt = conn.prepareStatement(query);
+  pstmt.setString(1, userInput);  // Parameterized — input is never
+                                  // interpreted as SQL
+  ResultSet rs = pstmt.executeQuery();
+
+------------------------------------------------------------------------
+2️⃣  Cross-Site Scripting (XSS)
+------------------------------------------------------------------------
+User input rendered in HTML without encoding allows attackers to inject JavaScript.
+
+  // VULNERABLE
+  response.getWriter().write("<h1>Hello " + request.getParameter("name")
+    + "</h1>");
+
+  // FIXED — Encode output using OWASP Java Encoder
+  import org.owasp.encoder.Encode;
+  String safeName = Encode.forHtml(request.getParameter("name"));
+  response.getWriter().write("<h1>Hello " + safeName + "</h1>");
+
+------------------------------------------------------------------------
+3️⃣  Resource Leak (RESOURCE_LEAK)
+------------------------------------------------------------------------
+Streams, database connections, and readers must always be closed. Use try-with-resources.
+
+  // VULNERABLE — connection never closed on exception
+  Connection conn = dataSource.getConnection();
+  PreparedStatement stmt = conn.prepareStatement(sql);
+  ResultSet rs = stmt.executeQuery();
+  // If exception thrown here, conn leaks!
+
+  // FIXED — try-with-resources auto-closes all
+  try (Connection conn = dataSource.getConnection();
+       PreparedStatement stmt = conn.prepareStatement(sql);
+       ResultSet rs = stmt.executeQuery()) {
+      // Use rs here
+  }  // All resources closed automatically
+
+------------------------------------------------------------------------
+4️⃣  Null Dereference (NULL_RETURNS)
+------------------------------------------------------------------------
+  // VULNERABLE
+  User user = userService.findById(id);
+  String email = user.getEmail();  // NullPointerException if not found
+
+  // FIXED — Check for null first
+  User user = userService.findById(id);
+  if (user == null) {
+      throw new UserNotFoundException("User " + id + " not found");
+  }
+  String email = user.getEmail();
+
+  // MODERN — Use Optional
+  Optional<User> userOpt = userService.findById(id);
+  String email = userOpt.map(User::getEmail)
+    .orElseThrow(() -> new UserNotFoundException(id));
+
+--------------------------------------------------
+5️⃣  Path Traversal
+--------------------------------------------------
+  // VULNERABLE
+  String filename = request.getParameter("file");
+  File file = new File("/uploads/" + filename);
+  // Attacker passes: ../../etc/passwd
+
+  // FIXED — Normalize and validate path
+  String filename = request.getParameter("file");
+  File baseDir = new File("/uploads/").getCanonicalFile();
+  File file = new File(baseDir, filename).getCanonicalFile();
+  if (!file.getPath().startsWith(baseDir.getPath())) {
+      throw new SecurityException("Path traversal detected!");
+  }
+
+--------------------------------------------------
+6️⃣  Hardcoded Credentials (HARDCODED_CREDENTIALS)
+--------------------------------------------------
+  // VULNERABLE — never commit credentials to code
+  String password = "SuperSecret123!";
+  String apiKey = "sk-prod-abc123xyz";
+
+  // FIXED — Load from environment variables
+  String password = System.getenv("DB_PASSWORD");
+
+  // Or use Spring Boot configuration
+  // In application.properties: db.password=${DB_PASSWORD}
+  // In Java: @Value("${db.password}") private String password;
+
+  // Or use a secrets manager (AWS Secrets Manager, HashiCorp Vault)
+
+--------------------------------------------------
+7️⃣  Weak Cryptography
+--------------------------------------------------
+  // VULNERABLE — MD5 and SHA-1 are cryptographically broken
+  MessageDigest md = MessageDigest.getInstance("MD5");
+  MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+
+  // VULNERABLE — DES is a broken encryption algorithm
+  Cipher cipher = Cipher.getInstance("DES");
+
+  // FIXED — Use strong algorithms
+  MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+  MessageDigest sha3 = MessageDigest.getInstance("SHA3-256");
+
+  // For password hashing — use bcrypt, not SHA
+  import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+  BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+  String hash = encoder.encode(rawPassword);
+
+  // For encryption — use AES-256-GCM
+  Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+
+
+================================================================================
+SUPPRESSING FALSE POSITIVES
+================================================================================
+------------------------------------------------------------------------
+1️⃣ When to Suppress
+------------------------------------------------------------------------
+Not every finding is a real vulnerability. Polaris can flag code that is intentionally designed in a certain way. Suppression should ONLY be done when:
+  • The finding is confirmed to be a false positive after thorough analysis
+  • The code pattern is a known-safe implementation (e.g., a custom sanitizer that Polaris doesn't recognize)
+  • Business logic intentionally accepts certain risks with documented justification
+
+IMPORTANT WARNING:
+✔️ Never suppress findings to simply clear your dashboard. Every suppression should be reviewed by the security team and documented with justification.
+✔️ Suppressing a real vulnerability creates a false sense of security and is a common audit failure point.
+
+
+-----------------------------
+2️⃣  Java Inline Suppression
+-----------------------------
+  // Suppress a specific checker for the next statement
+  @SuppressWarnings("coverity:TAINTED_DATA")
+  public String processInput(String input) {
+      // Polaris knows this method is a sanitizer
+      return myCustomSanitizer.clean(input);
+  }
+
+  // Suppress with justification comment (best practice)
+  // coverity[TAINTED_DATA] : False positive — input validated by
+  //                          validateUserInput() above
+  return dao.query(input);
+
+
+------------------------------------------------------------------------
+3️⃣  Suppressing via Web UI
+------------------------------------------------------------------------
+In the Polaris web portal, open an issue and set the Triage status to Dismissed. You must provide a justification reason. This is tracked in audit history and is the preferred method for team environments.
+
+------------------------------------------------------------------------
+4️⃣  Suppressing via polaris.yml
+------------------------------------------------------------------------
+
+  analyze:
+    checkers:
+      java:
+        enabled: true
+        filters:
+          # Ignore a specific file from scanning
+          - pathPattern: "**/generated/**"
+            enabled: false
+          # Ignore test files for specific checker
+          - pathPattern: "**/test/**"
+            checker: HARDCODED_CREDENTIALS
+            enabled: false
+
+
+================================================================================
+ ADVANCED TOPICS
+================================================================================
+------------------------------------------------------------------------
+1️⃣  Differential Scans (Scanning Only Changed Code)
+------------------------------------------------------------------------
+For large codebases, scanning everything on every PR is time-consuming. Polaris supports differential scanning — only analyzing code changed since the last full scan. Configure in polaris.yml:
+
+  analyze:
+    mode: incremental    # Only analyze changed files
+    # OR
+    mode: full           # Analyze entire codebase (default, required for
+                         # first run)
+In CI/CD pipelines, a common pattern is: run full scans on main branch merges, and incremental scans on pull requests.
+
+
+------------------------------------------------------------------------
+2️⃣  Branch Comparison
+------------------------------------------------------------------------
+Polaris tracks issues per branch. When you create a PR from  feature/login-fix to main, Polaris shows you only the new issues introduced in your branch — not issues that existed before. This prevents alert fatigue and focuses developers on what they broke.
+
+
+------------------------------------------------------------------------
+3️⃣  Polaris REST API for Automation
+------------------------------------------------------------------------
+
+The Polaris REST API lets you automate workflows. Common use cases include
+auto-creating Jira tickets for Critical findings, generating weekly
+security reports, and blocking deployments programmatically.
+
+  # List all projects
+  curl -H "Authorization: Bearer $POLARIS_ACCESS_TOKEN" \"$POLARIS_SERVER_URL/api/v0/projects"
+
+  # Get issues for a project branch
+  curl -H "Authorization: Bearer $POLARIS_ACCESS_TOKEN" \ "$POLARIS_SERVER_URL/api/v0/issues?projectId=123&branchId=456"
+
+  # Get issue counts by severity
+  curl -H "Authorization: Bearer $POLARIS_ACCESS_TOKEN" \"$POLARIS_SERVER_URL/api/v0/issues/summary?projectId=123"
+
+
+------------------------------------------------------------------------
+4️⃣  IDE Integration (IntelliJ / VS Code)
+------------------------------------------------------------------------
+
+Polaris can show findings directly in your IDE so developers fix issues
+before committing. The SARIF output file generated by Polaris can be
+loaded into:
+
+  • IntelliJ IDEA : Use the SARIF Viewer plugin or the Synopsys Security
+                    plugin
+  • VS Code       : Use the SARIF Viewer extension (Microsoft) — load
+                    .polaris/polaris-results.sarif
+  • Eclipse       : Use the Synopsys Code Sight plugin for real-time
+                    feedback
+
+Enable SARIF output in polaris.yml:
+
+  reporting:
+    sarif:
+      create: true
+      output: .polaris/results.sarif
+
+
+------------------------------------------------------------------------
+5️⃣ Quality Gates — Failing Builds on New Issues
+------------------------------------------------------------------------
+Quality gates prevent new vulnerabilities from being merged. Configure
+Polaris to fail your CI build:
+
+  # In polaris.yml — define your quality gate
+  exit:
+    criteria:
+      - severity: critical
+        count: 0        # Zero critical issues allowed
+      - severity: high
+        count: 0        # Zero high issues allowed
+        onlyNew: true   # Only count issues new in this branch
+
+
+=======================================
+BEST PRACTICES & WORKFLOW
+=======================================
+-------------------------------
+1️⃣  Recommended Team Workflow
+-------------------------------
+  1. Initial baseline scan: Run a full scan on your main branch. Triage existing findings — this establishes your baseline.
+  2. Enable on PRs: Configure Polaris to scan every pull request. Use incremental mode for speed.
+  3. Set quality gates: Block merges if new Critical or High issues are introduced.
+  4. Weekly full scans: Schedule a full scan on main every weekend to catch anything incremental missed.
+  5. Regular triage meetings: Hold bi-weekly sessions where the team reviews and triages new findings together.
+  6. Track metrics: Monitor your trend — are you reducing the total issue count over time?
+
+
+-------------------------------
+2️⃣  Polaris in the Secure SDLC
+-------------------------------
+Polaris fits into the Secure Software Development Lifecycle (SSDLC) at the 'Code' and 'Build' phases:
+  • Design phase  : Use threat modeling to identify what code areas Polaris should monitor most closely
+  • Code phase    : Developers use IDE plugins to catch issues while typing (shift-left security)
+  • Build phase   : CI/CD pipeline runs Polaris scan and enforces quality gates
+  • Test phase    : Combine with DAST (dynamic testing) for complete coverage
+  • Release phase : Polaris scan result is part of release checklist — all Critical issues resolved
+
+
+-------------------------------
+3️⃣  Common Mistakes to Avoid
+-------------------------------
+  Mistake                   | Why It Hurts
+  --------------------------|-------------------------------------------
+  Ignoring findings         | Every finding should be triaged. Do not let the backlog grow unreviewed.
+  Suppressing without review| Never dismiss issues just to clear numbers without security team sign-off.
+  Scanning only main branch | Scan PRs too — you want to catch issues before merge, not after.
+  Not reading event traces  | The full trace is your fix guide. Developers who skip it miss the root cause.
+  Using only Polaris        | SAST is not sufficient alone. Combine with SCA (Black Duck), DAST, and pen testing.
+  Outdated CLI version      | Keep the Polaris CLI updated — new checkers and bug fixes are released regularly.
+
+
+-------------------------------
+  Essential CLI Commands
+-------------------------------
+  Command                                         | What It Does
+  ------------------------------------------------|---------------------------
+  polaris analyze -w                              | Run full scan and wait for results
+  polaris --verbose analyze -w                    | Run scan with debug output
+  polaris analyze --incremental -w                | Scan only changed files
+  polaris check-results --fail-on-severity high   | Return exit code 1 if high+ issues found
+  polaris list-projects                           | Show all projects in your Polaris account
+  polaris configure --url URL --token TOKEN       | Configure CLI credentials
+
